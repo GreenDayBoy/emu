@@ -333,11 +333,11 @@ void game_t::onCharacterMoveRequest(gameServerUser_t &user,
 
 			m_protocol.sendViewportObjectMoveRequest(character);
 		} else {
-			m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " [" << character.getName() << "] Invalid path for character.";
+			m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " [" << character << "] Invalid path for character.";
 			m_logger.out();
 
 			#ifdef _DEBUG
-			m_logger.in(eMUCore::logger_t::_MESSAGE_DEBUG) << user << " [" << character.getName() << "] Path dump: " 
+			m_logger.in(eMUCore::logger_t::_MESSAGE_DEBUG) << user << " [" << character << "] Path dump: " 
 															<< m_mapManager[character.getMapId()].dumpPath(path) << ".";
 			m_logger.out();
 			#endif
@@ -351,7 +351,7 @@ void game_t::onCharacterTeleportRequest(gameServerUser_t &user,
 										unsigned short gateId) {
 	character_t &character = user.getCharacter();
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " [" << character.getName() << "] Requested teleport to gate [" << gateId << "].";
+	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << "[" << character << "] Requested teleport to gate [" << gateId << "].";
 	m_logger.out();
 
 	gate_t &gate = m_gateManager[gateId];
@@ -486,7 +486,7 @@ void game_t::teleportCharacter(gameServerUser_t &user,
 								unsigned char gateId) {
 	character_t &character = user.getCharacter();
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Character ["	<< character.getName() << "] Teleporting to"
+	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << "[" << character << "] Teleporting to"
 													<< " [" << static_cast<int>(mapId) << "]["
 													<< static_cast<int>(x) << "][" << static_cast<int>(y) << "].";
 	m_logger.out();
