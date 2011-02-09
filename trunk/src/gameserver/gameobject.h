@@ -19,7 +19,7 @@ public:
 	virtual ~gameObject_t() {}
 
 	friend std::ostream& operator<<(std::ostream &out, const gameObject_t &object) {
-		out << object.m_name;
+		out << "[" << object.m_name << "]";
 		return out;
 	}
 

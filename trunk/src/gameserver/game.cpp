@@ -190,10 +190,8 @@ void game_t::onCharacterCreateAnswer(unsigned int connectionStamp,
 										unsigned char result) {
 	gameServerUser_t &user = m_userManager.find(connectionStamp);
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user;
-
 	if(result != 0x02) {
-		m_logger.append() << " Character [" << name << "]";
+		m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Character [" << name << "]";
 
 		int slot = 0;
 
@@ -208,7 +206,7 @@ void game_t::onCharacterCreateAnswer(unsigned int connectionStamp,
 
 		m_protocol.sendCharacterCreteAnswer(user, result, name, slot, 1, race);
 	} else {
-		m_logger.append() << " account already have 5 characters.";
+		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " already have 5 characters.";
 		m_logger.out();
 
 		m_disconnectCallback(user);
@@ -236,9 +234,9 @@ void game_t::onCharacterDeleteAnswer(unsigned int connectionStamp,
 										unsigned char result) {
 	gameServerUser_t &user = m_userManager.find(connectionStamp);
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Character [" << name << "]";
-
 	if(result != 0x00) {
+		m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Character [" << name << "]";
+
 		if(result == 0x01) { // ok.
 			m_logger.append() << " deleted.";
 			user.deleteFromCharacterList(name);
@@ -250,7 +248,8 @@ void game_t::onCharacterDeleteAnswer(unsigned int connectionStamp,
 
 		m_protocol.sendCharacterDeleteAnswer(user, result);
 	} else {
-		m_logger.append() << " not associated with account.";
+		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " Character [" << name << "]"
+														<< " not associated with account.";
 		m_logger.out();
 
 		m_disconnectCallback(user);
@@ -265,7 +264,7 @@ void game_t::onCharacterSelectRequest(gameServerUser_t &user,
 	if(!user.getCharacter().isActive()) {
 		m_dataServerProtocol.sendCharacterSelectRequest(user.getConnectionStamp(), user.getAccountId(), name);
 	} else {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " User is playing -> character [" << user.getCharacter().getName() << "].";
+		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " User is playing -> character " << user.getCharacter() << ".";
 		m_logger.out();
 
 		m_disconnectCallback(user);
@@ -333,11 +332,11 @@ void game_t::onCharacterMoveRequest(gameServerUser_t &user,
 
 			m_protocol.sendViewportObjectMoveRequest(character);
 		} else {
-			m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " [" << character << "] Invalid path for character.";
+			m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " " << character << " Invalid path for character.";
 			m_logger.out();
 
 			#ifdef _DEBUG
-			m_logger.in(eMUCore::logger_t::_MESSAGE_DEBUG) << user << " [" << character << "] Path dump: " 
+			m_logger.in(eMUCore::logger_t::_MESSAGE_DEBUG) << user << " " << character << " Path dump: " 
 															<< m_mapManager[character.getMapId()].dumpPath(path) << ".";
 			m_logger.out();
 			#endif
@@ -351,7 +350,7 @@ void game_t::onCharacterTeleportRequest(gameServerUser_t &user,
 										unsigned short gateId) {
 	character_t &character = user.getCharacter();
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << "[" << character << "] Requested teleport to gate [" << gateId << "].";
+	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " " << character << " Requested teleport to gate [" << gateId << "].";
 	m_logger.out();
 
 	gate_t &gate = m_gateManager[gateId];
@@ -438,7 +437,7 @@ void game_t::checkSelfClose() {
 }
 
 void game_t::saveCharacter(gameServerUser_t &user) const {
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Saving character :: name [" << user.getCharacter().getName() << "].";
+	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Saving character :: name " << user.getCharacter() << ".";
 	m_logger.out();
 
 	character_t &character = user.getCharacter();
@@ -486,7 +485,7 @@ void game_t::teleportCharacter(gameServerUser_t &user,
 								unsigned char gateId) {
 	character_t &character = user.getCharacter();
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << "[" << character << "] Teleporting to"
+	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " " << character << " Teleporting to"
 													<< " [" << static_cast<int>(mapId) << "]["
 													<< static_cast<int>(x) << "][" << static_cast<int>(y) << "].";
 	m_logger.out();

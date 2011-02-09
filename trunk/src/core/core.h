@@ -245,7 +245,8 @@ public:
 	socketContext_t(int index);
 	virtual ~socketContext_t() {}
 
-	void close();
+	void preClose();
+	void postClose();
 
 	friend std::ostream& operator<<(std::ostream &out, const socketContext_t &context) {
 		out << "[" << context.m_index << "][" << context.m_ipAddress << "]";
@@ -421,42 +422,21 @@ private:
 	callback_t						m_onAllocate;
 };
 
-class eMUCORE_DECLSPEC tcpClient_t {
+class eMUCORE_DECLSPEC tcpClient_t: public socketContext_t {
 public:
-	typedef boost::function0<void> onConnect_t;
-	typedef boost::function0<void> onClose_t;
-	typedef boost::function2<void, unsigned char*, size_t> onReceive_t;
-
-	tcpClient_t(logger_t &logger,
-				synchronizer_t &synchronizer,
-				const onConnect_t &onConnect,
-				const onReceive_t &onReceive,
-				const onClose_t &onClose);
-
+	tcpClient_t(logger_t &logger, iocpEngine_t &iocpEngine);
 	~tcpClient_t();
 
-	bool connect(const std::string &hostname, unsigned short port) throw(eMUCore::exception_t);
-	void close();
-	void send(const unsigned char *data, size_t dataSize) const;
-	void worker();
-	inline bool isActive() const { return m_active; }
-	inline const std::string& getHostname() const { return m_hostname; }
-	inline unsigned short getPort() const { return m_port; }
+	bool connect(const std::string &address, unsigned short port) throw(eMUCore::exception_t);
+	inline void disconnect() { m_iocpEngine.detach(*this); }
 
 private:
 	tcpClient_t();
 	tcpClient_t(const tcpClient_t&);
 	tcpClient_t& operator=(const tcpClient_t&);
 
-	std::string		m_hostname;
 	logger_t		&m_logger;
-	synchronizer_t	&m_synchronizer;
-	SOCKET			m_socket;
-	unsigned short	m_port;
-	bool			m_active;
-	onConnect_t		m_onConnect;
-	onReceive_t		m_onReceive;
-	onClose_t		m_onClose;
+	iocpEngine_t	&m_iocpEngine;
 };
 
 class eMUCORE_DECLSPEC udpSocket_t {

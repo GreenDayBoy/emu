@@ -30,7 +30,7 @@ public:
 	void onDatagramReceive(sockaddr_in& /*inetAddr*/, unsigned char * /*data*/, size_t /*dataSize*/) {}
 
 	void onTcpClientConnect();
-	void onTcpClientReceive(unsigned char* data, size_t dataSize);
+	void onTcpClientReceive();
 	void onTcpClientClose();
 
 	void send(gameServerUser_t &user, eMUCore::packet_t &packet);

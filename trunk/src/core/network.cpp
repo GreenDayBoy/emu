@@ -41,13 +41,16 @@ socketContext_t::socketContext_t(int index):
   m_port(0) {}
 
 
-void socketContext_t::close() {
+void socketContext_t::preClose() {
 	this->setInactive();
 	closesocket(m_socket);
 	m_socket = INVALID_SOCKET;
 	m_recvBuffer.clearData();
 	m_sendBuffer.clearData();
 	m_sendBuffer.clearSecondData();
+}
+
+void socketContext_t::postClose() {
 	m_ipAddress = "";
 	m_port = 0;
 }
@@ -137,7 +140,8 @@ void iocpEngine_t::attach(socketContext_t &context) const {
 															<< " WSARecv() failed with error#" << wsaLastError << ".";
 				m_logger.out();
 				// Serwer nie wie, ze obiekt zostal polaczony, wiec wystarczy go tylko zamknac bez uruchamiania OnClose() callback.
-				context.close();
+				context.preClose();
+				context.postClose();
 			} else {
 				context.setActive();
 				context.onAttach();
@@ -151,7 +155,8 @@ void iocpEngine_t::attach(socketContext_t &context) const {
 												<< " Attach socket context to completion port failed with error#" << GetLastError() << ".";
 		m_logger.out();
 		// Serwer nie wie, ze obiekt zostal polaczony, wiec wystarczy tylko zamknac bez uruchamiania OnClose() callback.
-		context.close();
+		context.preClose();
+		context.postClose();
 	}
 
 	m_synchronizer.unlock();
@@ -166,8 +171,9 @@ void iocpEngine_t::detach(socketContext_t &context) const {
 												<< " Detach socket context from completion port failed with error#" << GetLastError() << ".";
 		m_logger.out();
 		// ----------------
+		context.preClose();
 		context.onClose();
-		context.close();
+		context.postClose();
 	}
 }
 
@@ -249,8 +255,9 @@ void iocpEngine_t::dequeueReceive(socketContext_t &context) const {
 	} else if(context.getRecvBuffer().m_dataSize == 0) {
 		// ----------------
 		if(context.isActive()) {
+			context.preClose();
 			context.onClose();
-			context.close();
+			context.postClose();
 		}
 	}
 }
@@ -302,8 +309,9 @@ void iocpEngine_t::dequeueError(socketContext_t &context, int lastError) const {
 	// ---------------------------------
 	// Error - check is context cleaned.
 	if(context.isActive()) {
+		context.preClose();
 		context.onClose();
-		context.close();
+		context.postClose();
 	}
 }
 
@@ -457,22 +465,15 @@ DWORD tcpServer_t::worker(tcpServer_t *instance) {
 	return 0;
 }
 
-tcpClient_t::tcpClient_t(logger_t &logger,
-							synchronizer_t &synchronizer,
-							const onConnect_t &onConnect,
-							const onReceive_t &onReceive,
-							const onClose_t &onClose):
+tcpClient_t::tcpClient_t(logger_t &logger, iocpEngine_t &iocpEngine):
+  socketContext_t(-1),
   m_logger(logger),
-  m_synchronizer(synchronizer),
-  m_onConnect(onConnect),
-  m_onReceive(onReceive),
-  m_onClose(onClose) {}
+  m_iocpEngine(iocpEngine) {}
 
 tcpClient_t::~tcpClient_t() {
-	this->close();
 }
 
-bool tcpClient_t::connect(const std::string &hostname, unsigned short port) throw(eMUCore::exception_t) {
+bool tcpClient_t::connect(const std::string &address, unsigned short port) throw(eMUCore::exception_t) {
 	m_socket = WSASocket(AF_INET,
 							SOCK_STREAM,
 							IPPROTO_TCP,
@@ -484,24 +485,23 @@ bool tcpClient_t::connect(const std::string &hostname, unsigned short port) thro
 		sockaddr_in inetAddr = {0};
 		inetAddr.sin_family = AF_INET;
 		inetAddr.sin_port = htons(port);
-		inetAddr.sin_addr.S_un.S_addr = inet_addr(hostname.c_str());
+		inetAddr.sin_addr.S_un.S_addr = inet_addr(address.c_str());
 
 		if(inetAddr.sin_addr.S_un.S_addr == INADDR_NONE) {
-			hostent *h = gethostbyname(hostname.c_str());
+			hostent *h = gethostbyname(address.c_str());
 			if(h != NULL) {
 				inetAddr.sin_addr.S_un.S_addr = *(reinterpret_cast<u_long*>(h->h_addr_list[0]));
 			} else {
 				exception_t e;
-				e.in() << __FILE__ << ":" << __LINE__ << "[tcpClient_t::connect()] Invalid hostname " << hostname << " specified.";
+				e.in() << __FILE__ << ":" << __LINE__ << "[tcpClient_t::connect()] Invalid address " << address << " specified.";
 				throw e;
 			}
 		}
 
 		if(::connect(m_socket, (sockaddr*)&inetAddr, sizeof(inetAddr)) != SOCKET_ERROR) {
-			m_hostname = hostname;
+			m_ipAddress = address;
 			m_port = port;
-			m_active = true;
-			m_onConnect();
+			m_iocpEngine.attach(*this);
 			return true;
 		} else {
 			unsigned int wsaLastError = WSAGetLastError();
@@ -521,79 +521,6 @@ bool tcpClient_t::connect(const std::string &hostname, unsigned short port) thro
 		exception_t e;
 		e.in() << __FILE__ << ":" << __LINE__ << "[tcpClient_t::connect()] Could not create client socket. Error #" << WSAGetLastError() << ".";
 		throw e;
-	}
-}
-
-void tcpClient_t::close() {
-	if(m_socket != INVALID_SOCKET) {
-		closesocket(m_socket);
-		m_socket = INVALID_SOCKET;
-		m_hostname = "";
-		m_port = 0;
-		m_active = false;
-	}
-}
-
-void tcpClient_t::send(const unsigned char *data, size_t dataSize) const {
-	size_t sentSize = 0;
-
-	do {
-		int ret = ::send(m_socket, reinterpret_cast<const char*>(&data[sentSize]), static_cast<int>(dataSize - sentSize), 0);
-
-		if(ret != SOCKET_ERROR) {
-			sentSize += ret;
-		} else {
-			m_logger.in(logger_t::_MESSAGE_ERROR) << "[tcpClient_t::send()] send() failed with error#" << WSAGetLastError() << "."; m_logger.out();
-			break;
-		}
-	} while(sentSize < dataSize);
-}
-
-void tcpClient_t::worker() {
-	if(m_socket != INVALID_SOCKET) {
-		timeval tv = {0, 1};
-		fd_set fdSet = {0};
-		FD_ZERO(&fdSet);
-		FD_SET(m_socket, &fdSet);
-		
-		int ret = select(1, &fdSet, NULL, NULL, &tv);
-
-		if(ret > 0) {
-			if(FD_ISSET(m_socket, &fdSet)) {
-				unsigned char buffer[c_ioDataMaxSize];
-
-				int ret = recv(m_socket, reinterpret_cast<char*>(buffer), c_ioDataMaxSize, 0);
-
-				if(ret > 0)	{
-					m_synchronizer.lock();
-					m_onReceive(buffer, ret);
-					m_synchronizer.unlock();
-				} else if(ret == 0) {
-					this->close();
-					m_onClose();
-				} else {
-					int wsaLastError = WSAGetLastError();
-
-					if(wsaLastError != WSAECONNRESET) {
-						m_logger.in(logger_t::_MESSAGE_ERROR) << "[tcpClient_t::worker()] recv() failed with error#" << wsaLastError << ".";
-						m_logger.out();
-					}
-
-					this->close();
-					m_onClose();			
-				}
-			}
-		} else if(ret == SOCKET_ERROR) {
-			int wsaLastError = WSAGetLastError();
-
-			if(wsaLastError != WSAECONNRESET) {
-				m_logger.in(logger_t::_MESSAGE_ERROR) << "[tcpClient_t::worker()] select() failed with error#" << wsaLastError << ".";
-				m_logger.out();
-			} else {
-				this->close();
-				m_onClose();
-			}
-		}
 	}
 }
 

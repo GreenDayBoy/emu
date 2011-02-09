@@ -19,10 +19,7 @@ gameServer_t::gameServer_t(size_t maxStoredLogsCount,
   m_iocpEngine(m_logger,
 				m_synchronizer),
   m_tcpClient(m_logger,
-				m_synchronizer,
-				boost::bind(&gameServer_t::onTcpClientConnect, this),
-				boost::bind(&gameServer_t::onTcpClientReceive, this, _1, _2),
-				boost::bind(&gameServer_t::onTcpClientClose, this)),
+				m_iocpEngine),
   m_tcpServer(m_logger,
 				m_iocpEngine,
 				boost::bind(&gameServer_t::onContextAllocate, this),
@@ -62,11 +59,14 @@ void gameServer_t::startup() {
 	m_logger.out();
 	m_game.startup();
 
-	this->dataServerConnect();
-
 	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Starting iocp engine.";
 	m_logger.out();
 	m_iocpEngine.startup();
+
+	m_tcpClient.setCallbacks(boost::bind(&gameServer_t::onTcpClientConnect, this),
+								boost::bind(&gameServer_t::onTcpClientReceive, this),
+								boost::bind(&gameServer_t::onTcpClientClose, this));
+	this->dataServerConnect();
 
 	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Starting tcp server on port " << m_tcpServer.getListenPort() << ".";
 	m_logger.out();
@@ -106,7 +106,6 @@ void gameServer_t::dataServerConnect() {
 
 void gameServer_t::worker() {
 	while(!m_interrupt) {
-		m_tcpClient.worker();
 		m_udpSocket.worker();
 		m_scheduler.worker();
 		Sleep(1);
@@ -118,7 +117,7 @@ void gameServer_t::updateWindowTitle() const {
 	titleStream << "[GameServer] ::"
 				<< " [Users: " << m_userCount << "/" << m_userManager.getCount() << "] ::"
 				<< " [Port: " << m_tcpServer.getListenPort() << "] ::"
-				<< " [DataServer: " << m_tcpClient.getHostname() << ":" << m_tcpClient.getPort() << "] ::"
+				<< " [DataServer: " << m_tcpClient.getIpAddress() << ":" << m_tcpClient.getPort() << "] ::"
 				<< " [Version: " << m_versionConfiguration.m_version << "] ::"
 				<< " [Serial: " << m_versionConfiguration.m_serial << "]";
 
@@ -290,7 +289,7 @@ void gameServer_t::onContextClose(eMUCore::socketContext_t &context) {
 
 void gameServer_t::onTcpClientConnect() {
 	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Connected to dataserver " 
-													<< m_tcpClient.getHostname() << ":" << m_tcpClient.getPort() << ".";
+													<< m_tcpClient.getIpAddress() << ":" << m_tcpClient.getPort() << ".";
 	m_logger.out();
 
 	if(!m_packetQueue.empty()) {
@@ -309,12 +308,12 @@ void gameServer_t::onTcpClientConnect() {
 	this->updateWindowTitle();
 }
 
-void gameServer_t::onTcpClientReceive(unsigned char* data, size_t dataSize) {
+void gameServer_t::onTcpClientReceive() {
 	try {
 		size_t parsedDataSize = 0;
 
 		do {
-			eMUCore::packet_t packet(&data[parsedDataSize]);
+			eMUCore::packet_t packet(&m_tcpClient.getRecvBuffer().m_data[parsedDataSize]);
 
 			#ifdef _DEBUG
 			m_logger.in(eMUCore::logger_t::_MESSAGE_PROTOCOL) << "[DataServer] Received " << packet << ".";
@@ -326,7 +325,7 @@ void gameServer_t::onTcpClientReceive(unsigned char* data, size_t dataSize) {
 			// -----------------------------------
 
 			parsedDataSize += packet.getSize();
-		} while(parsedDataSize < dataSize);
+		} while(parsedDataSize < m_tcpClient.getRecvBuffer().m_dataSize);
 	} catch(eMUCore::exception_t &e) {
 		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << "Exception: [DataServer] " << e.what();
 		m_logger.out();
@@ -386,7 +385,7 @@ void gameServer_t::sendDataServer(const eMUCore::packet_t &packet) {
 		m_logger.out();
 		#endif
 
-		m_tcpClient.send(packet.getData(), packet.getSize());
+		m_iocpEngine.write(m_tcpClient, packet.getData(), packet.getSize());
 	}
 	else {
 		m_packetQueue.push_back(packet);
