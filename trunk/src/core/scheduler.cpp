@@ -2,6 +2,9 @@
 
 using namespace eMUCore;
 
+scheduler_t::scheduler_t(synchronizer_t &synchronizer):
+  m_synchronizer(synchronizer) {}
+
 void scheduler_t::insert(scheduleType_t type, const boost::function0<void> &callback, time_t delay) {
 	schedule_t schedule = {callback, type, delay, 0};
 	m_list.push_back(schedule);

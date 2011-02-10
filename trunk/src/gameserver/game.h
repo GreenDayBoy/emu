@@ -26,6 +26,7 @@ public:
 			const disconnectCallback_t &disconnectCallback);
 
 	void startup();
+	void cleanup();
 
 	void onClientClose(gameServerUser_t &user);
 	void onCharacterLeave(gameServerUser_t &user);

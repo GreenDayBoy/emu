@@ -8,10 +8,6 @@ xmlConfig_t::xmlConfig_t():
   m_node(NULL),
   m_firstIteration(true) {}
 
-xmlConfig_t::~xmlConfig_t() {
-	xmlFreeDoc(m_configFile);
-}
-
 void xmlConfig_t::open(const std::string &fileName, const std::string &rootNodeName) throw(eMUCore::exception_t) {
 	m_configFile = xmlReadFile(fileName.c_str(), NULL, XML_PARSE_NOBLANKS);
 
@@ -37,6 +33,10 @@ void xmlConfig_t::open(const std::string &fileName, const std::string &rootNodeN
 		e.in() << __FILE__ << ":" << __LINE__ << "[xmlConfig_t::xmlConfig_t()] Could not open " << fileName << " file.";
 		throw e;
 	}
+}
+
+void xmlConfig_t::close() {
+	xmlFreeDoc(m_configFile);
 }
 
 bool xmlConfig_t::nextNode() {

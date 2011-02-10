@@ -12,18 +12,14 @@ public:
 	dataServer_t(size_t maxStoredLogsCount,
 					size_t userMax,
 					unsigned short port);
-	~dataServer_t();
-
 	void startup();
+	void cleanup();
 	void worker();
 	void updateWindowTitle() const;
-
 	dataServerUser_t* onContextAllocate();
-
 	void onContextAttach(eMUCore::socketContext_t &context);
 	void onContextReceive(eMUCore::socketContext_t &context);
 	void onContextClose(eMUCore::socketContext_t &context);
-
 	void send(dataServerUser_t &user, const eMUCore::packet_t &packet);
 	void disconnect(dataServerUser_t &user) { m_iocpEngine.detach(user); }
 

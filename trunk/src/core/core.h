@@ -55,7 +55,7 @@ public:
 
 	exception_t(const exception_t &e) { m_stream << e.m_stream.rdbuf(); }
 
-	~exception_t() {}
+	virtual ~exception_t() {}
 
 	inline std::stringstream& in() {
 		m_stream.str("");
@@ -139,11 +139,6 @@ private:
 #define _PROFILE
 #endif
 
-extern const std::string c_loggerMessageHeader[];
-extern const std::string c_loggerMessageCSSClass[];
-extern const std::string c_loggerMessageIconPath[];
-extern const unsigned char c_loggerMessageColor[];
-
 class eMUCORE_DECLSPEC logger_t {
 public:
 	enum logMessageType_t {
@@ -155,9 +150,9 @@ public:
 	};
 
 	logger_t(const std::string &fileName, size_t maxStoredLogsCount);
-	~logger_t();
 
 	void startup() throw(eMUCore::exception_t);
+	void cleanup();
 	std::stringstream& in(logMessageType_t logMessageType);
 	inline std::stringstream& append() { return m_stream; }
 	void out();
@@ -179,6 +174,11 @@ private:
 	size_t					m_storedLogCount;
 	logMessageType_t		m_currentMessageType;
 	HANDLE					m_stdOutput;
+
+	static const std::string c_loggerMessageHeader[];
+	static const std::string c_loggerMessageCSSClass[];
+	static const std::string c_loggerMessageIconPath[];
+	static const unsigned char c_loggerMessageColor[];
 };
 
 const size_t c_ioDataMaxSize = 8192;
@@ -307,13 +307,14 @@ private:
 template<typename T>
 class socketContextManager_t {
 public:
-	socketContextManager_t() {}
+	socketContextManager_t(size_t count) {
+		m_list.reserve(count);
+	}
 
-	socketContextManager_t(size_t size,
-						const socketContext_t::callback_t &onAttach,
-						const socketContext_t::callback_t &onReceive,
-						const socketContext_t::callback_t &onClose) {
-		for(size_t i = 0; i < size; ++i) {
+	void startup(const socketContext_t::callback_t &onAttach,
+					const socketContext_t::callback_t &onReceive,
+					const socketContext_t::callback_t &onClose) {
+		for(size_t i = 0; i < m_list.capacity(); ++i) {
 			T *ctx = new T(i);
 			ctx->setCallbacks(onAttach, onReceive, onClose);
 
@@ -321,7 +322,7 @@ public:
 		}
 	}
 
-	~socketContextManager_t() {
+	void cleanup() {
 		for(size_t i = 0; i < m_list.size(); ++i) {
 			delete m_list[i];
 		}
@@ -356,6 +357,7 @@ public:
 	}
 
 private:
+	socketContextManager_t();
 	socketContextManager_t(const socketContextManager_t&);
 	socketContextManager_t& operator=(const socketContextManager_t&);
 
@@ -367,9 +369,8 @@ public:
 	iocpEngine_t(logger_t &logger,
 					synchronizer_t &synchronizer);
 
-	~iocpEngine_t();
-
 	void startup() throw(eMUCore::exception_t);
+	void cleanup();
 	void attach(socketContext_t &context) const;
 	void detach(socketContext_t &context) const;
 	void write(socketContext_t &context, const unsigned char *data, size_t dataSize) const;
@@ -401,9 +402,8 @@ public:
 				const callback_t &onAllocate,
 				unsigned short listenPort);
 
-	~tcpServer_t();
-
 	void startup() throw (eMUCore::exception_t);
+	void cleanup();
 
 	inline unsigned short getListenPort() const { return m_listenPort; }
 
@@ -425,7 +425,6 @@ private:
 class eMUCORE_DECLSPEC tcpClient_t: public socketContext_t {
 public:
 	tcpClient_t(logger_t &logger, iocpEngine_t &iocpEngine);
-	~tcpClient_t();
 
 	bool connect(const std::string &address, unsigned short port) throw(eMUCore::exception_t);
 	inline void disconnect() { m_iocpEngine.detach(*this); }
@@ -447,12 +446,9 @@ public:
 				const callback_t &onReceive,
 				unsigned short port);
 
-	~udpSocket_t();
-
 	void startup() throw(eMUCore::exception_t);
-
+	void cleanup();
 	void worker() const;
-
 	void send(std::string hostname,
 				unsigned short port,
 				const unsigned char *buffer,
@@ -474,9 +470,9 @@ private:
 class eMUCORE_DECLSPEC xmlConfig_t {
 public:
 	xmlConfig_t();
-	~xmlConfig_t();
 
 	void open(const std::string &fileName, const std::string &rootNodeName) throw(eMUCore::exception_t);
+	void close();
 
 	template <typename T>
 	T readFromNode(const std::string &nodeName, const T &defaultValue) {
@@ -633,8 +629,7 @@ public:
 		_SCHEDULE_NONSYNCHRONIZED
 	};
 
-	scheduler_t(synchronizer_t &synchronizer):
-	  m_synchronizer(synchronizer) {}
+	scheduler_t(synchronizer_t &synchronizer);
 
 	void insert(scheduleType_t type, const boost::function0<void> &callback, time_t delay);
 	void worker();

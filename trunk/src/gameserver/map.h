@@ -67,9 +67,9 @@ public:
 	typedef std::map<int, map_t*> mapList_t;
 
 	mapManager_t() {}
-	~mapManager_t();
 
 	void startup(const std::string &filename);
+	void cleanup();
 	map_t& operator[](int mapId);
 	bool isMapExists(int mapId);
 

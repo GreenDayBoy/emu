@@ -25,6 +25,10 @@ void game_t::startup() {
 						300);
 }
 
+void game_t::cleanup() {
+	m_database.cleanup();
+}
+
 void game_t::onAccountCheckRequest(dataServerUser_t &user,
 									unsigned int connectionStamp,
 									const std::string &accountId,

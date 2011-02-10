@@ -31,6 +31,12 @@ void game_t::startup() {
 						1);
 }
 
+void game_t::cleanup() {
+	m_monsterManager.cleanup();
+	m_gateManager.cleanup();
+	m_mapManager.cleanup();
+}
+
 void game_t::onLoginRequest(gameServerUser_t &user,
 							const std::string &accountId,
 							const std::string &password,

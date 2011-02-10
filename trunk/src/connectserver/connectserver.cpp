@@ -9,44 +9,43 @@ bool connectServer_t::m_interrupt = false;
 connectServer_t::connectServer_t(size_t maxStoredLogsCount,
 									size_t userMax,
 									unsigned short port):
-  m_userManager(userMax,
-				boost::bind(&connectServer_t::onContextAttach, this, _1),
-				boost::bind(&connectServer_t::onContextReceive, this, _1),
-				boost::bind(&connectServer_t::onContextClose, this, _1)),
+  m_userManager(userMax),
   m_logger("log\\logs.html",
 			maxStoredLogsCount),
-			m_scheduler(m_synchronizer),
-			m_iocpEngine(m_logger,
-			m_synchronizer),
-			m_tcpServer(m_logger,
-			m_iocpEngine,
-			boost::bind(&connectServer_t::onContextAllocate, this),
-			port),
+  m_scheduler(m_synchronizer),
+  m_iocpEngine(m_logger,
+				m_synchronizer),
+  m_tcpServer(m_logger,
+				m_iocpEngine,
+				boost::bind(&connectServer_t::onContextAllocate, this),
+				port),
   m_udpSocket(m_logger,
 				boost::bind(&connectServer_t::onDatagramReceive, this, _1, _2, _3),
 				port),
   m_protocol(m_game,
 				boost::bind(&connectServer_t::send, this, _1, _2)),
-				m_game(m_logger,
-				m_scheduler,
-				m_protocol,
-				boost::bind(&connectServer_t::disconnect, this, _1)),
+  m_game(m_logger,
+			m_scheduler,
+			m_protocol,
+			boost::bind(&connectServer_t::disconnect, this, _1)),
   m_userCount(0) {}
-
-connectServer_t::~connectServer_t() {
-	this->disconnectAll();
-}
 
 void connectServer_t::startup() {
 	m_logger.startup();
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Initializing game.";
+	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Starting game.";
 	m_logger.out();
 	m_game.startup();
 
 	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Starting iocp engine.";
 	m_logger.out();
 	m_iocpEngine.startup();
+
+	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Starting user manager.";
+	m_logger.out();
+	m_userManager.startup(boost::bind(&connectServer_t::onContextAttach, this, _1),
+							boost::bind(&connectServer_t::onContextReceive, this, _1),
+							boost::bind(&connectServer_t::onContextClose, this, _1));
 
 	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Starting tcp server on port " << m_tcpServer.getListenPort() << ".";
 	m_logger.out();
@@ -60,6 +59,32 @@ void connectServer_t::startup() {
 
 	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Waiting for connections.";
 	m_logger.out();
+}
+
+void connectServer_t::cleanup() {
+	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Disconnecting all users.";
+	m_logger.out();
+	this->disconnectAll();
+
+	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Cleaning udp socket.";
+	m_logger.out();
+	m_udpSocket.cleanup();
+
+	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Cleaning tcp server.";
+	m_logger.out();
+	m_tcpServer.cleanup();
+
+	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Cleaning iocp engine.";
+	m_logger.out();
+	m_iocpEngine.cleanup();
+
+	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Cleaning user manager.";
+	m_logger.out();
+	m_userManager.cleanup();
+
+	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Cleaning logger.";
+	m_logger.out();
+	m_logger.cleanup();
 }
 
 void connectServer_t::worker() {
@@ -252,6 +277,7 @@ void main(int argsCount, char *argsVect[]) {
 																			boost::lexical_cast<unsigned short>(argsVect[3]));
 					connectServer->startup();
 					connectServer->worker();
+					connectServer->cleanup();
 					delete connectServer;
 				} else {
 					eMUCore::exception_t e;

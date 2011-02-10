@@ -18,6 +18,7 @@ public:
 			const disconnectCallback_t &disconnectCallback);
 
 	void startup();
+	void cleanup();
 
 	// --------------------------------------------------------
 	// Interface for protocolExecutorInterface_t.

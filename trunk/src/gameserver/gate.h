@@ -62,9 +62,9 @@ public:
 	typedef std::map<int, gate_t*> gateList_t;
 
 	gateManager_t() {}
-	~gateManager_t();
 
 	void startup(const std::string &filename);
+	void cleanup();
 	gate_t& operator[](int gateId);
 	bool isGateExists(int gateId) const;
 

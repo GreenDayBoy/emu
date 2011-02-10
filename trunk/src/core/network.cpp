@@ -63,28 +63,6 @@ iocpEngine_t::iocpEngine_t(logger_t &logger,
   m_ioCompletionPort(NULL),
   m_workerThreadCount(0) {}
 
-iocpEngine_t::~iocpEngine_t() {
-	if(m_workerThreadCount > 0) {
-		for(size_t i = 0; i < m_workerThreadCount; ++i) {
-			if(m_workerThread[i] != NULL) {
-				PostQueuedCompletionStatus(m_ioCompletionPort, 0, NULL, NULL);
-			}
-		}
-
-		WaitForMultipleObjects(static_cast<DWORD>(m_workerThreadCount), m_workerThread, TRUE, INFINITE);
-
-		delete[] m_workerThread;
-
-		m_workerThread = NULL;
-		m_workerThreadCount = 0;
-	}
-
-	if(m_ioCompletionPort != NULL) {
-		CloseHandle(m_ioCompletionPort);
-		m_ioCompletionPort = NULL;
-	}
-}
-
 void iocpEngine_t::startup() {
 	m_ioCompletionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, NULL, 0);
 
@@ -114,6 +92,28 @@ void iocpEngine_t::startup() {
 		exception_t e;
 		e.in() << __FILE__ << ":" << __LINE__ << "[iocpEngine_t::iocpEngine_t()] Could not create completion port. Error #" << GetLastError() << ".";
 		throw e;
+	}
+}
+
+void iocpEngine_t::cleanup() {
+	if(m_workerThreadCount > 0) {
+		for(size_t i = 0; i < m_workerThreadCount; ++i) {
+			if(m_workerThread[i] != NULL) {
+				PostQueuedCompletionStatus(m_ioCompletionPort, 0, NULL, NULL);
+			}
+		}
+
+		WaitForMultipleObjects(static_cast<DWORD>(m_workerThreadCount), m_workerThread, TRUE, INFINITE);
+
+		delete[] m_workerThread;
+
+		m_workerThread = NULL;
+		m_workerThreadCount = 0;
+	}
+
+	if(m_ioCompletionPort != NULL) {
+		CloseHandle(m_ioCompletionPort);
+		m_ioCompletionPort = NULL;
 	}
 }
 
@@ -377,18 +377,6 @@ tcpServer_t::tcpServer_t(logger_t &logger,
   m_listenPort(listenPort),
   m_onAllocate(onAllocate) {}
 
-tcpServer_t::~tcpServer_t() {
-	if(m_acceptWorkerThread != NULL) {
-		TerminateThread(m_acceptWorkerThread, 0);
-		m_acceptWorkerThread = NULL;
-	}
-
-	if(m_socket != INVALID_SOCKET) {
-		closesocket(m_socket);
-		m_socket = INVALID_SOCKET;
-	}
-}
-
 void tcpServer_t::startup() {
 	m_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, NULL, WSA_FLAG_OVERLAPPED);
 
@@ -425,6 +413,18 @@ void tcpServer_t::startup() {
 		exception_t e;
 		e.in() << __FILE__ << ":" << __LINE__ << "[tcpServer_t::tcpServer_t()] Could not create listen socket. Error #" << WSAGetLastError() << ".";
 		throw e;
+	}
+}
+
+void tcpServer_t::cleanup() {
+	if(m_acceptWorkerThread != NULL) {
+		TerminateThread(m_acceptWorkerThread, 0);
+		m_acceptWorkerThread = NULL;
+	}
+
+	if(m_socket != INVALID_SOCKET) {
+		closesocket(m_socket);
+		m_socket = INVALID_SOCKET;
 	}
 }
 
@@ -469,9 +469,6 @@ tcpClient_t::tcpClient_t(logger_t &logger, iocpEngine_t &iocpEngine):
   socketContext_t(-1),
   m_logger(logger),
   m_iocpEngine(iocpEngine) {}
-
-tcpClient_t::~tcpClient_t() {
-}
 
 bool tcpClient_t::connect(const std::string &address, unsigned short port) throw(eMUCore::exception_t) {
 	m_socket = WSASocket(AF_INET,
@@ -532,12 +529,6 @@ udpSocket_t::udpSocket_t(logger_t &logger,
   m_socket(INVALID_SOCKET),
   m_port(port) {}
 
-udpSocket_t::~udpSocket_t() {
-	if(m_socket != INVALID_SOCKET) {
-		closesocket(m_socket);
-	}
-}
-
 void udpSocket_t::startup() {
 	m_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -556,6 +547,12 @@ void udpSocket_t::startup() {
 		exception_t e;
 		e.in() << __FILE__ << ":" << __LINE__ << "[udpSocket_t::udpSocket_t()] Could not create udp socket. Error #" << WSAGetLastError() << ".";
 		throw e;
+	}
+}
+
+void udpSocket_t::cleanup() {
+	if(m_socket != INVALID_SOCKET) {
+		closesocket(m_socket);
 	}
 }
 

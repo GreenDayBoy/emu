@@ -48,14 +48,6 @@ std::string map_t::dumpPath(const path_t &path) const {
 	return stream.str();
 }
 
-mapManager_t::~mapManager_t() {
-	for(mapList_t::iterator i = m_mapList.begin(); i != m_mapList.end(); ++i) {
-		delete i->second;
-	}
-
-	m_mapList.clear();
-}
-
 void mapManager_t::startup(const std::string &filename) {
 	eMUCore::xmlConfig_t mapFile;
 	mapFile.open(filename, "worlds");
@@ -69,6 +61,14 @@ void mapManager_t::startup(const std::string &filename) {
 
 		m_mapList[id] = map;
 	}
+}
+
+void mapManager_t::cleanup() {
+	for(mapList_t::iterator i = m_mapList.begin(); i != m_mapList.end(); ++i) {
+		delete i->second;
+	}
+
+	m_mapList.clear();
 }
 
 map_t& mapManager_t::operator[](int mapId) {

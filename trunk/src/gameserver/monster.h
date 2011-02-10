@@ -85,10 +85,10 @@ class monsterManager_t {
 public:
 	monsterManager_t(monsterAttributesManager_t	&monsterAttributesManager,
 						int startIndex);
-	~monsterManager_t();
 
 	void startup(const std::string &monstersFileName,
 					const boost::function1<void, monster_t*> &registerObjectCallback);
+	void cleanup();
 	size_t getCount() const { return m_monsterList.size(); }
 
 	monster_t& operator[](int index) { return *m_monsterList[index - m_startIndex]; }

@@ -4,29 +4,29 @@
 
 using namespace eMUCore;
 
-const std::string eMUCore::c_loggerMessageHeader[]	= {"[Debug] ",
-														"[Info] ",
-														"[Warning] ",
-														"[Error] ",
-														"[Protocol] "};
+const std::string eMUCore::logger_t::c_loggerMessageHeader[]	= {"[Debug] ",
+																	"[Info] ",
+																	"[Warning] ",
+																	"[Error] ",
+																	"[Protocol] "};
 
-const std::string eMUCore::c_loggerMessageCSSClass[] = {"msg_debug",
-														"msg_information",
-														"msg_warning",
-														"msg_error",
-														"msg_protocol"};
+const std::string eMUCore::logger_t::c_loggerMessageCSSClass[] = {"msg_debug",
+																	"msg_information",
+																	"msg_warning",
+																	"msg_error",
+																	"msg_protocol"};
 
-const std::string eMUCore::c_loggerMessageIconPath[] = {"images/icon_debug.png",
-														"images/icon_information.png",
-														"images/icon_warning.png",
-														"images/icon_error.png",
-														"images/icon_protocol.png"};
+const std::string eMUCore::logger_t::c_loggerMessageIconPath[] = {"images/icon_debug.png",
+																	"images/icon_information.png",
+																	"images/icon_warning.png",
+																	"images/icon_error.png",
+																	"images/icon_protocol.png"};
 
-const unsigned char eMUCore::c_loggerMessageColor[] = {11,
-														2,
-														4,
-														12,
-														5};
+const unsigned char eMUCore::logger_t::c_loggerMessageColor[] = {11,
+																	2,
+																	4,
+																	12,
+																	5};
 
 logger_t::logger_t(const std::string &fileName, size_t maxStoredLogsCount):
   m_fileName(fileName),
@@ -35,13 +35,6 @@ logger_t::logger_t(const std::string &fileName, size_t maxStoredLogsCount):
   m_maxStoredLogCount(maxStoredLogsCount),
   m_storedLogCount(0),
   m_stdOutput(INVALID_HANDLE_VALUE) {}
-
-logger_t::~logger_t() {
-	if(m_file != NULL)	{
-		xmlSaveFile(m_fileName.c_str(), m_file);
-		xmlFreeDoc(m_file);
-	}
-}
 
 void logger_t::startup() {
 	m_file = xmlReadFile(m_fileName.c_str(), 0, XML_PARSE_NOBLANKS);
@@ -68,6 +61,13 @@ void logger_t::startup() {
 		exception_t e;
 		e.in() << __FILE__ << ":" << __LINE__ << " :: Could not open " << m_fileName << ".";
 		throw e;
+	}
+}
+
+void logger_t::cleanup() {
+	if(m_file != NULL)	{
+		xmlSaveFile(m_fileName.c_str(), m_file);
+		xmlFreeDoc(m_file);
 	}
 }
 

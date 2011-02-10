@@ -10,13 +10,13 @@
 class database_t {
 public:
 	database_t(eMUCore::logger_t &logger);
-	~database_t();
 
 	void startup(const std::string &hostname,
 					unsigned short port,
 					const std::string &dbName,
 					const std::string &userName,
 					const std::string &password);
+	void cleanup();
 
 	inline std::stringstream& query() { 
 		m_queryBuffer.str("");

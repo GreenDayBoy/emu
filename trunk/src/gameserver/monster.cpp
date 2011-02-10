@@ -111,12 +111,6 @@ monsterManager_t::monsterManager_t(monsterAttributesManager_t	&monsterAttributes
   m_monsterAttributesManager(monsterAttributesManager),
   m_startIndex(startIndex) {}
 
-monsterManager_t::~monsterManager_t() {
-	for(size_t i = 0; i < m_monsterList.size(); ++i) {
-		delete m_monsterList[i];
-	}
-}
-
 void monsterManager_t::startup(const std::string &fileName,
 							   const boost::function1<void, monster_t*> &registerObjectCallback) {
 	eMUCore::xmlConfig_t monstersFile;
@@ -136,5 +130,11 @@ void monsterManager_t::startup(const std::string &fileName,
 
 		m_monsterList.push_back(monster);
 		registerObjectCallback(monster);
+	}
+}
+
+void monsterManager_t::cleanup() {
+	for(size_t i = 0; i < m_monsterList.size(); ++i) {
+		delete m_monsterList[i];
 	}
 }

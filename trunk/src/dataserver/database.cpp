@@ -4,10 +4,6 @@
 database_t::database_t(eMUCore::logger_t &logger):
   m_logger(logger) {}
 
-database_t::~database_t() {
-	mysql_close(&m_connectionHandle);
-}
-
 void database_t::startup(const std::string &hostname,
 							unsigned short port,
 							const std::string &dbName,
@@ -35,6 +31,10 @@ void database_t::startup(const std::string &hostname,
 		e.in() << __FILE__ << ":" << __LINE__ << "[database_t::database_t()] MySQL init error.";
 		throw e;
 	}
+}
+
+void database_t::cleanup() {
+	mysql_close(&m_connectionHandle);
 }
 
 void database_t::execute() {

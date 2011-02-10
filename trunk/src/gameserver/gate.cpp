@@ -38,14 +38,6 @@ map_t::position_t gate_t::getRandomPosition() const {
 	return map_t::position_t(x, y);
 }
 
-gateManager_t::~gateManager_t() {
-	for(gateList_t::iterator i = m_gateList.begin(); i != m_gateList.end(); ++i) {
-		delete i->second;
-	}
-
-	m_gateList.clear();
-}
-
 void gateManager_t::startup(const std::string &filename) {
 	eMUCore::xmlConfig_t gateFile;
 	gateFile.open(filename, "gates");
@@ -63,6 +55,14 @@ void gateManager_t::startup(const std::string &filename) {
 									gateFile.readFromProperty<unsigned short>("gate", "level", 0));
 		m_gateList[gate->getId()] = gate;
 	}
+}
+
+void gateManager_t::cleanup() {
+	for(gateList_t::iterator i = m_gateList.begin(); i != m_gateList.end(); ++i) {
+		delete i->second;
+	}
+
+	m_gateList.clear();
 }
 
 gate_t& gateManager_t::operator[](int gateId) {

@@ -28,6 +28,8 @@ void serverList_t::startup(const std::string &fileName) {
 
 		m_list[attr.m_code] = attr;
 	}
+
+	listFile.close();
 }
 
 void serverList_t::update() {

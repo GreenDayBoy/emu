@@ -11,6 +11,8 @@ void configuration_t::read(const std::string &configFileName) {
 	m_dbName = configFile.readFromNode<std::string>("dbName", "muonline");
 	m_dbUserName = configFile.readFromNode<std::string>("dbUserName", "root");
 	m_dbPassword = configFile.readFromNode<std::string>("dbPassword", "");
+
+	configFile.close();
 }
 
 void allowedHostList_t::read(const std::string &hostsFileName) {
@@ -21,6 +23,8 @@ void allowedHostList_t::read(const std::string &hostsFileName) {
 		std::string hostname = hostsFile.readFromProperty<std::string>("host", "address", "127.0.0.1");
 		m_list.push_back(hostname);
 	}
+
+	hostsFile.close();
 }
 
 bool allowedHostList_t::isHostAllowed(const std::string &ipAddress) const {

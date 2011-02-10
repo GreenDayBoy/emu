@@ -18,21 +18,17 @@ public:
 	~gameServer_t();
 
 	void startup();
+	void cleanup();
 	void worker();
 	void updateWindowTitle() const;
-
 	gameServerUser_t* onContextAllocate();
-
 	void onContextAttach(eMUCore::socketContext_t &context);
 	void onContextReceive(eMUCore::socketContext_t &context);
 	void onContextClose(eMUCore::socketContext_t &context);
-
 	void onDatagramReceive(sockaddr_in& /*inetAddr*/, unsigned char * /*data*/, size_t /*dataSize*/) {}
-
 	void onTcpClientConnect();
 	void onTcpClientReceive();
 	void onTcpClientClose();
-
 	void send(gameServerUser_t &user, eMUCore::packet_t &packet);
 	void sendDataServer(const eMUCore::packet_t &packet);
 	void disconnect(gameServerUser_t &user) { m_iocpEngine.detach(user); }
@@ -55,8 +51,8 @@ private:
 	eMUCore::logger_t									m_logger;
 	eMUCore::synchronizer_t								m_synchronizer;
 	eMUCore::scheduler_t								m_scheduler;
-	eMUCore::tcpClient_t								m_tcpClient;
 	eMUCore::iocpEngine_t								m_iocpEngine;
+	eMUCore::tcpClient_t								m_tcpClient;
 	eMUCore::tcpServer_t								m_tcpServer;
 	eMUCore::udpSocket_t								m_udpSocket;
 	dataServerPacketQueue_t								m_packetQueue;
