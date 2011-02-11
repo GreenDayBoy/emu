@@ -58,10 +58,10 @@ private:
 	dataServerPacketQueue_t								m_packetQueue;
 	serverConfiguration_t								m_serverConfiguration;
 	versionConfiguration_t								m_versionConfiguration;
+	game_t												m_game;
 	protocol_t											m_protocol;
 	dataServerProtocol_t								m_dataServerProtocol;
 	crypt_t												m_crypt;
-	game_t												m_game;
 	size_t												m_userCount;
 	static bool											m_interrupt; // zmienna jest statyczna z powodu console ctrl handlera...
 };

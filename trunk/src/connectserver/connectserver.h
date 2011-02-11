@@ -45,8 +45,8 @@ private:
 	eMUCore::socketContextManager_t<connectServerUser_t>	m_userManager;
 	eMUCore::tcpServer_t									m_tcpServer;
 	eMUCore::udpSocket_t									m_udpSocket;
-	protocol_t												m_protocol;
 	game_t													m_game;
+	protocol_t												m_protocol;
 	size_t													m_userCount;
 	static bool												m_interrupt; // zmienna jest statyczna z powodu console ctrl handlera...
 };

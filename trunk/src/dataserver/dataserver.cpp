@@ -19,12 +19,12 @@ dataServer_t::dataServer_t(size_t maxStoredLogsCount,
 				m_iocpEngine,
 				boost::bind(&dataServer_t::onContextAllocate, this),
 				port),
-  m_protocol(m_game,
-				boost::bind(&dataServer_t::send, this, _1, _2)),
   m_game(m_logger,
 			m_scheduler,
 			m_protocol,
 			boost::bind(&dataServer_t::disconnect, this, _1)),
+  m_protocol(m_game,
+				boost::bind(&dataServer_t::send, this, _1, _2)),
   m_userCount(0) {}
 
 void dataServer_t::startup() {

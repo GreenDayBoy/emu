@@ -22,12 +22,12 @@ connectServer_t::connectServer_t(size_t maxStoredLogsCount,
   m_udpSocket(m_logger,
 				boost::bind(&connectServer_t::onDatagramReceive, this, _1, _2, _3),
 				port),
-  m_protocol(m_game,
-				boost::bind(&connectServer_t::send, this, _1, _2)),
   m_game(m_logger,
 			m_scheduler,
 			m_protocol,
 			boost::bind(&connectServer_t::disconnect, this, _1)),
+  m_protocol(m_game,
+				boost::bind(&connectServer_t::send, this, _1, _2)),
   m_userCount(0) {}
 
 void connectServer_t::startup() {

@@ -42,8 +42,8 @@ private:
 	eMUCore::iocpEngine_t								m_iocpEngine;
 	eMUCore::tcpServer_t								m_tcpServer;
 	allowedHostList_t									m_allowedHostList;
-	protocol_t											m_protocol;
 	game_t												m_game;
+	protocol_t											m_protocol;
 	size_t												m_userCount;
 	static bool											m_interrupt; // zmienna jest statyczna z powodu console ctrl handlera...
 };
