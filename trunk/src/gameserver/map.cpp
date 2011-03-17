@@ -48,6 +48,31 @@ std::string map_t::dumpPath(const path_t &path) const {
 	return stream.str();
 }
 
+map_t::position_t map_t::getRandomPosition(unsigned char x1,
+											 unsigned char y1,
+											 unsigned char x2,
+											 unsigned char y2) const {
+	std::vector<position_t> positions;
+
+	for(size_t x = x1; x <= x2; ++x) {
+		for(size_t y = y1; y <= y2; ++y) {
+			if(this->canStand(x, y) && this->isTileEmpty(x, y)) {
+				positions.push_back(position_t(x, y));
+			}
+		}
+	}
+
+	if(positions.size() > 0)
+		return positions[eMUCore::role<size_t>(0, positions.size())];
+	else
+	{
+		eMUCore::exception_t e;
+		e.in() << __FILE__ << ":" << __LINE__ << "[map_t::getRandomPosition()] No free field in area [" << x1 << "/" << x2
+				<< "][" << y1 << "/" << y2 << "].";
+		throw e;
+	}
+}
+
 void mapManager_t::startup(const std::string &filename) {
 	eMUCore::xmlConfig_t mapFile;
 	mapFile.open(filename, "worlds");

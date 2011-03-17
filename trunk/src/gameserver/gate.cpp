@@ -31,13 +31,6 @@ bool gate_t::isInGate(unsigned char x, unsigned char y) const {
 	}
 }
 
-map_t::position_t gate_t::getRandomPosition() const {
-	unsigned char x = eMUCore::role<unsigned char>(m_x1, m_x2);
-	unsigned char y = eMUCore::role<unsigned char>(m_y1, m_y2);
-
-	return map_t::position_t(x, y);
-}
-
 void gateManager_t::startup(const std::string &filename) {
 	eMUCore::xmlConfig_t gateFile;
 	gateFile.open(filename, "gates");

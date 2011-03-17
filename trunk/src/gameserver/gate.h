@@ -39,7 +39,6 @@ public:
 	inline unsigned short getRequiredLevel() const { return m_requiredLevel; }
 
 	bool isInGate(unsigned char x, unsigned char y) const;
-	map_t::position_t getRandomPosition() const;
 
 private:
 	gate_t(const gate_t&);

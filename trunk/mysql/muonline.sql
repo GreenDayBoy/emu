@@ -12,8 +12,6 @@
 
 SET FOREIGN_KEY_CHECKS=0;
 
-DROP DATABASE IF EXISTS `emu`;
-
 CREATE DATABASE `emu`
     CHARACTER SET 'latin1'
     COLLATE 'latin1_swedish_ci';
@@ -23,8 +21,6 @@ USE `emu`;
 #
 # Structure for the `accounts` table : 
 #
-
-DROP TABLE IF EXISTS `accounts`;
 
 CREATE TABLE `accounts` (
   `id` varchar(11) NOT NULL DEFAULT '',
@@ -41,8 +37,6 @@ CREATE TABLE `accounts` (
 #
 # Structure for the `characters` table : 
 #
-
-DROP TABLE IF EXISTS `characters`;
 
 CREATE TABLE `characters` (
   `created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
@@ -73,8 +67,6 @@ CREATE TABLE `characters` (
 #
 # Definition for the `eMU_AccountCheck` function : 
 #
-
-DROP FUNCTION IF EXISTS `eMU_AccountCheck`;
 
 CREATE DEFINER = 'root'@'localhost' FUNCTION `eMU_AccountCheck`(
         _id VARCHAR(11),
@@ -166,8 +158,6 @@ END;
 # Definition for the `eMU_AccountCreate` function : 
 #
 
-DROP FUNCTION IF EXISTS `eMU_AccountCreate`;
-
 CREATE DEFINER = 'root'@'localhost' FUNCTION `eMU_AccountCreate`(
         _id VARCHAR(11),
         _password VARCHAR(11),
@@ -204,8 +194,6 @@ END;
 #
 # Definition for the `eMU_CharacterCreate` function : 
 #
-
-DROP FUNCTION IF EXISTS `eMU_CharacterCreate`;
 
 CREATE DEFINER = 'root'@'localhost' FUNCTION `eMU_CharacterCreate`(
         _accountId VARCHAR(11),
@@ -326,8 +314,6 @@ END;
 #
 # Definition for the `eMU_CharacterDelete` function : 
 #
-
-DROP FUNCTION IF EXISTS `eMU_CharacterDelete`;
 
 CREATE DEFINER = 'root'@'localhost' FUNCTION `eMU_CharacterDelete`(
         _accountId VARCHAR(11),

@@ -262,8 +262,8 @@ void protocol_t::sendCharacterSelectAnswer(gameServerUser_t &user,
 }
 
 void protocol_t::sendTextNotice(gameServerUser_t &user,
-										unsigned char type,
 										const std::string &notice,
+										unsigned char type,
 										unsigned char loopCount,
 										unsigned short loopDelay,
 										unsigned int color,

@@ -293,14 +293,12 @@ void game_t::onCharacterSelectAnswer(unsigned int connectionStamp,
 			character.setAttributes(attr);
 			character.setPreview();
 			character.setActive();
-			character.activateTeleportEffect();
-
 			m_protocol.sendCharacterSelectAnswer(user, character);
-			m_protocol.sendTextNotice(user, 0, m_gameConfiguration.m_welcomeNotice);
+			m_protocol.sendTextNotice(user, m_gameConfiguration.m_welcomeNotice);
 
+			character.activateTeleportEffect();
 			m_viewportManager.registerObject(&character);
 			m_viewportManager.generate(character);
-
 			character.deactivateTeleportEffect();
 		} else {
 			m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " Invalid start coordinates [" << static_cast<int>(attr.m_posX) 
@@ -364,7 +362,10 @@ void game_t::onCharacterTeleportRequest(gameServerUser_t &user,
 	if(gate.isInGate(character.getPosX(), character.getPosY())) {
 		if(gate.getRequiredLevel() <= character.getLevel()) {
 			gate_t &destGate = m_gateManager[gate.getDestId()];
-			map_t::position_t position = destGate.getRandomPosition();
+			map_t::position_t position = m_mapManager[destGate.getMapId()].getRandomPosition(destGate.getX1(),
+																								destGate.getY1(),
+																								destGate.getX2(),
+																								destGate.getY2());
 
 			#ifdef _DEBUG
 			m_logger.in(eMUCore::logger_t::_MESSAGE_DEBUG) << "Source gate: " << gate << ", destination gate: " << destGate << ".";
@@ -433,7 +434,7 @@ void game_t::checkSelfClose() {
 				} else {
 					std::stringstream notice;
 					notice << "You will left the game after " << user.getTimeToClose() << " seconds.";
-					m_protocol.sendTextNotice(user, 1, notice.str()); // 1 - blue, 0 - gold
+					m_protocol.sendTextNotice(user, notice.str(), 1); // 1 - blue, 0 - gold
 
 					user.decrecemntTimeToClose();
 				}
@@ -506,10 +507,9 @@ void game_t::teleportCharacter(gameServerUser_t &user,
 	character.setPosY(y);
 	character.setDirection(direction);
 	character.setPose(0x7B); // default - stand.
-	character.activateTeleportEffect();
-
 	m_protocol.sendCharacterTeleportAnswer(user, mapId, x, y, direction, gateId);
-	m_viewportManager.generate(character);
 
+	character.activateTeleportEffect();
+	m_viewportManager.generate(character);
 	character.deactivateTeleportEffect();
 }

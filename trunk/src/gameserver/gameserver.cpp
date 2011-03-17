@@ -34,7 +34,7 @@ gameServer_t::gameServer_t(size_t maxStoredLogsCount,
   m_protocol(m_game,
 				boost::bind(&gameServer_t::send, this, _1, _2)),
   m_dataServerProtocol(m_game,
-				boost::bind(&gameServer_t::sendDataServer, this, _1)),
+						boost::bind(&gameServer_t::sendDataServer, this, _1)),
   m_userCount(0) {}
 
 gameServer_t::~gameServer_t() {

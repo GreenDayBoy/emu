@@ -97,8 +97,8 @@ public:
 									const character_t &character) const;
 
 	void sendTextNotice(gameServerUser_t &user,
-						unsigned char type,
 						const std::string &notice,
+						unsigned char type = 0,
 						unsigned char loopCount = 0,
 						unsigned short loopDelay = 0,
 						unsigned int color = 0,
