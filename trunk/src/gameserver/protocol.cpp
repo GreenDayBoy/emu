@@ -360,7 +360,7 @@ void protocol_t::sendViewportCharacterCreateRequest(gameServerUser_t &user,
 
 			unsigned short step = count * 41;
 
-			if(character->isTeleportEffect()) {
+			if(character->hasTeleportEffect()) {
 				packet.insert<unsigned char>(5 + step, HIBYTE(character->getOwner().getIndex()) | 0x80);
 			} else {
 				packet.insert<unsigned char>(5 + step, HIBYTE(character->getOwner().getIndex()));

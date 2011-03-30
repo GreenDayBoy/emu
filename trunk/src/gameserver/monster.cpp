@@ -50,63 +50,20 @@ void monsterAttributesManager_t::startup(const std::string &fileName) {
 	}
 }
 
-monster_t::monster_t(int index):
+monster_t::monster_t(int index,
+					 const monsterAttributesManager_t::monsterAttributes_t &attr):
   gameObject_t(gameObject_t::_OBJECT_MONSTER),
+  m_attributes(attr),
   m_index(index),
   m_id(0),
-  m_magicDefense(0),
-  m_attackSuccessRate(0),
-  m_defenseSuccessRate(0),
-  m_attackSpeed(0),
-  m_attackType(0),
-  m_attackRange(0),
-  m_moveRange(0),
-  m_moveSpeed(0),
-  m_respawnTime(0),
-  m_itemDropRate(0),
-  m_maxItemDropLevel(0),
-  m_moneyDropRate(0),
-  m_windProtect(0),
-  m_poisonProtect(0),
-  m_iceProtect(0),
-  m_electricProtect(0),
-  m_fireProtect(0),
-  m_minDamage(0),
-  m_maxDamage(0),
-  m_defense(0),
-  m_isNpc(false) {}
+  m_posX(0),
+  m_posY(0),
+  m_mapId(0),
+  m_direction(0),
+  m_health(0),
+  m_mana(0) {}
 
-void monster_t::setAttributes(const monsterAttributesManager_t::monsterAttributes_t &attr) {
-	m_name = attr.m_name;
-	m_level = attr.m_level;
-	m_health = attr.m_maxHealth;
-	m_maxHealth = attr.m_maxHealth;
-	m_mana = attr.m_maxMana;
-	m_maxMana = attr.m_maxMana;
-	m_magicDefense = attr.m_magicDefense;
-	m_attackSuccessRate = attr.m_attackSuccessRate;
-	m_defenseSuccessRate = attr.m_defenseSuccessRate;
-	m_attackSpeed = attr.m_attackSpeed;
-	m_attackType = attr.m_attackType;
-	m_attackRange = attr.m_attackRange;
-	m_viewRange = attr.m_viewRange;
-	m_moveRange = attr.m_moveRange;
-	m_moveSpeed = attr.m_moveSpeed;
-	m_respawnTime = attr.m_respawnTime;
-	m_itemDropRate = attr.m_itemDropRate;
-	m_maxItemDropLevel = attr.m_maxItemDropLevel;
-	m_moneyDropRate = attr.m_moneyDropRate;
-	m_windProtect = attr.m_windProtect;
-	m_poisonProtect = attr.m_poisonProtect;
-	m_iceProtect = attr.m_iceProtect;
-	m_electricProtect = attr.m_electricProtect;
-	m_fireProtect = attr.m_fireProtect;
-	m_minDamage = attr.m_minDamage;
-	m_maxDamage = attr.m_maxDamage;
-	m_defense = attr.m_defense;
-}
-
-monsterManager_t::monsterManager_t(monsterAttributesManager_t	&monsterAttributesManager,
+monsterManager_t::monsterManager_t(monsterAttributesManager_t &monsterAttributesManager,
 									int startIndex):
   m_monsterAttributesManager(monsterAttributesManager),
   m_startIndex(startIndex) {}
@@ -119,14 +76,14 @@ void monsterManager_t::startup(const std::string &fileName,
 	int i = m_startIndex;
 
 	while(monstersFile.nextNode()) {
-		monster_t *monster = new monster_t(i++);
+		int id = monstersFile.readFromProperty<int>("monster", "id", 0);
 
+		monster_t *monster = new monster_t(++i, m_monsterAttributesManager[id]);
 		monster->setMapId(monstersFile.readFromProperty<unsigned int>("monster", "mapId", 0));
 		monster->setPosX(monstersFile.readFromProperty<unsigned int>("monster", "posX", 0));
 		monster->setPosY(monstersFile.readFromProperty<unsigned int>("monster", "posY", 0));
 		monster->setDirection(monstersFile.readFromProperty<unsigned int>("monster", "direction", 0));
-		monster->setId(monstersFile.readFromProperty<int>("monster", "id", 0));
-		monster->setAttributes(m_monsterAttributesManager[monster->getId()]);
+		monster->setId(id);
 
 		m_monsterList.push_back(monster);
 		registerObjectCallback(monster);
