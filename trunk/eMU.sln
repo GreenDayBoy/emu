@@ -3,6 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{7C78F04D-7291-4B86-9B68-66A943FE5FC2}"
 	ProjectSection(SolutionItems) = preProject
+		src\shared\enum.h = src\shared\enum.h
 		src\shared\shared.h = src\shared\shared.h
 	EndProjectSection
 EndProject

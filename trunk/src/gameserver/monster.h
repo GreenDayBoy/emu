@@ -49,14 +49,15 @@ public:
 	monster_t(int index, const monsterAttributesManager_t::monsterAttributes_t &attr);
 
 	inline int getIndex() { return m_index; }
-	unsigned short getLevel() const { return m_attributes.m_level; }
-	const std::string& getName() const { return m_attributes.m_name; }
-	unsigned int getMaxHealth() const { return m_attributes.m_maxHealth; }
-	unsigned int getMaxMana() const { return m_attributes.m_maxMana; }
-	unsigned short getViewRange() const { return m_attributes.m_viewRange; }
 
 	inline void setId(int id) { m_id = id; }
 	inline int getId() const { return m_id; }
+
+	const monsterAttributesManager_t::monsterAttributes_t& getAttributes() const { return m_attributes; }
+
+	const std::string& getName() const { return m_attributes.m_name; }
+
+	unsigned short getViewRange() const { return m_attributes.m_viewRange; }
 
 	unsigned int getHealth() const { return m_health; }
 	void setHealth(unsigned short health) { m_health = health; }

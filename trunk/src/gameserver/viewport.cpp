@@ -22,13 +22,13 @@ void viewportManager_t::generate(gameObject_t &object) { _PROFILE;
 				//std::cout << "[viewportManager_t::generate()] " << *checkedObject << " saw " << object << ".\n";
 
 				// -----------------------------------------------------------------------------------
-				if(checkedObject->getType() == gameObject_t::_OBJECT_CHARACTER) {
+				if(checkedObject->getType() == gameObject_e::_character) {
 					character_t &character = reinterpret_cast<character_t&>(*checkedObject);
 
 					viewport_t viewed;
 					viewed.insert(&object);
 
-					if(object.getType() == gameObject_t::_OBJECT_CHARACTER) {
+					if(object.getType() == gameObject_e::_character) {
 						m_protocol.sendViewportCharacterCreateRequest(character.getOwner(), viewed);
 					} else {
 						m_protocol.sendViewportMonsterCreateRequest(character.getOwner(), viewed);
@@ -46,13 +46,13 @@ void viewportManager_t::generate(gameObject_t &object) { _PROFILE;
 				// kiedy po pierwszym wejsciu postaci wysylamy mu liste widzianych obiektow.
 				// Trzeba pojedynczo. Byc moze na nowszych klientach nie ma tego problemu.
 				// -------------------------------------------------------------------------------
-				if(object.getType() == gameObject_t::_OBJECT_CHARACTER) {
+				if(object.getType() == gameObject_e::_character) {
 					character_t &character = reinterpret_cast<character_t&>(object);
 
 					viewport_t viewed;
 					viewed.insert(checkedObject);
 
-					if(checkedObject->getType() == gameObject_t::_OBJECT_CHARACTER) {
+					if(checkedObject->getType() == gameObject_e::_character) {
 						m_protocol.sendViewportCharacterCreateRequest(character.getOwner(), viewed);
 					} else {
 						m_protocol.sendViewportMonsterCreateRequest(character.getOwner(), viewed);
@@ -76,7 +76,7 @@ void viewportManager_t::update(gameObject_t &object) { _PROFILE;
 				//std::cout << "[viewportManager_t::update()] " << *checkedObject << " forgot " << object << ".\n";
 
 				// --------------------------------------------------------------------------
-				if(checkedObject->getType() == gameObject_t::_OBJECT_CHARACTER) {
+				if(checkedObject->getType() == gameObject_e::_character) {
 					character_t &character = reinterpret_cast<character_t&>(*checkedObject);
 
 					viewport_t forgot;
@@ -98,7 +98,7 @@ void viewportManager_t::update(gameObject_t &object) { _PROFILE;
 			forgot.insert(checkedObject);
 
 			// ----------------------------------------------------------------------
-			if(object.getType() == gameObject_t::_OBJECT_CHARACTER) {
+			if(object.getType() == gameObject_e::_character) {
 				character_t &character = reinterpret_cast<character_t&>(object);
 				m_protocol.sendViewportDestroyRequest(character.getOwner(), forgot);
 			}
@@ -120,7 +120,7 @@ void viewportManager_t::clear(gameObject_t &object) { _PROFILE;
 			//std::cout << "[viewportManager_t::clear()] " << *checkedObject << " forgot " << object << ".\n";
 
 			// --------------------------------------------------------------------------
-			if(checkedObject->getType() == gameObject_t::_OBJECT_CHARACTER) {
+			if(checkedObject->getType() == gameObject_e::_character) {
 				character_t &character = reinterpret_cast<character_t&>(*checkedObject);
 
 				viewport_t forgot;
@@ -136,7 +136,7 @@ void viewportManager_t::clear(gameObject_t &object) { _PROFILE;
 	}
 
 	// --------------------------------------------------------------------------------------
-	if(object.getType() == gameObject_t::_OBJECT_CHARACTER) {
+	if(object.getType() == gameObject_e::_character) {
 		character_t &character = reinterpret_cast<character_t&>(object);
 
 		if(character.isActive()) {

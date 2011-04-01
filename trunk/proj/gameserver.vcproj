@@ -258,6 +258,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\gameserver\enum.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\gameserver\game.h"
 				>
 			</File>

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "enum.h"
 
 const size_t c_mapWidth = 256;
 const size_t c_mapHeight = 256;
@@ -17,13 +18,6 @@ struct mapFileHeader_t {
 
 class map_t {
 public:
-	enum mapTileAttribute_t {
-		_ATTR_GROUND = 0,
-		_ATTR_SAFEZONE,
-		_ATTR_SAFEZONE_NONGROUND = 4,
-		_ATTR_NONGROUND
-	};
-
 	typedef std::pair<unsigned char, unsigned char> position_t;
 	typedef std::vector<position_t> path_t;
 
@@ -43,7 +37,7 @@ public:
 
 	inline bool canStand(unsigned char x, unsigned char y) const {
 		unsigned char attr = this->getTileAttribute(x, y) & 127; // & 127 - without stand bit.
-		return (attr == _ATTR_GROUND || attr == _ATTR_SAFEZONE);
+		return (attr == mapTileAttribute_e::_ground || attr == mapTileAttribute_e::_safezone);
 	}
 
 	inline bool isTileEmpty(unsigned char x, unsigned char y) const {

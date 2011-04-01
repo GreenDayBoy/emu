@@ -1,8 +1,9 @@
-#ifndef eMU_SHARED_H
-#define eMU_SHARED_H
+#ifndef eMU_SHARED_SHARED_H
+#define eMU_SHARED_SHARED_H
 
 #include <string>
 #include <vector>
+#include "enum.h"
 
 namespace eMUShared {
 struct characterListAttributes_t {
@@ -16,7 +17,7 @@ typedef std::vector<characterListAttributes_t> characterList_t;
 
 struct characterAttributes_t {
 	std::string		m_name;
-	unsigned char	m_race;
+	characterRace_e::type_t	m_race;
 	unsigned char	m_posX;
 	unsigned char	m_posY;
 	unsigned char	m_mapId;
@@ -47,7 +48,7 @@ struct characterAttributes_t {
 
 	void clear() {
 		m_name = "";
-		m_race = 0;
+		m_race = characterRace_e::_none;
 		m_posX = 0;
 		m_posY = 0;
 		m_mapId = 0;
@@ -79,4 +80,4 @@ struct characterAttributes_t {
 };
 };
 
-#endif // eMU_SHARED_H
+#endif // eMU_SHARED_SHARED_H

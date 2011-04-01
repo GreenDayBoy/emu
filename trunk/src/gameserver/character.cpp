@@ -1,7 +1,7 @@
 #include "character.h"
 
 character_t::character_t(gameServerUser_t &owner):
-  gameObject_t(gameObject_t::_OBJECT_CHARACTER),
+  gameObject_t(gameObject_e::_character),
   m_owner(owner) {
 	__super::reset();
 	this->reset();
@@ -16,7 +16,7 @@ void character_t::reset() {
 	__super::reset();
 
 	m_active = false;
-	m_pose = 0;
+	m_pose = characterPose_e::_stand;
 	m_hasTeleportEffect = false;
 	m_attributes.clear();
 }
@@ -44,28 +44,28 @@ void character_t::setPreview() {
 	m_preview[17] = 0x00;
 }
 
-void character_t::setPose(unsigned char actionId) {
-	unsigned char pose = m_pose;
+void character_t::setPose(characterAction_e::type_t actionId) {
+	characterPose_e::type_t pose = m_pose;
 
 	switch(actionId) {
-		case 0x7B: // stoi.
-			pose = 0;
+		case characterAction_e::_setStand: // stoi.
+			pose = characterPose_e::_stand;
 			break;
 
-		case 0x80: // siedzi.
-			pose = 2;
+		case characterAction_e::_setSit: // siedzi.
+			pose = characterPose_e::_sit;
 			break;
 
-		case 0x81: // oparty.
-			pose = 3;
+		case characterAction_e::_setLeaning: // oparty.
+			pose = characterPose_e::_leaning;
 			break;
 
-		case 0x82: // wisi
-			pose = 4;
+		case characterAction_e::_setLevitation: // wisi
+			pose = characterPose_e::_levitation;
 			break;
 	}
 
-	if(m_pose != 0) {
+	if(m_pose != characterPose_e::_stand) {
 		m_preview[0] &= ~(m_pose & 0x0F);
 	}
 

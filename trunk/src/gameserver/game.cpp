@@ -57,7 +57,7 @@ void game_t::onLoginRequest(gameServerUser_t &user,
 			m_logger.append() << " Invalid version or serial [" << clientExeVersion << "][" << clientExeSerial << "].";
 			m_logger.out();
 
-			m_protocol.sendLoginAnswer(user, 0x06); // Bad version or serial.
+			m_protocol.sendLoginAnswer(user, accountCheckResult_e::_invalidVersionOrSerial);
 		}
 	} else {
 		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " User already logged in.";
@@ -68,12 +68,12 @@ void game_t::onLoginRequest(gameServerUser_t &user,
 
 void game_t::onAccountCheckAnswer(unsigned int connectionStamp,
 							const std::string &accountId,
-							unsigned char result) {
+							accountCheckResult_e::type_t result) {
 	gameServerUser_t &user = m_userManager.find(connectionStamp);
 
 	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << "[" << accountId << "]";
 
-	if(result == 0x01) {
+	if(result == accountCheckResult_e::_success) {
 			m_logger.append() << " logged in.";
 			m_logger.out();
 
@@ -81,19 +81,19 @@ void game_t::onAccountCheckAnswer(unsigned int connectionStamp,
 			user.setLoggedIn();
 	} else {
 		switch(result) {
-		case 0x00:
+		case accountCheckResult_e::_invalidPassword:
 			m_logger.append() << " Invalid password.";
 			break;
 
-		case 0x02:
+		case accountCheckResult_e::_notExists:
 			m_logger.append() << " Not exists.";
 			break;
 
-		case 0x03:
+		case accountCheckResult_e::_alreadyInUse:
 			m_logger.append() << " Already in use.";
 			break;
 
-		case 0x05:
+		case accountCheckResult_e::_banned:
 			m_logger.append() << " Banned.";
 			break;
 		}
@@ -103,7 +103,7 @@ void game_t::onAccountCheckAnswer(unsigned int connectionStamp,
 		user.incerementLoginAttempts();
 
 		if(user.getLoginAttempts() >= 3) {
-			result = 0x08; // to many attempts.
+			result = accountCheckResult_e::_checkAttemptsExceeded; // to many attempts.
 		}
 	}
 
@@ -154,24 +154,24 @@ void game_t::onCharacterLeave(gameServerUser_t &user) {
 	m_viewportManager.unregisterObject(&user.getCharacter());
 }
 
-void game_t::onLogoutRequest(gameServerUser_t &user, unsigned char closeReason) {
+void game_t::onLogoutRequest(gameServerUser_t &user, clientCloseReason_e::type_t closeReason) {
 	user.setCloseReason(closeReason);
 	user.setTimeToClose(5);
 }
 
 void game_t::onCharacterCreateRequest(gameServerUser_t &user,
 										const std::string &name,
-										unsigned char race) {
+										eMUShared::characterRace_e::type_t race) {
 	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Create character request :: name [" << name 
-													<< "] race [" << static_cast<int>(race) << "].";
+													<< "] race [" << race << "].";
 	m_logger.out();
 
 	if(user.isLoggedIn()) {
-		if(race == 0 ||
-			race == 16 ||
-			race == 32 ||
-			race == 48 ||
-			race == 64) {
+		if(race == eMUShared::characterRace_e::_darkWizard
+			|| race == eMUShared::characterRace_e::_darkKnight
+			|| race == eMUShared::characterRace_e::_elf
+			|| race == eMUShared::characterRace_e::_magicGladiator
+			|| race == eMUShared::characterRace_e::_darkLord) {
 			m_dataServerProtocol.sendCharacterCreateRequest(user.getConnectionStamp(),
 															user.getAccountId(),
 															name,
@@ -192,18 +192,18 @@ void game_t::onCharacterCreateRequest(gameServerUser_t &user,
 
 void game_t::onCharacterCreateAnswer(unsigned int connectionStamp,
 										const std::string &name,
-										unsigned char race,
-										unsigned char result) {
+										eMUShared::characterRace_e::type_t race,
+										characterCreateResult_e::type_t result) {
 	gameServerUser_t &user = m_userManager.find(connectionStamp);
 
-	if(result != 0x02) {
+	if(result != characterCreateResult_e::_toManyCharacters) {
 		m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Character [" << name << "]";
 
 		int slot = 0;
 
-		if(result == 0x00) {
+		if(result == characterCreateResult_e::_alreadyExists) {
 			m_logger.append() << " already exists.";
-		} else if(result == 0x01) {
+		} else if(result == characterCreateResult_e::_success) {
 			slot = user.insertToCharacterList(name);
 			m_logger.append() << " created at slot [" << slot << "].";
 		}
@@ -237,16 +237,16 @@ void game_t::onCharacterDeleteRequest(gameServerUser_t &user,
 
 void game_t::onCharacterDeleteAnswer(unsigned int connectionStamp,
 										const std::string &name,
-										unsigned char result) {
+										characterDeleteResult_e::type_t result) {
 	gameServerUser_t &user = m_userManager.find(connectionStamp);
 
-	if(result != 0x00) {
+	if(result != characterDeleteResult_e::_noAccountAssociation) {
 		m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Character [" << name << "]";
 
-		if(result == 0x01) { // ok.
+		if(result == characterDeleteResult_e::_success) {
 			m_logger.append() << " deleted.";
 			user.deleteFromCharacterList(name);
-		} else if(result == 0x02) { // invalid pin.
+		} else if(result == characterDeleteResult_e::_invalidPin) {
 			m_logger.append() << " invalid PIN.";
 		}
 
@@ -330,7 +330,7 @@ void game_t::onCharacterMoveRequest(gameServerUser_t &user,
 			character.setPosY(y);
 			character.setDirection(direction);
 			character.setLastMoveTime(GetTickCount());
-			character.setPose(0x7B);  // default - stand.
+			character.setPose(characterAction_e::_setStand);  // default - stand.
 
 			m_viewportManager.update(character);
 
@@ -360,7 +360,7 @@ void game_t::onCharacterTeleportRequest(gameServerUser_t &user,
 	gate_t &gate = m_gateManager[gateId];
 
 	if(gate.isInGate(character.getPosX(), character.getPosY())) {
-		if(gate.getRequiredLevel() <= character.getLevel()) {
+		if(gate.getRequiredLevel() <= character.getAttributes().m_level) {
 			gate_t &destGate = m_gateManager[gate.getDestId()];
 			map_t::position_t position = m_mapManager[destGate.getMapId()].getRandomPosition(destGate.getX1(),
 																								destGate.getY1(),
@@ -401,7 +401,7 @@ void game_t::onPublicChat(gameServerUser_t& user,
 
 void game_t::onCharacterAction(gameServerUser_t &user,
 							   unsigned char direction,
-							   unsigned char actionId) {
+							   characterAction_e::type_t actionId) {
 	user.getCharacter().setDirection(direction);
 	user.getCharacter().setPose(actionId);
 	m_protocol.sendViewportCharacterActionRequest(user.getCharacter(), actionId, user.getIndex());
@@ -422,9 +422,9 @@ void game_t::checkSelfClose() {
 		gameServerUser_t &user = m_userManager[i];
 
 		if(user.isLoggedIn()) {
-			if(user.getCloseReason() != 0xFF) {
+			if(user.getCloseReason() != clientCloseReason_e::_none) {
 				if(user.getTimeToClose() == 0) {
-					if(user.getCloseReason() == 0x01 && user.getCharacter().isActive()) { // 0x01 - switch character, 0x00 - exit game, 0x02 - select server.
+					if(user.getCloseReason() == clientCloseReason_e::_switchCharacter && user.getCharacter().isActive()) {
 						this->onCharacterLeave(user);
 					}
 
@@ -434,7 +434,7 @@ void game_t::checkSelfClose() {
 				} else {
 					std::stringstream notice;
 					notice << "You will left the game after " << user.getTimeToClose() << " seconds.";
-					m_protocol.sendTextNotice(user, notice.str(), 1); // 1 - blue, 0 - gold
+					m_protocol.sendTextNotice(user, notice.str(), gameNotice_e::_blue); // 1 - blue, 0 - gold
 
 					user.decrecemntTimeToClose();
 				}
@@ -447,41 +447,8 @@ void game_t::saveCharacter(gameServerUser_t &user) const {
 	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Saving character :: name " << user.getCharacter() << ".";
 	m_logger.out();
 
-	character_t &character = user.getCharacter();
-	eMUShared::characterAttributes_t attr;
-
-	attr.m_name = character.getName();
-	attr.m_race = character.getRace();
-	attr.m_posX = character.getPosX();
-	attr.m_posY = character.getPosY();
-	attr.m_mapId = character.getMapId();
-	attr.m_direction = character.getDirection();
-	attr.m_experience = character.getExperience();
-	attr.m_levelUpPoints = character.getLevelUpPoints();
-	attr.m_level = character.getLevel();
-	attr.m_strength = character.getStrength();
-	attr.m_agility = character.getAgility();
-	attr.m_vitality = character.getVitality();
-	attr.m_energy = character.getEnergy();
-	attr.m_health = character.getHealth();
-	attr.m_maxHealth = character.getMaxHealth();
-	attr.m_mana = character.getMana();
-	attr.m_maxMana = character.getMaxMana();
-	attr.m_shield = character.getShield();
-	attr.m_maxShield = character.getMaxShield();
-	attr.m_stamina = character.getStamina();
-	attr.m_maxStamina = character.getMaxStamina();
-	attr.m_money = character.getMoney();
-	attr.m_pkLevel = character.getPkLevel();
-	attr.m_controlCode = character.getControlCode();
-	attr.m_addPoints = character.getAddPoints();
-	attr.m_maxAddPoints = character.getMaxAddPoints();
-	attr.m_command = character.getCommand();
-	attr.m_minusPoints = character.getMinusPoints();
-	attr.m_maxMinusPoints = character.getMaxMinusPoints();
-
 	m_dataServerProtocol.sendCharacterSaveRequest(user.getAccountId(),
-													attr);
+													user.getCharacter().getAttributes());
 }
 
 void game_t::teleportCharacter(gameServerUser_t &user,
@@ -506,7 +473,7 @@ void game_t::teleportCharacter(gameServerUser_t &user,
 	character.setPosX(x);
 	character.setPosY(y);
 	character.setDirection(direction);
-	character.setPose(0x7B); // default - stand.
+	character.setPose(characterAction_e::_setStand); // default - stand.
 	m_protocol.sendCharacterTeleportAnswer(user, mapId, x, y, direction, gateId);
 
 	character.activateTeleportEffect();

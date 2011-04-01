@@ -1,4 +1,5 @@
 #include "dsprotocol.h"
+#include "..\shared\enum.h"
 
 dataServerProtocol_t::dataServerProtocol_t(dataServerProtocolExecutorInterface_t &iface,
 											const sendCallback_t &sendCallback):
@@ -7,33 +8,33 @@ dataServerProtocol_t::dataServerProtocol_t(dataServerProtocolExecutorInterface_t
 
 void dataServerProtocol_t::core(const eMUCore::packet_t &packet) const {
 	switch(packet.getProtocolId()) {
-	case 0x00:
+	case eMUShared::dataServerProtocol_e::_queryException:
 		this->parseQueryExceptionNotice(packet);
 		break;
 
-	case 0xF1:
+	case eMUShared::dataServerProtocol_e::_accountManage:
 		switch(packet.getData()[3]) {
-		case 0x01:
+		case eMUShared::dataServerProtocol_e::accountManage_e::_check:
 			this->parseAccountCheckAnswer(packet);
 			break;
 		}
 		break;
 
-	case 0xF3:
+	case eMUShared::dataServerProtocol_e::_characterManage:
 		switch(packet.getData()[3]) {
-		case 0x00:
+		case eMUShared::dataServerProtocol_e::characterManage_e::_list:
 			this->parseCharacterListAnswer(packet);
 			break;
 
-		case 0x01:
+		case eMUShared::dataServerProtocol_e::characterManage_e::_create:
 			this->parseCharacterCreateAnswer(packet);
 			break;
 
-		case 0x02:
+		case eMUShared::dataServerProtocol_e::characterManage_e::_delete:
 			this->parseCharacterDeleteAnswer(packet);
 			break;
 
-		case 0x03:
+		case eMUShared::dataServerProtocol_e::characterManage_e::_select:
 			this->parseCharacterSelectAnswer(packet);
 			break;
 		}
@@ -46,8 +47,8 @@ void dataServerProtocol_t::sendAccountCheckRequest(unsigned int connectionStamp,
 														const std::string &password,
 														const std::string &ipAddress) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0xF1);
-	packet.insert<unsigned char>(3, 0x01); // SubProtocolId
+	packet.construct(0xC1, eMUShared::dataServerProtocol_e::_accountManage);
+	packet.insert<unsigned char>(3, eMUShared::dataServerProtocol_e::accountManage_e::_check); // SubProtocolId
 	packet.insert<unsigned int>(4, connectionStamp);
 	packet.insertString(8, accountId, 10);
 	packet.insertString(18, password, 10);
@@ -59,7 +60,7 @@ void dataServerProtocol_t::sendAccountCheckRequest(unsigned int connectionStamp,
 void dataServerProtocol_t::parseAccountCheckAnswer(const eMUCore::packet_t &packet) const {
 	unsigned int connectionStamp = packet.read<unsigned int>(4);
 	std::string accountId = packet.readString(8, 10);
-	unsigned char result = packet.read<unsigned char>(18);
+	accountCheckResult_e::type_t result = static_cast<accountCheckResult_e::type_t>(packet.read<unsigned char>(18));
 
 	m_executorInterface.onAccountCheckAnswer(connectionStamp, accountId, result);
 }
@@ -67,8 +68,8 @@ void dataServerProtocol_t::parseAccountCheckAnswer(const eMUCore::packet_t &pack
 void dataServerProtocol_t::sendCharacterListRequest(unsigned int connectionStamp,
 															const std::string &accountId) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0xF3);
-	packet.insert<unsigned char>(3, 0x00); // SubProtocolId
+	packet.construct(0xC1, eMUShared::dataServerProtocol_e::_characterManage);
+	packet.insert<unsigned char>(3, eMUShared::dataServerProtocol_e::characterManage_e::_list); // SubProtocolId
 	packet.insert<unsigned int>(4, connectionStamp);
 	packet.insertString(8, accountId, 10);
 
@@ -98,8 +99,8 @@ void dataServerProtocol_t::parseCharacterListAnswer(const eMUCore::packet_t &pac
 
 void dataServerProtocol_t::sendLogoutRequest(const std::string &accountId) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0xF1);
-	packet.insert<unsigned char>(3, 0x02); // SubProtocolId.
+	packet.construct(0xC1, eMUShared::dataServerProtocol_e::_accountManage);
+	packet.insert<unsigned char>(3, eMUShared::dataServerProtocol_e::accountManage_e::_logout); // SubProtocolId.
 	packet.insertString(4, accountId, 10);
 
 	m_sendCallback(packet);
@@ -108,10 +109,10 @@ void dataServerProtocol_t::sendLogoutRequest(const std::string &accountId) const
 void dataServerProtocol_t::sendCharacterCreateRequest(unsigned int connectionStamp,
 														const std::string &accountId,
 														const std::string &name,
-														unsigned char race) const {
+														eMUShared::characterRace_e::type_t race) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0xF3);
-	packet.insert<unsigned char>(3, 0x01);
+	packet.construct(0xC1, eMUShared::dataServerProtocol_e::_characterManage);
+	packet.insert<unsigned char>(3, eMUShared::dataServerProtocol_e::characterManage_e::_create);
 	packet.insert<unsigned int>(4, connectionStamp);
 	packet.insertString(8, accountId, 10);
 	packet.insertString(18, name, 10);
@@ -123,8 +124,8 @@ void dataServerProtocol_t::sendCharacterCreateRequest(unsigned int connectionSta
 void dataServerProtocol_t::parseCharacterCreateAnswer(const eMUCore::packet_t &packet) const {
 	unsigned int connectionStamp = packet.read<unsigned int>(4);
 	std::string name = packet.readString(8, 10);
-	unsigned char race = packet.read<unsigned char>(18);
-	unsigned char result = packet.read<unsigned char>(19);
+	eMUShared::characterRace_e::type_t race = static_cast<eMUShared::characterRace_e::type_t>(packet.read<unsigned char>(18));
+	characterCreateResult_e::type_t result = static_cast<characterCreateResult_e::type_t>(packet.read<unsigned char>(19));
 
 	m_executorInterface.onCharacterCreateAnswer(connectionStamp,
 													name,
@@ -137,8 +138,8 @@ void dataServerProtocol_t::sendCharacterDeleteRequest(unsigned int connectionSta
 														const std::string &name,
 														const std::string &pin) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0xF3);
-	packet.insert<unsigned char>(3, 0x02);
+	packet.construct(0xC1, eMUShared::dataServerProtocol_e::_characterManage);
+	packet.insert<unsigned char>(3, eMUShared::dataServerProtocol_e::characterManage_e::_delete);
 	packet.insert<unsigned int>(4, connectionStamp);
 	packet.insertString(8, accountId, 10);
 	packet.insertString(18, name, 10);
@@ -150,7 +151,7 @@ void dataServerProtocol_t::sendCharacterDeleteRequest(unsigned int connectionSta
 void dataServerProtocol_t::parseCharacterDeleteAnswer(const eMUCore::packet_t &packet) const {
 	unsigned int connectionStamp = packet.read<unsigned int>(4);
 	std::string name = packet.readString(8, 10);
-	unsigned char result = packet.read<unsigned char>(18);
+	characterDeleteResult_e::type_t result = static_cast<characterDeleteResult_e::type_t>(packet.read<unsigned char>(18));
 
 	m_executorInterface.onCharacterDeleteAnswer(connectionStamp, name, result);
 }
@@ -159,8 +160,8 @@ void dataServerProtocol_t::sendCharacterSelectRequest(unsigned int connectionSta
 														const std::string &accountId,
 														const std::string &name) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0xF3);
-	packet.insert<unsigned char>(3, 0x03);
+	packet.construct(0xC1, eMUShared::dataServerProtocol_e::_characterManage);
+	packet.insert<unsigned char>(3, eMUShared::dataServerProtocol_e::characterManage_e::_select);
 	packet.insert<unsigned int>(4, connectionStamp);
 	packet.insertString(8, accountId, 10);
 	packet.insertString(18, name, 10);
@@ -173,7 +174,7 @@ void dataServerProtocol_t::parseCharacterSelectAnswer(const eMUCore::packet_t &p
 
 	eMUShared::characterAttributes_t attr;
 	attr.m_name = packet.readString(8, 10);
-	attr.m_race = packet.read<unsigned char>(18);
+	attr.m_race = static_cast<eMUShared::characterRace_e::type_t>(packet.read<unsigned char>(18));
 	attr.m_posX = packet.read<unsigned char>(19);
 	attr.m_posY = packet.read<unsigned char>(20);
 	attr.m_mapId = packet.read<unsigned char>(21);
@@ -208,8 +209,8 @@ void dataServerProtocol_t::parseCharacterSelectAnswer(const eMUCore::packet_t &p
 void dataServerProtocol_t::sendCharacterSaveRequest(const std::string &accountId,
 													const eMUShared::characterAttributes_t &attr) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0xF3);
-	packet.insert<unsigned char>(3, 0x04);
+	packet.construct(0xC1, eMUShared::dataServerProtocol_e::_characterManage);
+	packet.insert<unsigned char>(3, eMUShared::dataServerProtocol_e::characterManage_e::_save);
 	packet.insertString(4, accountId, 10);
 	packet.insertString(14, attr.m_name, 10);
 	packet.insert<unsigned char>(24, attr.m_race);

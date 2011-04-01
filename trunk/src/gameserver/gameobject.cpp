@@ -1,7 +1,7 @@
 #include <math.h>
 #include "gameobject.h"
 
-gameObject_t::gameObject_t(gameObjectType_t type):
+gameObject_t::gameObject_t(gameObject_e::type_t type):
   m_type(type) {}
 
 void gameObject_t::reset() {

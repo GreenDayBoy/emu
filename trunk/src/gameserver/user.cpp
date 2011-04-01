@@ -8,8 +8,8 @@ gameServerUser_t::gameServerUser_t(int index):
   m_cryptSerial(0),
   m_loginAttempts(0),
   m_loggedIn(false),
-  m_availableRaces(0x02),
-  m_closeReason(0xFF),
+  m_availableRaces(availableRace_e::_basic),
+  m_closeReason(clientCloseReason_e::_none),
   m_timeToClose(0),
   m_connectionStamp(0) {}
 
@@ -18,8 +18,8 @@ void gameServerUser_t::reset() {
 	m_loginAttempts = 0;
 	m_accountId = "";
 	m_loggedIn = false;
-	m_availableRaces = 0x02;
-	m_closeReason = 0xFF;
+	m_availableRaces = availableRace_e::_basic;
+	m_closeReason = clientCloseReason_e::_none;
 	m_timeToClose = 0;
 	m_connectionStamp = 0xDEADC0DE;
 }
@@ -33,14 +33,14 @@ void gameServerUser_t::setAvailableRaces(const eMUShared::characterList_t &chara
 		if(shiftedRace == 3 
 			|| shiftedRace < 3 
 				&& characterList[i].m_level >= advancedRaceLevel) {
-			m_availableRaces = 0x03;
+			m_availableRaces = availableRace_e::_magicGladiator;
 		}
 
 		/* Dostepny Dark Lord. */
 		if(shiftedRace == 4
 			|| shiftedRace == 3 
 				&& characterList[i].m_level >= advancedRaceLevel) {
-			m_availableRaces = 0x04;
+			m_availableRaces = availableRace_e::_darkLord;
 		}
 	}
 }

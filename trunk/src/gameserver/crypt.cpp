@@ -3,11 +3,11 @@
 #include "..\core\core.h"
 
 void crypt_t::startup(const std::string &encFileName, const std::string &decFileName) {
-	this->loadKeys(encFileName, _ENCRYPTION_KEYS);
-	this->loadKeys(decFileName, _DECRYPTION_KEYS);
+	this->loadKeys(encFileName, cryptKeys_e::_encrypt);
+	this->loadKeys(decFileName, cryptKeys_e::_decrypt);
 }
 
-void crypt_t::loadKeys(std::string keysFileName, KEYS_TYPE keysType) {
+void crypt_t::loadKeys(std::string keysFileName, cryptKeys_e::type_t keysType) {
 	std::ifstream keysFile(keysFileName.c_str(), std::ios::in | std::ios::binary);
 
 	if(!keysFile.fail()) {
@@ -23,27 +23,27 @@ void crypt_t::loadKeys(std::string keysFileName, KEYS_TYPE keysType) {
 
 			keysFile.read(reinterpret_cast<char*>(&temp), sizeof(unsigned int) * 4);
 			for(int i = 0; i < 4; ++i) {
-				if(keysType == _DECRYPTION_KEYS) {
+				if(keysType == cryptKeys_e::_decrypt) {
 					m_decryptionModulus[i] = fileXOR[i] ^ temp[i];
-				} else if(keysType == _ENCRYPTION_KEYS) {
+				} else if(keysType == cryptKeys_e::_encrypt) {
 					m_encryptionModulus[i] = fileXOR[i] ^ temp[i];
 				}
 			}
 
 			keysFile.read(reinterpret_cast<char*>(&temp), sizeof(unsigned int) * 4);
 			for(int i = 0; i < 4; ++i) {
-				if(keysType == _DECRYPTION_KEYS) {
+				if(keysType == cryptKeys_e::_decrypt) {
 					this->m_decryptionKeys[i] = fileXOR[i] ^ temp[i];
-				} else if(keysType == _ENCRYPTION_KEYS) {
+				} else if(keysType == cryptKeys_e::_encrypt) {
 					this->m_encryptionKeys[i] = fileXOR[i] ^ temp[i];
 				}
 			}
 
 			keysFile.read(reinterpret_cast<char*>(&temp), sizeof(unsigned int) * 4);
 			for(int i = 0; i < 4; ++i) {
-				if(keysType == _DECRYPTION_KEYS) {
+				if(keysType == cryptKeys_e::_decrypt) {
 					this->m_decryptionXORKeys[i] = fileXOR[i] ^ temp[i];
-				} else if(keysType == _ENCRYPTION_KEYS) {
+				} else if(keysType == cryptKeys_e::_encrypt) {
 					this->m_encryptionXORKeys[i] = fileXOR[i] ^ temp[i];
 				}
 			}

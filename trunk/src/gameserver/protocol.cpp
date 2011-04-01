@@ -1,5 +1,6 @@
 #include "protocol.h"
 #include "monster.h"
+#include "enum.h"
 
 protocol_t::protocol_t(protocolExecutorInterface_t &iface,
 						const sendCallback_t &sendCallback):
@@ -9,50 +10,50 @@ protocol_t::protocol_t(protocolExecutorInterface_t &iface,
 void protocol_t::core(gameServerUser_t &user,
 						const eMUCore::packet_t &packet) const {
 	switch(packet.getProtocolId()) {
-	case 0x00:
+	case protocol_e::_publicChat:
 		this->parsePublicChatRequest(user, packet);
 		break;
 
-	case 0x18:
+	case protocol_e::_action:
 		this->parseCharacterActionRequest(user, packet);
 		break;
 
-	case 0xF1:
+	case protocol_e::_accountManage:
 		switch(packet.getData()[3]) {
-		case 0x01:
+		case protocol_e::accountManage_e::_login:
 			this->parseLoginRequest(user, packet);
 			break;
-		case 0x02:
+		case protocol_e::accountManage_e::_logout:
 			this->parseLogoutRequest(user, packet);
 			break;
 		}
 		break;
 
-	case 0xF3:
+	case protocol_e::_characterManage:
 		switch(packet.getData()[3]) {
-		case 0x00:
+		case protocol_e::characterManage_e::_list:
 			this->parseCharacterListRequest(user, packet);
 			break;
 
-		case 0x01:
+		case protocol_e::characterManage_e::_create:
 			this->parseCharacterCreateRequest(user, packet);
 			break;
 
-		case 0x02:
+		case protocol_e::characterManage_e::_delete:
 			this->parseCharacterDeleteRequest(user, packet);
 			break;
 
-		case 0x03:
+		case protocol_e::characterManage_e::_select:
 			this->parseCharacterSelectRequest(user, packet);
 			break;
 		}
 		break;
 
-	case 0xD7:
+	case protocol_e::_move:
 		this->parseCharacterMoveRequest(user, packet);
 		break;
 
-	case 0x1C:
+	case protocol_e::_teleport:
 		this->parseCharacterTeleportRequest(user, packet);
 		break;
 	}
@@ -70,8 +71,8 @@ void protocol_t::sendHandshake(gameServerUser_t &user, unsigned short userIndex,
 	// ------------------
 
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0xF1);
-	packet.insert<unsigned char>(3, 0x00);
+	packet.construct(0xC1, protocol_e::_accountManage);
+	packet.insert<unsigned char>(3, protocol_e::accountManage_e::_handshake);
 	packet.insert<unsigned char>(4, 0x01);
 	packet.insert<unsigned short>(5, _byteswap_ushort(userIndex));
 	packet.insertString(7, version, 5);
@@ -94,10 +95,10 @@ void protocol_t::parseLoginRequest(gameServerUser_t &user,
 }
 
 void protocol_t::sendLoginAnswer(gameServerUser_t &user, 
-											unsigned char result) const {
+								 accountCheckResult_e::type_t result) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0xF1);
-	packet.insert<unsigned char>(3, 0x01);
+	packet.construct(0xC1, protocol_e::_accountManage);
+	packet.insert<unsigned char>(3, protocol_e::accountManage_e::_login);
 	packet.insert<unsigned char>(4, result);
 
 	m_sendCallback(user, packet);
@@ -109,12 +110,12 @@ void protocol_t::parseCharacterListRequest(gameServerUser_t &user,
 }
 
 void protocol_t::sendCharacterListAnswer(gameServerUser_t &user,
-											   unsigned char availableRaces,
+										 availableRace_e::type_t availableRace,
 											   const eMUShared::characterList_t &characterList) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0xF3);
-	packet.insert<unsigned char>(3, 0x00); // SubProtocolId.
-	packet.insert<unsigned char>(4, availableRaces);
+	packet.construct(0xC1, protocol_e::_characterManage);
+	packet.insert<unsigned char>(3, protocol_e::characterManage_e::_list); // SubProtocolId.
+	packet.insert<unsigned char>(4, availableRace);
 	packet.insert<unsigned char>(5, 0); // ???
 	packet.insert<unsigned char>(6, characterList.size());
 	
@@ -156,15 +157,15 @@ void protocol_t::sendCharacterListAnswer(gameServerUser_t &user,
 
 void protocol_t::parseLogoutRequest(gameServerUser_t &user,
 									const eMUCore::packet_t &packet) const {
-	unsigned char closeReason = packet.read<unsigned char>(4);
+	clientCloseReason_e::type_t closeReason = static_cast<clientCloseReason_e::type_t>(packet.read<unsigned char>(4));
 	m_executorInterface.onLogoutRequest(user, closeReason);
 }
 
 void protocol_t::sendLogoutAnswer(gameServerUser_t &user,
 									   unsigned char closeReason) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC3, 0xF1);
-	packet.insert<unsigned char>(3, 0x02); // SubProtocolId.
+	packet.construct(0xC3, protocol_e::_accountManage);
+	packet.insert<unsigned char>(3, protocol_e::accountManage_e::_logout); // SubProtocolId.
 	packet.insert<unsigned char>(4, closeReason);
 
 	m_sendCallback(user, packet);
@@ -173,7 +174,7 @@ void protocol_t::sendLogoutAnswer(gameServerUser_t &user,
 void protocol_t::parseCharacterCreateRequest(gameServerUser_t &user,
 												const eMUCore::packet_t &packet) const {
 	std::string name = packet.readString(4, 10);
-	unsigned char race = packet.read<unsigned char>(14);
+	eMUShared::characterRace_e::type_t race = static_cast<eMUShared::characterRace_e::type_t>(packet.read<unsigned char>(14));
 
 	m_executorInterface.onCharacterCreateRequest(user, name, race);
 }
@@ -183,10 +184,10 @@ void protocol_t::sendCharacterCreteAnswer(gameServerUser_t &user,
 												const std::string &name,
 												int slot,
 												unsigned short level,
-												unsigned char race) const {
+												eMUShared::characterRace_e::type_t race) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0xF3);
-	packet.insert<unsigned char>(3, 0x01);
+	packet.construct(0xC1, protocol_e::_characterManage);
+	packet.insert<unsigned char>(3, protocol_e::characterManage_e::_create);
 	packet.insert<unsigned char>(4, result);
 	packet.insertString(5, name, 10);
 	packet.insert<unsigned char>(15, slot);
@@ -212,8 +213,8 @@ void protocol_t::parseCharacterDeleteRequest(gameServerUser_t &user,
 void protocol_t::sendCharacterDeleteAnswer(gameServerUser_t &user,
 												unsigned char result) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0xF3);
-	packet.insert<unsigned char>(3, 0x02);
+	packet.construct(0xC1, protocol_e::_characterManage);
+	packet.insert<unsigned char>(3, protocol_e::characterManage_e::_delete);
 	packet.insert<unsigned char>(4, result);
 
 	m_sendCallback(user, packet);
@@ -226,50 +227,50 @@ void protocol_t::parseCharacterSelectRequest(gameServerUser_t &user,
 }
 
 void protocol_t::sendCharacterSelectAnswer(gameServerUser_t &user,
-												const character_t &character) const {
+												character_t &character) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC3, 0xF3);
-	packet.insert<unsigned char>(3, 0x03);
+	packet.construct(0xC3, protocol_e::_characterManage);
+	packet.insert<unsigned char>(3, protocol_e::characterManage_e::_select);
 	packet.insert<unsigned char>(4, character.getPosX());
 	packet.insert<unsigned char>(5, character.getPosY());
 	packet.insert<unsigned char>(6, character.getMapId());
 	packet.insert<unsigned char>(7, character.getDirection());
-	packet.insert<unsigned int>(8, character.getExperience());
+	packet.insert<unsigned int>(8, character.getAttributes().m_experience);
 	packet.insert<unsigned int>(12, character.getNextExperience());
-	packet.insert<unsigned short>(16, character.getLevelUpPoints());
-	packet.insert<unsigned short>(18, character.getStrength());
-	packet.insert<unsigned short>(20, character.getAgility());
-	packet.insert<unsigned short>(22, character.getVitality());
-	packet.insert<unsigned short>(24, character.getEnergy());
-	packet.insert<unsigned short>(26, character.getHealth());
-	packet.insert<unsigned short>(28, character.getMaxHealth());
-	packet.insert<unsigned short>(30, character.getMana());
-	packet.insert<unsigned short>(32, character.getMaxMana());
-	packet.insert<unsigned short>(34, character.getShield());
-	packet.insert<unsigned short>(36, character.getMaxShield());
-	packet.insert<unsigned short>(38, character.getStamina());
-	packet.insert<unsigned short>(40, character.getMaxStamina());
-	packet.insert<unsigned int>(42, character.getMoney());
-	packet.insert<unsigned char>(46, character.getPkLevel());
-	packet.insert<unsigned char>(47, character.getControlCode());
-	packet.insert<unsigned short>(48, character.getAddPoints());
-	packet.insert<unsigned short>(50, character.getMaxAddPoints());
-	packet.insert<unsigned short>(52, character.getCommand());
-	packet.insert<unsigned short>(54, character.getMinusPoints());
-	packet.insert<unsigned short>(56, character.getMaxMinusPoints());
+	packet.insert<unsigned short>(16, character.getAttributes().m_levelUpPoints);
+	packet.insert<unsigned short>(18, character.getAttributes().m_strength);
+	packet.insert<unsigned short>(20, character.getAttributes().m_agility);
+	packet.insert<unsigned short>(22, character.getAttributes().m_vitality);
+	packet.insert<unsigned short>(24, character.getAttributes().m_energy);
+	packet.insert<unsigned short>(26, character.getAttributes().m_health);
+	packet.insert<unsigned short>(28, character.getAttributes().m_maxHealth);
+	packet.insert<unsigned short>(30, character.getAttributes().m_mana);
+	packet.insert<unsigned short>(32, character.getAttributes().m_maxMana);
+	packet.insert<unsigned short>(34, character.getAttributes().m_shield);
+	packet.insert<unsigned short>(36, character.getAttributes().m_maxShield);
+	packet.insert<unsigned short>(38, character.getAttributes().m_stamina);
+	packet.insert<unsigned short>(40, character.getAttributes().m_maxStamina);
+	packet.insert<unsigned int>(42, character.getAttributes().m_money);
+	packet.insert<unsigned char>(46, character.getAttributes().m_pkLevel);
+	packet.insert<unsigned char>(47, character.getAttributes().m_controlCode);
+	packet.insert<unsigned short>(48, character.getAttributes().m_addPoints);
+	packet.insert<unsigned short>(50, character.getAttributes().m_maxAddPoints);
+	packet.insert<unsigned short>(52, character.getAttributes().m_command);
+	packet.insert<unsigned short>(54, character.getAttributes().m_minusPoints);
+	packet.insert<unsigned short>(56, character.getAttributes().m_maxMinusPoints);
 
 	m_sendCallback(user, packet);
 }
 
 void protocol_t::sendTextNotice(gameServerUser_t &user,
 										const std::string &notice,
-										unsigned char type,
+										gameNotice_e::type_t type,
 										unsigned char loopCount,
 										unsigned short loopDelay,
 										unsigned int color,
 										unsigned char speed) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0x0D);
+	packet.construct(0xC1, protocol_e::_textNotice);
 	packet.insert<unsigned char>(3, type);
 	packet.insert<unsigned char>(4, loopCount);
 	packet.insert<unsigned short>(5, loopDelay);
@@ -335,7 +336,7 @@ void protocol_t::sendCharacterTeleportAnswer(gameServerUser_t &user,
 													unsigned char direction,
 													unsigned char gateId) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC3, 0x1C);
+	packet.construct(0xC3, protocol_e::_teleport);
 	packet.insert<unsigned char>(3, gateId);
 	packet.insert<unsigned char>(4, mapId);
 	packet.insert<unsigned char>(5, x);
@@ -348,14 +349,14 @@ void protocol_t::sendCharacterTeleportAnswer(gameServerUser_t &user,
 void protocol_t::sendViewportCharacterCreateRequest(gameServerUser_t &user,
 														 viewportManager_t::viewport_t &viewport) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC2, 0x12);
+	packet.construct(0xC2, protocol_e::_characterViewportCreate);
 
 	size_t count = 0;
 
 	for(viewportManager_t::viewport_t::iterator i = viewport.begin(); i != viewport.end(); ++i) {
 		gameObject_t *object = (*i);
 
-		if(object->getType() == gameObject_t::_OBJECT_CHARACTER) {
+		if(object->getType() == gameObject_e::_character) {
 			character_t *character = reinterpret_cast<character_t*>(object);
 
 			unsigned short step = count * 41;
@@ -409,14 +410,14 @@ void protocol_t::sendViewportCharacterCreateRequest(gameServerUser_t &user,
 void protocol_t::sendViewportMonsterCreateRequest(gameServerUser_t &user,
 													   viewportManager_t::viewport_t &viewport) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC2, 0x13);
+	packet.construct(0xC2, protocol_e::_monsterViewportCreate);
 
 	size_t count = 0;
 
 	for(viewportManager_t::viewport_t::iterator i = viewport.begin(); i != viewport.end(); ++i) {
 		gameObject_t *object = (*i);
 
-		if(object->getType() == gameObject_t::_OBJECT_MONSTER) {
+		if(object->getType() == gameObject_e::_monster) {
 			monster_t *monster = reinterpret_cast<monster_t*>(object);
 
 			unsigned short step = count * 13;
@@ -446,7 +447,7 @@ void protocol_t::sendViewportMonsterCreateRequest(gameServerUser_t &user,
 void protocol_t::sendViewportDestroyRequest(gameServerUser_t &user,
 												 viewportManager_t::viewport_t &viewport) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0x14);
+	packet.construct(0xC1, protocol_e::_viewportDestroy);
 
 	size_t count = 0;
 
@@ -454,7 +455,7 @@ void protocol_t::sendViewportDestroyRequest(gameServerUser_t &user,
 		unsigned short index = 0;
 		gameObject_t *object = (*i);
 
-		if(object->getType() == gameObject_t::_OBJECT_CHARACTER) {
+		if(object->getType() == gameObject_e::_character) {
 			index = reinterpret_cast<character_t*>(object)->getOwner().getIndex();
 		} else {
 			index = reinterpret_cast<monster_t*>(object)->getIndex();
@@ -476,11 +477,11 @@ void protocol_t::sendViewportDestroyRequest(gameServerUser_t &user,
 
 void protocol_t::sendViewportObjectMoveRequest(gameObject_t &object) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0xD7);
+	packet.construct(0xC1, protocol_e::_move);
 
 	unsigned short index = 0;
 
-	if(object.getType() == gameObject_t::_OBJECT_CHARACTER) {
+	if(object.getType() == gameObject_e::_character) {
 		index = reinterpret_cast<character_t&>(object).getOwner().getIndex();
 	} else {
 		index = reinterpret_cast<monster_t&>(object).getIndex();
@@ -495,7 +496,7 @@ void protocol_t::sendViewportObjectMoveRequest(gameObject_t &object) const {
 	for(viewportManager_t::viewport_t::iterator i = object.getViewport().begin(); i != object.getViewport().end(); ++i) {
 		gameObject_t *vo = (*i);
 
-		if(vo->getType() == gameObject_t::_OBJECT_CHARACTER) {
+		if(vo->getType() == gameObject_e::_character) {
 			m_sendCallback(reinterpret_cast<character_t*>(vo)->getOwner(), packet);
 		}
 	}
@@ -509,7 +510,7 @@ void protocol_t::parsePublicChatRequest(gameServerUser_t &user,
 
 void protocol_t::sendPublicChatAnswer(gameServerUser_t &user, const std::string &message) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0x00);
+	packet.construct(0xC1, protocol_e::_publicChat);
 	packet.insertString(3, user.getCharacter().getName(), 10);
 
 	size_t messageLen = std::min<size_t>(message.size(), 59);
@@ -519,7 +520,7 @@ void protocol_t::sendPublicChatAnswer(gameServerUser_t &user, const std::string 
 	for(viewportManager_t::viewport_t::iterator i = user.getCharacter().getViewport().begin(); i != user.getCharacter().getViewport().end(); ++i) {
 		gameObject_t *vo = (*i);
 
-		if(vo->getType() == gameObject_t::_OBJECT_CHARACTER) {
+		if(vo->getType() == gameObject_e::_character) {
 			m_sendCallback(reinterpret_cast<character_t*>(vo)->getOwner(), packet);
 		}
 	}
@@ -530,7 +531,7 @@ void protocol_t::sendPublicChatAnswer(gameServerUser_t &user, const std::string 
 void protocol_t::parseCharacterActionRequest(gameServerUser_t &user,
 											 const eMUCore::packet_t &packet) const {
 	unsigned char direction = packet.read<unsigned char>(3);
-	unsigned char actionId = packet.read<unsigned char>(4);
+	characterAction_e::type_t actionId = static_cast<characterAction_e::type_t>(packet.read<unsigned char>(4));
 
 	m_executorInterface.onCharacterAction(user, direction, actionId);
 }
@@ -539,7 +540,7 @@ void protocol_t::sendViewportCharacterActionRequest(character_t &character,
 													unsigned char actionId,
 													unsigned short targetId) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0x18);
+	packet.construct(0xC1, protocol_e::_action);
 	packet.insert<unsigned char>(3, HIBYTE(character.getOwner().getIndex()));
 	packet.insert<unsigned char>(4, LOBYTE(character.getOwner().getIndex()));
 	packet.insert<unsigned char>(5, character.getDirection());
@@ -550,7 +551,7 @@ void protocol_t::sendViewportCharacterActionRequest(character_t &character,
 	for(viewportManager_t::viewport_t::iterator i = character.getViewport().begin(); i != character.getViewport().end(); ++i) {
 		gameObject_t *vo = (*i);
 
-		if(vo->getType() == gameObject_t::_OBJECT_CHARACTER) {
+		if(vo->getType() == gameObject_e::_character) {
 			m_sendCallback(reinterpret_cast<character_t*>(vo)->getOwner(), packet);
 		}
 	}

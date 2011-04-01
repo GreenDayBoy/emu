@@ -24,7 +24,7 @@ public:
 											unsigned int connectionStamp,
 											const std::string &accountId,
 											const std::string &name,
-											unsigned char race) = 0;
+											eMUShared::characterRace_e::type_t race) = 0;
 
 	virtual void onCharacterDeleteRequest(dataServerUser_t &user,
 											unsigned int connectionStamp,
@@ -76,7 +76,7 @@ public:
 	void sendCharacterCreateAnswer(dataServerUser_t &user,
 									unsigned int connectionStamp,
 									const std::string &name,
-									unsigned char race,
+									eMUShared::characterRace_e::type_t race,
 									unsigned char result) const;
 
 	void parseCharacterDeleteRequest(dataServerUser_t &user,

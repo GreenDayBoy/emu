@@ -2,6 +2,7 @@
 #define eMU_GAMESERVER_CRYPT_H
 
 #include <string>
+#include "enum.h"
 
 const unsigned char	c_extractionKeys[32] = {0xE7, 0x6D, 0x3A, 0x89, 0xBC, 0xB2, 0x9F, 0x73,
 											0x23, 0xA8, 0xFE, 0xB6, 0x49, 0x5D, 0x39, 0x5D,
@@ -10,11 +11,6 @@ const unsigned char	c_extractionKeys[32] = {0xE7, 0x6D, 0x3A, 0x89, 0xBC, 0xB2, 
 
 class crypt_t {
 public:
-	enum KEYS_TYPE {
-		_ENCRYPTION_KEYS = 0,
-		_DECRYPTION_KEYS
-	};
-
 	crypt_t() {}
 
 	void startup(const std::string &encFileName, const std::string &decFileName);
@@ -26,7 +22,7 @@ private:
 	crypt_t(const crypt_t&);
 	crypt_t& operator=(const crypt_t&);
 
-	void loadKeys(std::string keysFileName, KEYS_TYPE keysType);
+	void loadKeys(std::string keysFileName, cryptKeys_e::type_t keysType);
 	void encryptBlock(unsigned char *buff, const unsigned char *src, size_t blockSize) const;
 	int decryptBlock(unsigned char *buff, const unsigned char *src) const;
 

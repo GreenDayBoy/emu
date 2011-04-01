@@ -3,25 +3,26 @@
 
 #include "..\core\core.h"
 #include "..\shared\shared.h"
+#include "enum.h"
 
 // what a big name xD.
 class dataServerProtocolExecutorInterface_t {
 public:
 	virtual void onAccountCheckAnswer(unsigned int connectionStamp,
-								const std::string &accountId,
-								unsigned char result) = 0;
+										const std::string &accountId,
+										accountCheckResult_e::type_t result) = 0;
 
 	virtual void onCharacterListAnswer(unsigned int connectionStamp,
 										const eMUShared::characterList_t &characterList) = 0;
 
 	virtual void onCharacterCreateAnswer(unsigned int connectionStamp,
 											const std::string &name,
-											unsigned char race,
-											unsigned char result) = 0;
+											eMUShared::characterRace_e::type_t race,
+											characterCreateResult_e::type_t result) = 0;
 
 	virtual void onCharacterDeleteAnswer(unsigned int connectionStamp,
 											const std::string &name,
-											unsigned char result) = 0;
+											characterDeleteResult_e::type_t result) = 0;
 
 	virtual void onCharacterSelectAnswer(unsigned int connectionStamp,
 											const eMUShared::characterAttributes_t &attr) = 0;
@@ -56,7 +57,7 @@ public:
 	void sendCharacterCreateRequest(unsigned int connectionStamp,
 									const std::string &accountId,
 									const std::string &name,
-									unsigned char race) const;
+									eMUShared::characterRace_e::type_t race) const;
 
 	void parseCharacterCreateAnswer(const eMUCore::packet_t &packet) const;
 

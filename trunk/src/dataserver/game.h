@@ -39,7 +39,7 @@ public:
 									unsigned int connectionStamp,
 									const std::string &accountId,
 									const std::string &name,
-									unsigned char race);
+									eMUShared::characterRace_e::type_t race);
 
 	void onCharacterDeleteRequest(dataServerUser_t &user,
 									unsigned int connectionStamp,

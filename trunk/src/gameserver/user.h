@@ -37,10 +37,10 @@ public:
 
 	void setAvailableRaces(const eMUShared::characterList_t &characterList,
 							unsigned short advancedRaceLevel);
-	inline unsigned char getAvailableRaces() const { return m_availableRaces; }
+	inline availableRace_e::type_t getAvailableRaces() const { return m_availableRaces; }
 
-	inline void setCloseReason(unsigned char closeReason) { m_closeReason = closeReason; }
-	inline void resetCloseReason() { m_closeReason = 0xFF; }
+	inline void setCloseReason(clientCloseReason_e::type_t closeReason) { m_closeReason = closeReason; }
+	inline void resetCloseReason() { m_closeReason = clientCloseReason_e::_none; }
 	inline unsigned char getCloseReason() const { return m_closeReason; }
 
 	inline void setTimeToClose(int timeToClose) { m_timeToClose = timeToClose; }
@@ -65,8 +65,8 @@ private:
 	unsigned char						m_cryptSerial;
 	int									m_loginAttempts;
 	bool								m_loggedIn;
-	unsigned char						m_availableRaces;
-	unsigned char						m_closeReason;
+	availableRace_e::type_t				m_availableRaces;
+	clientCloseReason_e::type_t			m_closeReason;
 	int									m_timeToClose;
 	unsigned int						m_connectionStamp;
 	character_t							m_character;

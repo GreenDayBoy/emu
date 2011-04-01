@@ -52,7 +52,7 @@ void monsterAttributesManager_t::startup(const std::string &fileName) {
 
 monster_t::monster_t(int index,
 					 const monsterAttributesManager_t::monsterAttributes_t &attr):
-  gameObject_t(gameObject_t::_OBJECT_MONSTER),
+  gameObject_t(gameObject_e::_monster),
   m_attributes(attr),
   m_index(index),
   m_id(0),

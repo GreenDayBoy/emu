@@ -18,10 +18,10 @@ public:
 								const std::string &clientExeSerial) = 0;
 
 	virtual void onCharacterListRequest(gameServerUser_t &user) = 0;
-	virtual void onLogoutRequest(gameServerUser_t &user, unsigned char closeReason) = 0;
+	virtual void onLogoutRequest(gameServerUser_t &user, clientCloseReason_e::type_t closeReason) = 0;
 	virtual void onCharacterCreateRequest(gameServerUser_t &user,
 											const std::string &name,
-											unsigned char race) = 0;
+											eMUShared::characterRace_e::type_t race) = 0;
 	virtual void onCharacterDeleteRequest(gameServerUser_t &user,
 											const std::string &name,
 											const std::string &pin) = 0;
@@ -39,7 +39,7 @@ public:
 
 	virtual void onCharacterAction(gameServerUser_t &user,
 									unsigned char direction,
-									unsigned char actionId) = 0;
+									characterAction_e::type_t actionId) = 0;
 
 };
 
@@ -59,13 +59,13 @@ public:
 							const eMUCore::packet_t &packet) const;
 
 	void sendLoginAnswer(gameServerUser_t &user,
-							unsigned char result) const;
+							accountCheckResult_e::type_t result) const;
 
 	void parseCharacterListRequest(gameServerUser_t &user,
 									const eMUCore::packet_t &packet) const;
 
 	void sendCharacterListAnswer(gameServerUser_t &user,
-									unsigned char availableRaces,
+									availableRace_e::type_t availableRace,
 									const eMUShared::characterList_t &characterList) const;
 
 	void parseLogoutRequest(gameServerUser_t &user,
@@ -82,7 +82,7 @@ public:
 									const std::string &name,
 									int slot,
 									unsigned short level,
-									unsigned char race) const;
+									eMUShared::characterRace_e::type_t race) const;
 
 	void parseCharacterDeleteRequest(gameServerUser_t &user,
 										const eMUCore::packet_t &packet) const;
@@ -94,11 +94,11 @@ public:
 										const eMUCore::packet_t &packet) const;
 
 	void sendCharacterSelectAnswer(gameServerUser_t &user,
-									const character_t &character) const;
+									character_t &character) const;
 
 	void sendTextNotice(gameServerUser_t &user,
 						const std::string &notice,
-						unsigned char type = 0,
+						gameNotice_e::type_t type = gameNotice_e::_gold,
 						unsigned char loopCount = 0,
 						unsigned short loopDelay = 0,
 						unsigned int color = 0,

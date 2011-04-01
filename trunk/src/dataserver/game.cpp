@@ -81,7 +81,7 @@ void game_t::onCharacterListRequest(dataServerUser_t &user,
 		while(iter.nextRow()) {
 			eMUShared::characterListAttributes_t character;
 			character.m_name = iter.getValue<std::string>("name");
-			character.m_race = iter.getValue<unsigned int>("race");
+			character.m_race = static_cast<eMUShared::characterRace_e::type_t>(iter.getValue<unsigned int>("race"));
 			character.m_level = iter.getValue<unsigned short>("level");
 			character.m_controlCode = iter.getValue<unsigned int>("controlCode");
 
@@ -118,9 +118,9 @@ void game_t::onCharacterCreateRequest(dataServerUser_t &user,
 										unsigned int connectionStamp,
 										const std::string &accountId,
 										const std::string &name,
-										unsigned char race) {
+										eMUShared::characterRace_e::type_t race) {
 	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Character create request :: account [" << accountId << "] name [" << name 
-													<< "] race [" << static_cast<unsigned int>(race) << "].";
+													<< "] race [" << race << "].";
 	m_logger.out();
 
 	try {
@@ -128,7 +128,7 @@ void game_t::onCharacterCreateRequest(dataServerUser_t &user,
 								<< " `eMU_CharacterCreate`("
 									<< "'" << accountId << "'"
 									<< ", '" << name << "'"
-									<< ", '" << static_cast<unsigned int>(race) << "');";
+									<< ", '" << race << "');";
 		m_database.execute();
 		database_t::iterator_t iter = m_database.getQueryResult();
 
@@ -213,7 +213,7 @@ void game_t::onCharacterSelectRequest(dataServerUser_t &user,
 		eMUShared::characterAttributes_t attr;
 
 		attr.m_name = name;
-		attr.m_race = iter.getValue<unsigned int>("race");
+		attr.m_race = static_cast<eMUShared::characterRace_e::type_t>(iter.getValue<unsigned int>("race"));
 
 		attr.m_strength = iter.getValue<unsigned short>("strength");
 		attr.m_agility = iter.getValue<unsigned short>("agility");
@@ -271,7 +271,7 @@ void game_t::onCharacterSaveRequest(dataServerUser_t &user,
 		m_database.query() << "UPDATE"
 								<< " `characters`"
 							<< " SET"
-								<< " `race` = " << static_cast<unsigned int>(attr.m_race)
+								<< " `race` = " << attr.m_race
 								<< ", `posX` = "  << static_cast<unsigned int>(attr.m_posX)
 								<< ", `posY` = "  << static_cast<unsigned int>(attr.m_posY)
 								<< ", `mapId` = " << static_cast<unsigned int>(attr.m_mapId)

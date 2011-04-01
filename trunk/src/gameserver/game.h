@@ -48,10 +48,10 @@ public:
 							const std::string &clientExeVersion,
 							const std::string &clientExeSerial);
 	void onCharacterListRequest(gameServerUser_t &user);
-	void onLogoutRequest(gameServerUser_t &user, unsigned char closeReason);
+	void onLogoutRequest(gameServerUser_t &user, clientCloseReason_e::type_t closeReason);
 	void onCharacterCreateRequest(gameServerUser_t &user,
 									const std::string &name,
-									unsigned char race);
+									eMUShared::characterRace_e::type_t race);
 	void onCharacterDeleteRequest(gameServerUser_t &user,
 									const std::string &name,
 									const std::string &pin);
@@ -68,26 +68,26 @@ public:
 						const std::string &message);
 	void onCharacterAction(gameServerUser_t &user,
 							unsigned char direction,
-							unsigned char actionId);
+							characterAction_e::type_t actionId);
 	// --------------------------------------------------------
 
 	// --------------------------------------------------------
 	// Interface for dataServerProtocolExecutor_t.
 	void onAccountCheckAnswer(unsigned int connectionStamp,
 								const std::string &accountId,
-								unsigned char result);
+								accountCheckResult_e::type_t result);
 
 	void onCharacterListAnswer(unsigned int connectionStamp,
 								const eMUShared::characterList_t &characterList);
 
 	void onCharacterCreateAnswer(unsigned int connectionStamp,
 									const std::string &name,
-									unsigned char race,
-									unsigned char result);
+									eMUShared::characterRace_e::type_t race,
+									characterCreateResult_e::type_t result);
 
 	void onCharacterDeleteAnswer(unsigned int connectionStamp,
 									const std::string &name,
-									unsigned char result);
+									characterDeleteResult_e::type_t result);
 
 	void onCharacterSelectAnswer(unsigned int connectionStamp,
 									const eMUShared::characterAttributes_t &attr);

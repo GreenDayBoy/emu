@@ -1,4 +1,5 @@
 #include "protocol.h"
+#include "enum.h"
 
 protocol_t::protocol_t(protocolExecutorInterface_t &iface,
 						const sendCallback_t &sendCallback):
@@ -8,13 +9,13 @@ protocol_t::protocol_t(protocolExecutorInterface_t &iface,
 void protocol_t::core(connectServerUser_t &user,
 						const eMUCore::packet_t &packet) const {
 	switch(packet.getProtocolId()) {
-	case 0xF4:
+	case protocol_e::_serverListManage:
 		switch(packet.getData()[3]) {
-		case 0x03: // server details.
+		case protocol_e::serverListManage_e::_serverSelect:
 			this->parseServerSelectRequest(user, packet);
 			break;
 
-		case 0x06: // servers list.
+		case protocol_e::serverListManage_e::_get:
 			this->parseServerListRequest(user, packet);
 			break;
 		}
@@ -24,7 +25,7 @@ void protocol_t::core(connectServerUser_t &user,
 
 void protocol_t::sendHandshake(connectServerUser_t &user) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC1, 0x00);
+	packet.construct(0xC1, protocol_e::_handshake);
 	packet.insert<unsigned char>(3, 0x01);
 
 	m_sendCallback(user, packet);
@@ -42,8 +43,8 @@ void protocol_t::parseServerListRequest(connectServerUser_t &user,
 void protocol_t::sendServerListAnswer(connectServerUser_t &user,
 										const serverList_t::serverAttributesList_t &list) const {
 	eMUCore::packet_t packet;
-	packet.construct(0xC2, 0xF4);
-	packet.insert<unsigned char>(4, 0x06);
+	packet.construct(0xC2, protocol_e::_serverListManage);
+	packet.insert<unsigned char>(4, protocol_e::serverListManage_e::_get);
 
 	size_t serversCount = 0;
 
@@ -76,8 +77,8 @@ void protocol_t::sendServerSelectAnswer(connectServerUser_t &user,
 										const serverList_t::serverAttributes_t &attr) const {
 	eMUCore::packet_t packet;
 
-	packet.construct(0xC1, 0xF4);
-	packet.insert<unsigned char>(3, 0x03);
+	packet.construct(0xC1, protocol_e::_serverListManage);
+	packet.insert<unsigned char>(3, protocol_e::serverListManage_e::_serverSelect);
 
 	if(!eMUCore::isIpAddress(attr.m_address)) {
 		std::string ipAddress = eMUCore::convertToIpAddress(attr.m_address);
