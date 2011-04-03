@@ -43,7 +43,7 @@ void game_t::onLoginRequest(gameServerUser_t &user,
 							const std::string &password,
 							const std::string &clientExeVersion,
 							const std::string &clientExeSerial) {
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Login request :: account [" << accountId << "].";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Login request :: account [" << accountId << "].";
 
 	if(!user.isLoggedIn()) {
 		if(clientExeVersion == m_versionConfiguration.m_versionProtocol
@@ -61,7 +61,7 @@ void game_t::onLoginRequest(gameServerUser_t &user,
 			m_protocol.sendLoginAnswer(user, accountCheckResult_e::_invalidVersionOrSerial);
 		}
 	} else {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " User already logged in.";
+		m_logger.in(eMUCore::loggerMessage_e::_error) << user << " User already logged in.";
 		m_logger.out();
 		m_disconnectCallback(user);
 	}
@@ -72,7 +72,7 @@ void game_t::onAccountCheckAnswer(unsigned int connectionStamp,
 							accountCheckResult_e::type_t result) {
 	gameServerUser_t &user = m_userManager.find(connectionStamp);
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << "[" << accountId << "]";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << user << "[" << accountId << "]";
 
 	if(result == accountCheckResult_e::_success) {
 			m_logger.append() << " logged in.";
@@ -112,13 +112,13 @@ void game_t::onAccountCheckAnswer(unsigned int connectionStamp,
 }
 
 void game_t::onCharacterListRequest(gameServerUser_t &user) {
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Character list request.";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Character list request.";
 	m_logger.out();
 
 	if(user.isLoggedIn()) {
 		m_dataServerProtocol.sendCharacterListRequest(user.getConnectionStamp(), user.getAccountId());
 	} else {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " User is not logged on account.";
+		m_logger.in(eMUCore::loggerMessage_e::_error) << user << " User is not logged on account.";
 		m_logger.out();
 
 		m_disconnectCallback(user);
@@ -163,7 +163,7 @@ void game_t::onLogoutRequest(gameServerUser_t &user, clientCloseReason_e::type_t
 void game_t::onCharacterCreateRequest(gameServerUser_t &user,
 										const std::string &name,
 										eMUShared::characterRace_e::type_t race) {
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Create character request :: name [" << name 
+	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Create character request :: name [" << name 
 													<< "] race [" << race << "].";
 	m_logger.out();
 
@@ -178,13 +178,13 @@ void game_t::onCharacterCreateRequest(gameServerUser_t &user,
 															name,
 															race);
 		} else {
-			m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " Invalid race.";
+			m_logger.in(eMUCore::loggerMessage_e::_error) << user << " Invalid race.";
 			m_logger.out();
 			
 			m_disconnectCallback(user);
 		}
 	} else {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " User is not logged on account.";
+		m_logger.in(eMUCore::loggerMessage_e::_error) << user << " User is not logged on account.";
 		m_logger.out();
 
 		m_disconnectCallback(user);
@@ -198,7 +198,7 @@ void game_t::onCharacterCreateAnswer(unsigned int connectionStamp,
 	gameServerUser_t &user = m_userManager.find(connectionStamp);
 
 	if(result != characterCreateResult_e::_toManyCharacters) {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Character [" << name << "]";
+		m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Character [" << name << "]";
 
 		int slot = 0;
 
@@ -213,7 +213,7 @@ void game_t::onCharacterCreateAnswer(unsigned int connectionStamp,
 
 		m_protocol.sendCharacterCreteAnswer(user, result, name, slot, 1, race);
 	} else {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " already have 5 characters.";
+		m_logger.in(eMUCore::loggerMessage_e::_error) << user << " already have 5 characters.";
 		m_logger.out();
 
 		m_disconnectCallback(user);
@@ -223,13 +223,13 @@ void game_t::onCharacterCreateAnswer(unsigned int connectionStamp,
 void game_t::onCharacterDeleteRequest(gameServerUser_t &user,
 										const std::string &name,
 										const std::string &pin) {
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Delete character request ::" << " name [" << name << "].";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Delete character request ::" << " name [" << name << "].";
 	m_logger.out();
 
 	if(user.isLoggedIn()) {
 		m_dataServerProtocol.sendCharacterDeleteRequest(user.getConnectionStamp(), user.getAccountId(), name, pin);
 	} else {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " User is not logged on account.";
+		m_logger.in(eMUCore::loggerMessage_e::_error) << user << " User is not logged on account.";
 		m_logger.out();
 
 		m_disconnectCallback(user);
@@ -242,7 +242,7 @@ void game_t::onCharacterDeleteAnswer(unsigned int connectionStamp,
 	gameServerUser_t &user = m_userManager.find(connectionStamp);
 
 	if(result != characterDeleteResult_e::_noAccountAssociation) {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Character [" << name << "]";
+		m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Character [" << name << "]";
 
 		if(result == characterDeleteResult_e::_success) {
 			m_logger.append() << " deleted.";
@@ -255,7 +255,7 @@ void game_t::onCharacterDeleteAnswer(unsigned int connectionStamp,
 
 		m_protocol.sendCharacterDeleteAnswer(user, result);
 	} else {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " Character [" << name << "]"
+		m_logger.in(eMUCore::loggerMessage_e::_error) << user << " Character [" << name << "]"
 														<< " not associated with account.";
 		m_logger.out();
 
@@ -265,13 +265,13 @@ void game_t::onCharacterDeleteAnswer(unsigned int connectionStamp,
 
 void game_t::onCharacterSelectRequest(gameServerUser_t &user,
 									  const std::string &name) {
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Select character request ::" << " name [" << name << "].";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Select character request ::" << " name [" << name << "].";
 	m_logger.out();
 
 	if(!user.getCharacter().isActive()) {
 		m_dataServerProtocol.sendCharacterSelectRequest(user.getConnectionStamp(), user.getAccountId(), name);
 	} else {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " User is playing -> character " << user.getCharacter() << ".";
+		m_logger.in(eMUCore::loggerMessage_e::_error) << user << " User is playing -> character " << user.getCharacter() << ".";
 		m_logger.out();
 
 		m_disconnectCallback(user);
@@ -282,7 +282,7 @@ void game_t::onCharacterSelectAnswer(unsigned int connectionStamp,
 									 const eMUShared::characterAttributes_t &attr) {
 	gameServerUser_t &user = m_userManager.find(connectionStamp);
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Preparing character [" << attr.m_name << "].";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Preparing character [" << attr.m_name << "].";
 	m_logger.out();
 
 	if(m_mapManager.isMapExists(attr.m_mapId)) {
@@ -302,14 +302,14 @@ void game_t::onCharacterSelectAnswer(unsigned int connectionStamp,
 			m_viewportManager.generate(character);
 			character.deactivateTeleportEffect();
 		} else {
-			m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " Invalid start coordinates [" << static_cast<int>(attr.m_posX) 
+			m_logger.in(eMUCore::loggerMessage_e::_error) << user << " Invalid start coordinates [" << static_cast<int>(attr.m_posX) 
 															<< "][" << static_cast<int>(attr.m_posY) << "].";
 			m_logger.out();
 
 			m_disconnectCallback(user);
 		}
 	} else {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " Invalid mapId [" << static_cast<int>(attr.m_mapId) << "].";
+		m_logger.in(eMUCore::loggerMessage_e::_error) << user << " Invalid mapId [" << static_cast<int>(attr.m_mapId) << "].";
 		m_logger.out();
 
 		m_disconnectCallback(user);
@@ -337,11 +337,11 @@ void game_t::onCharacterMoveRequest(gameServerUser_t &user,
 
 			m_protocol.sendViewportObjectMoveRequest(character);
 		} else {
-			m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " " << character << " Invalid path for character.";
+			m_logger.in(eMUCore::loggerMessage_e::_error) << user << " " << character << " Invalid path for character.";
 			m_logger.out();
 
 			#ifdef _DEBUG
-			m_logger.in(eMUCore::logger_t::_MESSAGE_DEBUG) << user << " " << character << " Path dump: " 
+			m_logger.in(eMUCore::loggerMessage_e::_debug) << user << " " << character << " Path dump: " 
 															<< m_mapManager[character.getMapId()].dumpPath(path) << ".";
 			m_logger.out();
 			#endif
@@ -355,7 +355,7 @@ void game_t::onCharacterTeleportRequest(gameServerUser_t &user,
 										unsigned short gateId) {
 	character_t &character = user.getCharacter();
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " " << character << " Requested teleport to gate [" << gateId << "].";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " " << character << " Requested teleport to gate [" << gateId << "].";
 	m_logger.out();
 
 	gate_t &gate = m_gateManager[gateId];
@@ -369,7 +369,7 @@ void game_t::onCharacterTeleportRequest(gameServerUser_t &user,
 																								destGate.getY2());
 
 			#ifdef _DEBUG
-			m_logger.in(eMUCore::logger_t::_MESSAGE_DEBUG) << "Source gate: " << gate << ", destination gate: " << destGate << ".";
+			m_logger.in(eMUCore::loggerMessage_e::_debug) << "Source gate: " << gate << ", destination gate: " << destGate << ".";
 			m_logger.out();
 			#endif
 
@@ -380,13 +380,13 @@ void game_t::onCharacterTeleportRequest(gameServerUser_t &user,
 									destGate.getDirection(),
 									destGate.getId());
 		} else {
-			m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Character level not match to enter gate.";
+			m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Character level not match to enter gate.";
 			m_logger.out();
 
 			m_disconnectCallback(user);
 		}
 	} else {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " Character is not in gate range.";
+		m_logger.in(eMUCore::loggerMessage_e::_error) << user << " Character is not in gate range.";
 		m_logger.out();
 
 		m_disconnectCallback(user);
@@ -412,7 +412,7 @@ void game_t::onQueryExceptionNotice(unsigned int connectionStamp,
 								const std::string &what) {
 	gameServerUser_t &user = m_userManager.find(connectionStamp);
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << "DataServer query error: " << user << " " << what;
+	m_logger.in(eMUCore::loggerMessage_e::_error) << "DataServer query error: " << user << " " << what;
 	m_logger.out();
 
 	//m_disconnectCallback(user);
@@ -445,7 +445,7 @@ void game_t::checkSelfClose() {
 }
 
 void game_t::saveCharacter(gameServerUser_t &user) const {
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Saving character :: name " << user.getCharacter() << ".";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Saving character :: name " << user.getCharacter() << ".";
 	m_logger.out();
 
 	m_dataServerProtocol.sendCharacterSaveRequest(user.getAccountId(),
@@ -460,7 +460,7 @@ void game_t::teleportCharacter(gameServerUser_t &user,
 								unsigned char gateId) {
 	character_t &character = user.getCharacter();
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " " << character << " Teleporting to"
+	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " " << character << " Teleporting to"
 													<< " [" << static_cast<int>(mapId) << "]["
 													<< static_cast<int>(x) << "][" << static_cast<int>(y) << "].";
 	m_logger.out();

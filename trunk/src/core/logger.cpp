@@ -71,7 +71,7 @@ void logger_t::cleanup() {
 	}
 }
 
-std::stringstream& logger_t::in(logMessageType_t messageType) {
+std::stringstream& logger_t::in(loggerMessage_e::type_t type) {
 	m_synchronizer.lock();
 
 	SYSTEMTIME localTime = {0};
@@ -93,7 +93,7 @@ std::stringstream& logger_t::in(logMessageType_t messageType) {
 				//<< c_loggerMessageHeader[logMessageType]
 				//<< " ";
 
-	m_currentMessageType = messageType;
+	m_currentMessageType = type;
 	return m_stream;
 }
 

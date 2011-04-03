@@ -33,56 +33,56 @@ connectServer_t::connectServer_t(size_t maxStoredLogsCount,
 void connectServer_t::startup() {
 	m_logger.startup();
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Starting game.";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Starting game.";
 	m_logger.out();
 	m_game.startup();
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Starting iocp engine.";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Starting iocp engine.";
 	m_logger.out();
 	m_iocpEngine.startup();
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Starting user manager.";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Starting user manager.";
 	m_logger.out();
 	m_userManager.startup(boost::bind(&connectServer_t::onContextAttach, this, _1),
 							boost::bind(&connectServer_t::onContextReceive, this, _1),
 							boost::bind(&connectServer_t::onContextClose, this, _1));
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Starting tcp server on port " << m_tcpServer.getListenPort() << ".";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Starting tcp server on port " << m_tcpServer.getListenPort() << ".";
 	m_logger.out();
 	m_tcpServer.startup();
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Starting udp socket on port " << m_udpSocket.getPort() << ".";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Starting udp socket on port " << m_udpSocket.getPort() << ".";
 	m_logger.out();
 	m_udpSocket.startup();
 
 	this->updateWindowTitle();
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Waiting for connections.";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Waiting for connections.";
 	m_logger.out();
 }
 
 void connectServer_t::cleanup() {
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Disconnecting all users.";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Disconnecting all users.";
 	m_logger.out();
 	this->disconnectAll();
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Cleaning udp socket.";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Cleaning udp socket.";
 	m_logger.out();
 	m_udpSocket.cleanup();
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Cleaning tcp server.";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Cleaning tcp server.";
 	m_logger.out();
 	m_tcpServer.cleanup();
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Cleaning iocp engine.";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Cleaning iocp engine.";
 	m_logger.out();
 	m_iocpEngine.cleanup();
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Cleaning user manager.";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Cleaning user manager.";
 	m_logger.out();
 	m_userManager.cleanup();
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Cleaning logger.";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Cleaning logger.";
 	m_logger.out();
 	m_logger.cleanup();
 }
@@ -116,7 +116,7 @@ connectServerUser_t* connectServer_t::onContextAllocate() {
 	connectServerUser_t *user = m_userManager.findFree();
 
 	if(user == NULL) {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << "No free objects found.";
+		m_logger.in(eMUCore::loggerMessage_e::_error) << "No free objects found.";
 		m_logger.out();
 	}
 
@@ -127,7 +127,7 @@ void connectServer_t::onContextAttach(eMUCore::socketContext_t &context) {
 	connectServerUser_t &user = reinterpret_cast<connectServerUser_t&>(context);
 
 	try {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Connected.";
+		m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Connected.";
 		m_logger.out();
 
 		// -----------------------
@@ -137,15 +137,15 @@ void connectServer_t::onContextAttach(eMUCore::socketContext_t &context) {
 
 		m_protocol.sendHandshake(user);
 	} catch(eMUCore::exception_t &e) {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << "Exception: " << user << " " << e.what();
+		m_logger.in(eMUCore::loggerMessage_e::_error) << "Exception: " << user << " " << e.what();
 		m_logger.out();
 		this->disconnect(user);
 	} catch(std::exception &e) {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << "std exception: " << user << " " << e.what();
+		m_logger.in(eMUCore::loggerMessage_e::_error) << "std exception: " << user << " " << e.what();
 		m_logger.out();
 		this->disconnect(user);
 	} catch(...) {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << "Exception: " << user << " Unknown exception.";
+		m_logger.in(eMUCore::loggerMessage_e::_error) << "Exception: " << user << " Unknown exception.";
 		m_logger.out();
 		this->disconnect(user);
 	}
@@ -162,7 +162,7 @@ void connectServer_t::onContextReceive(eMUCore::socketContext_t &context) {
 			eMUCore::packet_t packet(&user.getRecvBuffer().m_data[parsedDataSize]);
 
 			#ifdef _DEBUG
-			m_logger.in(eMUCore::logger_t::_MESSAGE_PROTOCOL) << user << " Received " << packet << ".";
+			m_logger.in(eMUCore::loggerMessage_e::_protocol) << user << " Received " << packet << ".";
 			m_logger.out();
 			#endif
 
@@ -173,15 +173,15 @@ void connectServer_t::onContextReceive(eMUCore::socketContext_t &context) {
 			parsedDataSize += rawDataSize;
 		} while(parsedDataSize < user.getRecvBuffer().m_dataSize);
 	} catch(eMUCore::exception_t &e) {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << "Exception: " << user << " " << e.what();
+		m_logger.in(eMUCore::loggerMessage_e::_error) << "Exception: " << user << " " << e.what();
 		m_logger.out();
 		this->disconnect(user);
 	} catch(std::exception &e) {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << "std exception: " << user << " " << e.what();
+		m_logger.in(eMUCore::loggerMessage_e::_error) << "std exception: " << user << " " << e.what();
 		m_logger.out();
 		this->disconnect(user);
 	} catch(...) {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << "Exception: " << user << " Unknown exception.";
+		m_logger.in(eMUCore::loggerMessage_e::_error) << "Exception: " << user << " Unknown exception.";
 		m_logger.out();
 		this->disconnect(user);
 	}
@@ -190,7 +190,7 @@ void connectServer_t::onContextReceive(eMUCore::socketContext_t &context) {
 void connectServer_t::onContextClose(eMUCore::socketContext_t &context) {
 	connectServerUser_t &user = reinterpret_cast<connectServerUser_t&>(context);
 
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << user << " Disconnected.";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Disconnected.";
 	m_logger.out();
 
 	// -----------------------
@@ -217,20 +217,20 @@ void connectServer_t::onDatagramReceive(sockaddr_in& /*inetAddr*/, unsigned char
 			parsedDataSize += rawDataSize;
 		} while(parsedDataSize < dataSize);
 	} catch(eMUCore::exception_t &e) {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << "Exception: [UDP] " << e.what();
+		m_logger.in(eMUCore::loggerMessage_e::_error) << "Exception: [UDP] " << e.what();
 		m_logger.out();
 	} catch(std::exception &e) {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << "std exception: [UDP] " << e.what();
+		m_logger.in(eMUCore::loggerMessage_e::_error) << "std exception: [UDP] " << e.what();
 		m_logger.out();
 	} catch(...) {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << "Unknown exception: [UDP].";
+		m_logger.in(eMUCore::loggerMessage_e::_error) << "Unknown exception: [UDP].";
 		m_logger.out();
 	}
 }
 
 void connectServer_t::send(connectServerUser_t &user, const eMUCore::packet_t &packet) {
 	#ifdef _DEBUG
-	m_logger.in(eMUCore::logger_t::_MESSAGE_PROTOCOL) << user << " Sending " << packet << ".";
+	m_logger.in(eMUCore::loggerMessage_e::_protocol) << user << " Sending " << packet << ".";
 	m_logger.out();
 	#endif
 

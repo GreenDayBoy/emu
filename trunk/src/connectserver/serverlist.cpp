@@ -22,7 +22,7 @@ void serverList_t::startup(const std::string &fileName) {
 		attr.m_lastActivityTime = 0;
 
 		#ifdef _DEBUG
-		m_logger.in(eMUCore::logger_t::_MESSAGE_DEBUG) << "[serverList_t::startup()] Read " << attr << ".";
+		m_logger.in(eMUCore::loggerMessage_e::_debug) << "[serverList_t::startup()] Read " << attr << ".";
 		m_logger.out();
 		#endif
 
@@ -40,7 +40,7 @@ void serverList_t::update() {
 
 		if(tickCount - attr.m_lastActivityTime > m_serverTimeout * 1000) {
 			if(attr.m_active) {
-				m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << attr << " Server is timed out.";
+				m_logger.in(eMUCore::loggerMessage_e::_info) << attr << " Server is timed out.";
 				m_logger.out();
 
 				if(m_activeServersCount > 0) {
@@ -51,7 +51,7 @@ void serverList_t::update() {
 			attr.m_active = false;
 		} else {
 			if(!attr.m_active) {
-				m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << attr << " Server is alive.";
+				m_logger.in(eMUCore::loggerMessage_e::_info) << attr << " Server is alive.";
 				m_logger.out();
 				++m_activeServersCount;
 			}

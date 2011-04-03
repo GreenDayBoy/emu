@@ -34,7 +34,7 @@ void game_t::onAccountCheckRequest(dataServerUser_t &user,
 									const std::string &accountId,
 									const std::string &password,
 									const std::string &ipAddress) {
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Account check request :: account [" << accountId << "] ipAddress [" << ipAddress << "].";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Account check request :: account [" << accountId << "] ipAddress [" << ipAddress << "].";
 	m_logger.out();
 
 	try {
@@ -60,7 +60,7 @@ void game_t::onAccountCheckRequest(dataServerUser_t &user,
 void game_t::onCharacterListRequest(dataServerUser_t &user,
 										unsigned int connectionStamp,
 										const std::string &accountId) {
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Character list request :: account [" << accountId << "].";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Character list request :: account [" << accountId << "].";
 	m_logger.out();
 
 	try {
@@ -96,7 +96,7 @@ void game_t::onCharacterListRequest(dataServerUser_t &user,
 
 void game_t::onLogoutRequest(dataServerUser_t &/*user*/,
 								const std::string &accountId) {
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Logout request :: account [" << accountId << "].";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Logout request :: account [" << accountId << "].";
 	m_logger.out();
 
 	try {
@@ -109,7 +109,7 @@ void game_t::onLogoutRequest(dataServerUser_t &/*user*/,
 								<< " `id` = '" << accountId << "';";
 		m_database.execute();
 	} catch(eMUCore::exception_t &e) {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << e.what();
+		m_logger.in(eMUCore::loggerMessage_e::_error) << e.what();
 		m_logger.out();
 	}
 }
@@ -119,7 +119,7 @@ void game_t::onCharacterCreateRequest(dataServerUser_t &user,
 										const std::string &accountId,
 										const std::string &name,
 										eMUShared::characterRace_e::type_t race) {
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Character create request :: account [" << accountId << "] name [" << name 
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Character create request :: account [" << accountId << "] name [" << name 
 													<< "] race [" << race << "].";
 	m_logger.out();
 
@@ -149,7 +149,7 @@ void game_t::onCharacterDeleteRequest(dataServerUser_t &user,
 										const std::string &accountId,
 										const std::string &name,
 										const std::string &pin) {
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Character delete request :: account [" << accountId << "] name [" << name << "].";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Character delete request :: account [" << accountId << "] name [" << name << "].";
 	m_logger.out();
 
 	try {
@@ -176,7 +176,7 @@ void game_t::onCharacterSelectRequest(dataServerUser_t &user,
 										unsigned int connectionStamp,
 										const std::string &accountId,
 										const std::string &name) {
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Character select request :: account [" << accountId << "] name [" << name << "].";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Character select request :: account [" << accountId << "] name [" << name << "].";
 	m_logger.out();
 
 	try {
@@ -264,7 +264,7 @@ void game_t::onCharacterSelectRequest(dataServerUser_t &user,
 void game_t::onCharacterSaveRequest(dataServerUser_t &user,
 									const std::string &accountId,
 									const eMUShared::characterAttributes_t &attr) {
-	m_logger.in(eMUCore::logger_t::_MESSAGE_INFO) << "Character save request :: account [" << accountId << "] name [" << attr.m_name << "].";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Character save request :: account [" << accountId << "] name [" << attr.m_name << "].";
 	m_logger.out();
 
 	try {
@@ -297,7 +297,7 @@ void game_t::onCharacterSaveRequest(dataServerUser_t &user,
 
 		m_database.execute();
 	} catch(eMUCore::exception_t &e) {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " " << e.what();
+		m_logger.in(eMUCore::loggerMessage_e::_error) << user << " " << e.what();
 		m_logger.out();
 	}
 }
@@ -305,7 +305,7 @@ void game_t::onCharacterSaveRequest(dataServerUser_t &user,
 void game_t::onQueryExceptionNotice(dataServerUser_t &user,
 							  unsigned int connectionStamp,
 							  const std::string &what) {
-	m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << user << " " << what;
+	m_logger.in(eMUCore::loggerMessage_e::_error) << user << " " << what;
 	m_logger.out();
 
 	m_protocol.sendQueryExceptionNotice(user, connectionStamp, what);

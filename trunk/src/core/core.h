@@ -142,19 +142,11 @@ private:
 
 class eMUCORE_DECLSPEC logger_t {
 public:
-	enum logMessageType_t {
-		_MESSAGE_DEBUG = 0,
-		_MESSAGE_INFO,
-		_MESSAGE_WARNING,
-		_MESSAGE_ERROR,
-		_MESSAGE_PROTOCOL
-	};
-
 	logger_t(const std::string &fileName, size_t maxStoredLogsCount);
 
 	void startup() throw(eMUCore::exception_t);
 	void cleanup();
-	std::stringstream& in(logMessageType_t logMessageType);
+	std::stringstream& in(loggerMessage_e::type_t type);
 	inline std::stringstream& append() { return m_stream; }
 	void out();
 
@@ -173,7 +165,7 @@ private:
 	xmlNodePtr				m_tableNode;
 	size_t					m_maxStoredLogCount;
 	size_t					m_storedLogCount;
-	logMessageType_t		m_currentMessageType;
+	loggerMessage_e::type_t	m_currentMessageType;
 	HANDLE					m_stdOutput;
 
 	static const std::string c_loggerMessageHeader[];

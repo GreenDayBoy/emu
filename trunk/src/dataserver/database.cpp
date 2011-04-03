@@ -39,7 +39,7 @@ void database_t::cleanup() {
 
 void database_t::execute() {
 	#ifdef _DEBUG
-	m_logger.in(eMUCore::logger_t::_MESSAGE_DEBUG) << "Executing query: " << m_queryBuffer.str() << ".";
+	m_logger.in(eMUCore::loggerMessage_e::_debug) << "Executing query: " << m_queryBuffer.str() << ".";
 	m_logger.out();
 	#endif
 
@@ -50,7 +50,7 @@ void database_t::execute() {
     if(mysql_real_query(&m_connectionHandle,
 						m_queryBuffer.str().c_str(),
 						m_queryBuffer.str().size()) != 0) {
-		//m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << "Could not execute query: " << m_queryBuffer.str()
+		//m_logger.in(eMUCore::loggerMessage_e::_error) << "Could not execute query: " << m_queryBuffer.str()
 		//												<< ". Reason: " << mysql_error(&m_connectionHandle);
 		//m_logger.out();
 
@@ -62,7 +62,7 @@ void database_t::execute() {
 
 void database_t::ping() {
 	if(mysql_ping(&m_connectionHandle) != 0) {
-		m_logger.in(eMUCore::logger_t::_MESSAGE_ERROR) << "Could not ping mysql server. Reason: " << mysql_error(&m_connectionHandle) << ".";
+		m_logger.in(eMUCore::loggerMessage_e::_error) << "Could not ping mysql server. Reason: " << mysql_error(&m_connectionHandle) << ".";
 		m_logger.out();
 	}
 }
@@ -71,7 +71,7 @@ MYSQL_RES* database_t::getQueryResult() {
 	MYSQL_RES *queryResult = mysql_store_result(&m_connectionHandle);
 
 	if(queryResult == NULL) {
-		//m_logger.in(eMUCore::logger_t::_MESSAGE_WARNING) << "No result for query: " << m_queryBuffer.str();
+		//m_logger.in(eMUCore::loggerMessage_e::_warning) << "No result for query: " << m_queryBuffer.str();
 		//m_logger.out();
 
 		eMUCore::exception_t e;
