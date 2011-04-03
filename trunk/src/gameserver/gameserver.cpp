@@ -85,7 +85,7 @@ void gameServer_t::startup() {
 
 	this->updateWindowTitle();
 
-	m_scheduler.insert(eMUCore::scheduler_t::_SCHEDULE_SYNCHRONIZED,
+	m_scheduler.insert(eMUCore::schedule_e::_synchronized,
 						boost::bind(&gameServer_t::sendServerInfo, this),
 						1);
 

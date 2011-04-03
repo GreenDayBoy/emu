@@ -16,6 +16,8 @@ void serverConfiguration_t::read(const std::string &configFileName) {
 
 	m_slaveDataServerHost = configFile.readFromNode<std::string>("slaveDataServerHost", "localhost");
 	m_slaveDataServerPort = configFile.readFromNode<unsigned short>("slaveDataServerPort", 55962);
+
+	configFile.close();
 }
 
 void versionConfiguration_t::read(const std::string &versionFileName) {
@@ -25,6 +27,8 @@ void versionConfiguration_t::read(const std::string &versionFileName) {
 	m_version = versionFile.readFromNode<std::string>("clientExeVersion", "1.02.06");
 	m_versionProtocol = boost::algorithm::replace_all_copy(m_version, ".", "");
 	m_serial = versionFile.readFromNode<std::string>("clientExeSerial", "adkxNILNDL35skKh");
+
+	versionFile.close();
 }
 
 void gameConfiguration_t::read(const std::string &gameFileName) {
@@ -33,4 +37,6 @@ void gameConfiguration_t::read(const std::string &gameFileName) {
 
 	m_advancedRaceLevel = gameFile.readFromNode<unsigned short>("advancedRaceLevel", 220);
 	m_welcomeNotice = gameFile.readFromNode<std::string>("welcomeNotice", "Welcome!");
+
+	gameFile.close();
 }

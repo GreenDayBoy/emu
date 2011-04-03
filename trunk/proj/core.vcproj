@@ -215,6 +215,10 @@
 				RelativePath="..\src\core\core.h"
 				>
 			</File>
+			<File
+				RelativePath="..\src\core\enum.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

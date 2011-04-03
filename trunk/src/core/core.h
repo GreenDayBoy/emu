@@ -21,6 +21,7 @@
 #include <fstream>
 #include <map>
 #include <iomanip>
+#include "enum.h"
 
 #pragma warning(disable: 4251)
 #pragma warning(disable: 4290)
@@ -185,11 +186,6 @@ const size_t c_ioDataMaxSize = 8192;
 
 struct eMUCORE_DECLSPEC ioBuffer_t {
 public:
-	enum ioBufferType_t {
-		_IO_RECV_BUFFER = 0x500,
-		_IO_SEND_BUFFER
-	};
-
 	ioBuffer_t();
 	virtual ~ioBuffer_t() {}
 
@@ -202,7 +198,7 @@ public:
 	WSABUF			m_wsaBuff;
 	unsigned char	m_data[c_ioDataMaxSize];
 	size_t			m_dataSize;
-	ioBufferType_t	m_type;
+	ioBuffer_e::type_t m_type;
 
 private:
 	ioBuffer_t(const ioBuffer_t&);
@@ -471,13 +467,11 @@ class eMUCORE_DECLSPEC xmlConfig_t {
 public:
 	xmlConfig_t();
 
-	void open(const std::string &fileName, const std::string &rootNodeName) throw(eMUCore::exception_t);
+	void open(const std::string &fileName, const std::string &rootNodeName, bool autoBegin = true) throw(eMUCore::exception_t);
 	void close();
 
 	template <typename T>
 	T readFromNode(const std::string &nodeName, const T &defaultValue) {
-		m_node = m_rootNode->children;
-
 		if(m_node != NULL) {
 			while(m_node) {
 				if(xmlStrcmp(m_node->name, reinterpret_cast<const xmlChar*>(nodeName.c_str())) == 0) {
@@ -486,9 +480,9 @@ public:
 					if(readValue != NULL) {
 						try {
 							return boost::lexical_cast<T>(std::string(reinterpret_cast<char*>(readValue)));
-						} catch(std::exception &lc) {
+						} catch(std::exception &lce) {
 							eMUCore::exception_t e;
-							e.in() << "[xmlConfig_t::readFromNode()] " << lc.what() << " :: node [" << nodeName 
+							e.in() << "[xmlConfig_t::readFromNode()] " << lce.what() << " :: node [" << nodeName 
 									<< "] value [" << readValue << "].";
 							throw e;
 						}
@@ -513,19 +507,26 @@ public:
 			if(readValue != NULL) {
 				try {
 					return boost::lexical_cast<T>(std::string(reinterpret_cast<char*>(readValue)));
-				} catch(std::exception &lc) {
+				} catch(std::exception &lce) {
 					eMUCore::exception_t e;
-					e.in() << "[xmlConfig_t::readFromProperty()] " << lc.what() << " :: property [" << propertyName 
+					e.in() << "[xmlConfig_t::readFromProperty()] " << lce.what() << " :: property [" << propertyName 
 							<< "] value [" << readValue << "].";
 					throw e;
 				}
 			}
+		} else {
+			eMUCore::exception_t e;
+			e.in() << "[xmlConfig_t::readFromProperty()] Current node [" << reinterpret_cast<const char*>(m_node->name)
+						<< "] is not [" << nodeName << "].";
+			throw e;
 		}
 
 		return defaultValue;
 	}
 
 	bool nextNode();
+	bool childrenNode();
+	bool parentNode();
 	
 private:
 	xmlConfig_t(const xmlConfig_t&);
@@ -535,6 +536,7 @@ private:
 	xmlNodePtr	m_rootNode;
 	xmlNodePtr	m_node;
 	bool		m_firstIteration;
+	std::string m_rootNodeName;
 };
 
 class eMUCORE_DECLSPEC packet_t {
@@ -624,14 +626,9 @@ private:
 
 class eMUCORE_DECLSPEC scheduler_t {
 public:
-	enum scheduleType_t {
-		_SCHEDULE_SYNCHRONIZED = 0x37A,
-		_SCHEDULE_NONSYNCHRONIZED
-	};
-
 	scheduler_t(synchronizer_t &synchronizer);
 
-	void insert(scheduleType_t type, const boost::function0<void> &callback, time_t delay);
+	void insert(schedule_e::type_t type, const boost::function0<void> &callback, time_t delay);
 	void worker();
 
 private:
@@ -641,7 +638,7 @@ private:
 
 	struct schedule_t {
 		boost::function0<void>	m_callback;
-		scheduleType_t			m_type;
+		schedule_e::type_t		m_type;
 		time_t					m_delay;
 		time_t					m_lastExecuteTime;
 	};

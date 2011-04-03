@@ -14,7 +14,7 @@ game_t::game_t(eMUCore::logger_t &logger,
 void game_t::startup() {
 	m_serverList.startup("serverList.xml");
 
-	m_scheduler.insert(eMUCore::scheduler_t::_SCHEDULE_SYNCHRONIZED,
+	m_scheduler.insert(eMUCore::schedule_e::_synchronized,
 						boost::bind(&serverList_t::update, &m_serverList),
 						1);
 }

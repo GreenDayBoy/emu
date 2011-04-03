@@ -48,6 +48,8 @@ void gateManager_t::startup(const std::string &filename) {
 									gateFile.readFromProperty<unsigned short>("gate", "level", 0));
 		m_gateList[gate->getId()] = gate;
 	}
+
+	gateFile.close();
 }
 
 void gateManager_t::cleanup() {

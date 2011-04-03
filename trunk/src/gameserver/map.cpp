@@ -87,6 +87,8 @@ void mapManager_t::startup(const std::string &filename) {
 
 		m_mapList[id] = map;
 	}
+
+	mapFile.close();
 }
 
 void mapManager_t::cleanup() {

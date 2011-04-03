@@ -9,6 +9,7 @@
 #include "gate.h"
 #include "monster.h"
 #include "viewport.h"
+#include "item.h"
 
 #pragma warning(disable: 4355)
 
@@ -113,6 +114,7 @@ private:
 	monsterAttributesManager_t							m_monsterAttributesManager;
 	monsterManager_t									m_monsterManager;
 	viewportManager_t									m_viewportManager;
+	itemAttributesManager_t								m_itemAttributesManager;
 	disconnectCallback_t								m_disconnectCallback;
 };
 

@@ -26,7 +26,8 @@ void game_t::startup() {
 	m_monsterAttributesManager.startup("..\\data\\monstersAttributes.xml");
 	m_monsterManager.startup("..\\data\\monsters.xml",
 								boost::bind(&viewportManager_t::registerObject, &m_viewportManager, _1));
-	m_scheduler.insert(eMUCore::scheduler_t::_SCHEDULE_NONSYNCHRONIZED,
+	m_itemAttributesManager.startup("..\\data\\items.xml");
+	m_scheduler.insert(eMUCore::schedule_e::_nonSynchronized,
 						boost::bind(&game_t::checkSelfClose, this),
 						1);
 }

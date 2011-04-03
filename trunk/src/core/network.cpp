@@ -21,7 +21,7 @@ eMUCORE_DECLSPEC std::string eMUCore::convertToIpAddress(std::string hostname) {
 }
 
 ioBuffer_t::ioBuffer_t():
-  m_type(_IO_RECV_BUFFER) {
+  m_type(ioBuffer_e::_recv) {
 	this->clearData();
 	m_wsaBuff.buf = reinterpret_cast<char*>(m_data);
 	m_wsaBuff.len = c_ioDataMaxSize;
@@ -31,7 +31,7 @@ ioBuffer_t::ioBuffer_t():
 ioSendBuffer_t::ioSendBuffer_t():
 m_dataLocked(false) {
 	this->clearSecondData();
-	m_type = _IO_SEND_BUFFER;
+	m_type = ioBuffer_e::_send;
 }
 
 socketContext_t::socketContext_t(int index):
@@ -333,10 +333,10 @@ DWORD iocpEngine_t::worker(iocpEngine_t *instance) {
 
 			instance->m_synchronizer.lock();
 
-			if(buffer->m_type == ioBuffer_t::_IO_RECV_BUFFER) {
+			if(buffer->m_type == ioBuffer_e::_recv) {
 				buffer->m_dataSize = transferredBytes;
 				instance->dequeueReceive(*context);
-			} else if(buffer->m_type == ioBuffer_t::_IO_SEND_BUFFER) {
+			} else if(buffer->m_type == ioBuffer_e::_send) {
 				instance->dequeueSend(*context);
 			}
 			else {

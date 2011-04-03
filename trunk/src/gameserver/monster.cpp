@@ -48,6 +48,8 @@ void monsterAttributesManager_t::startup(const std::string &fileName) {
 
 		m_attributesList[monsterId] = attr;
 	}
+
+	attrFile.close();
 }
 
 monster_t::monster_t(int index,
@@ -88,6 +90,8 @@ void monsterManager_t::startup(const std::string &fileName,
 		m_monsterList.push_back(monster);
 		registerObjectCallback(monster);
 	}
+
+	monstersFile.close();
 }
 
 void monsterManager_t::cleanup() {

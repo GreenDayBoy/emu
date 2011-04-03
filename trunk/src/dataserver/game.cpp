@@ -20,7 +20,7 @@ void game_t::startup() {
 						m_configuration.m_dbUserName,
 						m_configuration.m_dbPassword);
 
-	m_scheduler.insert(eMUCore::scheduler_t::_SCHEDULE_NONSYNCHRONIZED,
+	m_scheduler.insert(eMUCore::schedule_e::_nonSynchronized,
 						boost::bind(&database_t::ping, &m_database),
 						300);
 }
