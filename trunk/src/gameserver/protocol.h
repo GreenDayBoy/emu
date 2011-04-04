@@ -40,6 +40,10 @@ public:
 									unsigned char direction,
 									characterAction_e::type_t actionId) = 0;
 
+	virtual void onWhisperChatRequest(gameServerUser_t& user,
+										const std::string &receiverName,
+										const std::string &message) = 0;
+
 };
 
 class protocol_t {
@@ -137,6 +141,13 @@ public:
 	void sendViewportCharacterActionRequest(character_t &character,
 											unsigned char actionId,
 											unsigned short targetId) const;
+
+	void parseWhisperChatRequest(gameServerUser_t &user,
+									const eMUCore::packet_t &packet) const;
+
+	void sendWhisperChatAnswer(gameServerUser_t &receiver,
+								const std::string &senderName,
+								const std::string &message);
 private:
 	std::string xorString(const std::string &buff) const;
 

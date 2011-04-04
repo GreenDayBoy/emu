@@ -68,6 +68,9 @@ public:
 	void onCharacterAction(gameServerUser_t &user,
 							unsigned char direction,
 							characterAction_e::type_t actionId);
+	void onWhisperChatRequest(gameServerUser_t& user,
+								const std::string &receiverName,
+								const std::string &message);
 	// --------------------------------------------------------
 
 	// --------------------------------------------------------

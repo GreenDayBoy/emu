@@ -58,6 +58,7 @@ public:
 	void deleteFromCharacterList(const std::string &name);
 
 	bool operator==(unsigned int connectionStamp) { return m_connectionStamp == connectionStamp; }
+	bool operator==(const std::string &characterName);
 
 private:
 	std::string							m_accountId;

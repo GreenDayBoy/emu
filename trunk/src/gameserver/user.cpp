@@ -85,4 +85,12 @@ void gameServerUser_t::deleteFromCharacterList(const std::string &name) {
 	throw e;
 }
 
+bool gameServerUser_t::operator==(const std::string &characterName) {
+	if(m_character.isActive()) {
+		return (m_character.getName() == characterName);
+	} else {
+		return false;
+	}
+}
+
 #pragma warning(default: 4355)

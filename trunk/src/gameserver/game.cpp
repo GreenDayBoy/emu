@@ -394,6 +394,26 @@ void game_t::onCharacterAction(gameServerUser_t &user,
 	m_protocol.sendViewportCharacterActionRequest(user.getCharacter(), actionId, user.getIndex());
 }
 
+void game_t::onWhisperChatRequest(gameServerUser_t& user,
+								  const std::string &receiverName,
+								  const std::string &message) {
+	gameServerUser_t *receiver = NULL;
+
+	try {
+		receiver = &m_userManager.find(receiverName);
+	} catch(eMUCore::exception_t&) {
+		m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Whisper chat with [" << receiverName << "] is currenty unavailable.";
+		m_logger.out();
+
+		m_protocol.sendTextNotice(user, "User is currenty unavailable.", gameNotice_e::_blue);
+		return;
+	}
+
+	if(receiver) {
+		m_protocol.sendWhisperChatAnswer(*receiver, user.getCharacter().getName(), message);
+	}
+}
+
 void game_t::onQueryExceptionNotice(unsigned int connectionStamp,
 								const std::string &what) {
 	gameServerUser_t &user = m_userManager.find(connectionStamp);

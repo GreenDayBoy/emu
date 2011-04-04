@@ -24,7 +24,7 @@ const std::string eMUCore::logger_t::c_loggerMessageIconPath[] = {"images/icon_d
 
 const unsigned char eMUCore::logger_t::c_loggerMessageColor[] = {11,
 																	2,
-																	4,
+																	14,
 																	12,
 																	5};
 

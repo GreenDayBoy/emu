@@ -14,6 +14,10 @@ void protocol_t::core(gameServerUser_t &user,
 		this->parsePublicChatRequest(user, packet);
 		break;
 
+	case protocol_e::_whisperChat:
+		this->parseWhisperChatRequest(user, packet);
+		break;
+
 	case protocol_e::_action:
 		this->parseCharacterActionRequest(user, packet);
 		break;
@@ -553,6 +557,28 @@ void protocol_t::sendViewportCharacterActionRequest(character_t &character,
 			m_sendCallback(reinterpret_cast<character_t*>(vo)->getOwner(), packet);
 		}
 	}
+}
+
+void protocol_t::parseWhisperChatRequest(gameServerUser_t &user,
+											const eMUCore::packet_t &packet) const {
+	std::string receiverName = packet.readString(3, 10);
+	std::string message = packet.readString(13, 59);
+
+	m_executorInterface.onWhisperChatRequest(user, receiverName, message);
+}
+
+void protocol_t::sendWhisperChatAnswer(gameServerUser_t &receiver,
+										const std::string &senderName,
+										const std::string &message) {
+	eMUCore::packet_t packet;
+	packet.construct(0xC1, protocol_e::_whisperChat);
+	packet.insertString(3, senderName, 10);
+
+	size_t messageLen = std::min<size_t>(message.size(), 59);
+	packet.insertString(13, message, messageLen);
+	packet.insert<unsigned char>(13 + messageLen, 0);
+
+	m_sendCallback(receiver, packet);
 }
 
 std::string protocol_t::xorString(const std::string &buff) const {

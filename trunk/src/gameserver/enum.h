@@ -27,6 +27,7 @@ namespace mapTileAttribute_e {
 namespace protocol_e {
 	enum type_t {
 		_publicChat = 0x00,
+		_whisperChat = 0x02,
 		_textNotice = 0x0D,
 		_characterViewportCreate = 0x12,
 		_monsterViewportCreate = 0x013,
