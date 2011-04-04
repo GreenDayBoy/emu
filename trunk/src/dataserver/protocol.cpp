@@ -179,8 +179,8 @@ void protocol_t::sendCharacterSelectAnswer(dataServerUser_t &user,
 	packet.insert<unsigned int>(4, connectionStamp);
 	packet.insertString(8, attr.m_name, 10);
 	packet.insert<unsigned char>(18, attr.m_race);
-	packet.insert<unsigned char>(19, attr.m_posX);
-	packet.insert<unsigned char>(20, attr.m_posY);
+	packet.insert<unsigned char>(19, attr.m_position.m_x);
+	packet.insert<unsigned char>(20, attr.m_position.m_y);
 	packet.insert<unsigned char>(21, attr.m_mapId);
 	packet.insert<unsigned char>(22, attr.m_direction);
 	packet.insert<unsigned int>(23, attr.m_experience);
@@ -217,8 +217,7 @@ void protocol_t::parseCharacterSaveRequest(dataServerUser_t &user,
 	eMUShared::characterAttributes_t attr;
 	attr.m_name = packet.readString(14, 10);
 	attr.m_race = static_cast<eMUShared::characterRace_e::type_t>(packet.read<unsigned char>(24));
-	attr.m_posX = packet.read<unsigned char>(25);
-	attr.m_posY = packet.read<unsigned char>(26);
+	attr.m_position.set(packet.read<unsigned char>(25), packet.read<unsigned char>(26));
 	attr.m_mapId = packet.read<unsigned char>(27);
 	attr.m_direction = packet.read<unsigned char>(28);
 	attr.m_experience = packet.read<unsigned int>(29);

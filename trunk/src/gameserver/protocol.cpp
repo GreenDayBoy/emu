@@ -231,8 +231,8 @@ void protocol_t::sendCharacterSelectAnswer(gameServerUser_t &user,
 	eMUCore::packet_t packet;
 	packet.construct(0xC3, protocol_e::_characterManage);
 	packet.insert<unsigned char>(3, protocol_e::characterManage_e::_select);
-	packet.insert<unsigned char>(4, character.getPosX());
-	packet.insert<unsigned char>(5, character.getPosY());
+	packet.insert<unsigned char>(4, character.getPosition().m_x);
+	packet.insert<unsigned char>(5, character.getPosition().m_y);
 	packet.insert<unsigned char>(6, character.getMapId());
 	packet.insert<unsigned char>(7, character.getDirection());
 	packet.insert<unsigned int>(8, character.getAttributes().m_experience);
@@ -296,8 +296,7 @@ void protocol_t::parseCharacterMoveRequest(gameServerUser_t &user,
 			++stepsCount;
 		}
 
-		unsigned char x = packet.read<unsigned char>(3);
-		unsigned char y = packet.read<unsigned char>(4);
+		eMUShared::position_t pos(packet.read<unsigned char>(3), packet.read<unsigned char>(4));
 		unsigned char direction = packet.read<unsigned char>(5) >> 4;
 		map_t::path_t path;
 
@@ -313,13 +312,13 @@ void protocol_t::parseCharacterMoveRequest(gameServerUser_t &user,
 				directionId = data[(i + 1) >> 1] & 0x0F;
 			}
 
-			x += directions[directionId << 1];
-			y += directions[(directionId << 1) + 1];
+			pos.m_x += directions[directionId << 1];
+			pos.m_y += directions[(directionId << 1) + 1];
 
-			path.push_back(map_t::position_t(x, y));
+			path.push_back(pos);
 		}
 
-		m_executorInterface.onCharacterMoveRequest(user, x, y, direction, path);
+		m_executorInterface.onCharacterMoveRequest(user, pos, direction, path);
 	}
 }
 
@@ -331,16 +330,15 @@ void protocol_t::parseCharacterTeleportRequest(gameServerUser_t &user,
 
 void protocol_t::sendCharacterTeleportAnswer(gameServerUser_t &user,
 													unsigned char mapId,
-													unsigned char x,
-													unsigned char y,
+													const eMUShared::position_t &pos,
 													unsigned char direction,
 													unsigned char gateId) const {
 	eMUCore::packet_t packet;
 	packet.construct(0xC3, protocol_e::_teleport);
 	packet.insert<unsigned char>(3, gateId);
 	packet.insert<unsigned char>(4, mapId);
-	packet.insert<unsigned char>(5, x);
-	packet.insert<unsigned char>(6, y);
+	packet.insert<unsigned char>(5, pos.m_x);
+	packet.insert<unsigned char>(6, pos.m_y);
 	packet.insert<unsigned char>(7, direction);
 
 	m_sendCallback(user, packet);
@@ -367,8 +365,8 @@ void protocol_t::sendViewportCharacterCreateRequest(gameServerUser_t &user,
 				packet.insert<unsigned char>(5 + step, HIBYTE(character->getOwner().getIndex()));
 			}
 			packet.insert<unsigned char>(6 + step, LOBYTE(character->getOwner().getIndex()));
-			packet.insert<unsigned char>(7 + step, character->getPosX());
-			packet.insert<unsigned char>(8 + step, character->getPosY());
+			packet.insert<unsigned char>(7 + step, character->getPosition().m_x);
+			packet.insert<unsigned char>(8 + step, character->getPosition().m_y);
 
 			packet.insert<unsigned char>(9 + step, character->getPreview()[0]);
 			packet.insert<unsigned char>(10 + step, character->getPreview()[1]);
@@ -393,8 +391,8 @@ void protocol_t::sendViewportCharacterCreateRequest(gameServerUser_t &user,
 			packet.insert<unsigned int>(29 + step, 0);
 
 			packet.insertString(33 + step, character->getName(), 10);
-			packet.insert<unsigned char>(43 + step, character->getPosX());
-			packet.insert<unsigned char>(44 + step, character->getPosY());
+			packet.insert<unsigned char>(43 + step, character->getPosition().m_x);
+			packet.insert<unsigned char>(44 + step, character->getPosition().m_y);
 			packet.insert<unsigned char>(45 + step, character->getDirection() << 4);
 			++count;
 		}
@@ -427,10 +425,10 @@ void protocol_t::sendViewportMonsterCreateRequest(gameServerUser_t &user,
 			packet.insert<unsigned char>(7 + step, HIBYTE(monster->getId()));
 			packet.insert<unsigned char>(8 + step, LOBYTE(monster->getId()));
 			packet.insert<unsigned int>(9 + step, 0);
-			packet.insert<unsigned char>(13 + step, monster->getPosX());
-			packet.insert<unsigned char>(14 + step, monster->getPosY());
-			packet.insert<unsigned char>(15 + step, monster->getPosX());
-			packet.insert<unsigned char>(16 + step, monster->getPosY());
+			packet.insert<unsigned char>(13 + step, monster->getPosition().m_x);
+			packet.insert<unsigned char>(14 + step, monster->getPosition().m_y);
+			packet.insert<unsigned char>(15 + step, monster->getPosition().m_x);
+			packet.insert<unsigned char>(16 + step, monster->getPosition().m_y);
 			packet.insert<unsigned char>(17 + step, monster->getDirection() << 4);
 
 			++count;
@@ -489,8 +487,8 @@ void protocol_t::sendViewportObjectMoveRequest(gameObject_t &object) const {
 
 	packet.insert<unsigned char>(3, HIBYTE(index));
 	packet.insert<unsigned char>(4, LOBYTE(index));
-	packet.insert<unsigned char>(5, object.getPosX());
-	packet.insert<unsigned char>(6, object.getPosY());
+	packet.insert<unsigned char>(5, object.getPosition().m_x);
+	packet.insert<unsigned char>(6, object.getPosition().m_y);
 	packet.insert<unsigned char>(7, object.getDirection() << 4);
 
 	for(viewportManager_t::viewport_t::iterator i = object.getViewport().begin(); i != object.getViewport().end(); ++i) {

@@ -175,8 +175,7 @@ void dataServerProtocol_t::parseCharacterSelectAnswer(const eMUCore::packet_t &p
 	eMUShared::characterAttributes_t attr;
 	attr.m_name = packet.readString(8, 10);
 	attr.m_race = static_cast<eMUShared::characterRace_e::type_t>(packet.read<unsigned char>(18));
-	attr.m_posX = packet.read<unsigned char>(19);
-	attr.m_posY = packet.read<unsigned char>(20);
+	attr.m_position.set(packet.read<unsigned char>(19), packet.read<unsigned char>(20));
 	attr.m_mapId = packet.read<unsigned char>(21);
 	attr.m_direction = packet.read<unsigned char>(22);
 	attr.m_experience = packet.read<unsigned int>(23);
@@ -214,8 +213,8 @@ void dataServerProtocol_t::sendCharacterSaveRequest(const std::string &accountId
 	packet.insertString(4, accountId, 10);
 	packet.insertString(14, attr.m_name, 10);
 	packet.insert<unsigned char>(24, attr.m_race);
-	packet.insert<unsigned char>(25, attr.m_posX);
-	packet.insert<unsigned char>(26, attr.m_posY);
+	packet.insert<unsigned char>(25, attr.m_position.m_x);
+	packet.insert<unsigned char>(26, attr.m_position.m_y);
 	packet.insert<unsigned char>(27, attr.m_mapId);
 	packet.insert<unsigned char>(28, attr.m_direction);
 	packet.insert<unsigned int>(29, attr.m_experience);

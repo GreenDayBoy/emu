@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <ostream>
 #include "enum.h"
 
 namespace eMUShared {
@@ -15,11 +16,35 @@ struct characterListAttributes_t {
 
 typedef std::vector<characterListAttributes_t> characterList_t;
 
+struct position_t {
+	position_t() {}
+	position_t(unsigned char x, unsigned char y):
+	  m_x(x),
+	  m_y(y) {}
+
+	friend std::ostream& operator<<(std::ostream &out, const position_t &pos) {
+		out << "[" << static_cast<unsigned int>(pos.m_x) << "/" << static_cast<unsigned int>(pos.m_y) << "]";
+		return out;
+	}
+
+	inline void set(unsigned char x, unsigned char y) {
+		m_x = x;
+		m_y = y;
+	}
+
+	inline void clear() {
+		m_x = 0;
+		m_y = 0;
+	}
+
+	unsigned char m_x;
+	unsigned char m_y;
+};
+
 struct characterAttributes_t {
 	std::string		m_name;
 	characterRace_e::type_t	m_race;
-	unsigned char	m_posX;
-	unsigned char	m_posY;
+	position_t		m_position;
 	unsigned char	m_mapId;
 	unsigned char	m_direction;
 	unsigned int	m_experience;
@@ -49,8 +74,7 @@ struct characterAttributes_t {
 	void clear() {
 		m_name = "";
 		m_race = characterRace_e::_none;
-		m_posX = 0;
-		m_posY = 0;
+		m_position.clear();
 		m_mapId = 0;
 		m_direction = 0;
 		m_experience = 0;

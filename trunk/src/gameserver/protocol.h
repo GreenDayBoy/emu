@@ -28,8 +28,7 @@ public:
 	virtual void onCharacterSelectRequest(gameServerUser_t &user,
 											const std::string &name) = 0;
 	virtual void onCharacterMoveRequest(gameServerUser_t &user,
-										unsigned char x,
-										unsigned char y,
+										const eMUShared::position_t &pos,
 										unsigned char direction,
 										const map_t::path_t &path) = 0;
 	virtual void onCharacterTeleportRequest(gameServerUser_t &user,
@@ -112,8 +111,7 @@ public:
 
 	void sendCharacterTeleportAnswer(gameServerUser_t &user,
 										unsigned char mapId,
-										unsigned char x,
-										unsigned char y,
+										const eMUShared::position_t &pos,
 										unsigned char direction,
 										unsigned char gateId = 1) const;
 

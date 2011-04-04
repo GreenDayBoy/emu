@@ -10,19 +10,16 @@ public:
 	gate_t(int id,
 			int type,
 			unsigned char mapId,
-			unsigned char x1,
-			unsigned char y1,
-			unsigned char x2,
-			unsigned char y2,
+			const eMUShared::position_t &startPos,
+			const eMUShared::position_t &endPos,
 			int destId,
 			unsigned char direction,
 			unsigned short requiredLevel);
 
 	friend std::ostream& operator<<(std::ostream &out, const gate_t &gate) {
 		out << "[" << gate.m_id << "][" << static_cast<int>(gate.m_mapId) 
-			<< "][" << static_cast<int>(gate.m_x1) << "-" << static_cast<int>(gate.m_y1)
-			<< "][" << static_cast<int>(gate.m_x2) << "-" << static_cast<int>(gate.m_y2) 
-			<< "][" << gate.m_destId << "]";
+			<< "]" << gate.m_startPos << "-" << gate.m_endPos
+			<< "[" << gate.m_destId << "]";
 
 		return out;
 	}
@@ -30,15 +27,13 @@ public:
 	inline int getId() const { return m_id; }
 	inline int getType() const { return m_type; }
 	inline unsigned char getMapId() const { return m_mapId; }
-	inline unsigned char getX1() const { return m_x1; }
-	inline unsigned char getY1() const { return m_y1; }
-	inline unsigned char getX2() const { return m_x2; }
-	inline unsigned char getY2() const { return m_y2; }
+	inline const eMUShared::position_t& getStartPosition() const { return m_startPos; }
+	inline const eMUShared::position_t& getEndPosition() const { return m_endPos; }
 	inline int getDestId() const { return m_destId; }
 	inline unsigned char getDirection() const { return m_direction; }
 	inline unsigned short getRequiredLevel() const { return m_requiredLevel; }
 
-	bool isInGate(unsigned char x, unsigned char y) const;
+	bool isInGate(const eMUShared::position_t &pos) const;
 
 private:
 	gate_t(const gate_t&);
@@ -47,10 +42,8 @@ private:
 	int				m_id;
 	int				m_type;
 	unsigned char	m_mapId;
-	unsigned char	m_x1;
-	unsigned char	m_y1;
-	unsigned char	m_x2;
-	unsigned char	m_y2;
+	eMUShared::position_t m_startPos;
+	eMUShared::position_t m_endPos;
 	int				m_destId;
 	unsigned char	m_direction;
 	unsigned short	m_requiredLevel;

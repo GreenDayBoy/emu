@@ -36,8 +36,7 @@ public:
 	void saveCharacter(gameServerUser_t &user) const;
 	void teleportCharacter(gameServerUser_t &user,
 							unsigned char mapId,
-							unsigned char x,
-							unsigned char y,
+							const eMUShared::position_t &pos,
 							unsigned char direction,
 							unsigned char gateId = 1);
 
@@ -59,8 +58,7 @@ public:
 	void onCharacterSelectRequest(gameServerUser_t &user,
 									const std::string &name);
 	void onCharacterMoveRequest(gameServerUser_t &user,
-									unsigned char x,
-									unsigned char y,
+									const eMUShared::position_t &pos,
 									unsigned char direction,
 									const map_t::path_t &path);
 	void onCharacterTeleportRequest(gameServerUser_t &user,

@@ -41,11 +41,8 @@ public:
 	unsigned char getMapId() const { return m_attributes.m_mapId; }
 	void setMapId(unsigned char mapId) { m_attributes.m_mapId = mapId; }
 
-	unsigned char getPosX() const { return m_attributes.m_posX; }
-	void setPosX(unsigned char posX) { m_attributes.m_posX = posX; }
-
-	unsigned char getPosY() const { return m_attributes.m_posY; }
-	void setPosY(unsigned char posY) { m_attributes.m_posY = posY; }
+	const eMUShared::position_t& getPosition() const { return m_attributes.m_position; }
+	void setPosition(const eMUShared::position_t &pos) { m_attributes.m_position = pos; }
 
 	unsigned char getDirection() const { return m_attributes.m_direction; }
 	void setDirection(unsigned char direction) { m_attributes.m_direction = direction; }

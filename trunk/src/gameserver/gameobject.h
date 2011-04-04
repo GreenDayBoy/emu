@@ -4,6 +4,7 @@
 #include <string>
 #include "viewport.h"
 #include "enum.h"
+#include "..\shared\shared.h"
 
 #pragma warning(disable: 4355)
 
@@ -33,9 +34,7 @@ public:
 
 	virtual unsigned char getMapId() const = 0;
 
-	virtual unsigned char getPosX() const = 0;
-
-	virtual unsigned char getPosY() const = 0;
+	virtual const eMUShared::position_t& getPosition() const = 0;
 
 	virtual unsigned char getDirection() const = 0;
 

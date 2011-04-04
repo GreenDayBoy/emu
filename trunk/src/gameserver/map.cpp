@@ -30,7 +30,7 @@ void map_t::startup(const std::string &filename, int mapId) {
 
 bool map_t::isPathValid(const path_t &path) const {
 	for(size_t i = 0; i < path.size(); ++i) {
-		if(!this->canStand(path[i].first, path[i].second)) {
+		if(!this->canStand(path[i])) {
 			return false;
 		}
 	}
@@ -41,24 +41,20 @@ bool map_t::isPathValid(const path_t &path) const {
 std::string map_t::dumpPath(const path_t &path) const {
 	std::stringstream stream;
 	for(size_t i = 0; i < path.size(); ++i) {
-		stream << "[" << static_cast<int>(path[i].first) << "/" << static_cast<int>(path[i].second)
-				<< "][" << static_cast<int>(this->getTileAttribute(path[i].first, path[i].second)) << "] ";
+		stream << "[" << path[i] << "][" << static_cast<int>(this->getTileAttribute(path[i])) << "] ";
 	}
 
 	return stream.str();
 }
 
-map_t::position_t map_t::getRandomPosition(unsigned char x1,
-											 unsigned char y1,
-											 unsigned char x2,
-											 unsigned char y2) const { _PROFILE;
-	std::vector<position_t> positions;
+eMUShared::position_t map_t::getRandomPosition(const eMUShared::position_t &startPos,
+												const eMUShared::position_t &endPos) const { _PROFILE;
+std::vector<eMUShared::position_t> positions;
 
-	for(size_t x = x1; x <= x2; ++x) {
-		for(size_t y = y1; y <= y2; ++y) {
-			//if(this->canStand(x, y) && this->isTileEmpty(x, y)) {
-			if(this->canStand(x, y)) {
-				positions.push_back(position_t(x, y));
+	for(size_t x = startPos.m_x; x <= endPos.m_x; ++x) {
+		for(size_t y = startPos.m_y; y <= endPos.m_y; ++y) {
+			if(this->canStand(eMUShared::position_t(x, y))) {
+				positions.push_back(eMUShared::position_t(x, y));
 			}
 		}
 	}
@@ -68,8 +64,7 @@ map_t::position_t map_t::getRandomPosition(unsigned char x1,
 	else
 	{
 		eMUCore::exception_t e;
-		e.in() << __FILE__ << ":" << __LINE__ << "[map_t::getRandomPosition()] No free field in area [" << x1 << "/" << x2
-				<< "][" << y1 << "/" << y2 << "].";
+		e.in() << __FILE__ << ":" << __LINE__ << "[map_t::getRandomPosition()] No free field in area " << startPos << "-" << endPos << ".";
 		throw e;
 	}
 }

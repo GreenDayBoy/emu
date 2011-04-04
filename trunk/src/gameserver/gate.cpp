@@ -4,27 +4,23 @@
 gate_t::gate_t(int id,
 				int type,
 				unsigned char mapId,
-				unsigned char x1,
-				unsigned char y1,
-				unsigned char x2,
-				unsigned char y2,
+				const eMUShared::position_t &startPos,
+				const eMUShared::position_t &endPos,
 				int destId,
 				unsigned char direction,
 				unsigned short requiredLevel):
   m_id(id),
   m_type(type),
   m_mapId(mapId),
-  m_x1(x1),
-  m_y1(y1),
-  m_x2(x2),
-  m_y2(y2),
+  m_startPos(startPos),
+  m_endPos(endPos),
   m_destId(destId),
   m_direction(direction),
   m_requiredLevel(requiredLevel) {}
 
-bool gate_t::isInGate(unsigned char x, unsigned char y) const {
-	if(x >= m_x1 && x <= m_x2
-		&& y >= m_y1 && y <= m_y2) {
+bool gate_t::isInGate(const eMUShared::position_t &pos) const {
+	if(pos.m_x >= m_startPos.m_x && pos.m_x <= m_endPos.m_x
+		&& pos.m_y >= m_startPos.m_y && pos.m_y <= m_endPos.m_y) {
 		return true;
 	} else {
 		return false;
@@ -39,10 +35,10 @@ void gateManager_t::startup(const std::string &filename) {
 		gate_t *gate = new gate_t(gateFile.readFromProperty<int>("gate", "id", -1),
 									gateFile.readFromProperty<int>("gate", "type", -1),
 									gateFile.readFromProperty<int>("gate", "mapId", 0),
-									gateFile.readFromProperty<int>("gate", "x1", 0),
-									gateFile.readFromProperty<int>("gate", "y1", 0),
-									gateFile.readFromProperty<int>("gate", "x2", 0),
-									gateFile.readFromProperty<int>("gate", "y2", 0),
+									eMUShared::position_t(gateFile.readFromProperty<int>("gate", "x1", 0),
+															gateFile.readFromProperty<int>("gate", "y1", 0)),
+									eMUShared::position_t(gateFile.readFromProperty<int>("gate", "x2", 0),
+															gateFile.readFromProperty<int>("gate", "y2", 0)),
 									gateFile.readFromProperty<int>("gate", "destId", -1),
 									gateFile.readFromProperty<int>("gate", "dir", 0),
 									gateFile.readFromProperty<unsigned short>("gate", "level", 0));

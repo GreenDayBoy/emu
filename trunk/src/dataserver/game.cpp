@@ -222,8 +222,7 @@ void game_t::onCharacterSelectRequest(dataServerUser_t &user,
 		attr.m_command = iter.getValue<unsigned short>("command");
 
 		attr.m_mapId = iter.getValue<int>("mapId");
-		attr.m_posX = iter.getValue<int>("posX");
-		attr.m_posY = iter.getValue<int>("posY");
+		attr.m_position.set(iter.getValue<int>("posX"), iter.getValue<int>("posY"));
 		attr.m_direction = iter.getValue<int>("direction");
 
 		attr.m_health = iter.getValue<unsigned short>("health");
@@ -272,8 +271,8 @@ void game_t::onCharacterSaveRequest(dataServerUser_t &user,
 								<< " `characters`"
 							<< " SET"
 								<< " `race` = " << attr.m_race
-								<< ", `posX` = "  << static_cast<unsigned int>(attr.m_posX)
-								<< ", `posY` = "  << static_cast<unsigned int>(attr.m_posY)
+								<< ", `posX` = "  << static_cast<unsigned int>(attr.m_position.m_x)
+								<< ", `posY` = "  << static_cast<unsigned int>(attr.m_position.m_y)
 								<< ", `mapId` = " << static_cast<unsigned int>(attr.m_mapId)
 								<< ", `direction` = " << static_cast<unsigned int>(attr.m_direction)
 								<< ", `experience` = "  << attr.m_experience

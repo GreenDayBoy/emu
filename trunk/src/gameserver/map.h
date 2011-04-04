@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "..\shared\shared.h"
 #include "enum.h"
 
 const size_t c_mapWidth = 256;
@@ -18,40 +19,35 @@ struct mapFileHeader_t {
 
 class map_t {
 public:
-	typedef std::pair<unsigned char, unsigned char> position_t;
-	typedef std::vector<position_t> path_t;
+	typedef std::vector<eMUShared::position_t> path_t;
 
 	map_t();
 
 	void startup(const std::string &filename, int mapId);
 	bool isPathValid(const path_t &path) const;
 	std::string dumpPath(const path_t &path) const;
-	position_t getRandomPosition(unsigned char x1 = 0,
-									unsigned char y1 = 0,
-									unsigned char x2 = 255,
-									unsigned char y2 = 255) const;
+	eMUShared::position_t getRandomPosition(const eMUShared::position_t &startPos = eMUShared::position_t(0, 0),
+											const eMUShared::position_t &endPos = eMUShared::position_t(255, 255)) const;
 
-	inline unsigned char getTileAttribute(unsigned char x, unsigned char y) const {
-		return m_mapTiles[(y << 8) + x];
+	inline unsigned char getTileAttribute(const eMUShared::position_t &pos) const {
+		return m_mapTiles[(pos.m_y << 8) + pos.m_x];
 	}
 
-	inline bool canStand(unsigned char x, unsigned char y) const {
-		unsigned char attr = this->getTileAttribute(x, y) & 127; // & 127 - without stand bit.
+	inline bool canStand(const eMUShared::position_t &pos) const {
+		unsigned char attr = this->getTileAttribute(pos) & 127; // & 127 - without stand bit.
 		return (attr == mapTileAttribute_e::_ground || attr == mapTileAttribute_e::_safezone);
 	}
 
-	inline bool isTileEmpty(unsigned char x, unsigned char y) const {
-		return ((this->getTileAttribute(x, y) & 128) == 0);
+	inline bool isTileEmpty(const eMUShared::position_t &pos) const {
+		return ((this->getTileAttribute(pos) & 128) == 0);
 	}
 
-	inline void setStand(unsigned char x, unsigned char y) { m_mapTiles[(y << 8) + x] |= 128; }
-	inline void clearStand(unsigned char x, unsigned char y) { m_mapTiles[(y << 8) + x] &= 127; }
-	inline void map_t::resetStand(unsigned char oldX,
-									unsigned char oldY,
-									unsigned char newX,
-									unsigned char newY) {
-		this->clearStand(oldX, oldY);
-		this->setStand(newX, newY);
+	inline void setStand(const eMUShared::position_t &pos) { m_mapTiles[(pos.m_y << 8) + pos.m_x] |= 128; }
+	inline void clearStand(const eMUShared::position_t &pos) { m_mapTiles[(pos.m_y << 8) + pos.m_x] &= 127; }
+	inline void map_t::resetStand(const eMUShared::position_t &oldPos,
+									const eMUShared::position_t &newPos) {
+		this->clearStand(oldPos);
+		this->setStand(newPos);
 	}
 
 private:

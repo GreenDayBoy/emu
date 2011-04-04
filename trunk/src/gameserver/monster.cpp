@@ -58,12 +58,12 @@ monster_t::monster_t(int index,
   m_attributes(attr),
   m_index(index),
   m_id(0),
-  m_posX(0),
-  m_posY(0),
   m_mapId(0),
   m_direction(0),
   m_health(0),
-  m_mana(0) {}
+  m_mana(0) {
+	  m_position.clear();
+  }
 
 monsterManager_t::monsterManager_t(monsterAttributesManager_t &monsterAttributesManager,
 									int startIndex):
@@ -82,8 +82,8 @@ void monsterManager_t::startup(const std::string &fileName,
 
 		monster_t *monster = new monster_t(++i, m_monsterAttributesManager[id]);
 		monster->setMapId(monstersFile.readFromProperty<unsigned int>("monster", "mapId", 0));
-		monster->setPosX(monstersFile.readFromProperty<unsigned int>("monster", "posX", 0));
-		monster->setPosY(monstersFile.readFromProperty<unsigned int>("monster", "posY", 0));
+		monster->setPosition(eMUShared::position_t(monstersFile.readFromProperty<unsigned int>("monster", "posX", 0),
+													monstersFile.readFromProperty<unsigned int>("monster", "posY", 0)));
 		monster->setDirection(monstersFile.readFromProperty<unsigned int>("monster", "direction", 0));
 		monster->setId(id);
 

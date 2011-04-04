@@ -146,8 +146,7 @@ void game_t::onClientClose(gameServerUser_t &user) {
 }
 
 void game_t::onCharacterLeave(gameServerUser_t &user) {
-	m_mapManager[user.getCharacter().getMapId()].clearStand(user.getCharacter().getPosX(),
-															user.getCharacter().getPosY());
+	m_mapManager[user.getCharacter().getMapId()].clearStand(user.getCharacter().getPosition());
 	this->saveCharacter(user);
 	user.getCharacter().setInactive();
 
@@ -285,50 +284,40 @@ void game_t::onCharacterSelectAnswer(unsigned int connectionStamp,
 	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Preparing character [" << attr.m_name << "].";
 	m_logger.out();
 
-	if(m_mapManager.isMapExists(attr.m_mapId)) {
-		if(m_mapManager[attr.m_mapId].canStand(attr.m_posX, attr.m_posY)) {
-			character_t &character = user.getCharacter();
+	if(m_mapManager[attr.m_mapId].canStand(attr.m_position)) {
+		character_t &character = user.getCharacter();
 
-			m_mapManager[attr.m_mapId].setStand(attr.m_posX, attr.m_posY);
+		m_mapManager[attr.m_mapId].setStand(attr.m_position);
 
-			character.setAttributes(attr);
-			character.setPreview();
-			character.setActive();
-			m_protocol.sendCharacterSelectAnswer(user, character);
-			m_protocol.sendTextNotice(user, m_gameConfiguration.m_welcomeNotice);
+		character.setAttributes(attr);
+		character.setPreview();
+		character.setActive();
+		m_protocol.sendCharacterSelectAnswer(user, character);
+		m_protocol.sendTextNotice(user, m_gameConfiguration.m_welcomeNotice);
 
-			character.activateTeleportEffect();
-			m_viewportManager.registerObject(&character);
-			m_viewportManager.generate(character);
-			character.deactivateTeleportEffect();
-		} else {
-			m_logger.in(eMUCore::loggerMessage_e::_error) << user << " Invalid start coordinates [" << static_cast<int>(attr.m_posX) 
-															<< "][" << static_cast<int>(attr.m_posY) << "].";
-			m_logger.out();
-
-			m_disconnectCallback(user);
-		}
+		character.activateTeleportEffect();
+		m_viewportManager.registerObject(&character);
+		m_viewportManager.generate(character);
+		character.deactivateTeleportEffect();
 	} else {
-		m_logger.in(eMUCore::loggerMessage_e::_error) << user << " Invalid mapId [" << static_cast<int>(attr.m_mapId) << "].";
+		m_logger.in(eMUCore::loggerMessage_e::_error) << user << " Invalid start coordinates " << attr.m_position << ".";
 		m_logger.out();
 
-		m_disconnectCallback(user);
+		//m_disconnectCallback(user);
 	}
 }
 
 void game_t::onCharacterMoveRequest(gameServerUser_t &user,
-									unsigned char x,
-									unsigned char y,
+									const eMUShared::position_t &pos,
 									unsigned char direction,
 									const map_t::path_t &path) {
 	character_t &character = user.getCharacter();
 
 	if(GetTickCount() - character.getLastMoveTime() >= 100) {
 		if(m_mapManager[character.getMapId()].isPathValid(path)) {
-			m_mapManager[character.getMapId()].resetStand(character.getPosX(), character.getPosY(), x, y);
+			m_mapManager[character.getMapId()].resetStand(character.getPosition(), pos);
 
-			character.setPosX(x);
-			character.setPosY(y);
+			character.getAttributes().m_position = pos;
 			character.setDirection(direction);
 			character.setLastMoveTime(GetTickCount());
 			character.setPose(characterAction_e::_setStand);  // default - stand.
@@ -360,13 +349,11 @@ void game_t::onCharacterTeleportRequest(gameServerUser_t &user,
 
 	gate_t &gate = m_gateManager[gateId];
 
-	if(gate.isInGate(character.getPosX(), character.getPosY())) {
+	if(gate.isInGate(character.getAttributes().m_position)) {
 		if(gate.getRequiredLevel() <= character.getAttributes().m_level) {
 			gate_t &destGate = m_gateManager[gate.getDestId()];
-			map_t::position_t position = m_mapManager[destGate.getMapId()].getRandomPosition(destGate.getX1(),
-																								destGate.getY1(),
-																								destGate.getX2(),
-																								destGate.getY2());
+			eMUShared::position_t pos = m_mapManager[destGate.getMapId()].getRandomPosition(destGate.getStartPosition(),
+																								destGate.getEndPosition());
 
 			#ifdef _DEBUG
 			m_logger.in(eMUCore::loggerMessage_e::_debug) << "Source gate: " << gate << ", destination gate: " << destGate << ".";
@@ -375,8 +362,7 @@ void game_t::onCharacterTeleportRequest(gameServerUser_t &user,
 
 			this->teleportCharacter(user,
 									destGate.getMapId(),
-									position.first,
-									position.second,
+									pos,
 									destGate.getDirection(),
 									destGate.getId());
 		} else {
@@ -454,28 +440,25 @@ void game_t::saveCharacter(gameServerUser_t &user) const {
 
 void game_t::teleportCharacter(gameServerUser_t &user,
 								unsigned char mapId,
-								unsigned char x,
-								unsigned char y,
+								const eMUShared::position_t &pos,
 								unsigned char direction,
 								unsigned char gateId) {
 	character_t &character = user.getCharacter();
 
 	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " " << character << " Teleporting to"
-													<< " [" << static_cast<int>(mapId) << "]["
-													<< static_cast<int>(x) << "][" << static_cast<int>(y) << "].";
+													<< " [" << static_cast<int>(mapId) << "]" << pos << ".";
 	m_logger.out();
 
-	m_mapManager[character.getMapId()].clearStand(character.getPosX(), character.getPosY());
-	m_mapManager[mapId].setStand(x, y);
+	m_mapManager[character.getMapId()].clearStand(character.getAttributes().m_position);
+	m_mapManager[mapId].setStand(pos);
 
 	m_viewportManager.clear(character);
 
 	character.setMapId(mapId);
-	character.setPosX(x);
-	character.setPosY(y);
+	character.getAttributes().m_position = pos;
 	character.setDirection(direction);
 	character.setPose(characterAction_e::_setStand); // default - stand.
-	m_protocol.sendCharacterTeleportAnswer(user, mapId, x, y, direction, gateId);
+	m_protocol.sendCharacterTeleportAnswer(user, mapId, pos, direction, gateId);
 
 	character.activateTeleportEffect();
 	m_viewportManager.generate(character);
