@@ -98,7 +98,7 @@ public:
 		static synchronizer_t synchronizer;
 		synchronizer.lock();
 
-		static std::ofstream file("log\\profiles.txt", std::ios::out);
+		static std::ofstream file("log\\profiles.txt", std::ios::out | std::ios::app);
 
 		if(file) {
 			file << m_functionName << "() duration: " << duration / 1000 << "ms." << std::endl;
@@ -515,6 +515,8 @@ public:
 
 		return defaultValue;
 	}
+
+	bool readBoolFromProperty(const std::string &nodeName, const std::string &propertyName, bool defaultValue);
 
 	bool nextNode();
 	bool childrenNode();

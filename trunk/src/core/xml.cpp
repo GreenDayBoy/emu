@@ -79,3 +79,13 @@ bool xmlConfig_t::parentNode() {
 		return false;
 	}
 }
+
+bool xmlConfig_t::readBoolFromProperty(const std::string &nodeName, const std::string &propertyName, bool defaultValue) {
+	std::string val = readFromProperty<std::string>(nodeName, propertyName, defaultValue ? "true" : "false");
+
+	if(val == "true") {
+		return true;
+	} else {
+		return false;
+	}
+}

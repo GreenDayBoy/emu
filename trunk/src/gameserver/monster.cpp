@@ -37,11 +37,11 @@ void monsterAttributesManager_t::startup(const std::string &fileName) {
 		attr.m_itemDropRate = attrFile.readFromProperty<unsigned int>("monsterAttributes", "itemDropRate", 0);
 		attr.m_maxItemDropLevel = attrFile.readFromProperty<unsigned int>("monsterAttributes", "maxItemDropLevel", 0);
 		attr.m_moneyDropRate = attrFile.readFromProperty<unsigned int>("monsterAttributes", "moneyDropRate", 0);
-		attr.m_windProtect = attrFile.readFromProperty<unsigned int>("monsterAttributes", "windProtect", 0);
-		attr.m_poisonProtect = attrFile.readFromProperty<unsigned int>("monsterAttributes", "poisonProtect", 0);
-		attr.m_iceProtect = attrFile.readFromProperty<unsigned int>("monsterAttributes", "iceProtect", 0);	
-		attr.m_electricProtect = attrFile.readFromProperty<unsigned int>("monsterAttributes", "electricProtect", 0);
-		attr.m_fireProtect = attrFile.readFromProperty<unsigned int>("monsterAttributes", "fireProtect", 0);
+		attr.m_windProtect = attrFile.readBoolFromProperty("monsterAttributes", "windProtect", false);
+		attr.m_poisonProtect = attrFile.readBoolFromProperty("monsterAttributes", "poisonProtect", false);
+		attr.m_iceProtect = attrFile.readBoolFromProperty("monsterAttributes", "iceProtect", false);	
+		attr.m_electricProtect = attrFile.readBoolFromProperty("monsterAttributes", "electricProtect", false);
+		attr.m_fireProtect = attrFile.readBoolFromProperty("monsterAttributes", "fireProtect", false);
 		attr.m_minDamage = attrFile.readFromProperty<unsigned int>("monsterAttributes", "minDamage", 0);
 		attr.m_maxDamage = attrFile.readFromProperty<unsigned int>("monsterAttributes", "maxDamage", 0);
 		attr.m_defense = attrFile.readFromProperty<unsigned int>("monsterAttributes", "defense", 0);

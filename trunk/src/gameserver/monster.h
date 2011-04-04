@@ -27,11 +27,11 @@ public:
 		unsigned int	m_itemDropRate;
 		unsigned int	m_maxItemDropLevel;
 		unsigned int	m_moneyDropRate;	
-		unsigned int	m_windProtect;
-		unsigned int	m_poisonProtect;
-		unsigned int	m_iceProtect;
-		unsigned int	m_electricProtect;
-		unsigned int	m_fireProtect;
+		bool			m_windProtect;
+		bool			m_poisonProtect;
+		bool			m_iceProtect;
+		bool			m_electricProtect;
+		bool			m_fireProtect;
 		unsigned int	m_minDamage;
 		unsigned int	m_maxDamage;
 		unsigned int	m_defense;
