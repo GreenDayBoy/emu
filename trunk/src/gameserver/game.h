@@ -24,7 +24,8 @@ public:
 			protocol_t &protocol,
 			dataServerProtocol_t &dataServerProtocol,
 			versionConfiguration_t &versionConfiguration,
-			const disconnectCallback_t &disconnectCallback);
+			const disconnectCallback_t &disconnectCallback,
+			int monsterStartIndex);
 
 	void startup();
 	void cleanup();

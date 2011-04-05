@@ -7,9 +7,9 @@ game_t::game_t(eMUCore::logger_t &logger,
 				protocol_t &protocol,
 				dataServerProtocol_t &dataServerProtocol,
 				versionConfiguration_t &versionConfiguration,
-				const disconnectCallback_t &disconnectCallback):
-  m_monsterManager(m_monsterAttributesManager,
-					userManager.getCount()),
+				const disconnectCallback_t &disconnectCallback,
+				int monsterStartIndex):
+  m_monsterManager(m_monsterAttributesManager, monsterStartIndex),
   m_logger(logger),
   m_scheduler(scheduler),
   m_userManager(userManager),
@@ -317,7 +317,7 @@ void game_t::onCharacterMoveRequest(gameServerUser_t &user,
 		if(m_mapManager[character.getMapId()].isPathValid(path)) {
 			m_mapManager[character.getMapId()].resetStand(character.getPosition(), pos);
 
-			character.getAttributes().m_position = pos;
+			character.setPosition(pos);
 			character.setDirection(direction);
 			character.setLastMoveTime(GetTickCount());
 			character.setPose(characterAction_e::_setStand);  // default - stand.
@@ -349,7 +349,7 @@ void game_t::onCharacterTeleportRequest(gameServerUser_t &user,
 
 	gate_t &gate = m_gateManager[gateId];
 
-	if(gate.isInGate(character.getAttributes().m_position)) {
+	if(gate.isInGate(character.getPosition())) {
 		if(gate.getRequiredLevel() <= character.getAttributes().m_level) {
 			gate_t &destGate = m_gateManager[gate.getDestId()];
 			eMUShared::position_t pos = m_mapManager[destGate.getMapId()].getRandomPosition(destGate.getStartPosition(),
@@ -408,10 +408,8 @@ void game_t::onWhisperChatRequest(gameServerUser_t& user,
 		m_protocol.sendTextNotice(user, "User is currenty unavailable.", gameNotice_e::_blue);
 		return;
 	}
-
-	if(receiver) {
-		m_protocol.sendWhisperChatAnswer(*receiver, user.getCharacter().getName(), message);
-	}
+	
+	m_protocol.sendWhisperChatAnswer(*receiver, user.getCharacter().getName(), message);
 }
 
 void game_t::onQueryExceptionNotice(unsigned int connectionStamp,
@@ -475,7 +473,7 @@ void game_t::teleportCharacter(gameServerUser_t &user,
 	m_viewportManager.clear(character);
 
 	character.setMapId(mapId);
-	character.getAttributes().m_position = pos;
+	character.setPosition(pos);
 	character.setDirection(direction);
 	character.setPose(characterAction_e::_setStand); // default - stand.
 	m_protocol.sendCharacterTeleportAnswer(user, mapId, pos, direction, gateId);
