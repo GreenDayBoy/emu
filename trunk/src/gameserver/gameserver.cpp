@@ -210,7 +210,7 @@ void gameServer_t::onContextAttach(eMUCore::socketContext_t &context) {
 
 		// ---------------------
 		user.setConnectionStamp(GetTickCount());
-		m_protocol.sendHandshake(user, user.getIndex(), m_versionConfiguration.m_versionProtocol);
+		m_protocol.sendHandshake(user, m_versionConfiguration.m_versionProtocol);
 		// ---------------------
 	} catch(eMUCore::exception_t &e) {
 		m_logger.in(eMUCore::loggerMessage_e::_error) << "Exception: " << user << " " << e.what();

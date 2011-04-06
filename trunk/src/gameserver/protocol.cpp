@@ -63,7 +63,7 @@ void protocol_t::core(gameServerUser_t &user,
 	}
 }
 
-void protocol_t::sendHandshake(gameServerUser_t &user, unsigned short userIndex, std::string version) const {
+void protocol_t::sendHandshake(gameServerUser_t &user, std::string version) const {
 	//[0] HeaderId: 0xC1
 	//[1] Size
 	//[2] ProtocolId: 0xF1
@@ -78,7 +78,7 @@ void protocol_t::sendHandshake(gameServerUser_t &user, unsigned short userIndex,
 	packet.construct(0xC1, protocol_e::_accountManage);
 	packet.insert<unsigned char>(3, protocol_e::accountManage_e::_handshake);
 	packet.insert<unsigned char>(4, 0x01);
-	packet.insert<unsigned short>(5, _byteswap_ushort(userIndex));
+	packet.insert<unsigned short>(5, _byteswap_ushort(user.getIndex()));
 	packet.insertString(7, version, 5);
 
 	m_sendCallback(user, packet);

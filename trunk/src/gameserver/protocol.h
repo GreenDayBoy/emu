@@ -56,7 +56,7 @@ public:
 	void core(gameServerUser_t &user, 
 				const eMUCore::packet_t &packet) const;
 
-	void sendHandshake(gameServerUser_t &user, unsigned short userIndex, std::string version) const;
+	void sendHandshake(gameServerUser_t &user, std::string version) const;
 
 	void parseLoginRequest(gameServerUser_t &user,
 							const eMUCore::packet_t &packet) const;
