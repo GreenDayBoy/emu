@@ -9,11 +9,11 @@ void gameObject_t::reset() {
 }
 
 unsigned int gameObject_t::calculateDistance(const gameObject_t &object) const {
-	if(this->getPosition().m_x == object.getPosition().m_x && this->getPosition().m_y == object.getPosition().m_y) {
+	if(this->position().m_x == object.position().m_x && this->position().m_y == object.position().m_y) {
 		return 0;
 	} else {
-		unsigned int distanceX = abs(this->getPosition().m_x - object.getPosition().m_x);
-		unsigned int distanceY = abs(this->getPosition().m_y - object.getPosition().m_y);
+		unsigned int distanceX = abs(this->position().m_x - object.position().m_x);
+		unsigned int distanceY = abs(this->position().m_y - object.position().m_y);
 
 		return static_cast<unsigned int>(sqrt(static_cast<float>(distanceX * distanceX + distanceY * distanceY)));
 	}

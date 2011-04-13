@@ -137,11 +137,11 @@ void logger_t::out() {
 	std::cout << m_date.str();
 	m_date.str("");
 
-	this->setColor(c_loggerMessageColor[m_currentMessageType]);
+	this->color(c_loggerMessageColor[m_currentMessageType]);
 	std::cout << c_loggerMessageHeader[m_currentMessageType] << m_stream.str() << std::endl;
 	m_stream.str("");
 
-	this->setColor(7); // Reset color.
+	this->color(7); // Reset color.
 
 	++m_storedLogCount;
 

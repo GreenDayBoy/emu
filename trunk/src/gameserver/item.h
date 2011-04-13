@@ -39,7 +39,7 @@ public:
 	typedef std::map<int, itemAttributes_t> itemAttributesList_t;
 
 	void startup(const std::string &fileName);
-	const itemAttributes_t& getAttributes(int group, int id);
+	const itemAttributes_t& attributes(int group, int id);
 
 private:
 	std::map<int, itemAttributesList_t> m_itemList;
@@ -50,7 +50,7 @@ public:
 	item_t(const itemAttributesManager_t::itemAttributes_t &attr):
 	  m_attributes(attr) {}
 
-	const itemAttributesManager_t::itemAttributes_t& getAttributes() const { return m_attributes; }
+	const itemAttributesManager_t::itemAttributes_t& attributes() const { return m_attributes; }
 
 private:
 	const itemAttributesManager_t::itemAttributes_t &m_attributes;

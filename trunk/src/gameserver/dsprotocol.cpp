@@ -7,13 +7,13 @@ dataServerProtocol_t::dataServerProtocol_t(dataServerProtocolExecutorInterface_t
   m_sendCallback(sendCallback) {}
 
 void dataServerProtocol_t::core(const eMUCore::packet_t &packet) const {
-	switch(packet.getProtocolId()) {
+	switch(packet.protocolId()) {
 	case eMUShared::dataServerProtocol_e::_queryException:
 		this->parseQueryExceptionNotice(packet);
 		break;
 
 	case eMUShared::dataServerProtocol_e::_accountManage:
-		switch(packet.getData()[3]) {
+		switch(packet.data()[3]) {
 		case eMUShared::dataServerProtocol_e::accountManage_e::_check:
 			this->parseAccountCheckAnswer(packet);
 			break;
@@ -21,7 +21,7 @@ void dataServerProtocol_t::core(const eMUCore::packet_t &packet) const {
 		break;
 
 	case eMUShared::dataServerProtocol_e::_characterManage:
-		switch(packet.getData()[3]) {
+		switch(packet.data()[3]) {
 		case eMUShared::dataServerProtocol_e::characterManage_e::_list:
 			this->parseCharacterListAnswer(packet);
 			break;

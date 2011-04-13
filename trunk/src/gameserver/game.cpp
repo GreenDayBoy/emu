@@ -45,15 +45,15 @@ void game_t::onLoginRequest(gameServerUser_t &user,
 							const std::string &clientExeSerial) {
 	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Login request :: account [" << accountId << "].";
 
-	if(!user.isLoggedIn()) {
+	if(!user.loggedIn()) {
 		if(clientExeVersion == m_versionConfiguration.m_versionProtocol
 			&& clientExeSerial == m_versionConfiguration.m_serial) {
 			m_logger.out();
 
-			m_dataServerProtocol.sendAccountCheckRequest(user.getConnectionStamp(), 
+			m_dataServerProtocol.sendAccountCheckRequest(user.connectionStamp(), 
 															accountId,
 															password,
-															user.getIpAddress());
+															user.ipAddress());
 		} else {
 			m_logger.append() << " Invalid version or serial [" << clientExeVersion << "][" << clientExeSerial << "].";
 			m_logger.out();
@@ -78,8 +78,8 @@ void game_t::onAccountCheckAnswer(unsigned int connectionStamp,
 			m_logger.append() << " logged in.";
 			m_logger.out();
 
-			user.setAccountId(accountId);
-			user.setLoggedIn();
+			user.accountId(accountId);
+			user.logIn();
 	} else {
 		switch(result) {
 		case accountCheckResult_e::_invalidPassword:
@@ -103,7 +103,7 @@ void game_t::onAccountCheckAnswer(unsigned int connectionStamp,
 
 		user.incerementLoginAttempts();
 
-		if(user.getLoginAttempts() >= 3) {
+		if(user.loginAttempts() >= 3) {
 			result = accountCheckResult_e::_checkAttemptsExceeded; // to many attempts.
 		}
 	}
@@ -115,8 +115,8 @@ void game_t::onCharacterListRequest(gameServerUser_t &user) {
 	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Character list request.";
 	m_logger.out();
 
-	if(user.isLoggedIn()) {
-		m_dataServerProtocol.sendCharacterListRequest(user.getConnectionStamp(), user.getAccountId());
+	if(user.loggedIn()) {
+		m_dataServerProtocol.sendCharacterListRequest(user.connectionStamp(), user.accountId());
 	} else {
 		m_logger.in(eMUCore::loggerMessage_e::_error) << user << " User is not logged on account.";
 		m_logger.out();
@@ -130,33 +130,33 @@ void game_t::onCharacterListAnswer(unsigned int connectionStamp,
 	gameServerUser_t &user = m_userManager.find(connectionStamp);
 
 	user.mapCharacterList(characterList);
-	user.setAvailableRaces(characterList, m_gameConfiguration.m_advancedRaceLevel);
+	user.availableRaces(characterList, m_gameConfiguration.m_advancedRaceLevel);
 
-	m_protocol.sendCharacterListAnswer(user, user.getAvailableRaces(), characterList);
+	m_protocol.sendCharacterListAnswer(user, user.availableRaces(), characterList);
 }
 
 void game_t::onClientClose(gameServerUser_t &user) {
-	if(user.getCharacter().isActive()) {
+	if(user.character().active()) {
 		this->onCharacterLeave(user);
 	}
 
-	if(user.isLoggedIn()) {
-		m_dataServerProtocol.sendLogoutRequest(user.getAccountId());
+	if(user.loggedIn()) {
+		m_dataServerProtocol.sendLogoutRequest(user.accountId());
 	}
 }
 
 void game_t::onCharacterLeave(gameServerUser_t &user) {
-	m_mapManager[user.getCharacter().getMapId()].clearStand(user.getCharacter().getPosition());
+	m_mapManager[user.character().mapId()].clearStand(user.character().position());
 	this->saveCharacter(user);
-	user.getCharacter().setInactive();
+	user.character().deactivate();
 
-	m_viewportManager.clear(user.getCharacter());
-	m_viewportManager.unregisterObject(&user.getCharacter());
+	m_viewportManager.clear(user.character());
+	m_viewportManager.unregisterObject(&user.character());
 }
 
 void game_t::onLogoutRequest(gameServerUser_t &user, clientCloseReason_e::type_t closeReason) {
-	user.setCloseReason(closeReason);
-	user.setTimeToClose(5);
+	user.closeReason(closeReason);
+	user.timeToClose(5);
 }
 
 void game_t::onCharacterCreateRequest(gameServerUser_t &user,
@@ -166,14 +166,14 @@ void game_t::onCharacterCreateRequest(gameServerUser_t &user,
 													<< "] race [" << race << "].";
 	m_logger.out();
 
-	if(user.isLoggedIn()) {
+	if(user.loggedIn()) {
 		if(race == eMUShared::characterRace_e::_darkWizard
 			|| race == eMUShared::characterRace_e::_darkKnight
 			|| race == eMUShared::characterRace_e::_elf
 			|| race == eMUShared::characterRace_e::_magicGladiator
 			|| race == eMUShared::characterRace_e::_darkLord) {
-			m_dataServerProtocol.sendCharacterCreateRequest(user.getConnectionStamp(),
-															user.getAccountId(),
+			m_dataServerProtocol.sendCharacterCreateRequest(user.connectionStamp(),
+															user.accountId(),
 															name,
 															race);
 		} else {
@@ -225,8 +225,8 @@ void game_t::onCharacterDeleteRequest(gameServerUser_t &user,
 	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Delete character request ::" << " name [" << name << "].";
 	m_logger.out();
 
-	if(user.isLoggedIn()) {
-		m_dataServerProtocol.sendCharacterDeleteRequest(user.getConnectionStamp(), user.getAccountId(), name, pin);
+	if(user.loggedIn()) {
+		m_dataServerProtocol.sendCharacterDeleteRequest(user.connectionStamp(), user.accountId(), name, pin);
 	} else {
 		m_logger.in(eMUCore::loggerMessage_e::_error) << user << " User is not logged on account.";
 		m_logger.out();
@@ -267,10 +267,10 @@ void game_t::onCharacterSelectRequest(gameServerUser_t &user,
 	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Select character request ::" << " name [" << name << "].";
 	m_logger.out();
 
-	if(!user.getCharacter().isActive()) {
-		m_dataServerProtocol.sendCharacterSelectRequest(user.getConnectionStamp(), user.getAccountId(), name);
+	if(!user.character().active()) {
+		m_dataServerProtocol.sendCharacterSelectRequest(user.connectionStamp(), user.accountId(), name);
 	} else {
-		m_logger.in(eMUCore::loggerMessage_e::_error) << user << " User is playing -> character " << user.getCharacter() << ".";
+		m_logger.in(eMUCore::loggerMessage_e::_error) << user << " User is playing -> character " << user.character() << ".";
 		m_logger.out();
 
 		m_disconnectCallback(user);
@@ -285,13 +285,13 @@ void game_t::onCharacterSelectAnswer(unsigned int connectionStamp,
 	m_logger.out();
 
 	if(m_mapManager[attr.m_mapId].canStand(attr.m_position)) {
-		character_t &character = user.getCharacter();
+		character_t &character = user.character();
 
-		m_mapManager[attr.m_mapId].setStand(attr.m_position);
+		m_mapManager[attr.m_mapId].stand(attr.m_position);
 
-		character.setAttributes(attr);
-		character.setPreview();
-		character.setActive();
+		character.attributes(attr);
+		character.calculatePreview();
+		character.activate();
 		m_protocol.sendCharacterSelectAnswer(user, character);
 		m_protocol.sendTextNotice(user, m_gameConfiguration.m_welcomeNotice);
 
@@ -311,16 +311,16 @@ void game_t::onCharacterMoveRequest(gameServerUser_t &user,
 									const eMUShared::position_t &pos,
 									unsigned char direction,
 									const map_t::path_t &path) {
-	character_t &character = user.getCharacter();
+	character_t &character = user.character();
 
-	if(GetTickCount() - character.getLastMoveTime() >= 100) {
-		if(m_mapManager[character.getMapId()].isPathValid(path)) {
-			m_mapManager[character.getMapId()].resetStand(character.getPosition(), pos);
+	if(GetTickCount() - character.lastMoveTime() >= 100) {
+		if(m_mapManager[character.mapId()].pathValid(path)) {
+			m_mapManager[character.mapId()].resetStand(character.position(), pos);
 
-			character.setPosition(pos);
-			character.setDirection(direction);
-			character.setLastMoveTime(GetTickCount());
-			character.setPose(characterAction_e::_setStand);  // default - stand.
+			character.position(pos);
+			character.direction(direction);
+			character.lastMoveTime(GetTickCount());
+			character.pose(characterAction_e::_stand);  // default - stand.
 
 			m_viewportManager.update(character);
 
@@ -331,7 +331,7 @@ void game_t::onCharacterMoveRequest(gameServerUser_t &user,
 
 			#ifdef _DEBUG
 			m_logger.in(eMUCore::loggerMessage_e::_debug) << user << " " << character << " Path dump: " 
-															<< m_mapManager[character.getMapId()].dumpPath(path) << ".";
+															<< m_mapManager[character.mapId()].dumpPath(path) << ".";
 			m_logger.out();
 			#endif
 
@@ -342,18 +342,18 @@ void game_t::onCharacterMoveRequest(gameServerUser_t &user,
 
 void game_t::onCharacterTeleportRequest(gameServerUser_t &user,
 										unsigned short gateId) {
-	character_t &character = user.getCharacter();
+	character_t &character = user.character();
 
 	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " " << character << " Requested teleport to gate [" << gateId << "].";
 	m_logger.out();
 
 	gate_t &gate = m_gateManager[gateId];
 
-	if(gate.isInGate(character.getPosition())) {
-		if(gate.getRequiredLevel() <= character.getAttributes().m_level) {
-			gate_t &destGate = m_gateManager[gate.getDestId()];
-			eMUShared::position_t pos = m_mapManager[destGate.getMapId()].getRandomPosition(destGate.getStartPosition(),
-																								destGate.getEndPosition());
+	if(gate.inGate(character.position())) {
+		if(gate.requiredLevel() <= character.attributes().m_level) {
+			gate_t &destGate = m_gateManager[gate.destId()];
+			eMUShared::position_t pos = m_mapManager[destGate.mapId()].randomPosition(destGate.startPosition(),
+																							destGate.endPosition());
 
 			#ifdef _DEBUG
 			m_logger.in(eMUCore::loggerMessage_e::_debug) << "Source gate: " << gate << ", destination gate: " << destGate << ".";
@@ -361,10 +361,10 @@ void game_t::onCharacterTeleportRequest(gameServerUser_t &user,
 			#endif
 
 			this->teleportCharacter(user,
-									destGate.getMapId(),
+									destGate.mapId(),
 									pos,
-									destGate.getDirection(),
-									destGate.getId());
+									destGate.direction(),
+									destGate.id());
 		} else {
 			m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Character level not match to enter gate.";
 			m_logger.out();
@@ -389,9 +389,9 @@ void game_t::onPublicChat(gameServerUser_t& user,
 void game_t::onCharacterAction(gameServerUser_t &user,
 							   unsigned char direction,
 							   characterAction_e::type_t actionId) {
-	user.getCharacter().setDirection(direction);
-	user.getCharacter().setPose(actionId);
-	m_protocol.sendViewportCharacterActionRequest(user.getCharacter(), actionId, user.getIndex());
+	user.character().direction(direction);
+	user.character().pose(actionId);
+	m_protocol.sendViewportCharacterActionRequest(user.character(), actionId, user.index());
 }
 
 void game_t::onWhisperChatRequest(gameServerUser_t& user,
@@ -409,7 +409,7 @@ void game_t::onWhisperChatRequest(gameServerUser_t& user,
 		return;
 	}
 	
-	m_protocol.sendWhisperChatAnswer(*receiver, user.getCharacter().getName(), message);
+	m_protocol.sendWhisperChatAnswer(*receiver, user.character().name(), message);
 }
 
 void game_t::onQueryExceptionNotice(unsigned int connectionStamp,
@@ -423,22 +423,22 @@ void game_t::onQueryExceptionNotice(unsigned int connectionStamp,
 }
 
 void game_t::checkSelfClose() {
-	for(size_t i = 0; i < m_userManager.getCount(); ++i) {
+	for(size_t i = 0; i < m_userManager.count(); ++i) {
 		gameServerUser_t &user = m_userManager[i];
 
-		if(user.isLoggedIn()) {
-			if(user.getCloseReason() != clientCloseReason_e::_none) {
-				if(user.getTimeToClose() == 0) {
-					if(user.getCloseReason() == clientCloseReason_e::_switchCharacter && user.getCharacter().isActive()) {
+		if(user.loggedIn()) {
+			if(user.closeReason() != clientCloseReason_e::_none) {
+				if(user.timeToClose() == 0) {
+					if(user.closeReason() == clientCloseReason_e::_switchCharacter && user.character().active()) {
 						this->onCharacterLeave(user);
 					}
 
-					m_protocol.sendLogoutAnswer(user, user.getCloseReason());
+					m_protocol.sendLogoutAnswer(user, user.closeReason());
 
 					user.resetCloseReason();
 				} else {
 					std::stringstream notice;
-					notice << "You will left the game after " << user.getTimeToClose() << " seconds.";
+					notice << "You will left the game after " << user.timeToClose() << " seconds.";
 					m_protocol.sendTextNotice(user, notice.str(), gameNotice_e::_blue); // 1 - blue, 0 - gold
 
 					user.decrecemntTimeToClose();
@@ -449,11 +449,11 @@ void game_t::checkSelfClose() {
 }
 
 void game_t::saveCharacter(gameServerUser_t &user) const {
-	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Saving character :: name " << user.getCharacter() << ".";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Saving character :: name " << user.character() << ".";
 	m_logger.out();
 
-	m_dataServerProtocol.sendCharacterSaveRequest(user.getAccountId(),
-													user.getCharacter().getAttributes());
+	m_dataServerProtocol.sendCharacterSaveRequest(user.accountId(),
+													user.character().attributes());
 }
 
 void game_t::teleportCharacter(gameServerUser_t &user,
@@ -461,21 +461,21 @@ void game_t::teleportCharacter(gameServerUser_t &user,
 								const eMUShared::position_t &pos,
 								unsigned char direction,
 								unsigned char gateId) {
-	character_t &character = user.getCharacter();
+	character_t &character = user.character();
 
 	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " " << character << " Teleporting to"
 													<< " [" << static_cast<int>(mapId) << "]" << pos << ".";
 	m_logger.out();
 
-	m_mapManager[character.getMapId()].clearStand(character.getAttributes().m_position);
-	m_mapManager[mapId].setStand(pos);
+	m_mapManager[character.mapId()].clearStand(character.attributes().m_position);
+	m_mapManager[mapId].stand(pos);
 
 	m_viewportManager.clear(character);
 
-	character.setMapId(mapId);
-	character.setPosition(pos);
-	character.setDirection(direction);
-	character.setPose(characterAction_e::_setStand); // default - stand.
+	character.mapId(mapId);
+	character.position(pos);
+	character.direction(direction);
+	character.pose(characterAction_e::_stand); // default - stand.
 	m_protocol.sendCharacterTeleportAnswer(user, mapId, pos, direction, gateId);
 
 	character.activateTeleportEffect();

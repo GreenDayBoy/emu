@@ -9,7 +9,7 @@ protocol_t::protocol_t(protocolExecutorInterface_t &iface,
 
 void protocol_t::core(gameServerUser_t &user,
 						const eMUCore::packet_t &packet) const {
-	switch(packet.getProtocolId()) {
+	switch(packet.protocolId()) {
 	case protocol_e::_publicChat:
 		this->parsePublicChatRequest(user, packet);
 		break;
@@ -23,7 +23,7 @@ void protocol_t::core(gameServerUser_t &user,
 		break;
 
 	case protocol_e::_accountManage:
-		switch(packet.getData()[3]) {
+		switch(packet.data()[3]) {
 		case protocol_e::accountManage_e::_login:
 			this->parseLoginRequest(user, packet);
 			break;
@@ -34,7 +34,7 @@ void protocol_t::core(gameServerUser_t &user,
 		break;
 
 	case protocol_e::_characterManage:
-		switch(packet.getData()[3]) {
+		switch(packet.data()[3]) {
 		case protocol_e::characterManage_e::_list:
 			this->parseCharacterListRequest(user, packet);
 			break;
@@ -78,7 +78,7 @@ void protocol_t::sendHandshake(gameServerUser_t &user, std::string version) cons
 	packet.construct(0xC1, protocol_e::_accountManage);
 	packet.insert<unsigned char>(3, protocol_e::accountManage_e::_handshake);
 	packet.insert<unsigned char>(4, 0x01);
-	packet.insert<unsigned short>(5, _byteswap_ushort(user.getIndex()));
+	packet.insert<unsigned short>(5, _byteswap_ushort(user.index()));
 	packet.insertString(7, version, 5);
 
 	m_sendCallback(user, packet);
@@ -235,33 +235,33 @@ void protocol_t::sendCharacterSelectAnswer(gameServerUser_t &user,
 	eMUCore::packet_t packet;
 	packet.construct(0xC3, protocol_e::_characterManage);
 	packet.insert<unsigned char>(3, protocol_e::characterManage_e::_select);
-	packet.insert<unsigned char>(4, character.getPosition().m_x);
-	packet.insert<unsigned char>(5, character.getPosition().m_y);
-	packet.insert<unsigned char>(6, character.getMapId());
-	packet.insert<unsigned char>(7, character.getDirection());
-	packet.insert<unsigned int>(8, character.getAttributes().m_experience);
-	packet.insert<unsigned int>(12, character.getNextExperience());
-	packet.insert<unsigned short>(16, character.getAttributes().m_levelUpPoints);
-	packet.insert<unsigned short>(18, character.getAttributes().m_strength);
-	packet.insert<unsigned short>(20, character.getAttributes().m_agility);
-	packet.insert<unsigned short>(22, character.getAttributes().m_vitality);
-	packet.insert<unsigned short>(24, character.getAttributes().m_energy);
-	packet.insert<unsigned short>(26, character.getAttributes().m_health);
-	packet.insert<unsigned short>(28, character.getAttributes().m_maxHealth);
-	packet.insert<unsigned short>(30, character.getAttributes().m_mana);
-	packet.insert<unsigned short>(32, character.getAttributes().m_maxMana);
-	packet.insert<unsigned short>(34, character.getAttributes().m_shield);
-	packet.insert<unsigned short>(36, character.getAttributes().m_maxShield);
-	packet.insert<unsigned short>(38, character.getAttributes().m_stamina);
-	packet.insert<unsigned short>(40, character.getAttributes().m_maxStamina);
-	packet.insert<unsigned int>(42, character.getAttributes().m_money);
-	packet.insert<unsigned char>(46, character.getAttributes().m_pkLevel);
-	packet.insert<unsigned char>(47, character.getAttributes().m_controlCode);
-	packet.insert<unsigned short>(48, character.getAttributes().m_addPoints);
-	packet.insert<unsigned short>(50, character.getAttributes().m_maxAddPoints);
-	packet.insert<unsigned short>(52, character.getAttributes().m_command);
-	packet.insert<unsigned short>(54, character.getAttributes().m_minusPoints);
-	packet.insert<unsigned short>(56, character.getAttributes().m_maxMinusPoints);
+	packet.insert<unsigned char>(4, character.position().m_x);
+	packet.insert<unsigned char>(5, character.position().m_y);
+	packet.insert<unsigned char>(6, character.mapId());
+	packet.insert<unsigned char>(7, character.direction());
+	packet.insert<unsigned int>(8, character.attributes().m_experience);
+	packet.insert<unsigned int>(12, character.nextExperience());
+	packet.insert<unsigned short>(16, character.attributes().m_levelUpPoints);
+	packet.insert<unsigned short>(18, character.attributes().m_strength);
+	packet.insert<unsigned short>(20, character.attributes().m_agility);
+	packet.insert<unsigned short>(22, character.attributes().m_vitality);
+	packet.insert<unsigned short>(24, character.attributes().m_energy);
+	packet.insert<unsigned short>(26, character.attributes().m_health);
+	packet.insert<unsigned short>(28, character.attributes().m_maxHealth);
+	packet.insert<unsigned short>(30, character.attributes().m_mana);
+	packet.insert<unsigned short>(32, character.attributes().m_maxMana);
+	packet.insert<unsigned short>(34, character.attributes().m_shield);
+	packet.insert<unsigned short>(36, character.attributes().m_maxShield);
+	packet.insert<unsigned short>(38, character.attributes().m_stamina);
+	packet.insert<unsigned short>(40, character.attributes().m_maxStamina);
+	packet.insert<unsigned int>(42, character.attributes().m_money);
+	packet.insert<unsigned char>(46, character.attributes().m_pkLevel);
+	packet.insert<unsigned char>(47, character.attributes().m_controlCode);
+	packet.insert<unsigned short>(48, character.attributes().m_addPoints);
+	packet.insert<unsigned short>(50, character.attributes().m_maxAddPoints);
+	packet.insert<unsigned short>(52, character.attributes().m_command);
+	packet.insert<unsigned short>(54, character.attributes().m_minusPoints);
+	packet.insert<unsigned short>(56, character.attributes().m_maxMinusPoints);
 
 	m_sendCallback(user, packet);
 }
@@ -305,7 +305,7 @@ void protocol_t::parseCharacterMoveRequest(gameServerUser_t &user,
 		map_t::path_t path;
 
 		char directions[] = {-1, -1, 0, -1, 1, -1, 1, 0, 1, 1, 0, 1, -1, 1, -1, 0};
-		const unsigned char *data = &packet.getData()[5];
+		const unsigned char *data = &packet.data()[5];
 
 		for(int i = 1; i < stepsCount; ++i) {
 			int directionId = 0;
@@ -358,46 +358,46 @@ void protocol_t::sendViewportCharacterCreateRequest(gameServerUser_t &user,
 	for(viewportManager_t::viewport_t::iterator i = viewport.begin(); i != viewport.end(); ++i) {
 		gameObject_t *object = (*i);
 
-		if(object->getType() == gameObject_e::_character) {
+		if(object->type() == gameObject_e::_character) {
 			character_t *character = reinterpret_cast<character_t*>(object);
 
 			unsigned short step = count * 41;
 
-			if(character->hasTeleportEffect()) {
-				packet.insert<unsigned char>(5 + step, HIBYTE(character->getOwner().getIndex()) | 0x80);
+			if(character->teleportEffect()) {
+				packet.insert<unsigned char>(5 + step, HIBYTE(character->owner().index()) | 0x80);
 			} else {
-				packet.insert<unsigned char>(5 + step, HIBYTE(character->getOwner().getIndex()));
+				packet.insert<unsigned char>(5 + step, HIBYTE(character->owner().index()));
 			}
-			packet.insert<unsigned char>(6 + step, LOBYTE(character->getOwner().getIndex()));
-			packet.insert<unsigned char>(7 + step, character->getPosition().m_x);
-			packet.insert<unsigned char>(8 + step, character->getPosition().m_y);
+			packet.insert<unsigned char>(6 + step, LOBYTE(character->owner().index()));
+			packet.insert<unsigned char>(7 + step, character->position().m_x);
+			packet.insert<unsigned char>(8 + step, character->position().m_y);
 
-			packet.insert<unsigned char>(9 + step, character->getPreview()[0]);
-			packet.insert<unsigned char>(10 + step, character->getPreview()[1]);
-			packet.insert<unsigned char>(11 + step, character->getPreview()[2]);
-			packet.insert<unsigned char>(12 + step, character->getPreview()[3]);
-			packet.insert<unsigned char>(13 + step, character->getPreview()[4]);
-			packet.insert<unsigned char>(14 + step, character->getPreview()[5]);
-			packet.insert<unsigned char>(15 + step, character->getPreview()[6]);
-			packet.insert<unsigned char>(16 + step, character->getPreview()[7]);
-			packet.insert<unsigned char>(17 + step, character->getPreview()[8]);
-			packet.insert<unsigned char>(18 + step, character->getPreview()[9]);
-			packet.insert<unsigned char>(19 + step, character->getPreview()[10]);
-			packet.insert<unsigned char>(20 + step, character->getPreview()[11]);
-			packet.insert<unsigned char>(21 + step, character->getPreview()[12]);
-			packet.insert<unsigned char>(22 + step, character->getPreview()[13]);
-			packet.insert<unsigned char>(23 + step, character->getPreview()[14]);
-			packet.insert<unsigned char>(24 + step, character->getPreview()[15]);
-			packet.insert<unsigned char>(25 + step, character->getPreview()[16]);
-			packet.insert<unsigned char>(26 + step, character->getPreview()[17]);
+			packet.insert<unsigned char>(9 + step, character->preview()[0]);
+			packet.insert<unsigned char>(10 + step, character->preview()[1]);
+			packet.insert<unsigned char>(11 + step, character->preview()[2]);
+			packet.insert<unsigned char>(12 + step, character->preview()[3]);
+			packet.insert<unsigned char>(13 + step, character->preview()[4]);
+			packet.insert<unsigned char>(14 + step, character->preview()[5]);
+			packet.insert<unsigned char>(15 + step, character->preview()[6]);
+			packet.insert<unsigned char>(16 + step, character->preview()[7]);
+			packet.insert<unsigned char>(17 + step, character->preview()[8]);
+			packet.insert<unsigned char>(18 + step, character->preview()[9]);
+			packet.insert<unsigned char>(19 + step, character->preview()[10]);
+			packet.insert<unsigned char>(20 + step, character->preview()[11]);
+			packet.insert<unsigned char>(21 + step, character->preview()[12]);
+			packet.insert<unsigned char>(22 + step, character->preview()[13]);
+			packet.insert<unsigned char>(23 + step, character->preview()[14]);
+			packet.insert<unsigned char>(24 + step, character->preview()[15]);
+			packet.insert<unsigned char>(25 + step, character->preview()[16]);
+			packet.insert<unsigned char>(26 + step, character->preview()[17]);
 
 			packet.insert<unsigned short>(27 + step, 0); // dummy - Dear WebZen forgot about structure alignment.
 			packet.insert<unsigned int>(29 + step, 0);
 
-			packet.insertString(33 + step, character->getName(), 10);
-			packet.insert<unsigned char>(43 + step, character->getPosition().m_x);
-			packet.insert<unsigned char>(44 + step, character->getPosition().m_y);
-			packet.insert<unsigned char>(45 + step, character->getDirection() << 4);
+			packet.insertString(33 + step, character->name(), 10);
+			packet.insert<unsigned char>(43 + step, character->position().m_x);
+			packet.insert<unsigned char>(44 + step, character->position().m_y);
+			packet.insert<unsigned char>(45 + step, character->direction() << 4);
 			++count;
 		}
 	}
@@ -419,21 +419,21 @@ void protocol_t::sendViewportMonsterCreateRequest(gameServerUser_t &user,
 	for(viewportManager_t::viewport_t::iterator i = viewport.begin(); i != viewport.end(); ++i) {
 		gameObject_t *object = (*i);
 
-		if(object->getType() == gameObject_e::_monster) {
+		if(object->type() == gameObject_e::_monster) {
 			monster_t *monster = reinterpret_cast<monster_t*>(object);
 
 			unsigned short step = count * 13;
 
-			packet.insert<unsigned char>(5 + step, HIBYTE(monster->getIndex()));
-			packet.insert<unsigned char>(6 + step, LOBYTE(monster->getIndex()));
-			packet.insert<unsigned char>(7 + step, HIBYTE(monster->getId()));
-			packet.insert<unsigned char>(8 + step, LOBYTE(monster->getId()));
+			packet.insert<unsigned char>(5 + step, HIBYTE(monster->index()));
+			packet.insert<unsigned char>(6 + step, LOBYTE(monster->index()));
+			packet.insert<unsigned char>(7 + step, HIBYTE(monster->id()));
+			packet.insert<unsigned char>(8 + step, LOBYTE(monster->id()));
 			packet.insert<unsigned int>(9 + step, 0);
-			packet.insert<unsigned char>(13 + step, monster->getPosition().m_x);
-			packet.insert<unsigned char>(14 + step, monster->getPosition().m_y);
-			packet.insert<unsigned char>(15 + step, monster->getPosition().m_x);
-			packet.insert<unsigned char>(16 + step, monster->getPosition().m_y);
-			packet.insert<unsigned char>(17 + step, monster->getDirection() << 4);
+			packet.insert<unsigned char>(13 + step, monster->position().m_x);
+			packet.insert<unsigned char>(14 + step, monster->position().m_y);
+			packet.insert<unsigned char>(15 + step, monster->position().m_x);
+			packet.insert<unsigned char>(16 + step, monster->position().m_y);
+			packet.insert<unsigned char>(17 + step, monster->direction() << 4);
 
 			++count;
 		}
@@ -457,10 +457,10 @@ void protocol_t::sendViewportDestroyRequest(gameServerUser_t &user,
 		unsigned short index = 0;
 		gameObject_t *object = (*i);
 
-		if(object->getType() == gameObject_e::_character) {
-			index = reinterpret_cast<character_t*>(object)->getOwner().getIndex();
+		if(object->type() == gameObject_e::_character) {
+			index = reinterpret_cast<character_t*>(object)->owner().index();
 		} else {
-			index = reinterpret_cast<monster_t*>(object)->getIndex();
+			index = reinterpret_cast<monster_t*>(object)->index();
 		}
 
 		unsigned short step = count * 2;
@@ -483,23 +483,23 @@ void protocol_t::sendViewportObjectMoveRequest(gameObject_t &object) const {
 
 	unsigned short index = 0;
 
-	if(object.getType() == gameObject_e::_character) {
-		index = reinterpret_cast<character_t&>(object).getOwner().getIndex();
+	if(object.type() == gameObject_e::_character) {
+		index = reinterpret_cast<character_t&>(object).owner().index();
 	} else {
-		index = reinterpret_cast<monster_t&>(object).getIndex();
+		index = reinterpret_cast<monster_t&>(object).index();
 	}
 
 	packet.insert<unsigned char>(3, HIBYTE(index));
 	packet.insert<unsigned char>(4, LOBYTE(index));
-	packet.insert<unsigned char>(5, object.getPosition().m_x);
-	packet.insert<unsigned char>(6, object.getPosition().m_y);
-	packet.insert<unsigned char>(7, object.getDirection() << 4);
+	packet.insert<unsigned char>(5, object.position().m_x);
+	packet.insert<unsigned char>(6, object.position().m_y);
+	packet.insert<unsigned char>(7, object.direction() << 4);
 
-	for(viewportManager_t::viewport_t::iterator i = object.getViewport().begin(); i != object.getViewport().end(); ++i) {
+	for(viewportManager_t::viewport_t::iterator i = object.viewport().begin(); i != object.viewport().end(); ++i) {
 		gameObject_t *vo = (*i);
 
-		if(vo->getType() == gameObject_e::_character) {
-			m_sendCallback(reinterpret_cast<character_t*>(vo)->getOwner(), packet);
+		if(vo->type() == gameObject_e::_character) {
+			m_sendCallback(reinterpret_cast<character_t*>(vo)->owner(), packet);
 		}
 	}
 }
@@ -513,17 +513,17 @@ void protocol_t::parsePublicChatRequest(gameServerUser_t &user,
 void protocol_t::sendPublicChatAnswer(gameServerUser_t &user, const std::string &message) const {
 	eMUCore::packet_t packet;
 	packet.construct(0xC1, protocol_e::_publicChat);
-	packet.insertString(3, user.getCharacter().getName(), 10);
+	packet.insertString(3, user.character().name(), 10);
 
 	size_t messageLen = std::min<size_t>(message.size(), 59);
 	packet.insertString(13, message, messageLen);
 	packet.insert<unsigned char>(13 + messageLen, 0);
 
-	for(viewportManager_t::viewport_t::iterator i = user.getCharacter().getViewport().begin(); i != user.getCharacter().getViewport().end(); ++i) {
+	for(viewportManager_t::viewport_t::iterator i = user.character().viewport().begin(); i != user.character().viewport().end(); ++i) {
 		gameObject_t *vo = (*i);
 
-		if(vo->getType() == gameObject_e::_character) {
-			m_sendCallback(reinterpret_cast<character_t*>(vo)->getOwner(), packet);
+		if(vo->type() == gameObject_e::_character) {
+			m_sendCallback(reinterpret_cast<character_t*>(vo)->owner(), packet);
 		}
 	}
 
@@ -543,18 +543,18 @@ void protocol_t::sendViewportCharacterActionRequest(character_t &character,
 													unsigned short targetId) const {
 	eMUCore::packet_t packet;
 	packet.construct(0xC1, protocol_e::_action);
-	packet.insert<unsigned char>(3, HIBYTE(character.getOwner().getIndex()));
-	packet.insert<unsigned char>(4, LOBYTE(character.getOwner().getIndex()));
-	packet.insert<unsigned char>(5, character.getDirection());
+	packet.insert<unsigned char>(3, HIBYTE(character.owner().index()));
+	packet.insert<unsigned char>(4, LOBYTE(character.owner().index()));
+	packet.insert<unsigned char>(5, character.direction());
 	packet.insert<unsigned char>(6, actionId);
 	packet.insert<unsigned char>(7, HIBYTE(targetId));
 	packet.insert<unsigned char>(8, LOBYTE(targetId));
 
-	for(viewportManager_t::viewport_t::iterator i = character.getViewport().begin(); i != character.getViewport().end(); ++i) {
+	for(viewportManager_t::viewport_t::iterator i = character.viewport().begin(); i != character.viewport().end(); ++i) {
 		gameObject_t *vo = (*i);
 
-		if(vo->getType() == gameObject_e::_character) {
-			m_sendCallback(reinterpret_cast<character_t*>(vo)->getOwner(), packet);
+		if(vo->type() == gameObject_e::_character) {
+			m_sendCallback(reinterpret_cast<character_t*>(vo)->owner(), packet);
 		}
 	}
 }

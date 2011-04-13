@@ -53,7 +53,7 @@ void itemAttributesManager_t::startup(const std::string &fileName) {
 				m_itemList[group][attr.m_id] = attr;
 			} else {
 				eMUCore::exception_t e;
-				e.in() << __FILE__ << ":" << __LINE__ << "[itemAttributesManager_t::getAttributes()] Invalid item id or item id not defined in group ["
+				e.in() << __FILE__ << ":" << __LINE__ << "[itemAttributesManager_t::attributes()] Invalid item id or item id not defined in group ["
 					<< group << "].";
 				throw e;
 			}
@@ -65,7 +65,7 @@ void itemAttributesManager_t::startup(const std::string &fileName) {
 	attrFile.close();
 }
 
-const itemAttributesManager_t::itemAttributes_t& itemAttributesManager_t::getAttributes(int group, int id) {
+const itemAttributesManager_t::itemAttributes_t& itemAttributesManager_t::attributes(int group, int id) {
 	if(m_itemList.find(group) != m_itemList.end()) {
 		itemAttributesList_t &list = m_itemList[group];
 
@@ -73,13 +73,13 @@ const itemAttributesManager_t::itemAttributes_t& itemAttributesManager_t::getAtt
 			return list[id];
 		} else {
 			eMUCore::exception_t e;
-			e.in() << __FILE__ << ":" << __LINE__ << "[itemAttributesManager_t::getAttributes()] No item in group ["
+			e.in() << __FILE__ << ":" << __LINE__ << "[itemAttributesManager_t::attributes()] No item in group ["
 				<< group << "] with id [" << id << "].";
 			throw e;
 		}
 	} else {
 		eMUCore::exception_t e;
-		e.in() << __FILE__ << ":" << __LINE__ << "[itemAttributesManager_t::getAttributes()] No items list for group ["
+		e.in() << __FILE__ << ":" << __LINE__ << "[itemAttributesManager_t::attributes()] No items list for group ["
 			<< group << "].";
 		throw e;
 	}

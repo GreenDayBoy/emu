@@ -122,7 +122,7 @@ void packet_t::increaseSize(size_t elementSize) {
 	}
 }
 
-size_t packet_t::getRawDataSize(const unsigned char *rawData) {
+size_t packet_t::rawDataSize(const unsigned char *rawData) {
 	if(rawData[0] == 0xC1 || rawData[0] == 0xC3) {
 		return rawData[1];
 	} else if(rawData[0] == 0xC2 || rawData[0] == 0xC4) {
@@ -135,7 +135,7 @@ size_t packet_t::getRawDataSize(const unsigned char *rawData) {
 	}
 }
 
-bool packet_t::isRawDataCrypted(const unsigned char *rawData) {
+bool packet_t::rawDataCrypted(const unsigned char *rawData) {
 	if(rawData[0] == 0xC3 || rawData[0] == 0xC4) {
 		return true;
 	} else {
@@ -143,7 +143,7 @@ bool packet_t::isRawDataCrypted(const unsigned char *rawData) {
 	}
 }
 
-size_t packet_t::getCryptedDataPointer(const unsigned char *rawData) {
+size_t packet_t::cryptedDataPointer(const unsigned char *rawData) {
 	if(rawData[0] == 0xC3) {
 		return 2;
 	} else if(rawData[0] == 0xC4) {
@@ -153,7 +153,7 @@ size_t packet_t::getCryptedDataPointer(const unsigned char *rawData) {
 	return 0;
 }
 
-void packet_t::setCryptSerial(unsigned char cryptSerial) {
+void packet_t::cryptSerial(unsigned char cryptSerial) {
 	if(m_headerId == 0xC3) {
 		m_data[1] = cryptSerial;
 	} else if(m_headerId == 0xC4) {

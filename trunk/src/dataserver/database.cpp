@@ -67,7 +67,7 @@ void database_t::ping() {
 	}
 }
 
-MYSQL_RES* database_t::getQueryResult() {
+MYSQL_RES* database_t::queryResult() {
 	MYSQL_RES *queryResult = mysql_store_result(&m_connectionHandle);
 
 	if(queryResult == NULL) {
@@ -109,7 +109,7 @@ bool database_t::iterator_t::nextRow() {
 	} else {
 		m_firstIteration = false;
 
-		if(this->getNumRows() > 0) {
+		if(this->numRows() > 0) {
 			return true;
 		} else {
 			return false;
@@ -117,7 +117,7 @@ bool database_t::iterator_t::nextRow() {
 	}
 }
 
-size_t database_t::iterator_t::getNumRows() {
+size_t database_t::iterator_t::numRows() {
 	if(m_queryResult != NULL) {
 		return static_cast<size_t>(mysql_num_rows(m_queryResult));
 	} else {
@@ -125,7 +125,7 @@ size_t database_t::iterator_t::getNumRows() {
 	}
 }
 
-size_t database_t::iterator_t::getNumFields() {
+size_t database_t::iterator_t::numFields() {
 	if(m_queryResult != NULL) {
 		return mysql_num_fields(m_queryResult); 
 	} else {

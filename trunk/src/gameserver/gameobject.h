@@ -16,27 +16,27 @@ public:
 	virtual ~gameObject_t() {}
 
 	friend std::ostream& operator<<(std::ostream &out, const gameObject_t &object) {
-		out << "[" << object.getName() << "]";
+		out << "[" << object.name() << "]";
 		return out;
 	}
 
 	virtual void reset();
 
-	gameObject_e::type_t getType() const { return m_type; }
+	gameObject_e::type_t type() const { return m_type; }
 
 	unsigned int calculateDistance(const gameObject_t &object) const;
 
-	viewportManager_t::viewport_t& getViewport() { return m_viewport; }
+	viewportManager_t::viewport_t& viewport() { return m_viewport; }
 
-	virtual const std::string& getName() const = 0;
+	virtual const std::string& name() const = 0;
 
-	virtual unsigned short getViewRange() const = 0;
+	virtual unsigned short viewRange() const = 0;
 
-	virtual unsigned char getMapId() const = 0;
+	virtual unsigned char mapId() const = 0;
 
-	virtual const eMUShared::position_t& getPosition() const = 0;
+	virtual const eMUShared::position_t& position() const = 0;
 
-	virtual unsigned char getDirection() const = 0;
+	virtual unsigned char direction() const = 0;
 
 protected:
 	gameObject_e::type_t m_type;

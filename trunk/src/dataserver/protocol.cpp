@@ -8,9 +8,9 @@ protocol_t::protocol_t(protocolExecutorInterface_t &iface,
 
 void protocol_t::core(dataServerUser_t &user,
 						const eMUCore::packet_t &packet) const {
-	switch(packet.getProtocolId()) {
+	switch(packet.protocolId()) {
 		case eMUShared::dataServerProtocol_e::_accountManage:
-		switch(packet.getData()[3]) {
+		switch(packet.data()[3]) {
 		case eMUShared::dataServerProtocol_e::accountManage_e::_check:
 			this->parseAccountCheckRequest(user, packet);
 			break;
@@ -21,7 +21,7 @@ void protocol_t::core(dataServerUser_t &user,
 		break;
 
 	case eMUShared::dataServerProtocol_e::_characterManage:
-		switch(packet.getData()[3]) {
+		switch(packet.data()[3]) {
 		case eMUShared::dataServerProtocol_e::characterManage_e::_list:
 			this->parseCharacterListRequest(user, packet);
 			break;

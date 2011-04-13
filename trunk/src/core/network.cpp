@@ -42,7 +42,7 @@ socketContext_t::socketContext_t(int index):
 
 
 void socketContext_t::preClose() {
-	this->setInactive();
+	this->deactivate();
 	closesocket(m_socket);
 	m_socket = INVALID_SOCKET;
 	m_recvBuffer.clearData();
@@ -120,38 +120,38 @@ void iocpEngine_t::cleanup() {
 void iocpEngine_t::attach(socketContext_t &context) const {
 	m_synchronizer.lock();
 
-	if(CreateIoCompletionPort(reinterpret_cast<HANDLE>(context.getSocket()),
+	if(CreateIoCompletionPort(reinterpret_cast<HANDLE>(context.socket()),
 								m_ioCompletionPort,
 								reinterpret_cast<ULONG_PTR>(&context),
 								0) == m_ioCompletionPort) {
 		unsigned int flags = 0;
 
-		if(WSARecv(context.getSocket(),
-					&context.getRecvBuffer().m_wsaBuff,
+		if(WSARecv(context.socket(),
+					&context.recvBuffer().m_wsaBuff,
 					1,
 					NULL,
 					reinterpret_cast<LPDWORD>(&flags),
-					reinterpret_cast<LPWSAOVERLAPPED>(&context.getRecvBuffer()),
+					reinterpret_cast<LPWSAOVERLAPPED>(&context.recvBuffer()),
 					NULL) == SOCKET_ERROR) {
 			int wsaLastError = WSAGetLastError();
 
 			if(wsaLastError != WSA_IO_PENDING) {
-				m_logger.in(loggerMessage_e::_error) << "[iocpEngine_t::attach()][" << context.getIpAddress() << ":" << context.getPort() << "]"
+				m_logger.in(loggerMessage_e::_error) << "[iocpEngine_t::attach()][" << context.ipAddress() << ":" << context.port() << "]"
 															<< " WSARecv() failed with error#" << wsaLastError << ".";
 				m_logger.out();
 				// Serwer nie wie, ze obiekt zostal polaczony, wiec wystarczy go tylko zamknac bez uruchamiania OnClose() callback.
 				context.preClose();
 				context.postClose();
 			} else {
-				context.setActive();
+				context.activate();
 				context.onAttach();
 			}
 		} else {
-			context.setActive();
+			context.activate();
 			context.onAttach();
 		}
 	} else {
-		m_logger.in(loggerMessage_e::_error) << "[iocpEngine_t::attach()][" << context.getIpAddress() << ":" << context.getPort() << "]"
+		m_logger.in(loggerMessage_e::_error) << "[iocpEngine_t::attach()][" << context.ipAddress() << ":" << context.port() << "]"
 												<< " Attach socket context to completion port failed with error#" << GetLastError() << ".";
 		m_logger.out();
 		// Serwer nie wie, ze obiekt zostal polaczony, wiec wystarczy tylko zamknac bez uruchamiania OnClose() callback.
@@ -166,8 +166,8 @@ void iocpEngine_t::detach(socketContext_t &context) const {
 	if(PostQueuedCompletionStatus(m_ioCompletionPort,
 									0,
 									reinterpret_cast<ULONG_PTR>(&context),
-									reinterpret_cast<LPOVERLAPPED>(&context.getRecvBuffer())) == FALSE) {
-		m_logger.in(loggerMessage_e::_error) << "[iocpEngine_t::detach()][" << context.getIpAddress() << ":" << context.getPort() << "]"
+									reinterpret_cast<LPOVERLAPPED>(&context.recvBuffer())) == FALSE) {
+		m_logger.in(loggerMessage_e::_error) << "[iocpEngine_t::detach()][" << context.ipAddress() << ":" << context.port() << "]"
 												<< " Detach socket context from completion port failed with error#" << GetLastError() << ".";
 		m_logger.out();
 		// ----------------
@@ -179,7 +179,7 @@ void iocpEngine_t::detach(socketContext_t &context) const {
 
 void iocpEngine_t::write(socketContext_t &context, const unsigned char *data, size_t dataSize) const {
 	m_synchronizer.lock();
-	ioSendBuffer_t &sendBuffer = context.getSendBuffer();
+	ioSendBuffer_t &sendBuffer = context.sendBuffer();
 
 	if(!sendBuffer.m_dataLocked) {
 		if(dataSize <= c_ioDataMaxSize) {
@@ -190,7 +190,7 @@ void iocpEngine_t::write(socketContext_t &context, const unsigned char *data, si
 
 			size_t sentSize = 0;
 
-			if(WSASend(context.getSocket(),
+			if(WSASend(context.socket(),
 						&sendBuffer.m_wsaBuff,
 						1,
 						reinterpret_cast<LPDWORD>(&sentSize),
@@ -200,7 +200,7 @@ void iocpEngine_t::write(socketContext_t &context, const unsigned char *data, si
 				unsigned int wsaLastError = WSAGetLastError();
 
 				if(wsaLastError != WSA_IO_PENDING) {
-					m_logger.in(loggerMessage_e::_error) << "[iocpEngine_t::write()][" << context.getIpAddress() << ":" << context.getPort() << "]"
+					m_logger.in(loggerMessage_e::_error) << "[iocpEngine_t::write()][" << context.ipAddress() << ":" << context.port() << "]"
 															<< " WSASend() failed with error#" << wsaLastError << ".";
 					m_logger.out();
 					this->detach(context);
@@ -211,7 +211,7 @@ void iocpEngine_t::write(socketContext_t &context, const unsigned char *data, si
 				sendBuffer.m_dataLocked = false;
 			}
 		} else {
-			m_logger.in(loggerMessage_e::_error) << "[iocpEngine_t::write()][" << context.getIpAddress() << ":" << context.getPort() << "]"
+			m_logger.in(loggerMessage_e::_error) << "[iocpEngine_t::write()][" << context.ipAddress() << ":" << context.port() << "]"
 													<< "I/O buffer is overflowed.";
 			m_logger.out();
 			this->detach(context);
@@ -220,7 +220,7 @@ void iocpEngine_t::write(socketContext_t &context, const unsigned char *data, si
 		if(sendBuffer.m_secondDataSize + dataSize <= c_ioDataMaxSize) {
 			sendBuffer.mergeSecondData(data, dataSize);
 		} else {
-			m_logger.in(loggerMessage_e::_error) << "[iocpEngine_t::write()][" << context.getIpAddress() << ":" << context.getPort() << "]"
+			m_logger.in(loggerMessage_e::_error) << "[iocpEngine_t::write()][" << context.ipAddress() << ":" << context.port() << "]"
 													<< "I/O buffer is overflowed.";
 			m_logger.out();
 			this->detach(context);
@@ -231,30 +231,30 @@ void iocpEngine_t::write(socketContext_t &context, const unsigned char *data, si
 }
 
 void iocpEngine_t::dequeueReceive(socketContext_t &context) const {
-	if(context.getRecvBuffer().m_dataSize > 0) {
+	if(context.recvBuffer().m_dataSize > 0) {
 		context.onReceive();
 
 		unsigned int flags = 0;
 
-		if(WSARecv(context.getSocket(),
-					&context.getRecvBuffer().m_wsaBuff,
+		if(WSARecv(context.socket(),
+					&context.recvBuffer().m_wsaBuff,
 					1,
 					NULL,
 					reinterpret_cast<LPDWORD>(&flags),
-					reinterpret_cast<LPWSAOVERLAPPED>(&context.getRecvBuffer()),
+					reinterpret_cast<LPWSAOVERLAPPED>(&context.recvBuffer()),
 					NULL) == SOCKET_ERROR) {
 			int wsaLastError = WSAGetLastError();
 
 			if(wsaLastError != WSA_IO_PENDING) {
-				m_logger.in(loggerMessage_e::_error) << "[iocpEngine_t::dequeueReceive()][" << context.getIpAddress() << ":" << context.getPort() << "]"
+				m_logger.in(loggerMessage_e::_error) << "[iocpEngine_t::dequeueReceive()][" << context.ipAddress() << ":" << context.port() << "]"
 														<< " WSARecv() failed with error#" << wsaLastError << ".";
 				m_logger.out();
 				this->detach(context);
 			}
 		}
-	} else if(context.getRecvBuffer().m_dataSize == 0) {
+	} else if(context.recvBuffer().m_dataSize == 0) {
 		// ----------------
-		if(context.isActive()) {
+		if(context.active()) {
 			context.preClose();
 			context.onClose();
 			context.postClose();
@@ -263,7 +263,7 @@ void iocpEngine_t::dequeueReceive(socketContext_t &context) const {
 }
 
 void iocpEngine_t::dequeueSend(socketContext_t &context) const {
-	ioSendBuffer_t &sendBuffer = context.getSendBuffer();
+	ioSendBuffer_t &sendBuffer = context.sendBuffer();
 
 	if(sendBuffer.m_secondDataSize > 0) {
 		sendBuffer.clearData();
@@ -272,7 +272,7 @@ void iocpEngine_t::dequeueSend(socketContext_t &context) const {
 
 		size_t sentSize = 0;
 
-		if(WSASend(context.getSocket(),
+		if(WSASend(context.socket(),
 					&sendBuffer.m_wsaBuff,
 					1,
 					reinterpret_cast<LPDWORD>(&sentSize),
@@ -282,7 +282,7 @@ void iocpEngine_t::dequeueSend(socketContext_t &context) const {
 			unsigned int wsaLastError = WSAGetLastError();
 
 			if(wsaLastError != WSA_IO_PENDING) {
-				m_logger.in(loggerMessage_e::_error) << "[iocpEngine_t::dequeueSend()][" << context.getIpAddress() << ":" << context.getPort() << "]"
+				m_logger.in(loggerMessage_e::_error) << "[iocpEngine_t::dequeueSend()][" << context.ipAddress() << ":" << context.port() << "]"
 														<< " WSASend() failed with error#" << wsaLastError << ".";
 				m_logger.out();
 				this->detach(context);
@@ -308,7 +308,7 @@ void iocpEngine_t::dequeueError(socketContext_t &context, int lastError) const {
 
 	// ---------------------------------
 	// Error - check is context cleaned.
-	if(context.isActive()) {
+	if(context.active()) {
 		context.preClose();
 		context.onClose();
 		context.postClose();
@@ -341,7 +341,7 @@ DWORD iocpEngine_t::worker(iocpEngine_t *instance) {
 			}
 			else {
 				instance->m_logger.in(loggerMessage_e::_error) << "[iocpEngine_t::worker()][" 
-																<< context->getIpAddress() << ":" << context->getPort()
+																<< context->ipAddress() << ":" << context->port()
 																<< "] Invalid buffer type " << buffer->m_type << ".";
 				instance->m_logger.out();
 			}
@@ -446,9 +446,9 @@ DWORD tcpServer_t::worker(tcpServer_t *instance) {
 			socketContext_t *context = instance->m_onAllocate();
 
 			if(context != NULL) {
-				context->setSocket(incomingSocket);
-				context->setIpAddress(inet_ntoa(incomingInetAddr.sin_addr));
-				context->setPort(instance->m_listenPort);
+				context->socket(incomingSocket);
+				context->ipAddress(inet_ntoa(incomingInetAddr.sin_addr));
+				context->port(instance->m_listenPort);
 				instance->m_iocpEngine.attach(*context);
 			} else {
 				instance->m_logger.in(loggerMessage_e::_error) << "[tcpServer_t::worker()] got NULL socket context.";

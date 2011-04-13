@@ -59,9 +59,9 @@ void gameServer_t::startup() {
 
 	m_logger.in(eMUCore::loggerMessage_e::_info) << "Starting tcp client.";
 	m_logger.out();
-	m_tcpClient.setCallbacks(boost::bind(&gameServer_t::onTcpClientConnect, this),
-								boost::bind(&gameServer_t::onTcpClientReceive, this),
-								boost::bind(&gameServer_t::onTcpClientClose, this));
+	m_tcpClient.callbacks(boost::bind(&gameServer_t::onTcpClientConnect, this),
+							boost::bind(&gameServer_t::onTcpClientReceive, this),
+							boost::bind(&gameServer_t::onTcpClientClose, this));
 	this->dataServerConnect();
 
 	m_logger.in(eMUCore::loggerMessage_e::_info) << "Starting user manager.";
@@ -74,11 +74,11 @@ void gameServer_t::startup() {
 	m_logger.out();
 	m_crypt.startup("..\\data\\Enc2.dat", "..\\data\\Dec1.dat");
 
-	m_logger.in(eMUCore::loggerMessage_e::_info) << "Starting tcp server on port " << m_tcpServer.getListenPort() << ".";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Starting tcp server on port " << m_tcpServer.listenPort() << ".";
 	m_logger.out();
 	m_tcpServer.startup();
 
-	m_logger.in(eMUCore::loggerMessage_e::_info) << "Starting udp socket on port " << m_udpSocket.getPort() << ".";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Starting udp socket on port " << m_udpSocket.port() << ".";
 	m_logger.out();
 	m_udpSocket.startup();
 
@@ -155,9 +155,9 @@ void gameServer_t::worker() {
 void gameServer_t::updateWindowTitle() const {
 	std::stringstream titleStream;
 	titleStream << "[GameServer] ::"
-				<< " [Users: " << m_userCount << "/" << m_userManager.getCount() << "] ::"
-				<< " [Port: " << m_tcpServer.getListenPort() << "] ::"
-				<< " [DataServer: " << m_tcpClient.getIpAddress() << ":" << m_tcpClient.getPort() << "] ::"
+				<< " [Users: " << m_userCount << "/" << m_userManager.count() << "] ::"
+				<< " [Port: " << m_tcpServer.listenPort() << "] ::"
+				<< " [DataServer: " << m_tcpClient.ipAddress() << ":" << m_tcpClient.port() << "] ::"
 				<< " [Version: " << m_versionConfiguration.m_version << "] ::"
 				<< " [Serial: " << m_versionConfiguration.m_serial << "]";
 
@@ -165,15 +165,15 @@ void gameServer_t::updateWindowTitle() const {
 }
 
 void gameServer_t::disconnectAll() {
-	for(size_t i = 0; i < m_userManager.getCount(); ++i) {
-		if(m_userManager[i].isActive()) {
+	for(size_t i = 0; i < m_userManager.count(); ++i) {
+		if(m_userManager[i].active()) {
 			this->disconnect(m_userManager[i]);
 		}
 	}
 }
 
 void gameServer_t::sendServerInfo() const {
-	unsigned char serverLoad = static_cast<unsigned char>((static_cast<double>(m_userCount) / m_userManager.getCount()) * 100);
+	unsigned char serverLoad = static_cast<unsigned char>((static_cast<double>(m_userCount) / m_userManager.count()) * 100);
 
 	eMUCore::packet_t packet;
 	packet.construct(0xC1, 0x01);
@@ -181,8 +181,8 @@ void gameServer_t::sendServerInfo() const {
 	packet.insert<unsigned char>(5, serverLoad);
 	m_udpSocket.send(m_serverConfiguration.m_connectServerHost,
 						m_serverConfiguration.m_connectServerPort,
-						packet.getData(),
-						packet.getSize());
+						packet.data(),
+						packet.size());
 }
 
 gameServerUser_t* gameServer_t::onContextAllocate() {
@@ -209,7 +209,7 @@ void gameServer_t::onContextAttach(eMUCore::socketContext_t &context) {
 		// -----------------------
 
 		// ---------------------
-		user.setConnectionStamp(GetTickCount());
+		user.connectionStamp(GetTickCount());
 		m_protocol.sendHandshake(user, m_versionConfiguration.m_versionProtocol);
 		// ---------------------
 	} catch(eMUCore::exception_t &e) {
@@ -234,12 +234,12 @@ void gameServer_t::onContextReceive(eMUCore::socketContext_t &context) {
 		size_t parsedDataSize = 0;
 
 		do {
-			unsigned char *rawData = &user.getRecvBuffer().m_data[parsedDataSize];
-			size_t rawDataSize = eMUCore::packet_t::getRawDataSize(rawData);
+			unsigned char *rawData = &user.recvBuffer().m_data[parsedDataSize];
+			size_t rawDataSize = eMUCore::packet_t::rawDataSize(rawData);
 
-			if(eMUCore::packet_t::isRawDataCrypted(rawData)) {
+			if(eMUCore::packet_t::rawDataCrypted(rawData)) {
 				unsigned char decryptedBuff[eMUCore::c_ioDataMaxSize] = {0};
-				size_t dataPtr = eMUCore::packet_t::getCryptedDataPointer(rawData);
+				size_t dataPtr = eMUCore::packet_t::cryptedDataPointer(rawData);
 				int decryptedBuffSize = m_crypt.decrypt(&decryptedBuff[dataPtr - 1], &rawData[dataPtr], rawDataSize - dataPtr);
 
 				if(decryptedBuffSize > 0) {
@@ -284,7 +284,7 @@ void gameServer_t::onContextReceive(eMUCore::socketContext_t &context) {
 			}
 
 			parsedDataSize += rawDataSize;
-		} while(parsedDataSize < user.getRecvBuffer().m_dataSize);
+		} while(parsedDataSize < user.recvBuffer().m_dataSize);
 	} catch(eMUCore::exception_t &e) {
 		m_logger.in(eMUCore::loggerMessage_e::_error) << "Exception: " << user << " " << e.what();
 		m_logger.out();
@@ -329,7 +329,7 @@ void gameServer_t::onContextClose(eMUCore::socketContext_t &context) {
 
 void gameServer_t::onTcpClientConnect() {
 	m_logger.in(eMUCore::loggerMessage_e::_info) << "Connected to dataserver " 
-													<< m_tcpClient.getIpAddress() << ":" << m_tcpClient.getPort() << ".";
+													<< m_tcpClient.ipAddress() << ":" << m_tcpClient.port() << ".";
 	m_logger.out();
 
 	if(!m_packetQueue.empty()) {
@@ -353,7 +353,7 @@ void gameServer_t::onTcpClientReceive() {
 		size_t parsedDataSize = 0;
 
 		do {
-			eMUCore::packet_t packet(&m_tcpClient.getRecvBuffer().m_data[parsedDataSize]);
+			eMUCore::packet_t packet(&m_tcpClient.recvBuffer().m_data[parsedDataSize]);
 
 			#ifdef _DEBUG
 			m_logger.in(eMUCore::loggerMessage_e::_protocol) << "[DataServer] Received " << packet << ".";
@@ -364,8 +364,8 @@ void gameServer_t::onTcpClientReceive() {
 			m_dataServerProtocol.core(packet);
 			// -----------------------------------
 
-			parsedDataSize += packet.getSize();
-		} while(parsedDataSize < m_tcpClient.getRecvBuffer().m_dataSize);
+			parsedDataSize += packet.size();
+		} while(parsedDataSize < m_tcpClient.recvBuffer().m_dataSize);
 	} catch(eMUCore::exception_t &e) {
 		m_logger.in(eMUCore::loggerMessage_e::_error) << "Exception: [DataServer] " << e.what();
 		m_logger.out();
@@ -394,38 +394,38 @@ void gameServer_t::send(gameServerUser_t &user, eMUCore::packet_t &packet) {
 	m_logger.out();
 	#endif
 
-	if(packet.isCrypted()) {
+	if(packet.crypted()) {
 		unsigned char encryptedBuff[eMUCore::c_ioDataMaxSize] = {0};
-		size_t dataPtr = packet.getHeaderSize() - 2;
+		size_t dataPtr = packet.headerSize() - 2;
 
-		packet.setCryptSerial(user.generateCryptSerial());
+		packet.cryptSerial(user.generateCryptSerial());
 		size_t encryptedBuffSize = m_crypt.encrypt(&encryptedBuff[dataPtr + 1],
-													&packet.getData()[dataPtr],
-													packet.getSize() - dataPtr) + dataPtr + 1;
+													&packet.data()[dataPtr],
+													packet.size() - dataPtr) + dataPtr + 1;
 
-		encryptedBuff[0] = packet.getHeaderId();
+		encryptedBuff[0] = packet.headerId();
 
-		if(packet.getHeaderId() == 0xC3) {
+		if(packet.headerId() == 0xC3) {
 			encryptedBuff[1] = encryptedBuffSize;
-		} else if(packet.getHeaderId() == 0xC4) {
+		} else if(packet.headerId() == 0xC4) {
 			encryptedBuff[1] = HIBYTE(encryptedBuffSize);
 			encryptedBuff[2] = LOBYTE(encryptedBuffSize);
 		}
 
 		m_iocpEngine.write(user, encryptedBuff, encryptedBuffSize);
 	} else {
-		m_iocpEngine.write(user, packet.getData(), packet.getSize());
+		m_iocpEngine.write(user, packet.data(), packet.size());
 	}
 }
 
 void gameServer_t::sendDataServer(const eMUCore::packet_t &packet) {
-	if(m_tcpClient.isActive()) {
+	if(m_tcpClient.active()) {
 		#ifdef _DEBUG
 		m_logger.in(eMUCore::loggerMessage_e::_protocol) << "[DataServer] Sending " << packet << ".";
 		m_logger.out();
 		#endif
 
-		m_iocpEngine.write(m_tcpClient, packet.getData(), packet.getSize());
+		m_iocpEngine.write(m_tcpClient, packet.data(), packet.size());
 	}
 	else {
 		m_packetQueue.push_back(packet);

@@ -20,8 +20,8 @@ void game_t::startup() {
 }
 
 void game_t::onServerListRequest(connectServerUser_t &user) {
-	if(m_serverList.getActiveServersCount() > 0) {
-		m_protocol.sendServerListAnswer(user, m_serverList.getList());
+	if(m_serverList.activeServersCount() > 0) {
+		m_protocol.sendServerListAnswer(user, m_serverList.list());
 	} else {
 		m_logger.in(eMUCore::loggerMessage_e::_warning) << user << " No active gameservers.";
 		m_logger.out();
@@ -36,7 +36,7 @@ void game_t::onServerSelectRequest(connectServerUser_t &user, unsigned short ser
 	m_logger.out();
 	#endif
 
-	const serverList_t::serverAttributes_t &attr = m_serverList.getServerAttributes(serverCode);
+	const serverList_t::serverAttributes_t &attr = m_serverList.serverAttributes(serverCode);
 
 	m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Selected server " << attr << ".";
 	m_logger.out();

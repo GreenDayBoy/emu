@@ -27,30 +27,30 @@ public:
 	inline unsigned char generateCryptSerial() { return m_cryptSerial++; }
 
 	inline void incerementLoginAttempts() { ++m_loginAttempts; }
-	inline int getLoginAttempts() const { return m_loginAttempts; }
+	inline int loginAttempts() const { return m_loginAttempts; }
 
-	inline void setAccountId(const std::string &accountId) { m_accountId = accountId; }
-	inline const std::string& getAccountId() const { return m_accountId; }
+	inline void accountId(const std::string &accountId) { m_accountId = accountId; }
+	inline const std::string& accountId() const { return m_accountId; }
 
-	inline void setLoggedIn() { m_loggedIn = true; }
-	inline bool isLoggedIn() const { return m_loggedIn; }
+	inline void logIn() { m_loggedIn = true; }
+	inline bool loggedIn() const { return m_loggedIn; }
 
-	void setAvailableRaces(const eMUShared::characterList_t &characterList,
+	void availableRaces(const eMUShared::characterList_t &characterList,
 							unsigned short advancedRaceLevel);
-	inline availableRace_e::type_t getAvailableRaces() const { return m_availableRaces; }
+	inline availableRace_e::type_t availableRaces() const { return m_availableRaces; }
 
-	inline void setCloseReason(clientCloseReason_e::type_t closeReason) { m_closeReason = closeReason; }
+	inline void closeReason(clientCloseReason_e::type_t closeReason) { m_closeReason = closeReason; }
 	inline void resetCloseReason() { m_closeReason = clientCloseReason_e::_none; }
-	inline unsigned char getCloseReason() const { return m_closeReason; }
+	inline unsigned char closeReason() const { return m_closeReason; }
 
-	inline void setTimeToClose(int timeToClose) { m_timeToClose = timeToClose; }
+	inline void timeToClose(int timeToClose) { m_timeToClose = timeToClose; }
 	inline void decrecemntTimeToClose() { --m_timeToClose; }
-	inline int getTimeToClose() const { return m_timeToClose; }
+	inline int timeToClose() const { return m_timeToClose; }
 
-	inline void setConnectionStamp(unsigned int connectionStamp) { m_connectionStamp = connectionStamp; }
-	inline unsigned int getConnectionStamp() const { return m_connectionStamp; }
+	inline void connectionStamp(unsigned int connectionStamp) { m_connectionStamp = connectionStamp; }
+	inline unsigned int connectionStamp() const { return m_connectionStamp; }
 
-	inline character_t& getCharacter() { return m_character; }
+	inline character_t& character() { return m_character; }
 
 	void initializeCharacterListMap();
 	void mapCharacterList(const eMUShared::characterList_t &characterList);

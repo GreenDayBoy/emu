@@ -93,7 +93,7 @@ public:
 	  m_functionName(functionName) { QueryPerformanceCounter(&m_startTime); }
 
 	~profiler_t() {
-		time_t duration = this->getDuration();
+		time_t duration = this->duration();
 
 		static synchronizer_t synchronizer;
 		synchronizer.lock();
@@ -112,7 +112,7 @@ private:
 	profiler_t(const profiler_t&);
 	profiler_t& operator=(const profiler_t&);
 
-	time_t getDuration() {
+	time_t duration() {
 		LARGE_INTEGER endTime;
 		QueryPerformanceCounter(&endTime);
 
@@ -155,7 +155,7 @@ private:
 	logger_t(const logger_t&);
 	logger_t& operator=(const logger_t&);
 
-	inline void setColor(unsigned short color) { SetConsoleTextAttribute(m_stdOutput, color); }
+	inline void color(unsigned short color) { SetConsoleTextAttribute(m_stdOutput, color); }
 
 	std::string				m_fileName;
 	std::stringstream		m_date;
@@ -241,25 +241,25 @@ public:
 		return out;
 	}
 
-	inline void setActive() { m_active = true; }
-	inline void setInactive() { m_active = false; }
-	inline bool isActive() const { return m_active; }
+	inline void activate() { m_active = true; }
+	inline void deactivate() { m_active = false; }
+	inline bool active() const { return m_active; }
 
-	inline void setSocket(SOCKET socket) { m_socket = socket; }
-	inline SOCKET getSocket() const { return m_socket; }
+	inline void socket(SOCKET socket) { m_socket = socket; }
+	inline SOCKET socket() const { return m_socket; }
 
-	inline ioBuffer_t& getRecvBuffer() { return m_recvBuffer; }
-	inline ioSendBuffer_t& getSendBuffer() { return m_sendBuffer; }
+	inline ioBuffer_t& recvBuffer() { return m_recvBuffer; }
+	inline ioSendBuffer_t& sendBuffer() { return m_sendBuffer; }
 
-	inline void setIpAddress(const std::string &ipAddress) { m_ipAddress = ipAddress; }
-	inline const std::string& getIpAddress() const { return m_ipAddress; }
+	inline void ipAddress(const std::string &ipAddress) { m_ipAddress = ipAddress; }
+	inline const std::string& ipAddress() const { return m_ipAddress; }
 
-	inline void setPort(unsigned short port) { m_port = port; }
-	inline unsigned short getPort() const { return m_port; }
+	inline void port(unsigned short port) { m_port = port; }
+	inline unsigned short port() const { return m_port; }
 
-	inline int getIndex() const { return m_index; }
+	inline int index() const { return m_index; }
 
-	inline void setCallbacks(const socketContext_t::callback_t &onAttach,
+	inline void callbacks(const socketContext_t::callback_t &onAttach,
 							const socketContext_t::callback_t &onReceive,
 							const socketContext_t::callback_t &onClose) {
 		m_onAttach = onAttach;
@@ -271,7 +271,7 @@ public:
 	inline void onReceive() { m_onReceive(*this); }
 	inline void onClose() { m_onClose(*this); }
 
-	bool operator!() { return !this->isActive(); }
+	bool operator!() { return !this->active(); }
 	bool operator==(const int &key) { return key == m_index; }
 
 protected:
@@ -304,7 +304,7 @@ public:
 					const socketContext_t::callback_t &onClose) {
 		for(size_t i = 0; i < m_list.capacity(); ++i) {
 			T *ctx = new T(i);
-			ctx->setCallbacks(onAttach, onReceive, onClose);
+			ctx->callbacks(onAttach, onReceive, onClose);
 
 			m_list.push_back(ctx);
 		}
@@ -318,7 +318,7 @@ public:
 		m_list.clear();
 	}
 
-	inline size_t getCount() const { return m_list.size(); }
+	inline size_t count() const { return m_list.size(); }
 	T& operator[](size_t index) { return *m_list[index]; }
 
 	template<typename key_t>
@@ -393,7 +393,7 @@ public:
 	void startup() throw (eMUCore::exception_t);
 	void cleanup();
 
-	inline unsigned short getListenPort() const { return m_listenPort; }
+	inline unsigned short listenPort() const { return m_listenPort; }
 
 private:
 	tcpServer_t();
@@ -442,7 +442,7 @@ public:
 				const unsigned char *buffer,
 				size_t bufferSize) const;
 
-	unsigned short getPort() const { return m_port; }
+	unsigned short port() const { return m_port; }
 
 private:
 	udpSocket_t();
@@ -558,7 +558,7 @@ public:
 	}
 
 	void construct(unsigned char headerId, unsigned char protocolId);
-	void setCryptSerial(unsigned char cryptSerial);
+	void cryptSerial(unsigned char cryptSerial);
 	void clear();
 	
 	template<typename T> 
@@ -596,16 +596,16 @@ public:
 
 	std::string readString(size_t offset, size_t size) const;
 
-	inline unsigned char getHeaderId() const { return m_headerId; }
-	inline size_t getSize() const { return m_size; }
-	inline unsigned char getProtocolId() const { return m_protocolId; }
-	inline const unsigned char* getData() const { return m_data; }
-	inline size_t getHeaderSize() const { return m_headerSize; }
-	inline bool isCrypted() const { return isRawDataCrypted(m_data); }
+	inline unsigned char headerId() const { return m_headerId; }
+	inline size_t size() const { return m_size; }
+	inline unsigned char protocolId() const { return m_protocolId; }
+	inline const unsigned char* data() const { return m_data; }
+	inline size_t headerSize() const { return m_headerSize; }
+	inline bool crypted() const { return rawDataCrypted(m_data); }
 
-	static size_t getRawDataSize(const unsigned char *rawData);
-	static size_t getCryptedDataPointer(const unsigned char *rawData);
-	static bool isRawDataCrypted(const unsigned char *rawData);
+	static size_t rawDataSize(const unsigned char *rawData);
+	static size_t cryptedDataPointer(const unsigned char *rawData);
+	static bool rawDataCrypted(const unsigned char *rawData);
 
 private:
 	void increaseSize(size_t elementSize);

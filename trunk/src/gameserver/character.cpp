@@ -7,7 +7,7 @@ character_t::character_t(gameServerUser_t &owner):
 	this->reset();
 }
 
-void character_t::setAttributes(const eMUShared::characterAttributes_t &attr) {
+void character_t::attributes(const eMUShared::characterAttributes_t &attr) {
 	m_attributes = attr;
 	m_viewRange = 15;
 }
@@ -21,7 +21,7 @@ void character_t::reset() {
 	m_attributes.clear();
 }
 
-void character_t::setPreview() {
+void character_t::calculatePreview() {
 	m_preview[0] = ((m_attributes.m_race >> 4) << 5) & 0xE0;
 	m_preview[0] |= ((m_attributes.m_race & 0x07) << 4) & 0x10;
 	m_preview[0] |= m_pose & 0x0F;
@@ -44,23 +44,23 @@ void character_t::setPreview() {
 	m_preview[17] = 0x00;
 }
 
-void character_t::setPose(characterAction_e::type_t actionId) {
+void character_t::pose(characterAction_e::type_t actionId) {
 	characterPose_e::type_t pose = m_pose;
 
 	switch(actionId) {
-		case characterAction_e::_setStand: // stoi.
+		case characterAction_e::_stand: // stoi.
 			pose = characterPose_e::_stand;
 			break;
 
-		case characterAction_e::_setSit: // siedzi.
+		case characterAction_e::_sit: // siedzi.
 			pose = characterPose_e::_sit;
 			break;
 
-		case characterAction_e::_setLeaning: // oparty.
+		case characterAction_e::_leaning: // oparty.
 			pose = characterPose_e::_leaning;
 			break;
 
-		case characterAction_e::_setLevitation: // wisi
+		case characterAction_e::_levitation: // wisi
 			pose = characterPose_e::_levitation;
 			break;
 	}

@@ -24,16 +24,16 @@ public:
 		return out;
 	}
 
-	inline int getId() const { return m_id; }
-	inline int getType() const { return m_type; }
-	inline unsigned char getMapId() const { return m_mapId; }
-	inline const eMUShared::position_t& getStartPosition() const { return m_startPos; }
-	inline const eMUShared::position_t& getEndPosition() const { return m_endPos; }
-	inline int getDestId() const { return m_destId; }
-	inline unsigned char getDirection() const { return m_direction; }
-	inline unsigned short getRequiredLevel() const { return m_requiredLevel; }
+	inline int id() const { return m_id; }
+	inline int type() const { return m_type; }
+	inline unsigned char mapId() const { return m_mapId; }
+	inline const eMUShared::position_t& startPosition() const { return m_startPos; }
+	inline const eMUShared::position_t& endPosition() const { return m_endPos; }
+	inline int destId() const { return m_destId; }
+	inline unsigned char direction() const { return m_direction; }
+	inline unsigned short requiredLevel() const { return m_requiredLevel; }
 
-	bool isInGate(const eMUShared::position_t &pos) const;
+	bool inGate(const eMUShared::position_t &pos) const;
 
 private:
 	gate_t(const gate_t&);
@@ -58,7 +58,7 @@ public:
 	void startup(const std::string &filename);
 	void cleanup();
 	gate_t& operator[](int gateId);
-	bool isGateExists(int gateId) const;
+	bool gateExists(int gateId) const;
 
 private:
 	gateManager_t(const gateManager_t&);

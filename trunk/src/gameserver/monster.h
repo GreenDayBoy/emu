@@ -48,31 +48,31 @@ class monster_t: public gameObject_t {
 public:
 	monster_t(int index, const monsterAttributesManager_t::monsterAttributes_t &attr);
 
-	inline int getIndex() { return m_index; }
+	inline int index() { return m_index; }
 
-	inline void setId(int id) { m_id = id; }
-	inline int getId() const { return m_id; }
+	inline void id(int id) { m_id = id; }
+	inline int id() const { return m_id; }
 
-	const monsterAttributesManager_t::monsterAttributes_t& getAttributes() const { return m_attributes; }
+	const monsterAttributesManager_t::monsterAttributes_t& attributes() const { return m_attributes; }
 
-	const std::string& getName() const { return m_attributes.m_name; }
+	const std::string& name() const { return m_attributes.m_name; }
 
-	unsigned short getViewRange() const { return m_attributes.m_viewRange; }
+	unsigned short viewRange() const { return m_attributes.m_viewRange; }
 
-	unsigned int getHealth() const { return m_health; }
-	void setHealth(unsigned short health) { m_health = health; }
+	unsigned int health() const { return m_health; }
+	void health(unsigned short health) { m_health = health; }
 
-	unsigned int getMana() const { return m_mana; }
-	void setMana(unsigned short mana) { m_mana = mana; }
+	unsigned int mana() const { return m_mana; }
+	void mana(unsigned short mana) { m_mana = mana; }
 
-	unsigned char getMapId() const { return m_mapId; }
-	void setMapId(unsigned char mapId) { m_mapId = mapId; }
+	unsigned char mapId() const { return m_mapId; }
+	void mapId(unsigned char mapId) { m_mapId = mapId; }
 
-	const eMUShared::position_t& getPosition() const { return m_position; }
-	void setPosition(eMUShared::position_t &pos) { m_position = pos; }
+	const eMUShared::position_t& position() const { return m_position; }
+	void position(eMUShared::position_t &pos) { m_position = pos; }
 
-	unsigned char getDirection() const { return m_direction; }
-	void setDirection(unsigned char direction) { m_direction = direction; }
+	unsigned char direction() const { return m_direction; }
+	void direction(unsigned char direction) { m_direction = direction; }
 
 private:
 	int	m_index;
@@ -93,7 +93,7 @@ public:
 	void startup(const std::string &monstersFileName,
 					const boost::function1<void, monster_t*> &registerObjectCallback);
 	void cleanup();
-	size_t getCount() const { return m_monsterList.size(); }
+	size_t count() const { return m_monsterList.size(); }
 
 	monster_t& operator[](int index) { return *m_monsterList[index - m_startIndex]; }
 

@@ -44,9 +44,9 @@ void game_t::onAccountCheckRequest(dataServerUser_t &user,
 									<< ", '" << password << "'"
 									<< ", '" << ipAddress << "');";
 		m_database.execute();
-		database_t::iterator_t iter = m_database.getQueryResult();
+		database_t::iterator_t iter = m_database.queryResult();
 
-		int checkResult = iter.getValue<int>(0);
+		int checkResult = iter.value<int>(0);
 
 		m_protocol.sendAccountCheckAnswer(user,
 											connectionStamp,
@@ -74,16 +74,16 @@ void game_t::onCharacterListRequest(dataServerUser_t &user,
 								<< " `created`"
 							<< " ASC;";
 		m_database.execute();
-		database_t::iterator_t iter = m_database.getQueryResult();
+		database_t::iterator_t iter = m_database.queryResult();
 
 		eMUShared::characterList_t characterList;
 
 		while(iter.nextRow()) {
 			eMUShared::characterListAttributes_t character;
-			character.m_name = iter.getValue<std::string>("name");
-			character.m_race = static_cast<eMUShared::characterRace_e::type_t>(iter.getValue<unsigned int>("race"));
-			character.m_level = iter.getValue<unsigned short>("level");
-			character.m_controlCode = iter.getValue<unsigned int>("controlCode");
+			character.m_name = iter.value<std::string>("name");
+			character.m_race = static_cast<eMUShared::characterRace_e::type_t>(iter.value<unsigned int>("race"));
+			character.m_level = iter.value<unsigned short>("level");
+			character.m_controlCode = iter.value<unsigned int>("controlCode");
 
 			characterList.push_back(character);
 		}
@@ -130,9 +130,9 @@ void game_t::onCharacterCreateRequest(dataServerUser_t &user,
 									<< ", '" << name << "'"
 									<< ", '" << race << "');";
 		m_database.execute();
-		database_t::iterator_t iter = m_database.getQueryResult();
+		database_t::iterator_t iter = m_database.queryResult();
 
-		int createResult = iter.getValue<int>(0);
+		int createResult = iter.value<int>(0);
 
 		m_protocol.sendCharacterCreateAnswer(user,
 												connectionStamp,
@@ -159,9 +159,9 @@ void game_t::onCharacterDeleteRequest(dataServerUser_t &user,
 									<< ", '" << name << "'"
 									<< ", '" << pin << "');";
 		m_database.execute();
-		database_t::iterator_t iter = m_database.getQueryResult();
+		database_t::iterator_t iter = m_database.queryResult();
 
-		int deleteResult = iter.getValue<int>(0);
+		int deleteResult = iter.value<int>(0);
 
 		m_protocol.sendCharacterDeleteAnswer(user,
 												connectionStamp,
@@ -208,34 +208,34 @@ void game_t::onCharacterSelectRequest(dataServerUser_t &user,
 								<< " `name` = '" << name << "';";
 
 		m_database.execute();
-		database_t::iterator_t iter = m_database.getQueryResult();
+		database_t::iterator_t iter = m_database.queryResult();
 
 		eMUShared::characterAttributes_t attr;
 
 		attr.m_name = name;
-		attr.m_race = static_cast<eMUShared::characterRace_e::type_t>(iter.getValue<unsigned int>("race"));
+		attr.m_race = static_cast<eMUShared::characterRace_e::type_t>(iter.value<unsigned int>("race"));
 
-		attr.m_strength = iter.getValue<unsigned short>("strength");
-		attr.m_agility = iter.getValue<unsigned short>("agility");
-		attr.m_vitality = iter.getValue<unsigned short>("vitality");
-		attr.m_energy = iter.getValue<unsigned short>("energy");
-		attr.m_command = iter.getValue<unsigned short>("command");
+		attr.m_strength = iter.value<unsigned short>("strength");
+		attr.m_agility = iter.value<unsigned short>("agility");
+		attr.m_vitality = iter.value<unsigned short>("vitality");
+		attr.m_energy = iter.value<unsigned short>("energy");
+		attr.m_command = iter.value<unsigned short>("command");
 
-		attr.m_mapId = iter.getValue<int>("mapId");
-		attr.m_position.set(iter.getValue<int>("posX"), iter.getValue<int>("posY"));
-		attr.m_direction = iter.getValue<int>("direction");
+		attr.m_mapId = iter.value<int>("mapId");
+		attr.m_position.set(iter.value<int>("posX"), iter.value<int>("posY"));
+		attr.m_direction = iter.value<int>("direction");
 
-		attr.m_health = iter.getValue<unsigned short>("health");
-		attr.m_maxHealth = iter.getValue<unsigned short>("maxHealth");
-		attr.m_mana = iter.getValue<unsigned short>("mana");
-		attr.m_maxMana = iter.getValue<unsigned short>("maxMana");
+		attr.m_health = iter.value<unsigned short>("health");
+		attr.m_maxHealth = iter.value<unsigned short>("maxHealth");
+		attr.m_mana = iter.value<unsigned short>("mana");
+		attr.m_maxMana = iter.value<unsigned short>("maxMana");
 
-		attr.m_experience = iter.getValue<unsigned int>("experience");
+		attr.m_experience = iter.value<unsigned int>("experience");
 
-		attr.m_controlCode = iter.getValue<int>("controlCode");
-		attr.m_levelUpPoints = iter.getValue<unsigned short>("levelUpPoints");
-		attr.m_level = iter.getValue<unsigned short>("level");
-		attr.m_money = iter.getValue<unsigned int>("money");
+		attr.m_controlCode = iter.value<int>("controlCode");
+		attr.m_levelUpPoints = iter.value<unsigned short>("levelUpPoints");
+		attr.m_level = iter.value<unsigned short>("level");
+		attr.m_money = iter.value<unsigned int>("money");
 		
 		// -------------------------
 		// Temporary.

@@ -24,7 +24,7 @@ void gameServerUser_t::reset() {
 	m_connectionStamp = 0xDEADC0DE;
 }
 
-void gameServerUser_t::setAvailableRaces(const eMUShared::characterList_t &characterList,
+void gameServerUser_t::availableRaces(const eMUShared::characterList_t &characterList,
 										   unsigned short advancedRaceLevel) {
 	for(size_t i = 0; i < characterList.size(); ++i) {
 		unsigned char shiftedRace = characterList[i].m_race >> 4;
@@ -86,8 +86,8 @@ void gameServerUser_t::deleteFromCharacterList(const std::string &name) {
 }
 
 bool gameServerUser_t::operator==(const std::string &characterName) {
-	if(m_character.isActive()) {
-		return (m_character.getName() == characterName);
+	if(m_character.active()) {
+		return (m_character.name() == characterName);
 	} else {
 		return false;
 	}

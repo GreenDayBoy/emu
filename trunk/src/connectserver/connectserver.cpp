@@ -47,11 +47,11 @@ void connectServer_t::startup() {
 							boost::bind(&connectServer_t::onContextReceive, this, _1),
 							boost::bind(&connectServer_t::onContextClose, this, _1));
 
-	m_logger.in(eMUCore::loggerMessage_e::_info) << "Starting tcp server on port " << m_tcpServer.getListenPort() << ".";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Starting tcp server on port " << m_tcpServer.listenPort() << ".";
 	m_logger.out();
 	m_tcpServer.startup();
 
-	m_logger.in(eMUCore::loggerMessage_e::_info) << "Starting udp socket on port " << m_udpSocket.getPort() << ".";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Starting udp socket on port " << m_udpSocket.port() << ".";
 	m_logger.out();
 	m_udpSocket.startup();
 
@@ -98,15 +98,15 @@ void connectServer_t::worker() {
 void connectServer_t::updateWindowTitle() const {
 	std::stringstream titleStream;
 	titleStream << "[ConnectServer] ::"
-				<< " [Users: " << m_userCount << "/" << m_userManager.getCount() << "] ::"
-				<< " [Port: " << m_tcpServer.getListenPort() << "]";
+				<< " [Users: " << m_userCount << "/" << m_userManager.count() << "] ::"
+				<< " [Port: " << m_tcpServer.listenPort() << "]";
 
 	SetConsoleTitle(titleStream.str().c_str());
 }
 
 void connectServer_t::disconnectAll() {
-	for(size_t i = 0; i < m_userManager.getCount(); ++i) {
-		if(m_userManager[i].isActive()) {
+	for(size_t i = 0; i < m_userManager.count(); ++i) {
+		if(m_userManager[i].active()) {
 			this->disconnect(m_userManager[i]);
 		}
 	}
@@ -158,8 +158,8 @@ void connectServer_t::onContextReceive(eMUCore::socketContext_t &context) {
 		size_t parsedDataSize = 0;
 
 		do {
-			size_t rawDataSize = eMUCore::packet_t::getRawDataSize(&user.getRecvBuffer().m_data[parsedDataSize]);
-			eMUCore::packet_t packet(&user.getRecvBuffer().m_data[parsedDataSize]);
+			size_t rawDataSize = eMUCore::packet_t::rawDataSize(&user.recvBuffer().m_data[parsedDataSize]);
+			eMUCore::packet_t packet(&user.recvBuffer().m_data[parsedDataSize]);
 
 			#ifdef _DEBUG
 			m_logger.in(eMUCore::loggerMessage_e::_protocol) << user << " Received " << packet << ".";
@@ -171,7 +171,7 @@ void connectServer_t::onContextReceive(eMUCore::socketContext_t &context) {
 			// -------------------------------
 
 			parsedDataSize += rawDataSize;
-		} while(parsedDataSize < user.getRecvBuffer().m_dataSize);
+		} while(parsedDataSize < user.recvBuffer().m_dataSize);
 	} catch(eMUCore::exception_t &e) {
 		m_logger.in(eMUCore::loggerMessage_e::_error) << "Exception: " << user << " " << e.what();
 		m_logger.out();
@@ -204,11 +204,11 @@ void connectServer_t::onDatagramReceive(sockaddr_in& /*inetAddr*/, unsigned char
 		size_t parsedDataSize = 0;
 
 		do {
-			size_t rawDataSize = eMUCore::packet_t::getRawDataSize(&data[parsedDataSize]);
+			size_t rawDataSize = eMUCore::packet_t::rawDataSize(&data[parsedDataSize]);
 
 			eMUCore::packet_t packet(&data[parsedDataSize]);
 
-			if(packet.getProtocolId() == 0x01) {
+			if(packet.protocolId() == 0x01) {
 				unsigned short gameServerCode = packet.read<unsigned short>(3);
 				size_t gameServerLoad = packet.read<unsigned char>(5);
 				m_game.serverListUpdate(gameServerCode, gameServerLoad);
@@ -234,7 +234,7 @@ void connectServer_t::send(connectServerUser_t &user, const eMUCore::packet_t &p
 	m_logger.out();
 	#endif
 
-	m_iocpEngine.write(user, packet.getData(), packet.getSize());
+	m_iocpEngine.write(user, packet.data(), packet.size());
 }
 
 void connectServer_t::fatalHandler(int /*signalId*/) {

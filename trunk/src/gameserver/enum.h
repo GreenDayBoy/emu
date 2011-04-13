@@ -59,10 +59,10 @@ namespace protocol_e {
 
 namespace characterAction_e {
 	enum type_t {
-		_setStand = 0x7B,
-		_setSit = 0x80,
-		_setLeaning = 0x81,
-		_setLevitation = 0x82
+		_stand = 0x7B,
+		_sit = 0x80,
+		_leaning = 0x81,
+		_levitation = 0x82
 	};
 };
 

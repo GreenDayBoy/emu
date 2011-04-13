@@ -8,9 +8,9 @@ protocol_t::protocol_t(protocolExecutorInterface_t &iface,
 
 void protocol_t::core(connectServerUser_t &user,
 						const eMUCore::packet_t &packet) const {
-	switch(packet.getProtocolId()) {
+	switch(packet.protocolId()) {
 	case protocol_e::_serverListManage:
-		switch(packet.getData()[3]) {
+		switch(packet.data()[3]) {
 		case protocol_e::serverListManage_e::_serverSelect:
 			this->parseServerSelectRequest(user, packet);
 			break;

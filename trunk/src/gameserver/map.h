@@ -24,30 +24,30 @@ public:
 	map_t();
 
 	void startup(const std::string &filename, int mapId);
-	bool isPathValid(const path_t &path) const;
+	bool pathValid(const path_t &path) const;
 	std::string dumpPath(const path_t &path) const;
-	eMUShared::position_t getRandomPosition(const eMUShared::position_t &startPos = eMUShared::position_t(0, 0),
+	eMUShared::position_t randomPosition(const eMUShared::position_t &startPos = eMUShared::position_t(0, 0),
 											const eMUShared::position_t &endPos = eMUShared::position_t(255, 255)) const;
 
-	inline unsigned char getTileAttribute(const eMUShared::position_t &pos) const {
+	inline unsigned char tileAttribute(const eMUShared::position_t &pos) const {
 		return m_mapTiles[(pos.m_y << 8) + pos.m_x];
 	}
 
 	inline bool canStand(const eMUShared::position_t &pos) const {
-		unsigned char attr = this->getTileAttribute(pos) & 127; // & 127 - without stand bit.
+		unsigned char attr = this->tileAttribute(pos) & 127; // & 127 - without stand bit.
 		return (attr == mapTileAttribute_e::_ground || attr == mapTileAttribute_e::_safezone);
 	}
 
-	inline bool isTileEmpty(const eMUShared::position_t &pos) const {
-		return ((this->getTileAttribute(pos) & 128) == 0);
+	inline bool tileEmpty(const eMUShared::position_t &pos) const {
+		return ((this->tileAttribute(pos) & 128) == 0);
 	}
 
-	inline void setStand(const eMUShared::position_t &pos) { m_mapTiles[(pos.m_y << 8) + pos.m_x] |= 128; }
+	inline void stand(const eMUShared::position_t &pos) { m_mapTiles[(pos.m_y << 8) + pos.m_x] |= 128; }
 	inline void clearStand(const eMUShared::position_t &pos) { m_mapTiles[(pos.m_y << 8) + pos.m_x] &= 127; }
 	inline void map_t::resetStand(const eMUShared::position_t &oldPos,
 									const eMUShared::position_t &newPos) {
 		this->clearStand(oldPos);
-		this->setStand(newPos);
+		this->stand(newPos);
 	}
 
 private:
@@ -67,7 +67,7 @@ public:
 	void startup(const std::string &filename);
 	void cleanup();
 	map_t& operator[](int mapId);
-	bool isMapExists(int mapId);
+	bool mapExists(int mapId);
 
 private:
 	mapManager_t(const mapManager_t&);

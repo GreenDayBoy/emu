@@ -31,9 +31,9 @@ public:
 	void update();
 	void serverUpdate(int serverCode, size_t load);
 
-	inline const serverAttributesList_t& getList() const { return m_list; }
-	inline size_t getActiveServersCount() const { return m_activeServersCount; }
-	const serverAttributes_t& getServerAttributes(unsigned short code) const;
+	inline const serverAttributesList_t& list() const { return m_list; }
+	inline size_t activeServersCount() const { return m_activeServersCount; }
+	const serverAttributes_t& serverAttributes(unsigned short code) const;
 
 private:
 	serverList_t();

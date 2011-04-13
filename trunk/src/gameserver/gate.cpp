@@ -18,7 +18,7 @@ gate_t::gate_t(int id,
   m_direction(direction),
   m_requiredLevel(requiredLevel) {}
 
-bool gate_t::isInGate(const eMUShared::position_t &pos) const {
+bool gate_t::inGate(const eMUShared::position_t &pos) const {
 	if(pos.m_x >= m_startPos.m_x && pos.m_x <= m_endPos.m_x
 		&& pos.m_y >= m_startPos.m_y && pos.m_y <= m_endPos.m_y) {
 		return true;
@@ -42,7 +42,7 @@ void gateManager_t::startup(const std::string &filename) {
 									gateFile.readFromProperty<int>("gate", "destId", -1),
 									gateFile.readFromProperty<int>("gate", "dir", 0),
 									gateFile.readFromProperty<unsigned short>("gate", "level", 0));
-		m_gateList[gate->getId()] = gate;
+		m_gateList[gate->id()] = gate;
 	}
 
 	gateFile.close();
@@ -57,7 +57,7 @@ void gateManager_t::cleanup() {
 }
 
 gate_t& gateManager_t::operator[](int gateId) {
-	if(this->isGateExists(gateId)) {
+	if(this->gateExists(gateId)) {
 		return *m_gateList[gateId];
 	} else {
 		eMUCore::exception_t e;
@@ -66,7 +66,7 @@ gate_t& gateManager_t::operator[](int gateId) {
 	}
 }
 
-bool gateManager_t::isGateExists(int gateId) const {
+bool gateManager_t::gateExists(int gateId) const {
 	gateList_t::const_iterator iter = m_gateList.find(gateId);
 
 	if(iter != m_gateList.end()) {

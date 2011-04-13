@@ -81,11 +81,11 @@ void monsterManager_t::startup(const std::string &fileName,
 		int id = monstersFile.readFromProperty<int>("monster", "id", 0);
 
 		monster_t *monster = new monster_t(++i, m_monsterAttributesManager[id]);
-		monster->setMapId(monstersFile.readFromProperty<unsigned int>("monster", "mapId", 0));
-		monster->setPosition(eMUShared::position_t(monstersFile.readFromProperty<unsigned int>("monster", "posX", 0),
+		monster->mapId(monstersFile.readFromProperty<unsigned int>("monster", "mapId", 0));
+		monster->position(eMUShared::position_t(monstersFile.readFromProperty<unsigned int>("monster", "posX", 0),
 													monstersFile.readFromProperty<unsigned int>("monster", "posY", 0)));
-		monster->setDirection(monstersFile.readFromProperty<unsigned int>("monster", "direction", 0));
-		monster->setId(id);
+		monster->direction(monstersFile.readFromProperty<unsigned int>("monster", "direction", 0));
+		monster->id(id);
 
 		m_monsterList.push_back(monster);
 		registerObjectCallback(monster);

@@ -48,7 +48,7 @@ void dataServer_t::startup() {
 							boost::bind(&dataServer_t::onContextReceive, this, _1),
 							boost::bind(&dataServer_t::onContextClose, this, _1));
 
-	m_logger.in(eMUCore::loggerMessage_e::_info) << "Starting tcp server on port " << m_tcpServer.getListenPort() << ".";
+	m_logger.in(eMUCore::loggerMessage_e::_info) << "Starting tcp server on port " << m_tcpServer.listenPort() << ".";
 	m_logger.out();
 	m_tcpServer.startup();
 
@@ -90,7 +90,7 @@ void dataServer_t::send(dataServerUser_t &user, const eMUCore::packet_t &packet)
 	m_logger.out();
 	#endif
 
-	m_iocpEngine.write(user, packet.getData(), packet.getSize());
+	m_iocpEngine.write(user, packet.data(), packet.size());
 }
 
 void dataServer_t::worker() {
@@ -103,15 +103,15 @@ void dataServer_t::worker() {
 void dataServer_t::updateWindowTitle() const {
 	std::stringstream titleStream;
 	titleStream << "[DataServer] ::"
-				<< " [Users: " << m_userCount << "/" << m_userManager.getCount() << "] ::"
-				<< " [Port: " << m_tcpServer.getListenPort() << "]";
+				<< " [Users: " << m_userCount << "/" << m_userManager.count() << "] ::"
+				<< " [Port: " << m_tcpServer.listenPort() << "]";
 
 	SetConsoleTitle(titleStream.str().c_str());
 }
 
 void dataServer_t::disconnectAll() {
-	for(size_t i = 0; i < m_userManager.getCount(); ++i) {
-		if(m_userManager[i].isActive()) {
+	for(size_t i = 0; i < m_userManager.count(); ++i) {
+		if(m_userManager[i].active()) {
 			this->disconnect(m_userManager[i]);
 		}
 	}
@@ -140,7 +140,7 @@ void dataServer_t::onContextAttach(eMUCore::socketContext_t &context) {
 		this->updateWindowTitle();
 		// -----------------------
 
-		if(!m_allowedHostList.isHostAllowed(user.getIpAddress())) {
+		if(!m_allowedHostList.isHostAllowed(user.ipAddress())) {
 			m_logger.in(eMUCore::loggerMessage_e::_info) << user << " Host is not allowed to connect.";
 			m_logger.out();
 			this->disconnect(user);
@@ -167,8 +167,8 @@ void dataServer_t::onContextReceive(eMUCore::socketContext_t &context) {
 		size_t parsedDataSize = 0;
 
 		do {
-			size_t rawDataSize = eMUCore::packet_t::getRawDataSize(&user.getRecvBuffer().m_data[parsedDataSize]);
-			eMUCore::packet_t packet(&user.getRecvBuffer().m_data[parsedDataSize]);
+			size_t rawDataSize = eMUCore::packet_t::rawDataSize(&user.recvBuffer().m_data[parsedDataSize]);
+			eMUCore::packet_t packet(&user.recvBuffer().m_data[parsedDataSize]);
 
 			#ifdef _DEBUG
 			m_logger.in(eMUCore::loggerMessage_e::_protocol) << user << " Received " << packet << ".";
@@ -180,7 +180,7 @@ void dataServer_t::onContextReceive(eMUCore::socketContext_t &context) {
 			// -------------------------------
 
 			parsedDataSize += rawDataSize;
-		} while(parsedDataSize < user.getRecvBuffer().m_dataSize);
+		} while(parsedDataSize < user.recvBuffer().m_dataSize);
 	} catch(eMUCore::exception_t &e) {
 		m_logger.in(eMUCore::loggerMessage_e::_error) << "Exception: " << user << " " << e.what();
 		m_logger.out();

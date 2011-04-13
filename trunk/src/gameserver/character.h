@@ -11,44 +11,44 @@ public:
 	character_t(gameServerUser_t &owner);
 
 	void reset();
-	inline gameServerUser_t& getOwner() { return m_owner; }
+	inline gameServerUser_t& owner() { return m_owner; }
 
-	void setAttributes(const eMUShared::characterAttributes_t &attr);
-	eMUShared::characterAttributes_t& getAttributes() { return m_attributes; }
+	void attributes(const eMUShared::characterAttributes_t &attr);
+	eMUShared::characterAttributes_t& attributes() { return m_attributes; }
 
-	inline bool isActive() { return m_active; }
-	inline void setActive() { m_active = true; }
-	inline void setInactive() { m_active = false; }
+	inline bool active() { return m_active; }
+	inline void activate() { m_active = true; }
+	inline void deactivate() { m_active = false; }
 
-	inline unsigned int getLastMoveTime() const { return m_lastMoveTime; }
-	inline void setLastMoveTime(unsigned int time) { m_lastMoveTime = time; }
+	inline unsigned int lastMoveTime() const { return m_lastMoveTime; }
+	inline void lastMoveTime(unsigned int time) { m_lastMoveTime = time; }
 
-	inline unsigned int getNextExperience() const { return m_nextExperience; }
-	inline void setNextExperience(unsigned int nextExperience) { m_nextExperience = nextExperience; }
+	inline unsigned int nextExperience() const { return m_nextExperience; }
+	inline void nextExperience(unsigned int nextExperience) { m_nextExperience = nextExperience; }
 
-	inline const unsigned char* getPreview() const { return m_preview; }
-	void setPreview();
+	inline const unsigned char* preview() const { return m_preview; }
+	void calculatePreview();
 
-	void setPose(characterAction_e::type_t actionId);
-	inline unsigned char getPose() { return m_pose; }
+	void pose(characterAction_e::type_t actionId);
+	inline unsigned char pose() { return m_pose; }
 
-	bool hasTeleportEffect() { return m_hasTeleportEffect; }
+	bool teleportEffect() { return m_hasTeleportEffect; }
 	void activateTeleportEffect() { m_hasTeleportEffect = true; }
 	void deactivateTeleportEffect() { m_hasTeleportEffect = false; }
 
-	const std::string& getName() const { return m_attributes.m_name; }
+	const std::string& name() const { return m_attributes.m_name; }
 
-	unsigned char getMapId() const { return m_attributes.m_mapId; }
-	void setMapId(unsigned char mapId) { m_attributes.m_mapId = mapId; }
+	unsigned char mapId() const { return m_attributes.m_mapId; }
+	void mapId(unsigned char mapId) { m_attributes.m_mapId = mapId; }
 
-	const eMUShared::position_t& getPosition() const { return m_attributes.m_position; }
-	void setPosition(const eMUShared::position_t &pos) { m_attributes.m_position = pos; }
+	const eMUShared::position_t& position() const { return m_attributes.m_position; }
+	void position(const eMUShared::position_t &pos) { m_attributes.m_position = pos; }
 
-	unsigned char getDirection() const { return m_attributes.m_direction; }
-	void setDirection(unsigned char direction) { m_attributes.m_direction = direction; }
+	unsigned char direction() const { return m_attributes.m_direction; }
+	void direction(unsigned char direction) { m_attributes.m_direction = direction; }
 
-	unsigned short getViewRange() const { return m_viewRange; }
-	void setViewRange(unsigned char viewRange) { m_viewRange = viewRange; }
+	unsigned short viewRange() const { return m_viewRange; }
+	void viewRange(unsigned char viewRange) { m_viewRange = viewRange; }
 
 private:
 	character_t();

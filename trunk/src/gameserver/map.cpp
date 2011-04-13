@@ -28,7 +28,7 @@ void map_t::startup(const std::string &filename, int mapId) {
 	}
 }
 
-bool map_t::isPathValid(const path_t &path) const {
+bool map_t::pathValid(const path_t &path) const {
 	for(size_t i = 0; i < path.size(); ++i) {
 		if(!this->canStand(path[i])) {
 			return false;
@@ -41,14 +41,14 @@ bool map_t::isPathValid(const path_t &path) const {
 std::string map_t::dumpPath(const path_t &path) const {
 	std::stringstream stream;
 	for(size_t i = 0; i < path.size(); ++i) {
-		stream << "[" << path[i] << "][" << static_cast<int>(this->getTileAttribute(path[i])) << "] ";
+		stream << "[" << path[i] << "][" << static_cast<int>(this->tileAttribute(path[i])) << "] ";
 	}
 
 	return stream.str();
 }
 
-eMUShared::position_t map_t::getRandomPosition(const eMUShared::position_t &startPos,
-												const eMUShared::position_t &endPos) const { _PROFILE;
+eMUShared::position_t map_t::randomPosition(const eMUShared::position_t &startPos,
+											const eMUShared::position_t &endPos) const { _PROFILE;
 std::vector<eMUShared::position_t> positions;
 
 	for(size_t x = startPos.m_x; x <= endPos.m_x; ++x) {
@@ -64,7 +64,7 @@ std::vector<eMUShared::position_t> positions;
 	else
 	{
 		eMUCore::exception_t e;
-		e.in() << __FILE__ << ":" << __LINE__ << "[map_t::getRandomPosition()] No free field in area " << startPos << "-" << endPos << ".";
+		e.in() << __FILE__ << ":" << __LINE__ << "[map_t::randomPosition()] No free field in area " << startPos << "-" << endPos << ".";
 		throw e;
 	}
 }
@@ -95,7 +95,7 @@ void mapManager_t::cleanup() {
 }
 
 map_t& mapManager_t::operator[](int mapId) {
-	if(this->isMapExists(mapId)) {
+	if(this->mapExists(mapId)) {
 		return *m_mapList[mapId];
 	} else {
 		eMUCore::exception_t e;
@@ -104,7 +104,7 @@ map_t& mapManager_t::operator[](int mapId) {
 	}
 }
 
-bool mapManager_t::isMapExists(int mapId) {
+bool mapManager_t::mapExists(int mapId) {
 	mapList_t::iterator iter = m_mapList.find(mapId);
 
 	if(iter != m_mapList.end()) {

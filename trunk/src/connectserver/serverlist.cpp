@@ -70,14 +70,14 @@ void serverList_t::serverUpdate(int code, size_t load) {
 	}
 }
 
-const serverList_t::serverAttributes_t& serverList_t::getServerAttributes(unsigned short code) const {
+const serverList_t::serverAttributes_t& serverList_t::serverAttributes(unsigned short code) const {
 	serverAttributesList_t::const_iterator iter = m_list.find(code);
 
 	if(iter != m_list.end()) {
 		return iter->second;
 	} else {
 		eMUCore::exception_t e;
-		e.in() << __FILE__ << ":" << __LINE__ << "[serverList_t::getServerAttributes()] No server [" << code << "] found on servers list.";
+		e.in() << __FILE__ << ":" << __LINE__ << "[serverList_t::serverAttributes()] No server [" << code << "] found on servers list.";
 		throw e;
 	}
 }
