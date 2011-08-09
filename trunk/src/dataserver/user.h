@@ -6,12 +6,12 @@
 
 class dataServerUser_t: public eMUCore::socketContext_t {
 public:
-	dataServerUser_t(int index);
+    dataServerUser_t(int index);
 
 private:
-	dataServerUser_t();
-	dataServerUser_t(const dataServerUser_t&);
-	dataServerUser_t& operator=(const dataServerUser_t&);
+    dataServerUser_t();
+    dataServerUser_t(const dataServerUser_t&);
+    dataServerUser_t& operator=(const dataServerUser_t&);
 };
 
 #endif // eMU_DATASERVER_USER_H
