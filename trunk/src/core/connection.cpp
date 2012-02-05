@@ -18,7 +18,7 @@ void eMUCore::network::connection_t::send(const uint8 *payload, size_t size) {
     bool result = wbuf_.insert(payload, size);
 
     if(!result) {
-        LOG_ERROR << "Cannot insert payload into write buffer. address:  " << std::endl;
+        LOG_ERROR << "Cannot insert payload into write buffer." << std::endl;
         this->disconnect();
         return;
     }
