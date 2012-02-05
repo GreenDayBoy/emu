@@ -44,7 +44,7 @@ public:
         ON_CALL(*this, queueWrite(::testing::_,
                                   ::testing::_,
                                   ::testing::_)).WillByDefault(::testing::Invoke(&fake_,
-                                                                                &fakeSocket_t::queueWrite));
+                                                                                 &fakeSocket_t::queueWrite));
     }
 
     MOCK_METHOD0(close, void());
@@ -79,25 +79,28 @@ TEST_F(connectionTest, construct) {
     mockSocket_t socket(NULL);
     mockEventHandler_t eventHandler;
 
+    // 1. Expect queue read operation after connection construct.
     EXPECT_CALL(socket, queueRead(::testing::NotNull(), eMUCore::network::maxPayloadSize_, ::testing::_));
     eMUCore::network::connection_t connection(&socket, &eventHandler);
 }
 
 TEST_F(connectionTest, send) {
     mockEventHandler_t eventHandler;
-
     ::testing::StrictMock<mockSocket_t> socket(reinterpret_cast<boost::asio::ip::tcp::socket*>(NULL));
     socket.delegateMethods();
 
+    // 1. Expect queue read operation after connection construct.
     EXPECT_CALL(socket, queueRead(::testing::NotNull(), eMUCore::network::maxPayloadSize_, ::testing::_));
     eMUCore::network::connection_t connection(&socket, &eventHandler);
 
+    // 2. Expect queue write operation after send() call.
     EXPECT_CALL(socket, queueWrite(::testing::NotNull(), eMUCore::network::maxPayloadSize_, ::testing::_));
     connection.send(&patternBuf_.payload_[0], eMUCore::network::maxPayloadSize_);
 
     // Dequeue earlier send() call and unlock write buffer.
     socket.fake_.dequeueWrite(boost::system::error_code(), eMUCore::network::maxPayloadSize_);
 
+    // 3. Expect queue write after send call() and dequeue previous send().
     EXPECT_CALL(socket, queueWrite(::testing::NotNull(), eMUCore::network::maxPayloadSize_, ::testing::_));
     connection.send(&patternBuf_.payload_[0], eMUCore::network::maxPayloadSize_);
 }
@@ -105,54 +108,80 @@ TEST_F(connectionTest, send) {
 TEST_F(connectionTest, send_Pending) {
     size_t testPayloadSize = eMUCore::network::maxPayloadSize_ / 2;
     mockEventHandler_t eventHandler;
-
     ::testing::StrictMock<mockSocket_t> socket(reinterpret_cast<boost::asio::ip::tcp::socket*>(NULL));
     socket.delegateMethods();
 
+    // 1. Expect queue read operation after connection construct.
     EXPECT_CALL(socket, queueRead(::testing::NotNull(), eMUCore::network::maxPayloadSize_, ::testing::_));
     eMUCore::network::connection_t connection(&socket, &eventHandler);
 
+    // 2. Expect queue write operation after send() call.
     EXPECT_CALL(socket, queueWrite(::testing::NotNull(), eMUCore::network::maxPayloadSize_, ::testing::_));
     connection.send(&patternBuf_.payload_[0], eMUCore::network::maxPayloadSize_);
 
-    // this send payloads should be add to second wbuf payload
+    // This send payloads should be add to second of wbuf payload
     // because master payload is currently pending.
     connection.send(&patternBuf_.payload_[0], testPayloadSize);
     connection.send(&patternBuf_.payload_[testPayloadSize], testPayloadSize);
 
+    // 3. Dequeue previous write operation. It should trigger queueWrite with second payload from wbuf.
     EXPECT_CALL(socket, queueWrite(::testing::NotNull(), eMUCore::network::maxPayloadSize_, ::testing::_));
     socket.fake_.dequeueWrite(boost::system::error_code(), eMUCore::network::maxPayloadSize_);
 }
 
 TEST_F(connectionTest, send_Error) {
     mockEventHandler_t eventHandler;
-
     ::testing::StrictMock<mockSocket_t> socket(reinterpret_cast<boost::asio::ip::tcp::socket*>(NULL));
     socket.delegateMethods();
 
+    // 1. Expect queue read operation after connection construct.
     EXPECT_CALL(socket, queueRead(::testing::NotNull(), eMUCore::network::maxPayloadSize_, ::testing::_));
     eMUCore::network::connection_t connection(&socket, &eventHandler);
 
+    // 2. Expect queue write operation after send() call.
     EXPECT_CALL(socket, queueWrite(::testing::NotNull(), eMUCore::network::maxPayloadSize_, ::testing::_));
     connection.send(&patternBuf_.payload_[0], eMUCore::network::maxPayloadSize_);
 
+    // 3. Expect close connection after dequeue error.
     EXPECT_CALL(eventHandler, onClose());
     EXPECT_CALL(socket, close());
-
-    // Dequeue earlier send() with error.
     socket.fake_.dequeueWrite(boost::asio::error::connection_reset, 0);   
+}
+
+TEST_F(connectionTest, send_Overflow) {
+    mockEventHandler_t eventHandler;
+    ::testing::StrictMock<mockSocket_t> socket(reinterpret_cast<boost::asio::ip::tcp::socket*>(NULL));
+
+    // 1. Expect queue read operation after connection construct.
+    EXPECT_CALL(socket, queueRead(::testing::NotNull(), eMUCore::network::maxPayloadSize_, ::testing::_));
+    eMUCore::network::connection_t connection(&socket, &eventHandler);
+
+    // 2. Expect queue write operation after send() call.
+    EXPECT_CALL(socket, queueWrite(::testing::NotNull(), eMUCore::network::maxPayloadSize_, ::testing::_));
+    connection.send(&patternBuf_.payload_[0], eMUCore::network::maxPayloadSize_);
+
+    // This send payload should be add to second of wbuf payload
+    // because main payload is currently pending.
+    connection.send(&patternBuf_.payload_[0], eMUCore::network::maxPayloadSize_);
+
+    // 3. Expect close connection because main payload is currently pending and second payload is full.
+    EXPECT_CALL(eventHandler, onClose());
+    EXPECT_CALL(socket, close());
+    connection.send(&patternBuf_.payload_[0], eMUCore::network::maxPayloadSize_);
 }
 
 TEST_F(connectionTest, receive) {
     size_t readPayloadSize = 30;
     mockEventHandler_t eventHandler;
-
     ::testing::StrictMock<mockSocket_t> socket(reinterpret_cast<boost::asio::ip::tcp::socket*>(NULL));
     socket.delegateMethods();
 
+    // 1. Expect queue read operation after connection construct.
     EXPECT_CALL(socket, queueRead(::testing::NotNull(), eMUCore::network::maxPayloadSize_, ::testing::_));
     eMUCore::network::connection_t connection(&socket, &eventHandler);
 
+    // 3. Expect call onReceive event and next queue read, after dequeue previous read operation
+    // with non-zero payload size.
     EXPECT_CALL(eventHandler, onReceive(::testing::NotNull(), readPayloadSize));
     EXPECT_CALL(socket, queueRead(::testing::NotNull(), eMUCore::network::maxPayloadSize_, ::testing::_));
     socket.fake_.dequeueRead(boost::system::error_code(), readPayloadSize);
@@ -160,13 +189,14 @@ TEST_F(connectionTest, receive) {
 
 TEST_F(connectionTest, receive_Close) {
     mockEventHandler_t eventHandler;
-
     ::testing::StrictMock<mockSocket_t> socket(reinterpret_cast<boost::asio::ip::tcp::socket*>(NULL));
     socket.delegateMethods();
 
+    // 1. Expect queue read operation after connection construct.
     EXPECT_CALL(socket, queueRead(::testing::NotNull(), eMUCore::network::maxPayloadSize_, ::testing::_));
     eMUCore::network::connection_t connection(&socket, &eventHandler);
 
+    // 2. Expect close connection after dequeue read operation with zero payload size.
     EXPECT_CALL(eventHandler, onClose());
     EXPECT_CALL(socket, close());
     socket.fake_.dequeueRead(boost::system::error_code(), 0);
@@ -174,13 +204,14 @@ TEST_F(connectionTest, receive_Close) {
 
 TEST_F(connectionTest, receive_Error) {
     mockEventHandler_t eventHandler;
-
     ::testing::StrictMock<mockSocket_t> socket(reinterpret_cast<boost::asio::ip::tcp::socket*>(NULL));
     socket.delegateMethods();
 
+    // 1. Expect queue read operation after connection construct.
     EXPECT_CALL(socket, queueRead(::testing::NotNull(), eMUCore::network::maxPayloadSize_, ::testing::_));
     eMUCore::network::connection_t connection(&socket, &eventHandler);
 
+    // 3. Expect close connection after dequeue error.
     EXPECT_CALL(eventHandler, onClose());
     EXPECT_CALL(socket, close());
     socket.fake_.dequeueRead(boost::asio::error::connection_reset, 0);
