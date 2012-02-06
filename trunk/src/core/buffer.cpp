@@ -2,18 +2,18 @@
 #include "log.hpp"
 
 eMUCore::network::readBuffer_t::readBuffer_t():
-  payload_(maxPayloadSize_, 0) {}
+  payload_(maxPayloadSize_c, 0) {}
 
 void eMUCore::network::readBuffer_t::clear() {
     payload_.clear();
-    payload_.resize(maxPayloadSize_, 0);
+    payload_.resize(maxPayloadSize_c, 0);
 }
 
 eMUCore::network::writeBuffer_t::writeBuffer_t():
   pending_(false),
-  payload_(maxPayloadSize_, 0),
+  payload_(maxPayloadSize_c, 0),
   payloadSize_(0),
-  secPayload_(maxPayloadSize_, 0),
+  secPayload_(maxPayloadSize_c, 0),
   secPayloadSize_(0) {}
 
 void eMUCore::network::writeBuffer_t::clear() {
@@ -25,13 +25,13 @@ void eMUCore::network::writeBuffer_t::clearPri() {
     pending_ = false;
 
     payload_.clear();
-    payload_.resize(maxPayloadSize_, 0);
+    payload_.resize(maxPayloadSize_c, 0);
     payloadSize_ = 0;
 }
 
 void eMUCore::network::writeBuffer_t::clearSec() {
     secPayload_.clear();
-    secPayload_.resize(maxPayloadSize_, 0);
+    secPayload_.resize(maxPayloadSize_c, 0);
     secPayloadSize_ = 0;
 }
 
@@ -39,7 +39,7 @@ bool eMUCore::network::writeBuffer_t::insert(const uint8 *payload, size_t size) 
     payload_t &destPayload = pending_ ? secPayload_ : payload_;
     size_t &destPayloadSize = pending_ ? secPayloadSize_ : payloadSize_;
 
-    if((destPayloadSize + size) > maxPayloadSize_) {
+    if((destPayloadSize + size) > maxPayloadSize_c) {
         LOG_ERROR << "buffer overflow! pending: " << pending_ 
                   << ", current size: " << destPayloadSize 
                   << ", size: " << size << std::endl;

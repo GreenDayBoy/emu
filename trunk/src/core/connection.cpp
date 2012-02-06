@@ -7,7 +7,7 @@ eMUCore::network::connection_t::connection_t(socket_t *socket,
   socket_(socket),
   eventHandler_(eventHandler) {
     socket_->queueRead(&rbuf_.payload_[0],
-                       maxPayloadSize_,
+                       maxPayloadSize_c,
                        boost::bind(&connection_t::receiveHandler,
                                    this,
                                    boost::asio::placeholders::error,
@@ -51,7 +51,7 @@ void eMUCore::network::connection_t::receiveHandler(const boost::system::error_c
     if(bytesTransferred > 0) {
         eventHandler_->onReceive(&rbuf_.payload_[0], bytesTransferred);
         socket_->queueRead(&rbuf_.payload_[0],
-                           maxPayloadSize_,
+                           maxPayloadSize_c,
                            boost::bind(&connection_t::receiveHandler,
                                        this,
                                        boost::asio::placeholders::error,

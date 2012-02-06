@@ -13,7 +13,7 @@ namespace eMUCore {
 namespace network {
 
 typedef std::vector<uint8> payload_t;
-const size_t maxPayloadSize_ = 4096;
+const size_t maxPayloadSize_c = 4096;
 
 struct eMUCORE_DECLSPEC readBuffer_t {
     readBuffer_t();
