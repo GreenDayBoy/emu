@@ -272,10 +272,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\connection.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\core\core.cpp"
 				>
 			</File>
@@ -295,10 +291,6 @@
 			>
 			<File
 				RelativePath="..\src\core\buffer.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\core\connection.hpp"
 				>
 			</File>
 			<File

@@ -39,8 +39,8 @@ private:
     void clearSec();
 };
 
-};
-};
+}
+}
 
 #ifdef WIN32
 #pragma warning(default: 4251)

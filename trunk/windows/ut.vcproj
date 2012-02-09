@@ -274,16 +274,36 @@
 				>
 			</File>
 			<Filter
-				Name="core"
+				Name="env"
 				>
-				<File
-					RelativePath="..\src\ut\bufferTest.cpp"
+				<Filter
+					Name="core"
 					>
-				</File>
-				<File
-					RelativePath="..\src\ut\connectionTest.cpp"
+					<File
+						RelativePath="..\src\ut\ioServiceMock.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\socketStub.cpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="test"
+				>
+				<Filter
+					Name="core"
 					>
-				</File>
+					<File
+						RelativePath="..\src\ut\bufferTest.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\socketTest.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -295,6 +315,26 @@
 				RelativePath="..\src\ut\ut.hpp"
 				>
 			</File>
+			<Filter
+				Name="env"
+				>
+				<Filter
+					Name="core"
+					>
+					<File
+						RelativePath="..\src\ut\eventHandlerMock.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\ioServiceMock.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\socketStub.hpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"

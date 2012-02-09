@@ -7,7 +7,7 @@
 
 namespace eMUCore {
 eMUCORE_DECLSPEC std::string getCurrentDateString();
-};
+}
 
 #define LOG_BASE (std::cout << "<" << eMUCore::getCurrentDateString() << "> " << __FUNCTION__ << "():" << __LINE__ << " ")
 #define LOG_INFO (LOG_BASE << "[info] ")

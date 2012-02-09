@@ -19,7 +19,7 @@ TEST(readBufferTest, clear) {
     EXPECT_EQ(0x00, rbuf.payload_[eMUCore::network::maxPayloadSize_c - 1]);
 }
 
-class writeBufferTestFixture: public ::testing::Test {
+class writeBufferTest_t: public ::testing::Test {
 protected:
     virtual void SetUp() {
         initializePatternBuf();
@@ -36,7 +36,7 @@ protected:
     eMUCore::network::writeBuffer_t patternBuf_;
 };
 
-TEST_F(writeBufferTestFixture, construct) {
+TEST_F(writeBufferTest_t, construct) {
     eMUCore::network::writeBuffer_t wbuf;
 
     EXPECT_FALSE(wbuf.pending_);
@@ -46,7 +46,7 @@ TEST_F(writeBufferTestFixture, construct) {
     EXPECT_EQ(0, wbuf.secPayloadSize_);
 }
 
-TEST_F(writeBufferTestFixture, clear) {
+TEST_F(writeBufferTest_t, clear) {
     eMUCore::network::writeBuffer_t wbuf;
     wbuf.payload_[0] = 0x00;
     wbuf.payload_[eMUCore::network::maxPayloadSize_c - 1] = 0x01;
@@ -73,7 +73,7 @@ TEST_F(writeBufferTestFixture, clear) {
     EXPECT_FALSE(wbuf.pending_);
 }
 
-TEST_F(writeBufferTestFixture, swap) {
+TEST_F(writeBufferTest_t, swap) {
     eMUCore::network::writeBuffer_t wbuf;
     wbuf.secPayload_ = patternBuf_.payload_;
     wbuf.secPayloadSize_ = patternBuf_.payloadSize_;
@@ -84,7 +84,7 @@ TEST_F(writeBufferTestFixture, swap) {
     EXPECT_EQ(patternBuf_.payloadSize_, wbuf.payloadSize_);
 }
 
-TEST_F(writeBufferTestFixture, insert_PendingState) {
+TEST_F(writeBufferTest_t, insert_PendingState) {
     size_t partPayloadSize = patternBuf_.payloadSize_ / 2;
     eMUCore::network::writeBuffer_t wbuf;
     wbuf.pending_ = true;
@@ -110,7 +110,7 @@ TEST_F(writeBufferTestFixture, insert_PendingState) {
     EXPECT_EQ(patternBuf_.payloadSize_, wbuf.payloadSize_);
 }
 
-TEST_F(writeBufferTestFixture, insert_OverflowPrimaryBuffer) {
+TEST_F(writeBufferTest_t, insert_OverflowPrimaryBuffer) {
     eMUCore::network::writeBuffer_t wbuf;
     wbuf.pending_ = false;
     bool result = wbuf.insert(&patternBuf_.payload_[0], patternBuf_.payloadSize_);
@@ -123,7 +123,7 @@ TEST_F(writeBufferTestFixture, insert_OverflowPrimaryBuffer) {
     EXPECT_FALSE(result);
 }
 
-TEST_F(writeBufferTestFixture, insert_OverflowSecondaryBuffer) {
+TEST_F(writeBufferTest_t, insert_OverflowSecondaryBuffer) {
     eMUCore::network::writeBuffer_t wbuf;
     wbuf.pending_ = true;
     bool result = wbuf.insert(&patternBuf_.payload_[0], patternBuf_.payloadSize_);

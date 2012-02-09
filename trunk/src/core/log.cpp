@@ -1,4 +1,6 @@
-#include <boost/date_time/local_time/local_time.hpp>
+#include <iomanip>
+#include <time.h>
+#include <sstream>
 #include "log.hpp"
 
 std::string eMUCore::getCurrentDateString() {

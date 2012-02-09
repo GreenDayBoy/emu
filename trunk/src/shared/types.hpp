@@ -10,10 +10,4 @@ typedef signed int int32;
 typedef signed long long int int64;
 typedef unsigned long long int uint64;
 
-#ifdef UNIT_TESTING
-    #define MOCKABLE virtual
-#else
-    #define MOCKABLE
-#endif // UNIT_TESTING
-
 #endif //SHARED_TYPES_HPP
