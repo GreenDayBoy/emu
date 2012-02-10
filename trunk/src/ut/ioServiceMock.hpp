@@ -9,7 +9,7 @@
 namespace eMUUnitTest {
 namespace networkTest {
 
-class ioServiceMock_t {
+class ioServiceMock_t: private boost::noncopyable {
 public:
     typedef boost::function2<void, const boost::system::error_code&, size_t> ioHandler_t;
 
@@ -22,6 +22,7 @@ public:
     MOCK_METHOD1(shutdownSocket, void(boost::asio::ip::tcp::socket::shutdown_type type));
     MOCK_METHOD3(read, void(uint8 *payload, size_t size, ioHandler_t handler));
     MOCK_METHOD3(write, void(const uint8 *payload, size_t size, ioHandler_t handler));
+    MOCK_METHOD0(closeSocket, void());
 
 private:
     void readImpl(uint8 *payload, size_t size, ioHandler_t handler);

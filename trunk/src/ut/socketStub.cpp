@@ -7,7 +7,9 @@ void eMUUnitTest::networkTest::socketStub_t::shutdown(boost::asio::ip::tcp::sock
     ioService_.shutdownSocket(type);
 }
 
-void eMUUnitTest::networkTest::socketStub_t::close() {}
+void eMUUnitTest::networkTest::socketStub_t::close() {
+    ioService_.closeSocket();
+}
 
 void eMUUnitTest::networkTest::socketStub_t::async_receive(boost::asio::mutable_buffer &buf,
                                                            ioServiceMock_t::ioHandler_t handler) {

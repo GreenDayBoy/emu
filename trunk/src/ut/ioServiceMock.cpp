@@ -5,10 +5,10 @@ void eMUUnitTest::networkTest::ioServiceMock_t::delegateMocks() {
                         ::testing::_,
                         ::testing::_)).WillByDefault(::testing::Invoke(this,
                                                                        &ioServiceMock_t::readImpl));
-        ON_CALL(*this, write(::testing::_,
-                             ::testing::_,
-                             ::testing::_)).WillByDefault(::testing::Invoke(this,
-                                                                            &ioServiceMock_t::writeImpl));
+    ON_CALL(*this, write(::testing::_,
+                         ::testing::_,
+                         ::testing::_)).WillByDefault(::testing::Invoke(this,
+                                                                        &ioServiceMock_t::writeImpl));
 }
 
 void eMUUnitTest::networkTest::ioServiceMock_t::dequeueRead(const boost::system::error_code& ec,

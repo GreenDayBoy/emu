@@ -32,6 +32,10 @@ public:
         EXPECT_CALL(ioService_, shutdownSocket(boost::asio::ip::tcp::socket::shutdown_both));
     }
 
+    void expectCall_ioService_closeSocket() {
+        EXPECT_CALL(ioService_, closeSocket());
+    }
+
     void expectCall_eventHandler_onClose() {
         EXPECT_CALL(eventHandler_, onClose());
     }
@@ -58,6 +62,7 @@ TEST_F(socketTest_t, close) {
 
     this->expectCall_eventHandler_onClose();
     this->expectCall_ioService_shutdownSocket();
+    this->expectCall_ioService_closeSocket();
     socket.close();
 }
 
@@ -108,6 +113,7 @@ TEST_F(socketTest_t, send_Error) {
 
     this->expectCall_eventHandler_onClose();
     this->expectCall_ioService_shutdownSocket();
+    this->expectCall_ioService_closeSocket();
     ioService_.dequeueWrite(boost::asio::error::connection_reset, 0);
 }
 
@@ -125,6 +131,7 @@ TEST_F(socketTest_t, send_Overflow) {
 
     this->expectCall_eventHandler_onClose();
     this->expectCall_ioService_shutdownSocket();
+    this->expectCall_ioService_closeSocket();
     socket.send(&patternBuf_.payload_[0], eMUCore::network::maxPayloadSize_c);
 }
 
@@ -149,6 +156,7 @@ TEST_F(socketTest_t, receive_Close) {
 
     this->expectCall_eventHandler_onClose();
     this->expectCall_ioService_shutdownSocket();
+    this->expectCall_ioService_closeSocket();
     ioService_.dequeueRead(boost::system::error_code(), 0);
 }
 
@@ -161,5 +169,6 @@ TEST_F(socketTest_t, receive_Error) {
 
     this->expectCall_eventHandler_onClose();
     this->expectCall_ioService_shutdownSocket();
+    this->expectCall_ioService_closeSocket();
     ioService_.dequeueRead(boost::asio::error::bad_descriptor, 0);
 }
