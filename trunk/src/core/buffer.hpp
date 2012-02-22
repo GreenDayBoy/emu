@@ -20,6 +20,7 @@ struct eMUCORE_DECLSPEC readBuffer_t {
     void clear();
 
     payload_t payload_;
+    size_t payloadSize_;
 };
 
 struct eMUCORE_DECLSPEC writeBuffer_t {
@@ -46,4 +47,4 @@ private:
 #pragma warning(default: 4251)
 #endif
 
-#endif // eMUCORE_BUFFER_HPP
+#endif

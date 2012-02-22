@@ -10,4 +10,4 @@ typedef signed int int32;
 typedef signed long long int int64;
 typedef unsigned long long int uint64;
 
-#endif //SHARED_TYPES_HPP
+#endif

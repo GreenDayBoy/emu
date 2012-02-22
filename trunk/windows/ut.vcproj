@@ -280,7 +280,15 @@
 					Name="core"
 					>
 					<File
+						RelativePath="..\src\ut\acceptorStub.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\ut\ioServiceMock.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\serverEntityMock.cpp"
 						>
 					</File>
 					<File
@@ -297,6 +305,10 @@
 					>
 					<File
 						RelativePath="..\src\ut\bufferTest.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\serverTest.cpp"
 						>
 					</File>
 					<File
@@ -322,11 +334,19 @@
 					Name="core"
 					>
 					<File
-						RelativePath="..\src\ut\eventHandlerMock.hpp"
+						RelativePath="..\src\ut\acceptorStub.hpp"
 						>
 					</File>
 					<File
 						RelativePath="..\src\ut\ioServiceMock.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\serverEntityMock.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\socketCallbackMock.hpp"
 						>
 					</File>
 					<File

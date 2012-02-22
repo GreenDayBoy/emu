@@ -7,6 +7,6 @@
     #define eMUCORE_DECLSPEC __declspec(dllexport)
 #else
     #define eMUCORE_DECLSPEC __declspec(dllimport)
-#endif //WIN32
+#endif
 
-#endif //eMUCORE_CORE_HPP
+#endif

@@ -3,4 +3,4 @@
 
 void main(int count, char *args[]);
 
-#endif //eMUUT_UT_HPP
+#endif

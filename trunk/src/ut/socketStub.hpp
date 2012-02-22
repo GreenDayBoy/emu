@@ -16,8 +16,8 @@ public:
     void close();
     void async_receive(boost::asio::mutable_buffer &buf,
                        ioServiceMock_t::ioHandler_t handler);
-    void async_write(boost::asio::mutable_buffer &buf,
-                     ioServiceMock_t::ioHandler_t handler);
+    void async_send(boost::asio::mutable_buffer &buf,
+                    ioServiceMock_t::ioHandler_t handler);
 
 private:
     ioServiceMock_t &ioService_;
@@ -26,4 +26,4 @@ private:
 }
 }
 
-#endif //eMUUT_SOCKETSTUB_HPP
+#endif

@@ -2,11 +2,13 @@
 #include "log.hpp"
 
 eMUCore::network::readBuffer_t::readBuffer_t():
-  payload_(maxPayloadSize_c, 0) {}
+  payload_(maxPayloadSize_c, 0),
+  payloadSize_(0) {}
 
 void eMUCore::network::readBuffer_t::clear() {
     payload_.clear();
     payload_.resize(maxPayloadSize_c, 0);
+    payloadSize_ = 0;
 }
 
 eMUCore::network::writeBuffer_t::writeBuffer_t():

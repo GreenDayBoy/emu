@@ -3,6 +3,8 @@
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/shared_ptr.hpp>
 #include "../shared/types.hpp"
 #include "buffer.hpp"
 #include "log.hpp"
@@ -17,25 +19,26 @@ namespace network {
 
 template<typename Service = boost::asio::io_service,
          typename Socket = boost::asio::ip::tcp::socket>
-class socket_t: private boost::noncopyable {
+class socket_t: private boost::noncopyable,
+                public boost::enable_shared_from_this<socket_t<Service, Socket> > {
 public:
-    class eventHandler_t {
-    public:
-        virtual ~eventHandler_t() {}
-        virtual void onReceive(uint8 *payload, size_t size) = 0;
-        virtual void onClose() = 0;
-    };
+    typedef boost::shared_ptr<socket_t<Service, Socket> > ptr_t;
+    typedef boost::function1<void, typename socket_t<Service, Socket>::ptr_t> callback_t;
 
     socket_t(Service &ioService,
-             eventHandler_t &eventHandler):
+             const callback_t &readCallback,
+             const callback_t &closeCallback):
       socket_(ioService),
-      eventHandler_(eventHandler) {
-        this->queueRead();
-    }
+      readCallback_(readCallback),
+      closeCallback_(closeCallback) {}
     virtual ~socket_t() {}
 
     void close() {
-        eventHandler_.onClose();
+        closeCallback_(shared_from_this());
+        this->shutdown();
+    }
+
+    void shutdown() {
         socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
         socket_.close();
     }
@@ -55,8 +58,9 @@ public:
         }
     }
 
-private:
-    socket_t();
+    Socket& impl() {
+        return socket_;
+    }
 
     void queueRead() {
         socket_.async_receive(boost::asio::buffer(&rbuf_.payload_[0], maxPayloadSize_c),
@@ -66,9 +70,18 @@ private:
                                           boost::asio::placeholders::bytes_transferred));
     }
 
+    bool opened() {
+        return socket_.is_open();
+    }
+
+    readBuffer_t &rbuf() { return rbuf_; }
+
+private:
+    socket_t();
+
     void queueWrite() {
         // comment deleted by ACTA :-).
-        socket_.async_write(boost::asio::buffer(&wbuf_.payload_[0], wbuf_.payloadSize_),
+        socket_.async_send(boost::asio::buffer(&wbuf_.payload_[0], wbuf_.payloadSize_),
                             boost::bind(&socket_t::sendHandler,
                                         this,
                                         boost::asio::placeholders::error,
@@ -83,8 +96,10 @@ private:
             return;
         }
 
-        if(bytesTransferred > 0) {
-            eventHandler_.onReceive(&rbuf_.payload_[0], bytesTransferred);
+        rbuf_.payloadSize_ = bytesTransferred;
+
+        if(rbuf_.payloadSize_ > 0) {
+            readCallback_(shared_from_this());
             this->queueRead();
         } else {
             this->close();
@@ -110,7 +125,8 @@ private:
     Socket socket_;
     readBuffer_t rbuf_;
     writeBuffer_t wbuf_;
-    eventHandler_t &eventHandler_;
+    callback_t readCallback_;
+    callback_t closeCallback_;
 };
 
 }
@@ -122,4 +138,4 @@ private:
 #pragma warning(default: 4251)
 #endif
 
-#endif // eMUCORE_SOCKET_HPP
+#endif
