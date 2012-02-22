@@ -85,26 +85,6 @@ TEST_F(serverTest_t, peer_Receive) {
     ioService_.dequeueRead(boost::system::error_code(), eMUNetwork::maxPayloadSize_c);
 }
 
-TEST_F(serverTest_t, peer_Receive_Error) {
-    ioService_.delegateMocks();
-    serverEntity_.delegateMocks();
-
-    this->expectCall_ioService_accept();
-    server_.initialize();
-
-    this->expectCall_serverEntity_onPeerConnect();
-    this->expectCall_ioService_accept();
-    ioService_.dequeueAccept(boost::system::error_code());
-
-    eMUNetwork::socket_t<eMUNetworkUT::ioServiceMock_t,
-        eMUNetworkUT::socketStub_t>::ptr_t socket = serverEntity_.getConnectedSocket();
-
-    socket->queueRead();
-
-    this->expectCall_serverEntity_onPeerClose(socket);
-    ioService_.dequeueRead(boost::asio::error::access_denied, 0);
-}
-
 TEST_F(serverTest_t, peer_Close_byPeer) {
     ioService_.delegateMocks();
     serverEntity_.delegateMocks();
