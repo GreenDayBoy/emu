@@ -73,6 +73,12 @@ TEST_F(socketTest_t, close) {
     socket_->close();
 }
 
+TEST_F(socketTest_t, shutdown) {
+    this->expectCall_ioService_shutdownSocket();
+    this->expectCall_ioService_closeSocket();
+    socket_->shutdown();
+}
+
 TEST_F(socketTest_t, send) {
     ioService_.delegateMocks();
 
