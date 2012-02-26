@@ -179,8 +179,8 @@
 		</Configuration>
 		<Configuration
 			Name="UnitTesting|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)\tmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)\"
+			IntermediateDirectory="$(SolutionDir)\tmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)\"
 			ConfigurationType="2"
 			CharacterSet="0"
 			BuildLogFile="$(SolutionDir)\tmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)\BuildLog.htm"
