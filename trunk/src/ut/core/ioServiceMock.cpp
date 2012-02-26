@@ -1,6 +1,8 @@
 #include "ioServiceMock.hpp"
+#include "../../core/buffer.hpp"
 
 namespace eMUNetworkUT = eMUUnitTest::networkTest;
+namespace eMUNetwork = eMUCore::network;
 
 void eMUNetworkUT::ioServiceMock_t::delegateMocks() {
     ON_CALL(*this, read(::testing::_,
@@ -40,4 +42,24 @@ void eMUNetworkUT::ioServiceMock_t::writeImpl(const uint8 *payload, size_t size,
 
 void eMUNetworkUT::ioServiceMock_t::acceptImpl(acceptHandler_t handler) {
     acceptHandler_ = handler;      
+}
+
+void eMUNetworkUT::ioServiceMock_t::expectCall_read() {
+    EXPECT_CALL(*this, read(::testing::NotNull(), eMUNetwork::maxPayloadSize_c, ::testing::_));
+}
+
+void eMUNetworkUT::ioServiceMock_t::expectCall_write(size_t size) {
+    EXPECT_CALL(*this, write(::testing::NotNull(), size, ::testing::_));
+}
+
+void eMUNetworkUT::ioServiceMock_t::expectCall_shutdownSocket() {
+    EXPECT_CALL(*this, shutdownSocket(boost::asio::ip::tcp::socket::shutdown_both));
+}
+
+void eMUNetworkUT::ioServiceMock_t::expectCall_closeSocket() {
+    EXPECT_CALL(*this, closeSocket());
+}
+
+void eMUNetworkUT::ioServiceMock_t::expectCall_accept() {
+    EXPECT_CALL(*this, accept(::testing::_));
 }

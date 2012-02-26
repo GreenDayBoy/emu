@@ -26,3 +26,7 @@ void eMUNetworkUT::socketStub_t::async_send(boost::asio::mutable_buffer &buf,
                      boost::asio::buffer_size(buf),
                      handler);
 }
+
+bool eMUNetworkUT::socketStub_t::is_open() {
+    return true;
+}

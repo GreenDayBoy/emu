@@ -16,3 +16,15 @@ eMUNetworkUT::serverEntityMock_t::getConnectedSocket() {
 void eMUNetworkUT::serverEntityMock_t::onPeerConnectImpl(eMUNetwork::socket_t<ioServiceMock_t, socketStub_t>::ptr_t ptr) {
     socket_ = ptr;
 }
+
+void eMUNetworkUT::serverEntityMock_t::expectCall_onPeerConnect() {
+    EXPECT_CALL(*this, onPeerConnect(::testing::NotNull()));
+}
+
+void eMUNetworkUT::serverEntityMock_t::expectCall_onPeerReceive(eMUNetwork::socket_t<ioServiceMock_t, socketStub_t>::ptr_t socket) {
+    EXPECT_CALL(*this, onPeerReceive(socket));
+}
+
+void eMUNetworkUT::serverEntityMock_t::expectCall_onPeerClose(eMUNetwork::socket_t<ioServiceMock_t, socketStub_t>::ptr_t socket) {
+    EXPECT_CALL(*this, onPeerClose(socket));
+}

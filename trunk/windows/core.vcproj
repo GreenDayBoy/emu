@@ -280,6 +280,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\core\peer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\core\peersList.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\core\server.cpp"
 				>
 			</File>
@@ -307,6 +315,14 @@
 			</File>
 			<File
 				RelativePath="..\src\core\log.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\core\peer.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\core\peersList.hpp"
 				>
 			</File>
 			<File

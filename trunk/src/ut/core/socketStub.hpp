@@ -18,6 +18,7 @@ public:
                        ioServiceMock_t::ioHandler_t handler);
     void async_send(boost::asio::mutable_buffer &buf,
                     ioServiceMock_t::ioHandler_t handler);
+    bool is_open();
 
 private:
     ioServiceMock_t &ioService_;

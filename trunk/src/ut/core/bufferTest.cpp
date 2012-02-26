@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../core/buffer.hpp"
+#include "../../core/buffer.hpp"
 
 namespace eMUNetwork = eMUCore::network;
 

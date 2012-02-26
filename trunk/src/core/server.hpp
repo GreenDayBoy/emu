@@ -14,21 +14,23 @@ template<typename Service = boost::asio::io_service,
 class server_t: private boost::noncopyable {
 public:
     server_t(Service &ioService,
-             serverEntity_t<SocketImpl> &serverEntity):
+             serverEntity_t<SocketImpl> &serverEntity,
+             uint16 port):
       ioService_(ioService),
-      acceptor_(ioService),
+      acceptor_(ioService,
+                boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
       serverEntity_(serverEntity) {}
     virtual ~server_t() {}
 
-    virtual void initialize() {
+    void initialize() {
         this->queueAccept();
     }
 
-    virtual void cleanup() {
+    void cleanup() {
     }
 
 protected:
-    virtual void queueAccept() {
+    void queueAccept() {
         SocketImpl::ptr_t socket(new SocketImpl(ioService_,
                                                 boost::bind(&serverEntity_t<SocketImpl>::onPeerReceive,
                                                             &serverEntity_,
@@ -44,8 +46,8 @@ protected:
                                            boost::asio::placeholders::error));
     }
 
-    virtual void acceptHandler(typename SocketImpl::ptr_t socket,
-                               const boost::system::error_code &ec) {
+    void acceptHandler(typename SocketImpl::ptr_t socket,
+                       const boost::system::error_code &ec) {
         if(!ec) {
             serverEntity_.onPeerConnect(socket);
         } else {

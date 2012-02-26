@@ -274,45 +274,53 @@
 				>
 			</File>
 			<Filter
-				Name="env"
+				Name="core"
 				>
 				<Filter
-					Name="core"
+					Name="env"
 					>
 					<File
-						RelativePath="..\src\ut\acceptorStub.cpp"
+						RelativePath="..\src\ut\core\acceptorStub.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\ioServiceMock.cpp"
+						RelativePath="..\src\ut\core\ioServiceMock.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\serverEntityMock.cpp"
+						RelativePath="..\src\ut\core\serverEntityMock.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\socketStub.cpp"
+						RelativePath="..\src\ut\core\socketCallbackMock.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\core\socketStub.cpp"
 						>
 					</File>
 				</Filter>
-			</Filter>
-			<Filter
-				Name="test"
-				>
 				<Filter
-					Name="core"
+					Name="test"
 					>
 					<File
-						RelativePath="..\src\ut\bufferTest.cpp"
+						RelativePath="..\src\ut\core\bufferTest.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\serverTest.cpp"
+						RelativePath="..\src\ut\core\peersListTest.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\socketTest.cpp"
+						RelativePath="..\src\ut\core\peerTest.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\core\serverTest.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\core\socketTest.cpp"
 						>
 					</File>
 				</Filter>
@@ -328,29 +336,29 @@
 				>
 			</File>
 			<Filter
-				Name="env"
+				Name="core"
 				>
 				<Filter
-					Name="core"
+					Name="env"
 					>
 					<File
-						RelativePath="..\src\ut\acceptorStub.hpp"
+						RelativePath="..\src\ut\core\acceptorStub.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\ioServiceMock.hpp"
+						RelativePath="..\src\ut\core\ioServiceMock.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\serverEntityMock.hpp"
+						RelativePath="..\src\ut\core\serverEntityMock.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\socketCallbackMock.hpp"
+						RelativePath="..\src\ut\core\socketCallbackMock.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\socketStub.hpp"
+						RelativePath="..\src\ut\core\socketStub.hpp"
 						>
 					</File>
 				</Filter>

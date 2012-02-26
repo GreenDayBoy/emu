@@ -74,6 +74,10 @@ public:
         return socket_.is_open();
     }
 
+    std::string address() {
+        return socket_.remote_endpoint().address().to_string();
+    }
+
     readBuffer_t &rbuf() { return rbuf_; }
 
 private:

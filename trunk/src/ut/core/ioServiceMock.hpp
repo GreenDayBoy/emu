@@ -4,7 +4,7 @@
 #include <boost/function.hpp>
 #include <boost/asio.hpp>
 #include <gmock/gmock.h>
-#include "../shared/types.hpp"
+#include "../../shared/types.hpp"
 
 namespace eMUUnitTest {
 namespace networkTest {
@@ -26,6 +26,12 @@ public:
     MOCK_METHOD3(write, void(const uint8 *payload, size_t size, ioHandler_t handler));
     MOCK_METHOD0(closeSocket, void());
     MOCK_METHOD1(accept, void(acceptHandler_t handler));
+
+    void expectCall_read();
+    void expectCall_write(size_t size);
+    void expectCall_shutdownSocket();
+    void expectCall_closeSocket();
+    void expectCall_accept();
 
 private:
     void readImpl(uint8 *payload, size_t size, ioHandler_t handler);
