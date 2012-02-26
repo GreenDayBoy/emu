@@ -5,6 +5,7 @@
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/function.hpp>
 #include "../shared/types.hpp"
 #include "buffer.hpp"
 #include "log.hpp"
@@ -29,13 +30,14 @@ public:
              const callback_t &readCallback,
              const callback_t &closeCallback):
       socket_(ioService),
+      strand_(ioService),
       readCallback_(readCallback),
       closeCallback_(closeCallback) {}
     virtual ~socket_t() {}
 
     void close() {
-        closeCallback_(shared_from_this());
         this->shutdown();
+        closeCallback_(shared_from_this());
     }
 
     void shutdown() {
@@ -64,10 +66,10 @@ public:
 
     void queueRead() {
         socket_.async_receive(boost::asio::buffer(&rbuf_.payload_[0], maxPayloadSize_c),
-                              boost::bind(&socket_t::receiveHandler,
-                                          this,
-                                          boost::asio::placeholders::error,
-                                          boost::asio::placeholders::bytes_transferred));
+                              strand_.wrap(boost::bind(&socket_t::receiveHandler,
+                                           this,
+                                           boost::asio::placeholders::error,
+                                           boost::asio::placeholders::bytes_transferred)));
     }
 
     bool opened() {
@@ -86,28 +88,26 @@ private:
     void queueWrite() {
         // comment deleted by ACTA :-).
         socket_.async_send(boost::asio::buffer(&wbuf_.payload_[0], wbuf_.payloadSize_),
-                            boost::bind(&socket_t::sendHandler,
-                                        this,
-                                        boost::asio::placeholders::error,
-                                        boost::asio::placeholders::bytes_transferred)); 
+                            strand_.wrap(boost::bind(&socket_t::sendHandler,
+                                                     this,
+                                                     boost::asio::placeholders::error,
+                                                     boost::asio::placeholders::bytes_transferred))); 
     }
 
     void receiveHandler(const boost::system::error_code& ec,
                         size_t bytesTransferred) {
-        if(ec) {
+        if(ec == boost::asio::error::eof) {
+            this->close();
+            return;
+        } else if(ec) {
             LOG_ERROR << "Error during handling receive operation, error: " << ec.message() << std::endl;
             this->close();
             return;
         }
 
         rbuf_.payloadSize_ = bytesTransferred;
-
-        if(rbuf_.payloadSize_ > 0) {
-            readCallback_(shared_from_this());
-            this->queueRead();
-        } else {
-            this->close();
-        }
+        readCallback_(shared_from_this());
+        this->queueRead();
     }
 
     void sendHandler(const boost::system::error_code& ec,
@@ -131,6 +131,7 @@ private:
     writeBuffer_t wbuf_;
     callback_t readCallback_;
     callback_t closeCallback_;
+    typename Service::strand strand_;
 };
 
 }

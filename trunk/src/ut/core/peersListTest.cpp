@@ -77,6 +77,11 @@ TEST_F(peersList_t, findFree) {
 
     peerPtr_t peer3 = peersList_.findFree();
     ASSERT_EQ(nullPeer, peer3);
+
+    peer1->reset();
+    peer1 = peersList_.findFree();
+    ASSERT_NE(nullPeer, peer1); 
+    peer1->socket(socket1);
 }
 
 TEST_F(peersList_t, find) {

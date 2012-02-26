@@ -86,7 +86,7 @@ TEST_F(serverTest_t, peer_Close_byPeer) {
     socket->queueRead();
 
     serverEntity_.expectCall_onPeerClose(socket);
-    ioService_.dequeueRead(boost::system::error_code(), 0);
+    ioService_.dequeueRead(boost::asio::error::eof, 0);
 }
 
 TEST_F(serverTest_t, peer_Close_byServer) {

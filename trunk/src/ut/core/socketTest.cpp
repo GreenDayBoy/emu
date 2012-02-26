@@ -136,7 +136,7 @@ TEST_F(socketTest_t, receive_Close) {
     socketCallback_.expectCall_onClose(socket_);
     ioService_.expectCall_shutdownSocket();
     ioService_.expectCall_closeSocket();
-    ioService_.dequeueRead(boost::system::error_code(), 0);
+    ioService_.dequeueRead(boost::asio::error::eof, 0);
 
     EXPECT_EQ(0, socket_->rbuf().payloadSize_);
 }

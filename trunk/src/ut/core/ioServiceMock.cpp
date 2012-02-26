@@ -32,15 +32,15 @@ void eMUNetworkUT::ioServiceMock_t::dequeueAccept(const boost::system::error_cod
     acceptHandler_(ec);
 }
 
-void eMUNetworkUT::ioServiceMock_t::readImpl(uint8 *payload, size_t size, ioHandler_t handler) {
+void eMUNetworkUT::ioServiceMock_t::readImpl(uint8 *payload, size_t size, const ioHandler_t &handler) {
     readHandler_ = handler;
 }
 
-void eMUNetworkUT::ioServiceMock_t::writeImpl(const uint8 *payload, size_t size, ioHandler_t handler) {
+void eMUNetworkUT::ioServiceMock_t::writeImpl(const uint8 *payload, size_t size, const ioHandler_t &handler) {
     writeHandler_ = handler;
 }
 
-void eMUNetworkUT::ioServiceMock_t::acceptImpl(acceptHandler_t handler) {
+void eMUNetworkUT::ioServiceMock_t::acceptImpl(const acceptHandler_t &handler) {
     acceptHandler_ = handler;      
 }
 

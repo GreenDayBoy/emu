@@ -28,11 +28,15 @@ public:
         socket_->send(payload, size);
     }
 
-    virtual void disconnect() {
+    void disconnect() {
         if(socket_->opened()) {
             socket_->close();
             socket_.reset();
         }
+    }
+
+    void reset() {
+        socket_.reset();
     }
 
     void socket(typename SocketImpl::ptr_t socket) {
@@ -40,11 +44,15 @@ public:
         socket_->queueRead();
     }
 
-    void address() {
-        socket_->address();
+    readBuffer_t& rbuf() {
+        return socket_->rbuf();
     }
 
-    bool connected() {
+    std::string address() const {
+        return socket_->address();
+    }
+
+    bool connected() const {
         if(!socket_)
             return false;
         else
@@ -54,8 +62,6 @@ public:
     bool operator==(typename const SocketImpl::ptr_t socket) {
         return socket_ == socket;
     }
-
-    uint32 id() { return id_; }
 
 protected:
     peer_t();
