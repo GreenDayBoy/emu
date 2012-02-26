@@ -65,13 +65,12 @@ TEST_F(peersList_t, findFree) {
     peerPtr_t nullPeer;
     peersList_.initialize(numOfMaxUsers);
 
-    socketPtr_t socket1 = this->createNewSocket();
-    socketPtr_t socket2 = this->createNewSocket();
-    
+    socketPtr_t socket1 = this->createNewSocket();    
     peerPtr_t peer1 = peersList_.findFree();
     ASSERT_NE(nullPeer, peer1); 
     peer1->socket(socket1);
 
+    socketPtr_t socket2 = this->createNewSocket();
     peerPtr_t peer2 = peersList_.findFree();
     ASSERT_NE(nullPeer, peer2);
     peer2->socket(socket2);
@@ -83,16 +82,14 @@ TEST_F(peersList_t, findFree) {
 TEST_F(peersList_t, find) {
     size_t numOfMaxUsers = 2;
     peerPtr_t nullPeer;
-    socketPtr_t nullSocket;
     peersList_.initialize(numOfMaxUsers);
 
     socketPtr_t socket1 = this->createNewSocket();
-    socketPtr_t socket2 = this->createNewSocket();
-
     peerPtr_t peer1 = peersList_.findFree();
     ASSERT_NE(nullPeer, peer1); 
     peer1->socket(socket1);
 
+    socketPtr_t socket2 = this->createNewSocket();
     peerPtr_t peer2 = peersList_.findFree();
     ASSERT_NE(nullPeer, peer2);
     peer2->socket(socket2);
@@ -103,6 +100,7 @@ TEST_F(peersList_t, find) {
     foundPeer = peersList_.find(socket2);
     ASSERT_EQ(peer2, foundPeer);
 
+    socketPtr_t nullSocket;
     foundPeer = peersList_.find(nullSocket);
     ASSERT_EQ(nullPeer, foundPeer);
 }
