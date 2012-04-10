@@ -43,7 +43,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(BOOST_HOME)&quot;"
-				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_USRDLL;eMUCORE_EXPORTS;BOOST_ALL_DYN_LINK;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_USRDLL;eMU_CORE_EXPORTS;BOOST_ALL_DYN_LINK;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -124,7 +124,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="&quot;$(BOOST_HOME)&quot;"
-				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_USRDLL;eMUCORE_EXPORTS;BOOST_ALL_DYN_LINK;NDEBUG;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_USRDLL;eMU_CORE_EXPORTS;BOOST_ALL_DYN_LINK;NDEBUG;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -204,7 +204,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(BOOST_HOME)&quot;"
-				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_USRDLL;eMUCORE_EXPORTS;BOOST_ALL_DYN_LINK;UNIT_TESTING;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_USRDLL;eMU_CORE_EXPORTS;BOOST_ALL_DYN_LINK;UNIT_TESTING;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -268,7 +268,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\src\core\baseApplication.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\core\buffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\core\connection.cpp"
 				>
 			</File>
 			<File
@@ -280,23 +288,23 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\peer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\core\peersList.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\core\server.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\serverEntity.cpp"
+				RelativePath="..\src\core\serviceThreading.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\socket.cpp"
+				RelativePath="..\src\core\user.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\core\userFactory.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\core\userIdGenerator.cpp"
 				>
 			</File>
 		</Filter>
@@ -306,7 +314,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\src\core\baseApplication.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\core\buffer.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\core\connection.hpp"
 				>
 			</File>
 			<File
@@ -318,23 +334,23 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\peer.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\core\peersList.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\core\server.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\serverEntity.hpp"
+				RelativePath="..\src\core\serviceThreading.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\socket.hpp"
+				RelativePath="..\src\core\user.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\core\userFactory.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\core\userIdGenerator.hpp"
 				>
 			</File>
 		</Filter>

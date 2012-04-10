@@ -1,5 +1,5 @@
-#ifndef eMUCORE_BUFFER_HPP
-#define eMUCORE_BUFFER_HPP
+#ifndef eMU_CORE_BUFFER_HPP
+#define eMU_CORE_BUFFER_HPP
 
 #include <vector>
 #include "core.hpp"
@@ -9,21 +9,21 @@
 #pragma warning(disable: 4251)
 #endif
 
-namespace eMUCore {
+namespace eMU {
+namespace core {
 namespace network {
 
 typedef std::vector<uint8> payload_t;
 const size_t maxPayloadSize_c = 4096;
 
-struct eMUCORE_DECLSPEC readBuffer_t {
+struct eMU_CORE_DECLSPEC readBuffer_t {
     readBuffer_t();
     void clear();
 
     payload_t payload_;
-    size_t payloadSize_;
 };
 
-struct eMUCORE_DECLSPEC writeBuffer_t {
+struct eMU_CORE_DECLSPEC writeBuffer_t {
     writeBuffer_t();
     void clear();
     bool insert(const uint8 *payload, size_t size);
@@ -40,6 +40,7 @@ private:
     void clearSec();
 };
 
+}
 }
 }
 

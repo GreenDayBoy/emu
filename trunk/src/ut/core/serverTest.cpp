@@ -1,108 +1,215 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "../../core/server.hpp"
-#include "socketStub.hpp"
-#include "serverEntityMock.hpp"
-#include "ioServiceMock.hpp"
-#include "acceptorStub.hpp"
+#include "serverMock.hpp"
+#include "connectionObserverMock.hpp"
 
-namespace eMUNetwork = eMUCore::network;
-namespace eMUNetworkUT = eMUUnitTest::networkTest;
+namespace eMUNetwork = eMU::core::network;
+namespace eMUNetworkUT = eMU::ut::network;
 
 class serverTest_t: public ::testing::Test {
 public:
-    static const uint16 port_c = 1524;
-
     serverTest_t():
-      server_(ioService_, serverEntity_, port_c) {}
+      server_(ioServiceStub_, 44405, maxNumOfUsers_) {
+        acceptorMock_ = &server_.acceptor();
+    }
 
     void SetUp() {}
-
+    
     void TearDown() {}
 
-    ::testing::NiceMock<eMUNetworkUT::ioServiceMock_t> ioService_;
-    eMUNetworkUT::serverEntityMock_t serverEntity_;
-    eMUNetwork::server_t<eMUNetworkUT::ioServiceMock_t,
-                         eMUNetworkUT::acceptorStub_t,
-                         eMUNetwork::socket_t<eMUNetworkUT::ioServiceMock_t,
-                                              eMUNetworkUT::socketStub_t> > server_;
+    eMUNetworkUT::ioServiceStub_t ioServiceStub_;
+    eMUNetworkUT::acceptorMock_t *acceptorMock_;
+    eMUNetworkUT::serverMock_t server_;    
+
+    static const size_t maxNumOfUsers_ = 10;
 };
 
 TEST_F(serverTest_t, accept) {
-    ioService_.delegateMocks();
+    acceptorMock_->expectCall_async_accept();
+    server_.queueAccept();
 
-    ioService_.expectCall_accept();
-    server_.initialize();
+    //onConnect event return true so server should queue receive for accepted socket.
+    acceptorMock_->socket_->expectCall_async_receive();
+
+    server_.expectCall_onConnect(true);
+    acceptorMock_->expectCall_async_accept();
+    acceptorMock_->acceptHandler_(boost::system::error_code());
+}
+
+TEST_F(serverTest_t, accept__onConnect_failed) {
+    acceptorMock_->expectCall_async_accept();
+    server_.queueAccept();
+
+    //onConnect event return false so server should close connection.
+    acceptorMock_->socket_->expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+    acceptorMock_->socket_->expectCall_close();
+
+    server_.expectCall_onConnect(false);
+    acceptorMock_->expectCall_async_accept();
+    acceptorMock_->acceptHandler_(boost::system::error_code());
+}
+
+TEST_F(serverTest_t, accept__error) {
+    acceptorMock_->expectCall_async_accept();
+    server_.queueAccept();
+
+    acceptorMock_->expectCall_async_accept();
+    acceptorMock_->acceptHandler_(boost::asio::error::already_connected);
+}
+
+TEST_F(serverTest_t, close__by_peer) {
+    acceptorMock_->expectCall_async_accept();
+    server_.queueAccept();
+
+    //onConnect event return true so server should queue receive for accepted socket.
+    acceptorMock_->socket_->expectCall_async_receive();
+
+    server_.expectCall_onConnect(true);
+    acceptorMock_->expectCall_async_accept();
+    acceptorMock_->acceptHandler_(boost::system::error_code());
+
+    eMUNetworkUT::userStub_t *user = server_.user_;
     
-    serverEntity_.expectCall_onPeerConnect();
-    ioService_.expectCall_accept();
-    ioService_.dequeueAccept(boost::system::error_code());
+    server_.expectCall_onClose(user);
+    user->connection()->socket().expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+    user->connection()->socket().expectCall_close();
+    user->connection()->socket().receiveHandler_(boost::asio::error::eof, 0);
 }
 
-TEST_F(serverTest_t, accept_Error) {
-    ioService_.delegateMocks();
+TEST_F(serverTest_t, close__by_server) {
+    acceptorMock_->expectCall_async_accept();
+    server_.queueAccept();
 
-    ioService_.expectCall_accept();
-    server_.initialize();
+    //onConnect event return true so server should queue receive for accepted socket.
+    acceptorMock_->socket_->expectCall_async_receive();
 
-    ioService_.expectCall_accept();
-    ioService_.dequeueAccept(boost::asio::error::network_down);
+    server_.expectCall_onConnect(true);
+    acceptorMock_->expectCall_async_accept();
+    acceptorMock_->acceptHandler_(boost::system::error_code());
+
+    eMUNetworkUT::userStub_t *user = server_.user_;
+
+    server_.expectCall_onClose(user);
+    user->connection()->socket().expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+    user->connection()->socket().expectCall_close();
+    user->connection()->disconnect();
 }
 
-TEST_F(serverTest_t, peer_Receive) {
-    ioService_.delegateMocks();
-    serverEntity_.delegateMocks();
+TEST_F(serverTest_t, close__not_found_user) {
+    acceptorMock_->expectCall_async_accept();
+    server_.queueAccept();
 
-    ioService_.expectCall_accept();
-    server_.initialize();
+    //onConnect event return true so server should queue receive for accepted socket.
+    acceptorMock_->socket_->expectCall_async_receive();
 
-    serverEntity_.expectCall_onPeerConnect();
-    ioService_.expectCall_accept();
-    ioService_.dequeueAccept(boost::system::error_code());
+    server_.expectCall_onConnect(true);
+    acceptorMock_->expectCall_async_accept();
+    acceptorMock_->acceptHandler_(boost::system::error_code());
 
-    eMUNetwork::socket_t<eMUNetworkUT::ioServiceMock_t,
-                         eMUNetworkUT::socketStub_t>::ptr_t socket = serverEntity_.getConnectedSocket();
+    // Create new connection which will not be owned by any user.
+    eMUNetwork::connection_t<eMUNetworkUT::socketMock_t, eMUNetworkUT::ioServiceStub_t> connection(ioServiceStub_, server_);
+    
+    // Associate connection with server.
+    connection.socket().expectCall_async_receive();
+    connection.queueReceive();
 
-    socket->queueRead();
-
-    serverEntity_.expectCall_onPeerReceive(socket);
-    ioService_.dequeueRead(boost::system::error_code(), eMUNetwork::maxPayloadSize_c);
+    // Important: Connection is not associated with any user object.
+    // It should be close but without calling onClose event.
+    connection.socket().expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+    connection.socket().expectCall_close();
+    connection.socket().receiveHandler_(boost::asio::error::eof, 0);
 }
 
-TEST_F(serverTest_t, peer_Close_byPeer) {
-    ioService_.delegateMocks();
-    serverEntity_.delegateMocks();
+TEST_F(serverTest_t, receive) {
+    acceptorMock_->expectCall_async_accept();
+    server_.queueAccept();
 
-    ioService_.expectCall_accept();
-    server_.initialize();
+    //onConnect event return true so server should queue receive for accepted socket.
+    acceptorMock_->socket_->expectCall_async_receive();
 
-    serverEntity_.expectCall_onPeerConnect();
-    ioService_.expectCall_accept();
-    ioService_.dequeueAccept(boost::system::error_code());
+    server_.expectCall_onConnect(true);
+    acceptorMock_->expectCall_async_accept();
+    acceptorMock_->acceptHandler_(boost::system::error_code());
 
-    eMUNetwork::socket_t<eMUNetworkUT::ioServiceMock_t,
-                         eMUNetworkUT::socketStub_t>::ptr_t socket = serverEntity_.getConnectedSocket();
+    eMUNetworkUT::userStub_t *user = server_.user_;
 
-    socket->queueRead();
+    // Insert prepared payload to connection rbuf.
+    eMUNetwork::payload_t payload(100, 0x14);
+    memcpy(user->connection()->socket().rbuf_, &payload[0], payload.size());
 
-    serverEntity_.expectCall_onPeerClose(socket);
-    ioService_.dequeueRead(boost::asio::error::eof, 0);
+    user->connection()->socket().expectCall_async_receive();
+    server_.expectCall_onReceive(user, payload);
+    user->connection()->socket().receiveHandler_(boost::system::error_code(), payload.size());
 }
 
-TEST_F(serverTest_t, peer_Close_byServer) {
-    ioService_.delegateMocks();
-    serverEntity_.delegateMocks();
+TEST_F(serverTest_t, receive__error) {
+    acceptorMock_->expectCall_async_accept();
+    server_.queueAccept();
 
-    ioService_.expectCall_accept();
-    server_.initialize();
+    //onConnect event return true so server should queue receive for accepted socket.
+    acceptorMock_->socket_->expectCall_async_receive();
 
-    serverEntity_.expectCall_onPeerConnect();
-    ioService_.expectCall_accept();
-    ioService_.dequeueAccept(boost::system::error_code());
+    server_.expectCall_onConnect(true);
+    acceptorMock_->expectCall_async_accept();
+    acceptorMock_->acceptHandler_(boost::system::error_code());
 
-    eMUNetwork::socket_t<eMUNetworkUT::ioServiceMock_t,
-                         eMUNetworkUT::socketStub_t>::ptr_t socket = serverEntity_.getConnectedSocket();
+    eMUNetworkUT::userStub_t *user = server_.user_;
 
-    serverEntity_.expectCall_onPeerClose(socket);
-    socket->close();
+    server_.expectCall_onClose(user);
+    user->connection()->socket().expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+    user->connection()->socket().expectCall_close();
+    user->connection()->socket().receiveHandler_(boost::asio::error::host_unreachable, 0);
+}
+
+TEST_F(serverTest_t, receive__not_found_user) {
+    acceptorMock_->expectCall_async_accept();
+    server_.queueAccept();
+
+    //onConnect event return true so server should queue receive for accepted socket.
+    acceptorMock_->socket_->expectCall_async_receive();
+
+    server_.expectCall_onConnect(true);
+    acceptorMock_->expectCall_async_accept();
+    acceptorMock_->acceptHandler_(boost::system::error_code());
+
+    // Create new connection which will not be owned by any user.
+    eMUNetwork::connection_t<eMUNetworkUT::socketMock_t, eMUNetworkUT::ioServiceStub_t> connection(ioServiceStub_, server_);
+
+    // Associate connection with server.
+    connection.socket().expectCall_async_receive();
+    connection.queueReceive();
+
+    // Normal another receive queuing - it is not matter if connection is associated with user object.
+    connection.socket().expectCall_async_receive();
+
+    // Important: Connection is not associated with any user object.
+    // It should be close but without calling onClose event and onReceive event.
+    connection.socket().expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+    connection.socket().expectCall_close();
+    connection.socket().receiveHandler_(boost::system::error_code(), 100);
+}
+
+TEST_F(serverTest_t, receive__error_not_found_user) {
+    acceptorMock_->expectCall_async_accept();
+    server_.queueAccept();
+
+    //onConnect event return true so server should queue receive for accepted socket.
+    acceptorMock_->socket_->expectCall_async_receive();
+
+    server_.expectCall_onConnect(true);
+    acceptorMock_->expectCall_async_accept();
+    acceptorMock_->acceptHandler_(boost::system::error_code());
+
+    // Create new connection which will not be owned by any user.
+    eMUNetwork::connection_t<eMUNetworkUT::socketMock_t, eMUNetworkUT::ioServiceStub_t> connection(ioServiceStub_, server_);
+
+    // Associate connection with server.
+    connection.socket().expectCall_async_receive();
+    connection.queueReceive();
+
+    // Important: Connection is not associated with any user object.
+    // It should be close but without calling onClose event.
+    connection.socket().expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+    connection.socket().expectCall_close();
+    connection.socket().receiveHandler_(boost::asio::error::connection_refused, 100);
 }

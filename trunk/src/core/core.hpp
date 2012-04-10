@@ -1,12 +1,12 @@
-#ifndef eMUCORE_CORE_HPP
-#define eMUCORE_CORE_HPP
+#ifndef eMU_CORE_CORE_HPP
+#define eMU_CORE_CORE_HPP
 
 #ifndef WIN32
-    #define eMUCORE_DECLSPEC
-#elif eMUCORE_EXPORTS
-    #define eMUCORE_DECLSPEC __declspec(dllexport)
+    #define eMU_CORE_DECLSPEC
+#elif eMU_CORE_EXPORTS
+    #define eMU_CORE_DECLSPEC __declspec(dllexport)
 #else
-    #define eMUCORE_DECLSPEC __declspec(dllimport)
+    #define eMU_CORE_DECLSPEC __declspec(dllimport)
 #endif
 
 #endif

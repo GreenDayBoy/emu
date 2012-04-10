@@ -1,13 +1,12 @@
 #include <gtest/gtest.h>
 #include "../../core/buffer.hpp"
 
-namespace eMUNetwork = eMUCore::network;
+namespace eMUNetwork = eMU::core::network;
 
 TEST(readBufferTest, construct) {
     eMUNetwork::readBuffer_t rbuf;
 
     EXPECT_EQ(eMUNetwork::maxPayloadSize_c, rbuf.payload_.size());
-    EXPECT_EQ(0, rbuf.payloadSize_);
 }
 
 TEST(readBufferTest, clear) {
@@ -51,13 +50,13 @@ TEST_F(writeBufferTest_t, construct) {
 
 TEST_F(writeBufferTest_t, clear) {
     eMUNetwork::writeBuffer_t wbuf;
-    wbuf.payload_[0] = 0x00;
-    wbuf.payload_[eMUNetwork::maxPayloadSize_c - 1] = 0x01;
-    wbuf.payloadSize_ = 2;
+    wbuf.payload_[0] = 0x01;
+    wbuf.payload_[eMUNetwork::maxPayloadSize_c - 1] = 0x02;
+    wbuf.payloadSize_ = eMUNetwork::maxPayloadSize_c;
 
-    wbuf.secPayload_[0] = 0x02;
-    wbuf.secPayload_[eMUNetwork::maxPayloadSize_c - 1] = 0x03;
-    wbuf.secPayloadSize_ = 2;
+    wbuf.secPayload_[0] = 0x03;
+    wbuf.secPayload_[eMUNetwork::maxPayloadSize_c - 1] = 0x04;
+    wbuf.secPayloadSize_ = eMUNetwork::maxPayloadSize_c;
 
     wbuf.pending_ = true;
 
@@ -87,7 +86,7 @@ TEST_F(writeBufferTest_t, swap) {
     EXPECT_EQ(patternBuf_.payloadSize_, wbuf.payloadSize_);
 }
 
-TEST_F(writeBufferTest_t, insert_PendingState) {
+TEST_F(writeBufferTest_t, insert__pending_state) {
     size_t partPayloadSize = patternBuf_.payloadSize_ / 2;
     eMUNetwork::writeBuffer_t wbuf;
     wbuf.pending_ = true;
@@ -113,7 +112,7 @@ TEST_F(writeBufferTest_t, insert_PendingState) {
     EXPECT_EQ(patternBuf_.payloadSize_, wbuf.payloadSize_);
 }
 
-TEST_F(writeBufferTest_t, insert_OverflowPrimaryBuffer) {
+TEST_F(writeBufferTest_t, insert__overflow_primary_buffer) {
     eMUNetwork::writeBuffer_t wbuf;
     wbuf.pending_ = false;
     bool result = wbuf.insert(&patternBuf_.payload_[0], patternBuf_.payloadSize_);
@@ -126,7 +125,7 @@ TEST_F(writeBufferTest_t, insert_OverflowPrimaryBuffer) {
     EXPECT_FALSE(result);
 }
 
-TEST_F(writeBufferTest_t, insert_OverflowSecondaryBuffer) {
+TEST_F(writeBufferTest_t, insert__overflow_secondary_buffer) {
     eMUNetwork::writeBuffer_t wbuf;
     wbuf.pending_ = true;
     bool result = wbuf.insert(&patternBuf_.payload_[0], patternBuf_.payloadSize_);

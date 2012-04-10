@@ -205,7 +205,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(GTEST_HOME)\include&quot;;&quot;$(GMOCK_HOME)\include&quot;;&quot;$(BOOST_HOME)&quot;"
-				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_CONSOLE;BOOST_ALL_DYN_LINK;UNIT_TESTING"
+				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_CONSOLE;BOOST_ALL_DYN_LINK;UNIT_TESTING;WIN32_LEAN_AND_MEAN"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -280,23 +280,27 @@
 					Name="env"
 					>
 					<File
-						RelativePath="..\src\ut\core\acceptorStub.cpp"
+						RelativePath="..\src\ut\core\acceptorMock.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\ioServiceMock.cpp"
+						RelativePath="..\src\ut\core\connectionObserverMock.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\serverEntityMock.cpp"
+						RelativePath="..\src\ut\core\ioServiceStub.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\socketCallbackMock.cpp"
+						RelativePath="..\src\ut\core\serverMock.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\socketStub.cpp"
+						RelativePath="..\src\ut\core\socketMock.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\core\userStub.cpp"
 						>
 					</File>
 				</Filter>
@@ -308,11 +312,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\peersListTest.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\ut\core\peerTest.cpp"
+						RelativePath="..\src\ut\core\connectionTest.cpp"
 						>
 					</File>
 					<File
@@ -320,7 +320,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\socketTest.cpp"
+						RelativePath="..\src\ut\core\userFactoryTest.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\core\userIdGeneratorTest.cpp"
 						>
 					</File>
 				</Filter>
@@ -342,23 +346,27 @@
 					Name="env"
 					>
 					<File
-						RelativePath="..\src\ut\core\acceptorStub.hpp"
+						RelativePath="..\src\ut\core\acceptorMock.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\ioServiceMock.hpp"
+						RelativePath="..\src\ut\core\connectionObserverMock.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\serverEntityMock.hpp"
+						RelativePath="..\src\ut\core\ioServiceStub.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\socketCallbackMock.hpp"
+						RelativePath="..\src\ut\core\serverMock.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\socketStub.hpp"
+						RelativePath="..\src\ut\core\socketMock.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\core\userStub.hpp"
 						>
 					</File>
 				</Filter>

@@ -1,15 +1,19 @@
-#ifndef eMUCORE_LOG_HPP
-#define eMUCORE_LOG_HPP
+#ifndef eMU_CORE_LOG_HPP
+#define eMU_CORE_LOG_HPP
 
 #include <string>
 #include <iostream>
 #include "core.hpp"
 
-namespace eMUCore {
-eMUCORE_DECLSPEC std::string getCurrentDateString();
+namespace eMU {
+namespace core {
+
+eMU_CORE_DECLSPEC std::string getCurrentDateString();
+
+}
 }
 
-#define LOG_BASE (std::cout << "<" << eMUCore::getCurrentDateString() << "> [" << __FILE__ << ":" << __LINE__ << "] ")
+#define LOG_BASE (std::cout << "<" << eMU::core::getCurrentDateString() << "> [" << __FILE__ << ":" << __LINE__ << "] ")
 #define LOG_INFO (LOG_BASE << "[info] ")
 #define LOG_WARNING (LOG_BASE << "[warning] ")
 #define LOG_ERROR (LOG_BASE << "[error] ")
