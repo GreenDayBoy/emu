@@ -18,18 +18,21 @@ namespace core {
 #endif
 
 template<typename UserImpl>
-class eMU_CORE_DECLSPEC baseApplication_t: private boost::noncopyable {
+class baseApplication_t: private boost::noncopyable {
 public:
     baseApplication_t(boost::asio::io_service &ioService,
-                      eMU::core::network::server_t<UserImpl> &server):
+                      eMU::core::network::server_t<UserImpl> &server,
+                      size_t maxNumOfThreads):
       ioService_(ioService),
       server_(server),
-      signalSet_(ioService_) {}
+      signalSet_(ioService_),
+      serviceThreading_(ioService, maxNumOfThreads) {}
     virtual ~baseApplication_t() {}
 
-    void initialize(size_t maxNumOfThreads, size_t maxNumOfUsers) {
+    void initialize() {
         signalSet_.add(SIGTERM);
         signalSet_.add(SIGINT);
+        server_.onStartup();
     }
 
     void start() {

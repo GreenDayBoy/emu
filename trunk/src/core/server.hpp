@@ -46,6 +46,7 @@ public:
     virtual bool onConnect(UserImpl *user) = 0;
     virtual void onReceive(UserImpl *user, payload_t &payload) = 0;
     virtual void onClose(UserImpl *user) = 0;
+    virtual void onStartup() = 0;
     virtual void onCleanup() = 0;
 
 protected:

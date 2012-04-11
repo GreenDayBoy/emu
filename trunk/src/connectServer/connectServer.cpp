@@ -2,26 +2,32 @@
 #include "../core/serviceThreading.hpp"
 #include "../core/baseApplication.hpp"
 #include "connectServer.hpp"
+#include "user.hpp"
 
-eMU::connectServer::server_t::server_t(boost::asio::io_service &ioService, uint16 port):
-  eMU::core::network::server_t<>(ioService, port) {
-
-}
+eMU::connectServer::server_t::server_t(boost::asio::io_service &ioService, uint16 port, size_t maxNumOfUsers):
+  eMU::core::network::server_t<user_t>(ioService, port, maxNumOfUsers) {}
 
 void eMU::connectServer::server_t::onStartup() {
-    this->queueAccept();
+    //this->queueAccept();
 }
 
 void eMU::connectServer::server_t::onCleanup() {
 }
 
-void eMU::connectServer::server_t::onConnect(eMU::core::network::connection_t<> *connection) {
+bool eMU::connectServer::server_t::onConnect(user_t *user) {
+    LOG_INFO << "User connected from: " << user->connection()->address() << ", id: " << user->id() << std::endl;
+    return true;
 }
 
-void eMU::connectServer::server_t::receiveEvent(eMU::core::network::connection_t<> *connection, eMU::core::network::payload_t &payload) {
+void eMU::connectServer::server_t::onReceive(user_t *user, eMU::core::network::payload_t &payload) {
+    LOG_INFO << "User received from: " << user->connection()->address() << ", id: " << user->id() 
+             << ", data: " << payload.size() << std::endl;
+
+    user->connection()->disconnect();
 }
 
-void eMU::connectServer::server_t::closeEvent(eMU::core::network::connection_t<> *connection) {
+void eMU::connectServer::server_t::onClose(user_t *user) {
+    LOG_INFO << "User closed from: " << user->connection()->address() << ", id: " << user->id() << std::endl;
 }
 
 void main(int argsCount, char *args[]) {
@@ -35,10 +41,11 @@ void main(int argsCount, char *args[]) {
     size_t maxNumOfThreads = boost::lexical_cast<uint16>(args[3]);
 
     boost::asio::io_service ioService;
-    eMU::connectServer::server_t server(ioService, port);
+    eMU::connectServer::server_t server(ioService, port, maxNumOfUsers);
+    server.queueAccept();
 
-    eMU::core::baseApplication_t app(ioService, server);
-    app.initialize(maxNumOfThreads, maxNumOfUsers);
+    eMU::core::baseApplication_t<eMU::connectServer::user_t> app(ioService, server, maxNumOfThreads);
+    app.initialize();
     app.start();
 
     system("PAUSE");

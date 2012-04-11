@@ -1,5 +1,4 @@
 #include "user.hpp"
 
-eMU::core::network::connection_t<>* eMU::connectServer::user_t::connection() {
-    return connection_;
-}
+eMU::connectServer::user_t::user_t(int16 id):
+  eMU::core::user::user_t<>(id) {}

@@ -3,20 +3,16 @@
 
 #include <boost/noncopyable.hpp>
 #include "../shared/types.hpp"
-#include "../core/connection.hpp"
+#include "../core/user.hpp"
 
 namespace eMU {
 namespace connectServer {
 
-class user_t: private boost::noncopyable {
+class user_t: public eMU::core::user::user_t<> {
 public:
     user_t(int16 id);
 
-    eMU::core::network::connection_t<>* connection();
-
 private:
-    int16 id_;
-    eMU::core::network::connection_t<> *connection_;
 };
 
 }

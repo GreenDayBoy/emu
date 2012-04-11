@@ -27,6 +27,7 @@ public:
     MOCK_METHOD2(onReceive, void(userStub_t *user, eMU::core::network::payload_t &payload));
     MOCK_METHOD1(onClose, void(userStub_t *user));
 
+    void onStartup() {}
     void onCleanup() {}
 
     void expectCall_onConnect(bool retValue);
