@@ -32,7 +32,8 @@ public:
                  observer_i &observer):
       socket_(ioService),
       strand_(ioService),
-      observer_(observer) {}
+      observer_(observer),
+      closeOngoing_(false) {}
 
     virtual ~connection_t() {}
 
@@ -43,8 +44,12 @@ public:
     std::string address() const { return socket_.remote_endpoint().address().to_string(); }
 
     void disconnect() {
-        observer_.closeEvent(this);
-        this->close();
+        closeOngoing_ = true;
+
+        IoServiceImpl &ioService = socket_.get_io_service();
+        ioService.post(strand_.wrap(boost::bind(&observer_i::closeEvent,
+                                                &observer_,
+                                                this)));
     }
 
     void close() {
@@ -97,8 +102,11 @@ private:
         }
 
         payload_t payload(rbuf_.payload_.begin(), rbuf_.payload_.begin() + bytesTransferred);
-        this->queueReceive();
         observer_.receiveEvent(this, payload);
+
+        if(!closeOngoing_) {
+            this->queueReceive();
+        }
     }
 
     void sendHandler(const boost::system::error_code& ec,
@@ -133,6 +141,7 @@ private:
     writeBuffer_t wbuf_;
     typename IoServiceImpl::strand strand_;
     observer_i &observer_;
+    bool closeOngoing_;
 };
 
 }

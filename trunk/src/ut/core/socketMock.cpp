@@ -6,7 +6,8 @@ eMUNetworkUT::socketMock_t::socketMock_t(ioServiceStub_t &ioService):
   rbuf_(NULL),
   rbufSize_(0),
   wbuf_(NULL),
-  wbufSize_(0) {
+  wbufSize_(0),
+  ioService_(ioService) {
     ON_CALL(*this, async_receive(::testing::_,
                                  ::testing::_)).WillByDefault(::testing::Invoke(this,
                                                                                 &socketMock_t::impl_async_receive));

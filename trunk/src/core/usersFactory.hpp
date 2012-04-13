@@ -1,8 +1,7 @@
-#ifndef eMU_CORE_USERFACTORY_HPP
-#define eMU_CORE_USERFACTORY_HPP
+#ifndef eMU_CORE_USERSFACTORY_HPP
+#define eMU_CORE_USERSFACTORY_HPP
 
-#include <boost/noncopyable.hpp>
-#include <boost/pool/object_pool.hpp>
+#include "objectsFactory.hpp"
 #include "userIdGenerator.hpp"
 #include "log.hpp"
 
@@ -11,7 +10,7 @@ namespace core {
 namespace user {
 
 template<typename UserImpl>
-class factory_t:private boost::noncopyable {
+class factory_t: objectsFactory_t<UserImpl> {
 public:
     factory_t(size_t maxNumOfUsers):
       idGenerator_(maxNumOfUsers) {}
@@ -24,18 +23,17 @@ public:
             return NULL;
         }
 
-        UserImpl *user = pool_.construct(id);
+        UserImpl *user = objectsPool_.construct(id);
         return user;
     }
 
     void destroy(UserImpl *user) {
         int16 id = user->id();
         idGenerator_.insert(id);
-        pool_.destroy(user);
+        objectsPool_.destroy(user);
     }
 
 protected:
-    boost::object_pool<UserImpl> pool_;
     idGenerator_t idGenerator_;
 };
 

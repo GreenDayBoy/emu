@@ -29,23 +29,23 @@ public:
     eMUNetworkUT::socketMock_t *socketMock_;
 };
 
-TEST_F(connectionTest_t, close__by_server) {
-    connectionObserverMock_.expectCall_closeEvent(&connection_);
+TEST_F(connectionTest_t, close) {
     socketMock_->expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
     socketMock_->expectCall_close();
-    
+
+    connection_.close();
+}
+
+TEST_F(connectionTest_t, disconnect) {
+    connectionObserverMock_.expectCall_closeEvent(&connection_);
     connection_.disconnect();
 }
 
-TEST_F(connectionTest_t, close__by_peer) {
+TEST_F(connectionTest_t, disconnect__remote) {
     socketMock_->expectCall_async_receive();
-
     connection_.queueReceive();
 
     connectionObserverMock_.expectCall_closeEvent(&connection_);
-    socketMock_->expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-    socketMock_->expectCall_close();
-
     socketMock_->receiveHandler_(boost::asio::error::eof, 0);
 }
 
@@ -69,19 +69,14 @@ TEST_F(connectionTest_t, receive) {
 
 TEST_F(connectionTest_t, receive__error) {
     socketMock_->expectCall_async_receive();
-
     connection_.queueReceive();
 
     connectionObserverMock_.expectCall_closeEvent(&connection_);
-    socketMock_->expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-    socketMock_->expectCall_close();
-
     socketMock_->receiveHandler_(boost::asio::error::broken_pipe, 0);
 }
 
 TEST_F(connectionTest_t, receive__operation_aborted) {
     socketMock_->expectCall_async_receive();
-
     connection_.queueReceive();
 
     socketMock_->receiveHandler_(boost::asio::error::operation_aborted, 0);
@@ -141,9 +136,6 @@ TEST_F(connectionTest_t, send__error) {
     connection_.send(&payload[0], payload.size());
 
     connectionObserverMock_.expectCall_closeEvent(&connection_);
-    socketMock_->expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-    socketMock_->expectCall_close();
-
     socketMock_->sendHandler_(boost::asio::error::connection_reset, 0);
 }
 
@@ -151,9 +143,6 @@ TEST_F(connectionTest_t, send__overflow_primary_buffer) {
     eMUNetwork::payload_t payload(eMUNetwork::maxPayloadSize_c + 1, 0x10);
 
     connectionObserverMock_.expectCall_closeEvent(&connection_);
-    socketMock_->expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-    socketMock_->expectCall_close();
-
     connection_.send(&payload[0], payload.size());
 }
 
@@ -165,9 +154,6 @@ TEST_F(connectionTest_t, send__overflow_secondary_buffer) {
     connection_.send(&payload1[0], payload1.size());
 
     connectionObserverMock_.expectCall_closeEvent(&connection_);
-    socketMock_->expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-    socketMock_->expectCall_close();
-
     connection_.send(&payload2[0], payload2.size());
 }
 

@@ -18,13 +18,17 @@ public:
     public:
         strand(ioServiceStub_t &ioService) {}
 
-        ioHandler_t wrap(const ioHandler_t &handler) {
+        template<typename CompletionHandler>
+        CompletionHandler wrap(const CompletionHandler &handler) {
             return handler;
         }
 
     private:
         strand();
     };
+
+    template<typename CompletionHandler>
+    void post(const CompletionHandler &handler) { handler(); }
 };
 
 }

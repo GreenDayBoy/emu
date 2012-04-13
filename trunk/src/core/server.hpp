@@ -4,7 +4,8 @@
 #include <boost/pool/object_pool.hpp>
 #include <boost/lambda/lambda.hpp>
 #include "connection.hpp"
-#include "userFactory.hpp"
+#include "usersFactory.hpp"
+#include "connectionsFactory.hpp"
 
 namespace eMU {
 namespace core {
@@ -24,12 +25,13 @@ public:
       acceptor_(ioService,
                 boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
       maxNumOfUsers_(maxNumOfUsers),
-      usersFactory_(maxNumOfUsers_) {}
+      usersFactory_(maxNumOfUsers_),
+      connectionsFactory_(ioService_) {}
 
     virtual ~server_t() {}
 
     void queueAccept() {
-        ConnectionImpl *connection = connectionsPool_.construct(boost::ref(ioService_), boost::ref(*this));
+        ConnectionImpl *connection = connectionsFactory_.construct(*this);
 
         if(NULL == connection) {
             LOG_ERROR << "Error in allocating new connection object!" << std::endl;
@@ -66,14 +68,16 @@ protected:
     void connectEvent(ConnectionImpl *connection) {
         if(usersList_.size() >= maxNumOfUsers_) {
             LOG_INFO << "Reached max number of users." << std::endl;
-            connection->close();
+
+            connectionsFactory_.destroy(connection);
             return;
         }
 
         UserImpl *user = usersFactory_.construct();
         if(NULL == user) {
             LOG_ERROR << "Error in allocating new user object, address: " << connection->address() << std::endl;
-            connection->close();
+
+            connectionsFactory_.destroy(connection);
             return;
         }
 
@@ -83,7 +87,8 @@ protected:
             usersList_.push_back(user);
             connection->queueReceive();
         } else {
-            connection->close();
+            connectionsFactory_.destroy(connection);
+            usersFactory_.destroy(user);
         }
     }
 
@@ -92,7 +97,8 @@ protected:
 
         if(usersList_.end() == userIter) {
             LOG_ERROR << "Could not find user by connection, address: " << connection->address() << std::endl;
-            connection->close();
+            
+            connectionsFactory_.destroy(connection);
             return;
         }
 
@@ -104,18 +110,24 @@ protected:
 
         if(usersList_.end() == userIter) {
             LOG_ERROR << "Could not find user by connection, address: " << connection->address() << std::endl;
+
+            connectionsFactory_.destroy(connection);
             return;
         }
 
-        this->onClose(*userIter);
-        usersFactory_.destroy(*userIter);
+        UserImpl *user = *userIter;
+
+        this->onClose(user);
+
+        connectionsFactory_.destroy(connection);
+        usersFactory_.destroy(user);
         usersList_.erase(userIter);
     }
 
     IoServiceImpl &ioService_;
     AcceptorImpl acceptor_;
     size_t maxNumOfUsers_;
-    boost::object_pool<ConnectionImpl> connectionsPool_;
+    connectionsFactory_t<ConnectionImpl, IoServiceImpl> connectionsFactory_;
     user::factory_t<UserImpl> usersFactory_;
     std::vector<UserImpl*> usersList_;
 };

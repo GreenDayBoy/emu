@@ -8,7 +8,6 @@ eMU::connectServer::server_t::server_t(boost::asio::io_service &ioService, uint1
   eMU::core::network::server_t<user_t>(ioService, port, maxNumOfUsers) {}
 
 void eMU::connectServer::server_t::onStartup() {
-    //this->queueAccept();
 }
 
 void eMU::connectServer::server_t::onCleanup() {
@@ -23,7 +22,7 @@ void eMU::connectServer::server_t::onReceive(user_t *user, eMU::core::network::p
     LOG_INFO << "User received from: " << user->connection()->address() << ", id: " << user->id() 
              << ", data: " << payload.size() << std::endl;
 
-    user->connection()->disconnect();
+    user->connection()->send(&payload[0], payload.size());
 }
 
 void eMU::connectServer::server_t::onClose(user_t *user) {

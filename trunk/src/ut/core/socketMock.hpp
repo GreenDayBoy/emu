@@ -39,6 +39,8 @@ public:
 
     endpointFake_t remote_endpoint() const { return endpointFake_t(); }
 
+    ioServiceStub_t& get_io_service() { return ioService_; }
+
     uint8 *rbuf_;
     size_t rbufSize_;
     ioServiceStub_t::ioHandler_t receiveHandler_;
@@ -46,6 +48,8 @@ public:
     uint8 *wbuf_;
     size_t wbufSize_;
     ioServiceStub_t::ioHandler_t sendHandler_;
+
+    ioServiceStub_t &ioService_;
 };
 
 }

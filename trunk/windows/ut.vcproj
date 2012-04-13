@@ -288,6 +288,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\ut\core\connectionsFactoryTest.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\ut\core\ioServiceStub.cpp"
 						>
 					</File>
@@ -320,11 +324,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\userFactoryTest.cpp"
+						RelativePath="..\src\ut\core\userIdGeneratorTest.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\userIdGeneratorTest.cpp"
+						RelativePath="..\src\ut\core\usersFactoryTest.cpp"
 						>
 					</File>
 				</Filter>

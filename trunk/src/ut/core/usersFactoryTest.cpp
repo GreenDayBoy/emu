@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../core/userFactory.hpp"
+#include "../../core/usersFactory.hpp"
 #include "../../core/connection.hpp"
 #include "userStub.hpp"
 #include "socketMock.hpp"
@@ -9,9 +9,9 @@ namespace eMUNetwork = eMU::core::network;
 namespace eMUNetworkUT = eMU::ut::network;
 namespace eMUUser = eMU::core::user;
 
-class userFactoryTest_t: public ::testing::Test {
+class usersFactoryTest_t: public ::testing::Test {
 public:
-    userFactoryTest_t():
+    usersFactoryTest_t():
       factory_(maxNumOfUsers_) {}
 
     void SetUp() {}
@@ -22,7 +22,7 @@ public:
     eMUUser::factory_t<eMUNetworkUT::userStub_t> factory_;
 };
 
-TEST_F(userFactoryTest_t, construct) {
+TEST_F(usersFactoryTest_t, construct) {
     eMUNetworkUT::userStub_t *user = NULL;
 
     for(size_t i = 0; i < maxNumOfUsers_; ++i) {
@@ -36,7 +36,7 @@ TEST_F(userFactoryTest_t, construct) {
     ASSERT_THAT(user, ::testing::IsNull());
 }
 
-TEST_F(userFactoryTest_t, destroy) {
+TEST_F(usersFactoryTest_t, destroy) {
     eMUNetworkUT::userStub_t *user = NULL;
 
     for(size_t i = 0; i < maxNumOfUsers_; ++i) {
