@@ -1,5 +1,5 @@
-#ifndef SHARED_TYPES_HPP
-#define SHARED_TYPES_HPP
+#ifndef eMU_SHARED_TYPES_HPP
+#define eMU_SHARED_TYPES_HPP
 
 typedef unsigned char uint8;
 typedef signed char int8;

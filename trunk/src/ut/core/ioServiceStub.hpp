@@ -2,9 +2,7 @@
 #define eMU_UT_IOSERVICESTUB_HPP
 
 #include <boost/function.hpp>
-#include <boost/asio.hpp>
-#include <gmock/gmock.h>
-#include "../../shared/types.hpp"
+#include <boost/system/error_code.hpp>
 
 namespace eMU {
 namespace ut {

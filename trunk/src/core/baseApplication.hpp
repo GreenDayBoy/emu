@@ -5,7 +5,6 @@
 #include <boost/asio.hpp>
 #include <boost/asio/signal_set.hpp>
 #include <boost/bind.hpp>
-#include "../shared/types.hpp"
 #include "server.hpp"
 #include "serviceThreading.hpp"
 

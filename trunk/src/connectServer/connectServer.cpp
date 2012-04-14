@@ -1,5 +1,4 @@
 #include <boost/lexical_cast.hpp>
-#include "../core/serviceThreading.hpp"
 #include "../core/baseApplication.hpp"
 #include "connectServer.hpp"
 #include "user.hpp"

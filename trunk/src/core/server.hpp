@@ -1,7 +1,6 @@
 #ifndef eMU_CORE_SERVER_HPP
 #define eMU_CORE_SERVER_HPP
 
-#include <boost/pool/object_pool.hpp>
 #include <boost/lambda/lambda.hpp>
 #include "connection.hpp"
 #include "usersFactory.hpp"

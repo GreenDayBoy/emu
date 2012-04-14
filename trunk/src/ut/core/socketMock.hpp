@@ -2,6 +2,7 @@
 #define eMU_UT_SOCKETMOCK_HPP
 
 #include <boost/noncopyable.hpp>
+#include <boost/asio.hpp>
 #include <gmock/gmock.h>
 #include "../../shared/types.hpp"
 #include "ioServiceStub.hpp"

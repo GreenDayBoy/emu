@@ -4,7 +4,7 @@
 #include <boost/noncopyable.hpp>
 #include <gmock/gmock.h>
 #include <boost/function.hpp>
-#include <boost/asio.hpp>
+#include <boost/system/error_code.hpp>
 #include "ioServiceStub.hpp"
 #include "socketMock.hpp"
 

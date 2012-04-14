@@ -1,7 +1,6 @@
 #ifndef eMU_UT_SERVERMOCK_HPP
 #define eMU_UT_SERVERMOCK_HPP
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
 #include "userStub.hpp"

@@ -1,7 +1,5 @@
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 #include "serverMock.hpp"
-#include "connectionObserverMock.hpp"
 
 namespace eMUNetwork = eMU::core::network;
 namespace eMUNetworkUT = eMU::ut::network;

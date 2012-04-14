@@ -1,9 +1,6 @@
 #include <gtest/gtest.h>
 #include "../../core/usersFactory.hpp"
-#include "../../core/connection.hpp"
 #include "userStub.hpp"
-#include "socketMock.hpp"
-#include "ioServiceStub.hpp"
 
 namespace eMUNetwork = eMU::core::network;
 namespace eMUNetworkUT = eMU::ut::network;

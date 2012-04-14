@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "../../shared/types.hpp"
 #include "socketMock.hpp"
 #include "ioServiceStub.hpp"
 #include "connectionObserverMock.hpp"
