@@ -9,7 +9,7 @@ namespace network {
 
 template<typename ConnectionImpl,
          typename IoServiceImpl>
-class connectionsFactory_t: objectsFactory_t<ConnectionImpl> {
+class connectionsFactory_t: public objectsFactory_t<ConnectionImpl> {
 public:
     connectionsFactory_t(IoServiceImpl &ioService):
       ioService_(ioService) {}

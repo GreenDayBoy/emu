@@ -15,6 +15,10 @@ eMUNetworkUT::socketMock_t::socketMock_t(ioServiceStub_t &ioService):
     ON_CALL(*this, async_send(::testing::_,
                               ::testing::_)).WillByDefault(::testing::Invoke(this,
                                                                              &socketMock_t::impl_async_send));
+
+    ON_CALL(*this, async_connect(::testing::_,
+                                 ::testing::_)).WillByDefault(::testing::Invoke(this,
+                                                                                &socketMock_t::impl_async_connect));
 }
 
 void eMUNetworkUT::socketMock_t::expectCall_async_receive() {
@@ -34,6 +38,10 @@ void eMUNetworkUT::socketMock_t::expectCall_close() {
     EXPECT_CALL(*this, close());
 }
 
+void eMUNetworkUT::socketMock_t::expectCall_async_connect(const boost::asio::ip::tcp::endpoint &endpoint) {
+    EXPECT_CALL(*this, async_connect(endpoint, ::testing::_));
+}
+
 void eMUNetworkUT::socketMock_t::impl_async_receive(boost::asio::mutable_buffers_1 &buffer, const ioServiceStub_t::ioHandler_t &handler) {
     rbuf_ = boost::asio::buffer_cast<uint8*>(buffer);
     rbufSize_ = boost::asio::buffer_size(buffer);
@@ -44,4 +52,8 @@ void eMUNetworkUT::socketMock_t::impl_async_send(boost::asio::mutable_buffers_1 
     wbuf_ = boost::asio::buffer_cast<uint8*>(buffer);
     wbufSize_ = boost::asio::buffer_size(buffer);
     sendHandler_ = handler;
+}
+
+void eMUNetworkUT::socketMock_t::impl_async_connect(const boost::asio::ip::tcp::endpoint &endpoint, const connectHandler_t &handler) {
+    connectHandler_ = handler;
 }

@@ -8,13 +8,13 @@ eMUNetworkUT::serverMock_t::serverMock_t(ioServiceStub_t &ioService,
   server_t(ioService,
            port,
            maxNumOfUsers) {
-    ON_CALL(*this, onConnect(::testing::_)).WillByDefault(::testing::Invoke(this,
+    ON_CALL(*this, onAccept(::testing::_)).WillByDefault(::testing::Invoke(this,
                                                                             &serverMock_t::impl_onConnect));
 }
 
-void eMUNetworkUT::serverMock_t::expectCall_onConnect(bool retValue) {
+void eMUNetworkUT::serverMock_t::expectCall_onAccept(bool retValue) {
     connectStatus_ = retValue;
-    EXPECT_CALL(*this, onConnect(::testing::NotNull()));
+    EXPECT_CALL(*this, onAccept(::testing::NotNull()));
 }
 
 void eMUNetworkUT::serverMock_t::expectCall_onReceive(userStub_t *user, eMU::core::network::payload_t &payload) {

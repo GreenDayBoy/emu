@@ -164,3 +164,23 @@ TEST_F(connectionTest_t, send__operation_aborted) {
 
     socketMock_->sendHandler_(boost::asio::error::operation_aborted, 0);
 }
+
+TEST_F(connectionTest_t, connect) {
+    boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), 55962);
+
+    socketMock_->expectCall_async_connect(endpoint);
+    connection_.connect(endpoint);
+
+    connectionObserverMock_.expectCall_connectEvent(&connection_);
+    socketMock_->connectHandler_(boost::system::error_code());
+}
+
+TEST_F(connectionTest_t, connect__error) {
+    boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), 55962);
+
+    socketMock_->expectCall_async_connect(endpoint);
+    connection_.connect(endpoint);
+
+    connectionObserverMock_.expectCall_closeEvent(&connection_);
+    socketMock_->connectHandler_(boost::asio::error::access_denied);
+}

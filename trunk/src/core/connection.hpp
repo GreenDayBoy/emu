@@ -24,6 +24,7 @@ public:
     class observer_i {
     public:
         virtual ~observer_i() {}
+        virtual void connectEvent(connection_t *connection) = 0;
         virtual void receiveEvent(connection_t *connection, payload_t &payload) = 0;
         virtual void closeEvent(connection_t *connection) = 0;
     };
@@ -77,6 +78,13 @@ public:
                                                        this,
                                                        boost::asio::placeholders::error,
                                                        boost::asio::placeholders::bytes_transferred)));
+    }
+
+    void connect(const boost::asio::ip::tcp::endpoint &endpoint) {
+        socket_.async_connect(endpoint,
+                              boost::bind(&connection_t::connectHandler,
+                                          this,
+                                          boost::asio::placeholders::error));
     }
 
 private:
@@ -134,6 +142,15 @@ private:
                   << ", code: " << ec.value() << std::endl;
 
         this->disconnect();
+    }
+
+    void connectHandler(const boost::system::error_code &ec) {
+        if(ec) {
+            this->errorHandler(ec, "connect");
+            return;
+        }
+
+        observer_.connectEvent(this);
     }
 
     SocketImpl socket_;

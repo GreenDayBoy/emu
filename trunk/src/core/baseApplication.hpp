@@ -28,15 +28,14 @@ public:
       serviceThreading_(ioService, maxNumOfThreads) {}
     virtual ~baseApplication_t() {}
 
-    void initialize() {
-        signalSet_.add(SIGTERM);
-        signalSet_.add(SIGINT);
-        server_.onStartup();
-    }
-
     void start() {
         LOG_INFO << "Starting server." << std::endl;
+
+        signalSet_.add(SIGTERM);
+        signalSet_.add(SIGINT);
+
         signalSet_.async_wait(boost::bind(&baseApplication_t::stopHandler, this));
+        server_.onStartup();
         serviceThreading_.join();
     }
 

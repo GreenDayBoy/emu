@@ -10,7 +10,7 @@ namespace core {
 namespace user {
 
 template<typename UserImpl>
-class factory_t: objectsFactory_t<UserImpl> {
+class factory_t: public objectsFactory_t<UserImpl> {
 public:
     factory_t(size_t maxNumOfUsers):
       idGenerator_(maxNumOfUsers) {}

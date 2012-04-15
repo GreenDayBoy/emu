@@ -22,14 +22,14 @@ public:
                  uint16 port,
                  size_t maxNumOfUsers);
 
-    MOCK_METHOD1(onConnect, bool(userStub_t *user));
+    MOCK_METHOD1(onAccept, bool(userStub_t *user));
     MOCK_METHOD2(onReceive, void(userStub_t *user, eMU::core::network::payload_t &payload));
     MOCK_METHOD1(onClose, void(userStub_t *user));
 
     void onStartup() {}
     void onCleanup() {}
 
-    void expectCall_onConnect(bool retValue);
+    void expectCall_onAccept(bool retValue);
     void expectCall_onReceive(userStub_t *user, eMU::core::network::payload_t &payload);
     void expectCall_onClose(userStub_t *user);
 

@@ -29,12 +29,12 @@ TEST_F(serverTest_t, accept) {
     //onConnect event return true so server should queue receive for accepted socket.
     acceptorMock_->socket_->expectCall_async_receive();
 
-    server_.expectCall_onConnect(true);
+    server_.expectCall_onAccept(true);
     acceptorMock_->expectCall_async_accept();
     acceptorMock_->acceptHandler_(boost::system::error_code());
 }
 
-TEST_F(serverTest_t, accept__onConnect_failed) {
+TEST_F(serverTest_t, accept__onAccept_failed) {
     acceptorMock_->expectCall_async_accept();
     server_.queueAccept();
 
@@ -42,7 +42,7 @@ TEST_F(serverTest_t, accept__onConnect_failed) {
     acceptorMock_->socket_->expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
     acceptorMock_->socket_->expectCall_close();
 
-    server_.expectCall_onConnect(false);
+    server_.expectCall_onAccept(false);
     acceptorMock_->expectCall_async_accept();
     acceptorMock_->acceptHandler_(boost::system::error_code());
 }
@@ -62,7 +62,7 @@ TEST_F(serverTest_t, close__by_peer) {
     //onConnect event return true so server should queue receive for accepted socket.
     acceptorMock_->socket_->expectCall_async_receive();
 
-    server_.expectCall_onConnect(true);
+    server_.expectCall_onAccept(true);
     acceptorMock_->expectCall_async_accept();
     acceptorMock_->acceptHandler_(boost::system::error_code());
 
@@ -81,7 +81,7 @@ TEST_F(serverTest_t, close__by_server) {
     //onConnect event return true so server should queue receive for accepted socket.
     acceptorMock_->socket_->expectCall_async_receive();
 
-    server_.expectCall_onConnect(true);
+    server_.expectCall_onAccept(true);
     acceptorMock_->expectCall_async_accept();
     acceptorMock_->acceptHandler_(boost::system::error_code());
 
@@ -100,7 +100,7 @@ TEST_F(serverTest_t, close__not_found_user) {
     //onConnect event return true so server should queue receive for accepted socket.
     acceptorMock_->socket_->expectCall_async_receive();
 
-    server_.expectCall_onConnect(true);
+    server_.expectCall_onAccept(true);
     acceptorMock_->expectCall_async_accept();
     acceptorMock_->acceptHandler_(boost::system::error_code());
 
@@ -125,7 +125,7 @@ TEST_F(serverTest_t, receive) {
     //onConnect event return true so server should queue receive for accepted socket.
     acceptorMock_->socket_->expectCall_async_receive();
 
-    server_.expectCall_onConnect(true);
+    server_.expectCall_onAccept(true);
     acceptorMock_->expectCall_async_accept();
     acceptorMock_->acceptHandler_(boost::system::error_code());
 
@@ -147,7 +147,7 @@ TEST_F(serverTest_t, receive__error) {
     //onConnect event return true so server should queue receive for accepted socket.
     acceptorMock_->socket_->expectCall_async_receive();
 
-    server_.expectCall_onConnect(true);
+    server_.expectCall_onAccept(true);
     acceptorMock_->expectCall_async_accept();
     acceptorMock_->acceptHandler_(boost::system::error_code());
 
@@ -166,7 +166,7 @@ TEST_F(serverTest_t, receive__not_found_user) {
     //onConnect event return true so server should queue receive for accepted socket.
     acceptorMock_->socket_->expectCall_async_receive();
 
-    server_.expectCall_onConnect(true);
+    server_.expectCall_onAccept(true);
     acceptorMock_->expectCall_async_accept();
     acceptorMock_->acceptHandler_(boost::system::error_code());
 
@@ -194,7 +194,7 @@ TEST_F(serverTest_t, receive__error_not_found_user) {
     //onConnect event return true so server should queue receive for accepted socket.
     acceptorMock_->socket_->expectCall_async_receive();
 
-    server_.expectCall_onConnect(true);
+    server_.expectCall_onAccept(true);
     acceptorMock_->expectCall_async_accept();
     acceptorMock_->acceptHandler_(boost::system::error_code());
 

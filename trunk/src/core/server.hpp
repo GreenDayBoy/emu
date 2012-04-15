@@ -44,7 +44,11 @@ public:
                                            boost::asio::placeholders::error));
     }
 
-    virtual bool onConnect(UserImpl *user) = 0;
+    virtual void connectEvent(ConnectionImpl *connection) {
+
+    }
+
+    virtual bool onAccept(UserImpl *user) = 0;
     virtual void onReceive(UserImpl *user, payload_t &payload) = 0;
     virtual void onClose(UserImpl *user) = 0;
     virtual void onStartup() = 0;
@@ -56,7 +60,7 @@ protected:
     void acceptHandler(ConnectionImpl *connection,
                        const boost::system::error_code &ec) {
         if(!ec) {
-            this->connectEvent(connection);
+            this->acceptEvent(connection);
         } else {
             LOG_ERROR << "Error during establishing connection, error: " << ec.message() << std::endl;
         }
@@ -64,7 +68,7 @@ protected:
         this->queueAccept();
     }
 
-    void connectEvent(ConnectionImpl *connection) {
+    void acceptEvent(ConnectionImpl *connection) {
         if(usersList_.size() >= maxNumOfUsers_) {
             LOG_INFO << "Reached max number of users." << std::endl;
 
@@ -82,7 +86,7 @@ protected:
 
         user->connection(connection);
 
-        if(this->onConnect(user)) {
+        if(this->onAccept(user)) {
             usersList_.push_back(user);
             connection->queueReceive();
         } else {

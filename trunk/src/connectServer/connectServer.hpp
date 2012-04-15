@@ -14,7 +14,7 @@ public:
     void onStartup();
     void onCleanup();
 
-    bool onConnect(user_t *user);
+    bool onAccept(user_t *user);
     void onReceive(user_t *user, eMU::core::network::payload_t &payload);
     void onClose(user_t *user);
 };
