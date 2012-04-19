@@ -1,5 +1,5 @@
-#ifndef eMU_UT_SOCKETMOCK_HPP
-#define eMU_UT_SOCKETMOCK_HPP
+#ifndef eMU_UT_TCPSOCKETMOCK_HPP
+#define eMU_UT_TCPSOCKETMOCK_HPP
 
 #include <boost/noncopyable.hpp>
 #include <boost/asio.hpp>
@@ -10,6 +10,7 @@
 namespace eMU {
 namespace ut {
 namespace network {
+namespace tcp {
 
 class socketMock_t: private boost::noncopyable {
 public:
@@ -60,6 +61,7 @@ public:
     ioServiceStub_t &ioService_;
 };
 
+}
 }
 }
 }

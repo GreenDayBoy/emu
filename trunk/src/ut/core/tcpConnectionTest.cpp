@@ -1,22 +1,22 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "socketMock.hpp"
+#include "tcpSocketMock.hpp"
 #include "ioServiceStub.hpp"
-#include "connectionEventCallbacksMock.hpp"
+#include "tcpConnectionEventCallbacksMock.hpp"
 #include "../../core/tcpConnection.hpp"
 
 namespace eMUNetwork = eMU::core::network;
 namespace eMUNetworkUT = eMU::ut::network;
 
-class connectionTest_t: public ::testing::Test {
+class tcpConnectionTest_t: public ::testing::Test {
 public:
-    connectionTest_t():
+    tcpConnectionTest_t():
       connection_(ioServiceStub_) {}
 
     void SetUp() {
-        connection_.connectEventCallback(boost::bind(&eMUNetworkUT::connectionEventCallbacksMock_t::connectEvent, &connectionEventCallbacks_, _1));
-        connection_.receiveEventCallback(boost::bind(&eMUNetworkUT::connectionEventCallbacksMock_t::receiveEvent, &connectionEventCallbacks_, _1, _2));
-        connection_.closeEventCallback(boost::bind(&eMUNetworkUT::connectionEventCallbacksMock_t::closeEvent, &connectionEventCallbacks_, _1));
+        connection_.connectEventCallback(boost::bind(&eMUNetworkUT::tcp::connectionEventCallbacksMock_t::connectEvent, &connectionEventCallbacks_, _1));
+        connection_.receiveEventCallback(boost::bind(&eMUNetworkUT::tcp::connectionEventCallbacksMock_t::receiveEvent, &connectionEventCallbacks_, _1, _2));
+        connection_.closeEventCallback(boost::bind(&eMUNetworkUT::tcp::connectionEventCallbacksMock_t::closeEvent, &connectionEventCallbacks_, _1));
 
         socketMock_ = &connection_.socket();
     }
@@ -25,25 +25,25 @@ public:
 
     }
 
-    eMUNetwork::tcp::connection_t<eMUNetworkUT::socketMock_t, eMUNetworkUT::ioServiceStub_t> connection_;
+    eMUNetworkUT::tcp::testConnection_t connection_;
     eMUNetworkUT::ioServiceStub_t ioServiceStub_;
-    eMUNetworkUT::socketMock_t *socketMock_;
-    eMUNetworkUT::connectionEventCallbacksMock_t connectionEventCallbacks_;
+    eMUNetworkUT::tcp::socketMock_t *socketMock_;
+    eMUNetworkUT::tcp::connectionEventCallbacksMock_t connectionEventCallbacks_;
 };
 
-TEST_F(connectionTest_t, close) {
+TEST_F(tcpConnectionTest_t, close) {
     socketMock_->expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
     socketMock_->expectCall_close();
 
     connection_.close();
 }
 
-TEST_F(connectionTest_t, disconnect) {
+TEST_F(tcpConnectionTest_t, disconnect) {
     connectionEventCallbacks_.expectCall_closeEvent(&connection_);
     connection_.disconnect();
 }
 
-TEST_F(connectionTest_t, disconnect__remote) {
+TEST_F(tcpConnectionTest_t, disconnect__remote) {
     socketMock_->expectCall_async_receive();
     connection_.queueReceive();
 
@@ -51,7 +51,7 @@ TEST_F(connectionTest_t, disconnect__remote) {
     socketMock_->receiveHandler_(boost::asio::error::eof, 0);
 }
 
-TEST_F(connectionTest_t, receive) {
+TEST_F(tcpConnectionTest_t, receive) {
     socketMock_->expectCall_async_receive();
 
     connection_.queueReceive();
@@ -69,7 +69,7 @@ TEST_F(connectionTest_t, receive) {
     socketMock_->receiveHandler_(boost::system::error_code(), payload.size());
 }
 
-TEST_F(connectionTest_t, receive__error) {
+TEST_F(tcpConnectionTest_t, receive__error) {
     socketMock_->expectCall_async_receive();
     connection_.queueReceive();
 
@@ -77,14 +77,14 @@ TEST_F(connectionTest_t, receive__error) {
     socketMock_->receiveHandler_(boost::asio::error::broken_pipe, 0);
 }
 
-TEST_F(connectionTest_t, receive__operation_aborted) {
+TEST_F(tcpConnectionTest_t, receive__operation_aborted) {
     socketMock_->expectCall_async_receive();
     connection_.queueReceive();
 
     socketMock_->receiveHandler_(boost::asio::error::operation_aborted, 0);
 }
 
-TEST_F(connectionTest_t, send) {
+TEST_F(tcpConnectionTest_t, send) {
     eMUNetwork::payload_t payload(100, 0x10);
 
     socketMock_->expectCall_async_send();
@@ -97,7 +97,7 @@ TEST_F(connectionTest_t, send) {
     ASSERT_EQ(0, result);
 }
 
-TEST_F(connectionTest_t, send__pending) {
+TEST_F(tcpConnectionTest_t, send__pending) {
     eMUNetwork::payload_t payload1(100, 0x10);
     eMUNetwork::payload_t payload2(100, 0x11);
 
@@ -131,7 +131,7 @@ TEST_F(connectionTest_t, send__pending) {
     }
 }
 
-TEST_F(connectionTest_t, send__error) {
+TEST_F(tcpConnectionTest_t, send__error) {
     eMUNetwork::payload_t payload(100, 0x10);
 
     socketMock_->expectCall_async_send();
@@ -141,14 +141,14 @@ TEST_F(connectionTest_t, send__error) {
     socketMock_->sendHandler_(boost::asio::error::connection_reset, 0);
 }
 
-TEST_F(connectionTest_t, send__overflow_primary_buffer) {
+TEST_F(tcpConnectionTest_t, send__overflow_primary_buffer) {
     eMUNetwork::payload_t payload(eMUNetwork::maxPayloadSize_c + 1, 0x10);
 
     connectionEventCallbacks_.expectCall_closeEvent(&connection_);
     connection_.send(&payload[0], payload.size());
 }
 
-TEST_F(connectionTest_t, send__overflow_secondary_buffer) {
+TEST_F(tcpConnectionTest_t, send__overflow_secondary_buffer) {
     eMUNetwork::payload_t payload1(eMUNetwork::maxPayloadSize_c, 0x10);
     eMUNetwork::payload_t payload2(eMUNetwork::maxPayloadSize_c + 1, 0x11);
     
@@ -159,7 +159,7 @@ TEST_F(connectionTest_t, send__overflow_secondary_buffer) {
     connection_.send(&payload2[0], payload2.size());
 }
 
-TEST_F(connectionTest_t, send__operation_aborted) {
+TEST_F(tcpConnectionTest_t, send__operation_aborted) {
     eMUNetwork::payload_t payload(100, 0x10);
 
     socketMock_->expectCall_async_send();
@@ -168,7 +168,7 @@ TEST_F(connectionTest_t, send__operation_aborted) {
     socketMock_->sendHandler_(boost::asio::error::operation_aborted, 0);
 }
 
-TEST_F(connectionTest_t, connect) {
+TEST_F(tcpConnectionTest_t, connect) {
     boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), 55962);
 
     socketMock_->expectCall_async_connect(endpoint);
@@ -178,7 +178,7 @@ TEST_F(connectionTest_t, connect) {
     socketMock_->connectHandler_(boost::system::error_code());
 }
 
-TEST_F(connectionTest_t, connect__error) {
+TEST_F(tcpConnectionTest_t, connect__error) {
     boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), 55962);
 
     socketMock_->expectCall_async_connect(endpoint);

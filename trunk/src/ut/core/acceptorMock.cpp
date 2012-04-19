@@ -9,7 +9,7 @@ eMUNetworkUT::acceptorMock_t::acceptorMock_t(ioServiceStub_t &ioService,
                                                                                &acceptorMock_t::impl_async_accept));
 }
 
-void eMUNetworkUT::acceptorMock_t::impl_async_accept(socketMock_t &socket, const acceptHandler_t &handler) {
+void eMUNetworkUT::acceptorMock_t::impl_async_accept(tcp::socketMock_t &socket, const acceptHandler_t &handler) {
     acceptHandler_ = handler;
     socket_ = &socket;
 }

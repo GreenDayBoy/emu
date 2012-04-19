@@ -30,7 +30,7 @@ bool eMUNetworkUT::serverMock_t::impl_onConnect(userStub_t *user) {
     return connectStatus_;
 }
 
-void eMUNetworkUT::serverMock_t::associateConnection(eMU::core::network::tcp::connection_t<socketMock_t, ioServiceStub_t> *connection) {
+void eMUNetworkUT::serverMock_t::associateConnection(tcp::testConnection_t *connection) {
     connection->receiveEventCallback(boost::bind(&serverMock_t::receiveEvent, this, _1, _2));
     connection->closeEventCallback(boost::bind(&serverMock_t::closeEvent, this, _1));
 }

@@ -1,21 +1,20 @@
-#ifndef eMU_UT_CONNECTIONEVENTCALLBACKSMOCK_HPP
-#define eMU_UT_CONNECTIONEVENTCALLBACKSMOCK_HPP
+#ifndef eMU_UT_TCPCONNECTIONEVENTCALLBACKSMOCK_HPP
+#define eMU_UT_TCPCONNECTIONEVENTCALLBACKSMOCK_HPP
 
 #include "../../core/tcpConnection.hpp"
 #include "ioServiceStub.hpp"
-#include "socketMock.hpp"
+#include "tcpSocketMock.hpp"
+#include "types.hpp"
 
 namespace eMU {
 namespace ut {
 namespace network {
+namespace tcp {
 
 namespace eMUNetwork = eMU::core::network;
 
 class connectionEventCallbacksMock_t {
 public:
-    typedef eMUNetwork::tcp::connection_t<socketMock_t,
-                                          ioServiceStub_t> testConnection_t;
-
     MOCK_METHOD1(connectEvent, void(testConnection_t *connection));
     MOCK_METHOD2(receiveEvent, void(testConnection_t *connection,
                                     eMUNetwork::payload_t &payload));
@@ -27,6 +26,7 @@ public:
     void expectCall_closeEvent(testConnection_t *connection);
 };
 
+}
 }
 }
 }

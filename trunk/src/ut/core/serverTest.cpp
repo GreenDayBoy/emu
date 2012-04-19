@@ -105,7 +105,7 @@ TEST_F(serverTest_t, close__not_found_user) {
     acceptorMock_->acceptHandler_(boost::system::error_code());
 
     // Create new connection which will not be owned by any user.
-    eMUNetwork::tcp::connection_t<eMUNetworkUT::socketMock_t, eMUNetworkUT::ioServiceStub_t> connection(ioServiceStub_);
+    eMUNetworkUT::tcp::testConnection_t connection(ioServiceStub_);
     server_.associateConnection(&connection);
     
     // Associate connection with server.
@@ -172,7 +172,7 @@ TEST_F(serverTest_t, receive__not_found_user) {
     acceptorMock_->acceptHandler_(boost::system::error_code());
 
     // Create new connection which will not be owned by any user.
-    eMUNetwork::tcp::connection_t<eMUNetworkUT::socketMock_t, eMUNetworkUT::ioServiceStub_t> connection(ioServiceStub_);
+    eMUNetworkUT::tcp::testConnection_t connection(ioServiceStub_);
     server_.associateConnection(&connection);
 
     // Associate connection with server.
@@ -201,7 +201,7 @@ TEST_F(serverTest_t, receive__error_not_found_user) {
     acceptorMock_->acceptHandler_(boost::system::error_code());
 
     // Create new connection which will not be owned by any user.
-    eMUNetwork::tcp::connection_t<eMUNetworkUT::socketMock_t, eMUNetworkUT::ioServiceStub_t> connection(ioServiceStub_);
+    eMUNetworkUT::tcp::testConnection_t connection(ioServiceStub_);
     server_.associateConnection(&connection);
 
     // Associate connection with server.

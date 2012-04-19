@@ -284,10 +284,6 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\connectionEventCallbacksMock.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\src\ut\core\ioServiceStub.cpp"
 						>
 					</File>
@@ -296,7 +292,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\socketMock.cpp"
+						RelativePath="..\src\ut\core\tcpConnectionEventCallbacksMock.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\core\tcpSocketMock.cpp"
 						>
 					</File>
 					<File
@@ -312,15 +312,15 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\connectionsFactoryTest.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\ut\core\connectionTest.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\src\ut\core\serverTest.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\core\tcpConnectionsFactoryTest.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\core\tcpConnectionTest.cpp"
 						>
 					</File>
 					<File
@@ -346,15 +346,15 @@
 			<Filter
 				Name="core"
 				>
+				<File
+					RelativePath="..\src\ut\core\types.hpp"
+					>
+				</File>
 				<Filter
 					Name="env"
 					>
 					<File
 						RelativePath="..\src\ut\core\acceptorMock.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\ut\core\connectionEventCallbacksMock.hpp"
 						>
 					</File>
 					<File
@@ -366,7 +366,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\socketMock.hpp"
+						RelativePath="..\src\ut\core\tcpConnectionEventCallbacksMock.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\core\tcpSocketMock.hpp"
 						>
 					</File>
 					<File

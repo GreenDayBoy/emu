@@ -2,11 +2,11 @@
 #define eMU_UT_SERVERMOCK_HPP
 
 #include <gmock/gmock.h>
-
 #include "userStub.hpp"
-#include "socketMock.hpp"
+#include "tcpSocketMock.hpp"
 #include "ioServiceStub.hpp"
 #include "acceptorMock.hpp"
+#include "types.hpp"
 #include "../../core/server.hpp"
 
 namespace eMU {
@@ -14,7 +14,7 @@ namespace ut {
 namespace network {
 
 class serverMock_t: public eMU::core::network::server_t<userStub_t,
-                                                        eMU::core::network::tcp::connection_t<socketMock_t, ioServiceStub_t>,
+                                                        tcp::testConnection_t,
                                                         ioServiceStub_t,
                                                         acceptorMock_t> {
 public:
@@ -37,7 +37,7 @@ public:
 
     acceptorMock_t& acceptor() { return acceptor_; }
 
-    void associateConnection(eMU::core::network::tcp::connection_t<socketMock_t, ioServiceStub_t> *connection);
+    void associateConnection(tcp::testConnection_t *connection);
 
     userStub_t *user_;
     bool connectStatus_;

@@ -4,9 +4,9 @@
 #include <boost/noncopyable.hpp>
 #include <gmock/gmock.h>
 #include <boost/function.hpp>
-#include <boost/system/error_code.hpp>
+#include <boost/asio.hpp>
 #include "ioServiceStub.hpp"
-#include "socketMock.hpp"
+#include "tcpSocketMock.hpp"
 
 namespace eMU {
 namespace ut {
@@ -19,12 +19,12 @@ public:
     acceptorMock_t(ioServiceStub_t &ioService,
                    const boost::asio::ip::tcp::endpoint &endpoint);
 
-    MOCK_METHOD2(async_accept, void(socketMock_t &socket, const acceptHandler_t &handler));
+    MOCK_METHOD2(async_accept, void(tcp::socketMock_t &socket, const acceptHandler_t &handler));
     void expectCall_async_accept();
-    void impl_async_accept(socketMock_t &socket, const acceptHandler_t &handler);
+    void impl_async_accept(tcp::socketMock_t &socket, const acceptHandler_t &handler);
 
     acceptHandler_t acceptHandler_;
-    socketMock_t *socket_;
+    tcp::socketMock_t *socket_;
 
 private:
     acceptorMock_t();
