@@ -284,7 +284,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\connectionObserverMock.cpp"
+						RelativePath="..\src\ut\core\connectionEventCallbacksMock.cpp"
 						>
 					</File>
 					<File
@@ -354,7 +354,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\connectionObserverMock.hpp"
+						RelativePath="..\src\ut\core\connectionEventCallbacksMock.hpp"
 						>
 					</File>
 					<File

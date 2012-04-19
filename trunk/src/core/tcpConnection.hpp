@@ -1,5 +1,5 @@
-#ifndef eMU_CORE_CONNECTION_HPP
-#define eMU_CORE_CONNECTION_HPP
+#ifndef eMU_CORE_TCPCONNECTION_HPP
+#define eMU_CORE_TCPCONNECTION_HPP
 
 #include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
@@ -16,41 +16,36 @@
 namespace eMU {
 namespace core {
 namespace network {
+namespace tcp {
 
 template<typename SocketImpl = boost::asio::ip::tcp::socket,
          typename IoServiceImpl = boost::asio::io_service>
 class connection_t: private boost::noncopyable {
 public:
-    class observer_i {
-    public:
-        virtual ~observer_i() {}
-        virtual void connectEvent(connection_t *connection) = 0;
-        virtual void receiveEvent(connection_t *connection, payload_t &payload) = 0;
-        virtual void closeEvent(connection_t *connection) = 0;
-    };
+    typedef boost::function1<void, connection_t*> connectEventCallback_t;
+    typedef connectEventCallback_t closeEventCallback_t;
+    typedef boost::function2<void, connection_t*, payload_t&> receiveEventCallback_t;
 
-    connection_t(IoServiceImpl &ioService,
-                 observer_i &observer):
+    connection_t(IoServiceImpl &ioService):
       socket_(ioService),
       strand_(ioService),
-      observer_(observer),
       closeOngoing_(false) {}
 
     virtual ~connection_t() {}
 
     SocketImpl& socket() { return socket_; }
-
     bool opened() { return socket_.is_open(); }
-
     std::string address() const { return socket_.remote_endpoint().address().to_string(); }
+
+    void connectEventCallback(const connectEventCallback_t &callback) { connectEventCallback_ = callback; }
+    void receiveEventCallback(const receiveEventCallback_t &callback) { receiveEventCallback_ = callback; }
+    void closeEventCallback(const closeEventCallback_t &callback) { closeEventCallback_ = callback; }
 
     void disconnect() {
         closeOngoing_ = true;
 
         IoServiceImpl &ioService = socket_.get_io_service();
-        ioService.post(strand_.wrap(boost::bind(&observer_i::closeEvent,
-                                                &observer_,
-                                                this)));
+        ioService.post(strand_.wrap(boost::bind(closeEventCallback_, this)));
     }
 
     void close() {
@@ -110,7 +105,7 @@ private:
         }
 
         payload_t payload(rbuf_.payload_.begin(), rbuf_.payload_.begin() + bytesTransferred);
-        observer_.receiveEvent(this, payload);
+        receiveEventCallback_(this, payload);
 
         if(!closeOngoing_) {
             this->queueReceive();
@@ -150,17 +145,20 @@ private:
             return;
         }
 
-        observer_.connectEvent(this);
+        connectEventCallback_(this);
     }
 
     SocketImpl socket_;
     readBuffer_t rbuf_;
     writeBuffer_t wbuf_;
     typename IoServiceImpl::strand strand_;
-    observer_i &observer_;
     bool closeOngoing_;
+    connectEventCallback_t connectEventCallback_;
+    receiveEventCallback_t receiveEventCallback_;
+    closeEventCallback_t closeEventCallback_;
 };
 
+}
 }
 }
 }

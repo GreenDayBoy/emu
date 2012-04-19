@@ -1,11 +1,12 @@
-#ifndef eMU_CORE_CONNECTIONSFACTORY_HPP
-#define eMU_CORE_CONNECTIONSFACTORY_HPP
+#ifndef eMU_CORE_TCPCONNECTIONSFACTORY_HPP
+#define eMU_CORE_TCPCONNECTIONSFACTORY_HPP
 
 #include "objectsFactory.hpp"
 
 namespace eMU {
 namespace core {
 namespace network {
+namespace tcp {
 
 template<typename ConnectionImpl,
          typename IoServiceImpl>
@@ -14,8 +15,8 @@ public:
     connectionsFactory_t(IoServiceImpl &ioService):
       ioService_(ioService) {}
 
-    ConnectionImpl* construct(typename ConnectionImpl::observer_i &observer) {
-        return objectsPool_.construct(boost::ref(ioService_), boost::ref(observer));
+    ConnectionImpl* construct() {
+        return objectsPool_.construct(boost::ref(ioService_));
     }
 
     void destroy(ConnectionImpl *connection) {
@@ -32,6 +33,7 @@ protected:
     IoServiceImpl &ioService_;
 };
 
+}
 }
 }
 }

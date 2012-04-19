@@ -272,18 +272,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\buffer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\core\connection.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\core\connectionsFactory.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\core\core.cpp"
 				>
 			</File>
@@ -296,25 +284,53 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\server.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\core\serviceThreading.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\src\core\user.cpp"
+			<Filter
+				Name="network"
 				>
-			</File>
-			<File
-				RelativePath="..\src\core\userIdGenerator.cpp"
+				<File
+					RelativePath="..\src\core\buffer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\core\server.cpp"
+					>
+				</File>
+				<Filter
+					Name="tcp"
+					>
+					<File
+						RelativePath="..\src\core\tcpConnection.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\core\tcpConnectionsFactory.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="udp"
+					>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="user"
 				>
-			</File>
-			<File
-				RelativePath="..\src\core\usersFactory.cpp"
-				>
-			</File>
+				<File
+					RelativePath="..\src\core\user.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\core\userIdGenerator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\core\usersFactory.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -323,18 +339,6 @@
 			>
 			<File
 				RelativePath="..\src\core\baseApplication.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\core\buffer.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\core\connection.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\core\connectionsFactory.hpp"
 				>
 			</File>
 			<File
@@ -350,25 +354,53 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\server.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\core\serviceThreading.hpp"
 				>
 			</File>
-			<File
-				RelativePath="..\src\core\user.hpp"
+			<Filter
+				Name="network"
 				>
-			</File>
-			<File
-				RelativePath="..\src\core\userIdGenerator.hpp"
+				<File
+					RelativePath="..\src\core\buffer.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\core\server.hpp"
+					>
+				</File>
+				<Filter
+					Name="tcp"
+					>
+					<File
+						RelativePath="..\src\core\tcpConnection.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\core\tcpConnectionsFactory.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="udp"
+					>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="user"
 				>
-			</File>
-			<File
-				RelativePath="..\src\core\usersFactory.hpp"
-				>
-			</File>
+				<File
+					RelativePath="..\src\core\user.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\core\userIdGenerator.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\core\usersFactory.hpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"

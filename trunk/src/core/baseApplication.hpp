@@ -3,10 +3,10 @@
 
 #include <boost/noncopyable.hpp>
 #include <boost/asio.hpp>
-#include <boost/asio/signal_set.hpp>
 #include <boost/bind.hpp>
-#include "server.hpp"
 #include "serviceThreading.hpp"
+#include "../shared/types.hpp"
+#include "log.hpp"
 
 namespace eMU {
 namespace core {
@@ -16,16 +16,15 @@ namespace core {
 #pragma warning(disable: 4251)
 #endif
 
-template<typename UserImpl>
+template<typename ServerImpl>
 class baseApplication_t: private boost::noncopyable {
 public:
-    baseApplication_t(boost::asio::io_service &ioService,
-                      eMU::core::network::server_t<UserImpl> &server,
-                      size_t maxNumOfThreads):
-      ioService_(ioService),
-      server_(server),
+    baseApplication_t(size_t maxNumOfThreads,
+                      int16 port,
+                      size_t maxNumOfUsers):
+      server_(ioService_, port, maxNumOfUsers),
       signalSet_(ioService_),
-      serviceThreading_(ioService, maxNumOfThreads) {}
+      serviceThreading_(maxNumOfThreads) {}
     virtual ~baseApplication_t() {}
 
     void start() {
@@ -36,6 +35,9 @@ public:
 
         signalSet_.async_wait(boost::bind(&baseApplication_t::stopHandler, this));
         server_.onStartup();
+        server_.queueAccept();
+
+        serviceThreading_.initialize(ioService_);
         serviceThreading_.join();
     }
 
@@ -45,10 +47,10 @@ public:
     }
 
 protected:
-    boost::asio::io_service &ioService_;
+    boost::asio::io_service ioService_;
     boost::asio::signal_set signalSet_;
     serviceThreading_t serviceThreading_;
-    network::server_t<UserImpl> &server_;
+    ServerImpl server_;
 };
 
 }

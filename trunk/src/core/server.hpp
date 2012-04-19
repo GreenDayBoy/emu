@@ -2,35 +2,35 @@
 #define eMU_CORE_SERVER_HPP
 
 #include <boost/lambda/lambda.hpp>
-#include "connection.hpp"
+#include "tcpConnection.hpp"
 #include "usersFactory.hpp"
-#include "connectionsFactory.hpp"
+#include "tcpConnectionsFactory.hpp"
 
 namespace eMU {
 namespace core {
 namespace network {
 
 template<typename UserImpl,
-         typename ConnectionImpl = connection_t<>,
+         typename ConnectionImpl = tcp::connection_t<>,
          typename IoServiceImpl = boost::asio::io_service,
          typename AcceptorImpl = boost::asio::ip::tcp::acceptor>
-class server_t: public ConnectionImpl::observer_i,
-                private boost::noncopyable {
+class server_t: private boost::noncopyable {
 public:
     server_t(IoServiceImpl &ioService,
              uint16 port,
              size_t maxNumOfUsers):
-      ioService_(ioService),
       acceptor_(ioService,
                 boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
       maxNumOfUsers_(maxNumOfUsers),
       usersFactory_(maxNumOfUsers_),
-      connectionsFactory_(ioService_) {}
+      connectionsFactory_(ioService) {}
 
     virtual ~server_t() {}
 
     void queueAccept() {
-        ConnectionImpl *connection = connectionsFactory_.construct(*this);
+        ConnectionImpl *connection = connectionsFactory_.construct();
+        connection->receiveEventCallback(boost::bind(&server_t::receiveEvent, this, _1, _2));
+        connection->closeEventCallback(boost::bind(&server_t::closeEvent, this, _1));
 
         if(NULL == connection) {
             LOG_ERROR << "Error in allocating new connection object!" << std::endl;
@@ -42,10 +42,6 @@ public:
                                            this,
                                            connection,
                                            boost::asio::placeholders::error));
-    }
-
-    virtual void connectEvent(ConnectionImpl *connection) {
-
     }
 
     virtual bool onAccept(UserImpl *user) = 0;
@@ -127,10 +123,9 @@ protected:
         usersList_.erase(userIter);
     }
 
-    IoServiceImpl &ioService_;
     AcceptorImpl acceptor_;
     size_t maxNumOfUsers_;
-    connectionsFactory_t<ConnectionImpl, IoServiceImpl> connectionsFactory_;
+    tcp::connectionsFactory_t<ConnectionImpl, IoServiceImpl> connectionsFactory_;
     user::factory_t<UserImpl> usersFactory_;
     std::vector<UserImpl*> usersList_;
 };

@@ -2,8 +2,8 @@
 #include <gmock/gmock.h>
 #include "socketMock.hpp"
 #include "ioServiceStub.hpp"
-#include "connectionObserverMock.hpp"
-#include "../../core/connection.hpp"
+#include "connectionEventCallbacksMock.hpp"
+#include "../../core/tcpConnection.hpp"
 
 namespace eMUNetwork = eMU::core::network;
 namespace eMUNetworkUT = eMU::ut::network;
@@ -11,9 +11,13 @@ namespace eMUNetworkUT = eMU::ut::network;
 class connectionTest_t: public ::testing::Test {
 public:
     connectionTest_t():
-      connection_(ioServiceStub_, connectionObserverMock_) {}
+      connection_(ioServiceStub_) {}
 
     void SetUp() {
+        connection_.connectEventCallback(boost::bind(&eMUNetworkUT::connectionEventCallbacksMock_t::connectEvent, &connectionEventCallbacks_, _1));
+        connection_.receiveEventCallback(boost::bind(&eMUNetworkUT::connectionEventCallbacksMock_t::receiveEvent, &connectionEventCallbacks_, _1, _2));
+        connection_.closeEventCallback(boost::bind(&eMUNetworkUT::connectionEventCallbacksMock_t::closeEvent, &connectionEventCallbacks_, _1));
+
         socketMock_ = &connection_.socket();
     }
     
@@ -21,11 +25,10 @@ public:
 
     }
 
-    eMUNetwork::connection_t<eMUNetworkUT::socketMock_t,
-                             eMUNetworkUT::ioServiceStub_t> connection_;
+    eMUNetwork::tcp::connection_t<eMUNetworkUT::socketMock_t, eMUNetworkUT::ioServiceStub_t> connection_;
     eMUNetworkUT::ioServiceStub_t ioServiceStub_;
-    eMUNetworkUT::connectionObserverMock_t connectionObserverMock_;
     eMUNetworkUT::socketMock_t *socketMock_;
+    eMUNetworkUT::connectionEventCallbacksMock_t connectionEventCallbacks_;
 };
 
 TEST_F(connectionTest_t, close) {
@@ -36,7 +39,7 @@ TEST_F(connectionTest_t, close) {
 }
 
 TEST_F(connectionTest_t, disconnect) {
-    connectionObserverMock_.expectCall_closeEvent(&connection_);
+    connectionEventCallbacks_.expectCall_closeEvent(&connection_);
     connection_.disconnect();
 }
 
@@ -44,7 +47,7 @@ TEST_F(connectionTest_t, disconnect__remote) {
     socketMock_->expectCall_async_receive();
     connection_.queueReceive();
 
-    connectionObserverMock_.expectCall_closeEvent(&connection_);
+    connectionEventCallbacks_.expectCall_closeEvent(&connection_);
     socketMock_->receiveHandler_(boost::asio::error::eof, 0);
 }
 
@@ -61,7 +64,7 @@ TEST_F(connectionTest_t, receive) {
     memcpy(socketMock_->rbuf_, &payload[0], payload.size());
 
     socketMock_->expectCall_async_receive();
-    connectionObserverMock_.expectCall_receiveEvent(&connection_, payload);
+    connectionEventCallbacks_.expectCall_receiveEvent(&connection_, payload);
 
     socketMock_->receiveHandler_(boost::system::error_code(), payload.size());
 }
@@ -70,7 +73,7 @@ TEST_F(connectionTest_t, receive__error) {
     socketMock_->expectCall_async_receive();
     connection_.queueReceive();
 
-    connectionObserverMock_.expectCall_closeEvent(&connection_);
+    connectionEventCallbacks_.expectCall_closeEvent(&connection_);
     socketMock_->receiveHandler_(boost::asio::error::broken_pipe, 0);
 }
 
@@ -134,14 +137,14 @@ TEST_F(connectionTest_t, send__error) {
     socketMock_->expectCall_async_send();
     connection_.send(&payload[0], payload.size());
 
-    connectionObserverMock_.expectCall_closeEvent(&connection_);
+    connectionEventCallbacks_.expectCall_closeEvent(&connection_);
     socketMock_->sendHandler_(boost::asio::error::connection_reset, 0);
 }
 
 TEST_F(connectionTest_t, send__overflow_primary_buffer) {
     eMUNetwork::payload_t payload(eMUNetwork::maxPayloadSize_c + 1, 0x10);
 
-    connectionObserverMock_.expectCall_closeEvent(&connection_);
+    connectionEventCallbacks_.expectCall_closeEvent(&connection_);
     connection_.send(&payload[0], payload.size());
 }
 
@@ -152,7 +155,7 @@ TEST_F(connectionTest_t, send__overflow_secondary_buffer) {
     socketMock_->expectCall_async_send();
     connection_.send(&payload1[0], payload1.size());
 
-    connectionObserverMock_.expectCall_closeEvent(&connection_);
+    connectionEventCallbacks_.expectCall_closeEvent(&connection_);
     connection_.send(&payload2[0], payload2.size());
 }
 
@@ -171,7 +174,7 @@ TEST_F(connectionTest_t, connect) {
     socketMock_->expectCall_async_connect(endpoint);
     connection_.connect(endpoint);
 
-    connectionObserverMock_.expectCall_connectEvent(&connection_);
+    connectionEventCallbacks_.expectCall_connectEvent(&connection_);
     socketMock_->connectHandler_(boost::system::error_code());
 }
 
@@ -181,6 +184,6 @@ TEST_F(connectionTest_t, connect__error) {
     socketMock_->expectCall_async_connect(endpoint);
     connection_.connect(endpoint);
 
-    connectionObserverMock_.expectCall_closeEvent(&connection_);
+    connectionEventCallbacks_.expectCall_closeEvent(&connection_);
     socketMock_->connectHandler_(boost::asio::error::access_denied);
 }

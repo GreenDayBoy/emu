@@ -36,12 +36,7 @@ void main(int argsCount, char *args[]) {
     uint16 port = boost::lexical_cast<uint16>(args[2]);
     size_t maxNumOfThreads = boost::lexical_cast<uint16>(args[3]);
 
-    boost::asio::io_service ioService;
-
-    eMU::connectServer::server_t server(ioService, port, maxNumOfUsers);
-    server.queueAccept();
-
-    eMU::core::baseApplication_t<eMU::connectServer::user_t> app(ioService, server, maxNumOfThreads);
+    eMU::core::baseApplication_t<eMU::connectServer::server_t> app(maxNumOfThreads, port, maxNumOfUsers);
     app.start();
 
     system("PAUSE");

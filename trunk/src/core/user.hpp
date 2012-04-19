@@ -1,13 +1,13 @@
 #ifndef eMU_CORE_USER_HPP
 #define eMU_CORE_USER_HPP
 
-#include "connection.hpp"
+#include "tcpConnection.hpp"
 
 namespace eMU {
 namespace core {
 namespace user {
 
-template<typename ConnectionImpl = network::connection_t<>>
+template<typename ConnectionImpl = network::tcp::connection_t<> >
 class user_t: private boost::noncopyable {
 public:
     user_t(int16 id):

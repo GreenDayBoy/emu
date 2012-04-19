@@ -16,14 +16,15 @@ namespace core {
 
 class eMU_CORE_DECLSPEC serviceThreading_t: private boost::noncopyable {
 public:
-    serviceThreading_t(boost::asio::io_service &ioService,
-                       size_t maxNumOfThreads);
+    serviceThreading_t(size_t maxNumOfThreads);
     virtual ~serviceThreading_t();
 
+    void initialize(boost::asio::io_service &ioService);
     void join();
 
 private:
     boost::thread_group threads_;
+    size_t maxNumOfThreads_;
 };
 
 }

@@ -14,7 +14,7 @@ namespace ut {
 namespace network {
 
 class serverMock_t: public eMU::core::network::server_t<userStub_t,
-                                                        eMU::core::network::connection_t<socketMock_t, ioServiceStub_t>,
+                                                        eMU::core::network::tcp::connection_t<socketMock_t, ioServiceStub_t>,
                                                         ioServiceStub_t,
                                                         acceptorMock_t> {
 public:
@@ -37,9 +37,10 @@ public:
 
     acceptorMock_t& acceptor() { return acceptor_; }
 
+    void associateConnection(eMU::core::network::tcp::connection_t<socketMock_t, ioServiceStub_t> *connection);
+
     userStub_t *user_;
     bool connectStatus_;
-private:
 };
 
 }
