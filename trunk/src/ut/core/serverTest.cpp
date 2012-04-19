@@ -26,7 +26,7 @@ TEST_F(serverTest_t, accept) {
     acceptorMock_->expectCall_async_accept();
     server_.queueAccept();
 
-    //onConnect event return true so server should queue receive for accepted socket.
+    //onAccept event return true so server should queue receive for accepted socket.
     acceptorMock_->socket_->expectCall_async_receive();
 
     server_.expectCall_onAccept(true);
@@ -38,7 +38,7 @@ TEST_F(serverTest_t, accept__onAccept_failed) {
     acceptorMock_->expectCall_async_accept();
     server_.queueAccept();
 
-    //onConnect event return false so server should close connection.
+    //onAccept event return false so server should close connection.
     acceptorMock_->socket_->expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
     acceptorMock_->socket_->expectCall_close();
 
@@ -59,7 +59,7 @@ TEST_F(serverTest_t, close__by_peer) {
     acceptorMock_->expectCall_async_accept();
     server_.queueAccept();
 
-    //onConnect event return true so server should queue receive for accepted socket.
+    //onAccept event return true so server should queue receive for accepted socket.
     acceptorMock_->socket_->expectCall_async_receive();
 
     server_.expectCall_onAccept(true);
@@ -78,7 +78,7 @@ TEST_F(serverTest_t, close__by_server) {
     acceptorMock_->expectCall_async_accept();
     server_.queueAccept();
 
-    //onConnect event return true so server should queue receive for accepted socket.
+    //onAccept event return true so server should queue receive for accepted socket.
     acceptorMock_->socket_->expectCall_async_receive();
 
     server_.expectCall_onAccept(true);
@@ -97,7 +97,7 @@ TEST_F(serverTest_t, close__not_found_user) {
     acceptorMock_->expectCall_async_accept();
     server_.queueAccept();
 
-    //onConnect event return true so server should queue receive for accepted socket.
+    //onAccept event return true so server should queue receive for accepted socket.
     acceptorMock_->socket_->expectCall_async_receive();
 
     server_.expectCall_onAccept(true);
@@ -123,7 +123,7 @@ TEST_F(serverTest_t, receive) {
     acceptorMock_->expectCall_async_accept();
     server_.queueAccept();
 
-    //onConnect event return true so server should queue receive for accepted socket.
+    //onAccept event return true so server should queue receive for accepted socket.
     acceptorMock_->socket_->expectCall_async_receive();
 
     server_.expectCall_onAccept(true);
@@ -145,7 +145,7 @@ TEST_F(serverTest_t, receive__error) {
     acceptorMock_->expectCall_async_accept();
     server_.queueAccept();
 
-    //onConnect event return true so server should queue receive for accepted socket.
+    //onAccept event return true so server should queue receive for accepted socket.
     acceptorMock_->socket_->expectCall_async_receive();
 
     server_.expectCall_onAccept(true);
@@ -164,7 +164,7 @@ TEST_F(serverTest_t, receive__not_found_user) {
     acceptorMock_->expectCall_async_accept();
     server_.queueAccept();
 
-    //onConnect event return true so server should queue receive for accepted socket.
+    //onAccept event return true so server should queue receive for accepted socket.
     acceptorMock_->socket_->expectCall_async_receive();
 
     server_.expectCall_onAccept(true);
@@ -179,9 +179,6 @@ TEST_F(serverTest_t, receive__not_found_user) {
     connection.socket().expectCall_async_receive();
     connection.queueReceive();
 
-    // Normal another receive queuing - it is not matter if connection is associated with user object.
-    connection.socket().expectCall_async_receive();
-
     // Important: Connection is not associated with any user object.
     // It should be close but without calling onClose event and onReceive event.
     connection.socket().expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
@@ -193,7 +190,7 @@ TEST_F(serverTest_t, receive__error_not_found_user) {
     acceptorMock_->expectCall_async_accept();
     server_.queueAccept();
 
-    //onConnect event return true so server should queue receive for accepted socket.
+    //onAccept event return true so server should queue receive for accepted socket.
     acceptorMock_->socket_->expectCall_async_receive();
 
     server_.expectCall_onAccept(true);

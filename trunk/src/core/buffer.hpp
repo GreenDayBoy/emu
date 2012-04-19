@@ -16,14 +16,16 @@ namespace network {
 typedef std::vector<uint8> payload_t;
 const size_t maxPayloadSize_c = 4096;
 
-struct eMU_CORE_DECLSPEC readBuffer_t {
+class eMU_CORE_DECLSPEC readBuffer_t {
+public:
     readBuffer_t();
     void clear();
 
     payload_t payload_;
 };
 
-struct eMU_CORE_DECLSPEC writeBuffer_t {
+class eMU_CORE_DECLSPEC writeBuffer_t {
+public:
     writeBuffer_t();
     void clear();
     bool insert(const uint8 *payload, size_t size);

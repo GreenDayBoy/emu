@@ -97,7 +97,7 @@ protected:
         if(usersList_.end() == userIter) {
             LOG_ERROR << "Could not find user by connection, address: " << connection->address() << std::endl;
             
-            connectionsFactory_.destroy(connection);
+            connection->disconnect();
             return;
         }
 

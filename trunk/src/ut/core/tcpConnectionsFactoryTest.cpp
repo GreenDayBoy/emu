@@ -8,9 +8,9 @@
 namespace eMUNetwork = eMU::core::network;
 namespace eMUNetworkUT = eMU::ut::network;
 
-class connectionsFactoryTest_t: public ::testing::Test {
+class tcpConnectionsFactoryTest_t: public ::testing::Test {
 public:
-    connectionsFactoryTest_t():
+    tcpConnectionsFactoryTest_t():
       factory_(ioService_) {}
 
     void SetUp() {}
@@ -21,14 +21,14 @@ public:
     eMUNetwork::tcp::connectionsFactory_t<eMUNetworkUT::tcp::testConnection_t, eMUNetworkUT::ioServiceStub_t> factory_;
 };
 
-TEST_F(connectionsFactoryTest_t, construct) {
+TEST_F(tcpConnectionsFactoryTest_t, construct) {
     eMUNetworkUT::tcp::testConnection_t *connection = NULL;
 
     connection = factory_.construct();
     ASSERT_THAT(connection, ::testing::NotNull());
 }
 
-TEST_F(connectionsFactoryTest_t, destroy) {
+TEST_F(tcpConnectionsFactoryTest_t, destroy) {
     eMUNetworkUT::tcp::testConnection_t *connection = NULL;
 
     connection = factory_.construct();
