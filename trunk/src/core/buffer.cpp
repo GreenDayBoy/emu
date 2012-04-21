@@ -10,9 +10,9 @@ void eMU::core::network::readBuffer_t::clear() {
 }
 
 eMU::core::network::writeBuffer_t::writeBuffer_t():
-  pending_(false),
   payload_(maxPayloadSize_c, 0),
   payloadSize_(0),
+  pending_(false),
   secPayload_(maxPayloadSize_c, 0),
   secPayloadSize_(0) {}
 

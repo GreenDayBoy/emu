@@ -1,9 +1,8 @@
 #ifndef eMU_UT_TCPCONNECTIONEVENTCALLBACKSMOCK_HPP
 #define eMU_UT_TCPCONNECTIONEVENTCALLBACKSMOCK_HPP
 
-#include "../../core/tcpConnection.hpp"
-#include "ioServiceStub.hpp"
-#include "tcpSocketMock.hpp"
+#include <gmock/gmock.h>
+#include "../../core/buffer.hpp"
 #include "types.hpp"
 
 namespace eMU {

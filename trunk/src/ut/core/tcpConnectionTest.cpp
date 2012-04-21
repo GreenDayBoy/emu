@@ -11,7 +11,8 @@ namespace eMUNetworkUT = eMU::ut::network;
 class tcpConnectionTest_t: public ::testing::Test {
 public:
     tcpConnectionTest_t():
-      connection_(ioServiceStub_) {}
+      connection_(ioServiceStub_),
+      socketMock_(NULL) {}
 
     void SetUp() {
         connection_.connectEventCallback(boost::bind(&eMUNetworkUT::tcp::connectionEventCallbacksMock_t::connectEvent, &connectionEventCallbacks_, _1));

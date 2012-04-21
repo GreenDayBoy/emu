@@ -22,7 +22,6 @@ eMUNetworkUT::tcp::socketMock_t::socketMock_t(ioServiceStub_t &ioService):
 }
 
 void eMUNetworkUT::tcp::socketMock_t::expectCall_async_receive() {
-    boost::asio::mutable_buffer buffer;
     EXPECT_CALL(*this, async_receive(::testing::_, ::testing::_));
 }
 

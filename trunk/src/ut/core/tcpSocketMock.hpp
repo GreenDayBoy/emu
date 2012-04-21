@@ -18,7 +18,7 @@ public:
     public:
         class addressFake_t {
         public:
-            std::string to_string() { return "fake.address.for.ut"; }
+            std::string to_string() const { return "fake.address.for.ut"; }
         };
 
         addressFake_t address() { return addressFake_t(); }
