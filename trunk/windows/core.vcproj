@@ -313,6 +313,14 @@
 				<Filter
 					Name="udp"
 					>
+					<File
+						RelativePath="..\src\core\udpConnection.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\core\udpWriteBufferManager.cpp"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -383,6 +391,14 @@
 				<Filter
 					Name="udp"
 					>
+					<File
+						RelativePath="..\src\core\udpConnection.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\core\udpWriteBufferManager.hpp"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter

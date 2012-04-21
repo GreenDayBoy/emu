@@ -300,6 +300,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\ut\core\udpConnectionEventCallbacksMock.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\core\udpSocketMock.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\ut\core\userStub.cpp"
 						>
 					</File>
@@ -321,6 +329,14 @@
 					</File>
 					<File
 						RelativePath="..\src\ut\core\tcpConnectionTest.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\core\udpConnectionTest.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\core\udpWriteBufferManagerTest.cpp"
 						>
 					</File>
 					<File
@@ -371,6 +387,14 @@
 					</File>
 					<File
 						RelativePath="..\src\ut\core\tcpSocketMock.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\core\udpConnectionEventCallbacksMock.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\core\udpSocketMock.hpp"
 						>
 					</File>
 					<File
