@@ -25,7 +25,7 @@ public:
     }
 
     friend std::ostream& operator<<(std::ostream &out, const user_t &user) {
-        out << "user id: " << user.id_ << ", address: " << user.connection_->address();
+        out << "id: " << user.id_ << ", address: " << user.connection_->address();
         return out;
     }
 

@@ -1,5 +1,5 @@
-#ifndef eMU_CORE_IDGENERATOR_HPP
-#define eMU_CORE_IDGENERATOR_HPP
+#ifndef eMU_CORE_USERIDGENERATOR_HPP
+#define eMU_CORE_USERIDGENERATOR_HPP
 
 #include <queue>
 #include "../core/core.hpp"
