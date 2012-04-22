@@ -2,6 +2,7 @@
 #define eMU_CONNECTSERVER_CONNECTSERVER_HPP
 
 #include "../core/server.hpp"
+#include "../core/udpConnection.hpp"
 #include "user.hpp"
 
 namespace eMU {
@@ -17,6 +18,13 @@ public:
     bool onAccept(user_t *user);
     void onReceive(user_t *user, eMU::core::network::payload_t &payload);
     void onClose(user_t *user);
+
+    void onReceiveFrom(eMU::core::network::udp::connection_t<> *connection,
+                       const boost::asio::ip::udp::endpoint &endpoint,
+                       eMU::core::network::payload_t &payload);
+
+private:
+    eMU::core::network::udp::connection_t<> udpConnection_;
 };
 
 }
