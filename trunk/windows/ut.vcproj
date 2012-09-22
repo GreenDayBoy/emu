@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(GTEST_HOME)\include&quot;;&quot;$(GMOCK_HOME)\include&quot;;&quot;$(BOOST_HOME)&quot;"
+				AdditionalIncludeDirectories="&quot;$(GTEST_HOME)\include&quot;;&quot;$(GMOCK_HOME)\include&quot;;&quot;$(BOOST_HOME)&quot;;&quot;$(ProjectDir)\..\inc\&quot;;&quot;$(ProjectDir)\..\inc\ut&quot;;&quot;$(ProjectDir)\..\inc\core&quot;"
 				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_CONSOLE;BOOST_ALL_DYN_LINK"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -124,7 +124,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(GTEST_HOME)\include&quot;;&quot;$(GMOCK_HOME)\include&quot;;&quot;$(BOOST_HOME)&quot;"
+				AdditionalIncludeDirectories="&quot;$(GTEST_HOME)\include&quot;;&quot;$(GMOCK_HOME)\include&quot;;&quot;$(BOOST_HOME)&quot;;&quot;$(ProjectDir)\..\inc\&quot;;&quot;$(ProjectDir)\..\inc\ut&quot;;&quot;$(ProjectDir)\..\inc\core&quot;"
 				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_CONSOLE;BOOST_ALL_DYN_LINK;NDEBUG"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -204,8 +204,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(GTEST_HOME)\include&quot;;&quot;$(GMOCK_HOME)\include&quot;;&quot;$(BOOST_HOME)&quot;"
-				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_CONSOLE;BOOST_ALL_DYN_LINK;UNIT_TESTING;WIN32_LEAN_AND_MEAN"
+				AdditionalIncludeDirectories="&quot;$(GTEST_HOME)\include&quot;;&quot;$(GMOCK_HOME)\include&quot;;&quot;$(BOOST_HOME)&quot;;&quot;$(ProjectDir)\..\inc\&quot;;&quot;$(ProjectDir)\..\inc\ut&quot;;&quot;$(ProjectDir)\..\inc\core&quot;"
+				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_CONSOLE;BOOST_ALL_DYN_LINK;eMU_UT;WIN32_LEAN_AND_MEAN"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -265,151 +265,133 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
-			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			Name="env"
 			>
-			<File
-				RelativePath="..\src\ut\ut.cpp"
-				>
-			</File>
-			<Filter
-				Name="core"
-				>
-				<Filter
-					Name="env"
-					>
-					<File
-						RelativePath="..\src\ut\core\acceptorMock.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\ut\core\ioServiceStub.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\ut\core\serverMock.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\ut\core\tcpConnectionEventCallbacksMock.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\ut\core\tcpSocketMock.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\ut\core\udpConnectionEventCallbacksMock.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\ut\core\udpSocketMock.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\ut\core\userStub.cpp"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="test"
-					>
-					<File
-						RelativePath="..\src\ut\core\bufferTest.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\ut\core\serverTest.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\ut\core\tcpConnectionsFactoryTest.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\ut\core\tcpConnectionTest.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\ut\core\udpConnectionTest.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\ut\core\udpWriteBufferManagerTest.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\ut\core\userIdGeneratorTest.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\ut\core\usersFactoryTest.cpp"
-						>
-					</File>
-				</Filter>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-			<File
-				RelativePath="..\src\ut\ut.hpp"
-				>
-			</File>
 			<Filter
 				Name="core"
 				>
 				<File
-					RelativePath="..\src\ut\core\types.hpp"
+					RelativePath="..\src\ut\env\core\ioServiceStub.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\inc\ut\env\core\ioServiceStub.hpp"
 					>
 				</File>
 				<Filter
-					Name="env"
+					Name="tcp"
 					>
 					<File
-						RelativePath="..\src\ut\core\acceptorMock.hpp"
+						RelativePath="..\src\ut\env\core\tcp\acceptorMock.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\ioServiceStub.hpp"
+						RelativePath="..\inc\ut\env\core\tcp\acceptorMock.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\serverMock.hpp"
+						RelativePath="..\src\ut\env\core\tcp\tcpConnectionEventCallbacksMock.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\tcpConnectionEventCallbacksMock.hpp"
+						RelativePath="..\inc\ut\env\core\tcp\tcpConnectionEventCallbacksMock.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\tcpSocketMock.hpp"
+						RelativePath="..\src\ut\env\core\tcp\tcpConnectionsManagerEventCallbacksMock.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\udpConnectionEventCallbacksMock.hpp"
+						RelativePath="..\inc\ut\env\core\tcp\tcpConnectionsManagerEventCallbacksMock.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\udpSocketMock.hpp"
+						RelativePath="..\src\ut\env\core\tcp\tcpSocketMock.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\ut\core\userStub.hpp"
+						RelativePath="..\inc\ut\env\core\tcp\tcpSocketMock.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="udp"
+					>
+					<File
+						RelativePath="..\src\ut\env\core\udp\udpConnectionEventCallbacksMock.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\inc\ut\env\core\udp\udpConnectionEventCallbacksMock.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\ut\env\core\udp\udpSocketMock.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\inc\ut\env\core\udp\udpSocketMock.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="user"
+					>
+					<File
+						RelativePath="..\src\ut\env\core\user\userStub.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\inc\ut\env\core\user\userStub.hpp"
 						>
 					</File>
 				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+			Name="test"
 			>
+			<Filter
+				Name="core"
+				>
+				<File
+					RelativePath="..\src\ut\test\core\bufferTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\ut\test\core\tcpConnectionsManagerTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\ut\test\core\tcpConnectionTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\ut\test\core\udpConnectionTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\ut\test\core\udpWriteBufferManagerTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\ut\test\core\userIdGeneratorTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\ut\test\core\usersFactoryTest.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
+		<File
+			RelativePath="..\src\ut\ut.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\inc\ut\ut.hpp"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

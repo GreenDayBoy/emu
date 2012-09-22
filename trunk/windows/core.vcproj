@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(BOOST_HOME)&quot;"
+				AdditionalIncludeDirectories="&quot;$(BOOST_HOME)&quot;;&quot;$(ProjectDir)\..\inc\core&quot;;&quot;$(ProjectDir)\..\inc\&quot;"
 				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_USRDLL;eMU_CORE_EXPORTS;BOOST_ALL_DYN_LINK;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -123,7 +123,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(BOOST_HOME)&quot;"
+				AdditionalIncludeDirectories="&quot;$(BOOST_HOME)&quot;;&quot;$(ProjectDir)\..\inc\core&quot;;&quot;$(ProjectDir)\..\inc\&quot;"
 				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_USRDLL;eMU_CORE_EXPORTS;BOOST_ALL_DYN_LINK;NDEBUG;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -203,8 +203,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(BOOST_HOME)&quot;"
-				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_USRDLL;eMU_CORE_EXPORTS;BOOST_ALL_DYN_LINK;UNIT_TESTING;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN"
+				AdditionalIncludeDirectories="&quot;$(BOOST_HOME)&quot;;&quot;$(ProjectDir)\..\inc\core&quot;;&quot;$(ProjectDir)\..\inc\&quot;"
+				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;_USRDLL;WIN32;WIN32_LEAN_AND_MEAN;BOOST_ALL_DYN_LINK;eMU_CORE_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -263,167 +263,113 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
-			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			Name="common"
 			>
 			<File
-				RelativePath="..\src\core\baseApplication.cpp"
+				RelativePath="..\src\core\common\log.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\core.cpp"
+				RelativePath="..\inc\core\common\log.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\log.cpp"
+				RelativePath="..\src\core\common\objectsFactory.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\objectsFactory.cpp"
+				RelativePath="..\inc\core\common\objectsFactory.hpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="network"
+			>
+			<File
+				RelativePath="..\src\core\network\buffer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\serviceThreading.cpp"
+				RelativePath="..\inc\core\network\buffer.hpp"
 				>
 			</File>
 			<Filter
-				Name="network"
+				Name="tcp"
 				>
 				<File
-					RelativePath="..\src\core\buffer.cpp"
+					RelativePath="..\src\core\network\tcp\tcpConnection.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\core\server.cpp"
+					RelativePath="..\inc\core\network\tcp\tcpConnection.hpp"
 					>
 				</File>
-				<Filter
-					Name="tcp"
+				<File
+					RelativePath="..\src\core\network\tcp\tcpConnectionsManager.cpp"
 					>
-					<File
-						RelativePath="..\src\core\tcpConnection.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\core\tcpConnectionsFactory.cpp"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="udp"
+				</File>
+				<File
+					RelativePath="..\inc\core\network\tcp\tcpConnectionsManager.hpp"
 					>
-					<File
-						RelativePath="..\src\core\udpConnection.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\core\udpWriteBufferManager.cpp"
-						>
-					</File>
-				</Filter>
+				</File>
 			</Filter>
 			<Filter
-				Name="user"
+				Name="udp"
 				>
 				<File
-					RelativePath="..\src\core\user.cpp"
+					RelativePath="..\src\core\network\udp\udpConnection.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\core\userIdGenerator.cpp"
+					RelativePath="..\inc\core\network\udp\udpConnection.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\core\usersFactory.cpp"
+					RelativePath="..\src\core\network\udp\udpWriteBufferManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\inc\core\network\udp\udpWriteBufferManager.hpp"
 					>
 				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			Name="user"
 			>
 			<File
-				RelativePath="..\src\core\baseApplication.hpp"
+				RelativePath="..\src\core\user\user.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\core.hpp"
+				RelativePath="..\inc\core\user\user.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\log.hpp"
+				RelativePath="..\src\core\user\userIdGenerator.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\objectsFactory.hpp"
+				RelativePath="..\inc\core\user\userIdGenerator.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\core\serviceThreading.hpp"
+				RelativePath="..\src\core\user\usersFactory.cpp"
 				>
 			</File>
-			<Filter
-				Name="network"
+			<File
+				RelativePath="..\inc\core\user\usersFactory.hpp"
 				>
-				<File
-					RelativePath="..\src\core\buffer.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\core\server.hpp"
-					>
-				</File>
-				<Filter
-					Name="tcp"
-					>
-					<File
-						RelativePath="..\src\core\tcpConnection.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\core\tcpConnectionsFactory.hpp"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="udp"
-					>
-					<File
-						RelativePath="..\src\core\udpConnection.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\core\udpWriteBufferManager.hpp"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
-				Name="user"
-				>
-				<File
-					RelativePath="..\src\core\user.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\core\userIdGenerator.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\core\usersFactory.hpp"
-					>
-				</File>
-			</Filter>
+			</File>
 		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+		<File
+			RelativePath="..\src\core\core.cpp"
 			>
-		</Filter>
+		</File>
+		<File
+			RelativePath="..\inc\core\core.hpp"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
