@@ -1,5 +1,4 @@
-#ifndef __core_tcpConnectionsManager_hpp__
-#define __core_tcpConnectionsManager_hpp__
+#pragma once
 
 #include <common/objectsFactory.hpp>
 #include <network/tcp/tcpConnection.hpp>
@@ -81,5 +80,3 @@ protected:
 }
 }
 }
-
-#endif

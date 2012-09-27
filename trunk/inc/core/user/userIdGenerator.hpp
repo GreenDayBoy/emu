@@ -1,5 +1,4 @@
-#ifndef __core_userIdGenerator_hpp__
-#define __core_userIdGenerator_hpp__
+#pragma once
 
 #include <queue>
 
@@ -35,6 +34,4 @@ private:
 
 #ifdef WIN32
 #pragma warning(default: 4251)
-#endif
-
 #endif

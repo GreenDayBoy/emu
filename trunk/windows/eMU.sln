@@ -2,6 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{49B127DF-AE05-43DF-9EB5-683A252896D8}"
+	ProjectSection(SolutionItems) = preProject
+		..\inc\shared\types.hpp = ..\inc\shared\types.hpp
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "core.vcproj", "{D5F31E14-4C22-4A60-BEFD-FD581E78B6EF}"
 EndProject

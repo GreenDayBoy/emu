@@ -1,5 +1,4 @@
-#ifndef __core_udpConnection_hpp__
-#define __core_udpConnection_hpp__
+#pragma once
 
 #include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
@@ -129,6 +128,4 @@ private:
 #ifdef WIN32
 #pragma warning(default: 4275)
 #pragma warning(default: 4251)
-#endif
-
 #endif

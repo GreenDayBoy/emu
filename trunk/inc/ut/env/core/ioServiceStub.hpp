@@ -1,5 +1,4 @@
-#ifndef __ut_ioServiceStub_hpp__
-#define __ut_ioServiceStub_hpp__
+#pragma once
 
 #include <boost/noncopyable.hpp>
 #include <boost/function.hpp>
@@ -33,5 +32,3 @@ public:
 }
 }
 }
-
-#endif

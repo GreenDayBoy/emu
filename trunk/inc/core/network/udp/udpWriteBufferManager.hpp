@@ -1,5 +1,4 @@
-#ifndef __core_udpWriteBufferManager_hpp__
-#define __core_udpWriteBufferManager_hpp__
+#pragma once
 
 #include <boost/asio/ip/udp.hpp>
 #include <map>
@@ -34,6 +33,4 @@ private:
 #ifdef WIN32
 #pragma warning(default: 4275)
 #pragma warning(default: 4251)
-#endif
-
 #endif

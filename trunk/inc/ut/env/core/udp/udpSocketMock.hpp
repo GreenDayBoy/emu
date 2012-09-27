@@ -1,5 +1,4 @@
-#ifndef __ut_udpSocketMock_hpp__
-#define __ut_udpSocketMock_hpp__
+#pragma once
 
 #include <gmock/gmock.h>
 #include <boost/asio.hpp>
@@ -53,5 +52,3 @@ public:
 }
 }
 }
-
-#endif

@@ -1,6 +1,3 @@
-#ifndef __ut_ut_hpp__
-#define __ut_ut_hpp__
+#pragma once
 
 void main(int count, char *args[]);
-
-#endif

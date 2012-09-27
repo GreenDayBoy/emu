@@ -1,5 +1,4 @@
-#ifndef __core_server_hpp__
-#define __core_server_hpp__
+#pragma once
 
 #include <boost/lambda/lambda.hpp>
 #include <network/tcp/tcpConnectionsManager.hpp>
@@ -114,4 +113,3 @@ protected:
 }
 }
 }
-#endif

@@ -1,5 +1,4 @@
-#ifndef __core_objectsFactory_hpp__
-#define __core_objectsFactory_hpp__
+#pragma once
 
 #include <boost/noncopyable.hpp>
 #include <boost/pool/object_pool.hpp>
@@ -18,5 +17,3 @@ protected:
 
 }
 }
-
-#endif

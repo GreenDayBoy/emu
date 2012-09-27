@@ -1,5 +1,4 @@
-#ifndef __ut_udpConnectionEventCallbacksMock_hpp__
-#define __ut_udpConnectionEventCallbacksMock_hpp__
+#pragma once
 
 #include <gmock/gmock.h>
 #include <boost/asio/ip/udp.hpp>
@@ -29,6 +28,3 @@ public:
 }
 }
 }
-
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef __ut_tcpConnectionsManagerEventCallbacksMock_hpp__
-#define __ut_tcpConnectionsManagerEventCallbacksMock_hpp__
+#pragma once
 
 #include <gmock/gmock.h>
 
@@ -24,6 +23,3 @@ public:
 }
 }
 }
-
-
-#endif

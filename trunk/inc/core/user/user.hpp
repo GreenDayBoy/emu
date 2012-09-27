@@ -1,5 +1,4 @@
-#ifndef __core_user_hpp__
-#define __core_user_hpp__
+#pragma once
 
 #include <network/tcp/tcpConnection.hpp>
 
@@ -36,5 +35,3 @@ protected:
 }
 }
 }
-
-#endif

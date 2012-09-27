@@ -1,5 +1,4 @@
-#ifndef __ut_userStub_hpp__
-#define __ut_userStub_hpp__
+#pragma once
 
 #include <shared/types.hpp>
 #include <core/user/user.hpp>
@@ -24,5 +23,3 @@ private:
 }
 }
 }
-
-#endif

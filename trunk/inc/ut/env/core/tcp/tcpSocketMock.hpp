@@ -1,5 +1,4 @@
-#ifndef __ut_tcpSocketMock_hpp__
-#define __ut_tcpSocketMock_hpp__
+#pragma once
 
 #include <boost/noncopyable.hpp>
 #include <boost/asio.hpp>
@@ -69,5 +68,3 @@ public:
 }
 }
 }
-
-#endif

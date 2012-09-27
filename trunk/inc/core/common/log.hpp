@@ -1,5 +1,4 @@
-#ifndef __core_log_hpp__
-#define __core_log_hpp__
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -21,5 +20,3 @@ eMU_CORE_DECLSPEC std::string getCurrentDateString();
 #define LOG_WARNING (LOG_BASE << "[warning] ")
 #define LOG_ERROR (LOG_BASE << "[error] ")
 #define LOG_DEBUG (LOG_BASE << "[debug] ")
-
-#endif

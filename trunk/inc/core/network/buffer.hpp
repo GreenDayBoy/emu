@@ -1,5 +1,4 @@
-#ifndef __core_buffer_hpp__
-#define __core_buffer_hpp__
+#pragma once
 
 #include <vector>
 
@@ -50,6 +49,4 @@ private:
 
 #ifdef WIN32
 #pragma warning(default: 4251)
-#endif
-
 #endif

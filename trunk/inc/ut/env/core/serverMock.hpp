@@ -1,5 +1,4 @@
-#ifndef __ut_serverMock_hpp__
-#define __ut_serverMock_hpp__
+#pragma once
 
 #include <boost/noncopyable.hpp>
 #include <boost/function.hpp>
@@ -34,5 +33,3 @@ public:
 }
 }
 }
-
-#endif
