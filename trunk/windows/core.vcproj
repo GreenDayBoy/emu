@@ -43,7 +43,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(BOOST_HOME)&quot;;&quot;$(ProjectDir)\..\inc\core&quot;;&quot;$(ProjectDir)\..\inc\&quot;"
-				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_USRDLL;eMU_CORE_EXPORTS;BOOST_ALL_DYN_LINK;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;_USRDLL;WIN32;WIN32_LEAN_AND_MEAN;BOOST_ALL_DYN_LINK;eMU_CORE_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"

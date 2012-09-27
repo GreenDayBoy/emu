@@ -7,13 +7,15 @@
 class serverTest_t: public ::testing::Test {
 public:
     serverTest_t():
-      server_(ioService_, 55901, 5) {}
+      server_(ioService_, 55901, maxNumOfUsers_) {}
 
     void SetUp() {}
     void TearDown() {}
 
     eMU::ut::env::core::serverMock_t server_;
     eMU::ut::env::core::ioServiceStub_t ioService_;
+
+    static const size_t maxNumOfUsers_ = 5;
 };
 
 TEST_F(serverTest_t, onAccept) {
@@ -128,4 +130,28 @@ TEST_F(serverTest_t, OnClose__unknown_socket) {
     connection->socket().expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
     connection->socket().expectCall_close();
     connection->socket().receiveHandler_(boost::asio::error::eof, 0);
+}
+
+TEST_F(serverTest_t, reachedMaxNumberOfUsers) {
+    for(size_t i = 0; i < maxNumOfUsers_; ++i) {
+        server_.connectionsManager().acceptor().expectCall_async_accept();
+        server_.queueAccept();
+
+        server_.expectCall_onAccept(true);
+        server_.connectionsManager().acceptor().socket_->expectCall_async_receive();
+        server_.connectionsManager().acceptor().expectCall_async_accept();
+        server_.connectionsManager().acceptor().acceptHandler_(boost::system::error_code());
+    }
+
+    size_t numOfAttempts = 10;
+
+    for(size_t i = 0; i < numOfAttempts; ++i) {
+        server_.connectionsManager().acceptor().expectCall_async_accept();
+        server_.queueAccept();
+
+        server_.connectionsManager().acceptor().socket_->expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+        server_.connectionsManager().acceptor().socket_->expectCall_close();
+        server_.connectionsManager().acceptor().expectCall_async_accept();
+        server_.connectionsManager().acceptor().acceptHandler_(boost::system::error_code());
+    }
 }

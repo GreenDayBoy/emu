@@ -42,8 +42,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(BOOST_HOME)&quot;"
-				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_CONSOLE;BOOST_ALL_DYN_LINK"
+				AdditionalIncludeDirectories="&quot;$(BOOST_HOME)&quot;;&quot;$(ProjectDir)\..\inc\core&quot;;&quot;$(ProjectDir)\..\inc\connectServer&quot;;&quot;$(ProjectDir)\..\inc\&quot;"
+				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;BOOST_ALL_DYN_LINK;_CRT_SECURE_NO_WARNINGS;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -122,7 +122,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(BOOST_HOME)&quot;"
+				AdditionalIncludeDirectories="&quot;$(BOOST_HOME)&quot;;&quot;$(ProjectDir)\..\inc\core&quot;;&quot;$(ProjectDir)\..\inc\connectServer&quot;;&quot;$(ProjectDir)\..\inc\&quot;"
 				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_CONSOLE;BOOST_ALL_DYN_LINK"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -202,7 +202,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(BOOST_HOME)&quot;"
+				AdditionalIncludeDirectories="&quot;$(BOOST_HOME)&quot;;&quot;$(ProjectDir)\..\inc\core&quot;;&quot;$(ProjectDir)\..\inc\connectServer&quot;;&quot;$(ProjectDir)\..\inc\&quot;"
 				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0501;_CONSOLE;BOOST_ALL_DYN_LINK;UNIT_TESTING"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -260,6 +260,22 @@
 	<References>
 	</References>
 	<Files>
+		<File
+			RelativePath="..\src\connectServer\connectServer.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\inc\connectServer\connectServer.hpp"
+			>
+		</File>
+		<File
+			RelativePath="..\src\connectServer\user.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\inc\connectServer\user.hpp"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
