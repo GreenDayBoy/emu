@@ -24,6 +24,8 @@ public:
         return out;
     }
 
+    bool operator==(const network::tcp::connection_t<> *connection) { return connection_ == connection; }
+
 protected:
     user_t();
 

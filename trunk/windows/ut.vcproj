@@ -278,6 +278,14 @@
 					RelativePath="..\inc\ut\env\core\ioServiceStub.hpp"
 					>
 				</File>
+				<File
+					RelativePath="..\src\ut\env\core\serverMock.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\inc\ut\env\core\serverMock.hpp"
+					>
+				</File>
 				<Filter
 					Name="tcp"
 					>
@@ -356,6 +364,10 @@
 				>
 				<File
 					RelativePath="..\src\ut\test\core\bufferTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\ut\test\core\serverTest.cpp"
 					>
 				</File>
 				<File

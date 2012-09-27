@@ -14,6 +14,7 @@ acceptorMock_t::acceptorMock_t(ioServiceStub_t &ioService,
 }
 
 void acceptorMock_t::impl_async_accept(tcp::socketMock_t &socket, const acceptHandler_t &handler) {
+    socket_ = &socket;
     acceptHandler_ = handler;
 }
 

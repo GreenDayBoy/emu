@@ -293,6 +293,14 @@
 				RelativePath="..\inc\core\network\buffer.hpp"
 				>
 			</File>
+			<File
+				RelativePath="..\src\core\network\server.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\inc\core\network\server.hpp"
+				>
+			</File>
 			<Filter
 				Name="tcp"
 				>
@@ -363,11 +371,27 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath="..\src\core\baseApplication.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\inc\core\baseApplication.hpp"
+			>
+		</File>
+		<File
 			RelativePath="..\src\core\core.cpp"
 			>
 		</File>
 		<File
 			RelativePath="..\inc\core\core.hpp"
+			>
+		</File>
+		<File
+			RelativePath="..\src\core\serviceThreading.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\inc\core\serviceThreading.hpp"
 			>
 		</File>
 	</Files>

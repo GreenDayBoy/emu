@@ -26,6 +26,7 @@ public:
     void expectCall_async_accept();
     void impl_async_accept(socketMock_t &socket, const acceptHandler_t &handler);
 
+    socketMock_t *socket_;
     acceptHandler_t acceptHandler_;
 
 private:

@@ -13,11 +13,8 @@ namespace tcp {
 
 class connectionsManagerEventCallbacksMock_t {
 public:
-    connectionsManagerEventCallbacksMock_t();
-
     MOCK_METHOD1(acceptEvent, void(eMU::core::network::tcp::connection_t<> *connection));
     void expectCall_acceptEvent();
-    void impl_acceptEvent(eMU::core::network::tcp::connection_t<> *connection);
 
     eMU::core::network::tcp::connection_t<> *connection_;
 };
