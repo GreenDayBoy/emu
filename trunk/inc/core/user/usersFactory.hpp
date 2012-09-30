@@ -24,13 +24,18 @@ public:
         }
 
         userImpl *user = objectsPool_.construct(id);
+
+        if(NULL == user) {
+            LOG_ERROR << "Error in allocating new user object." << std::endl;
+        }
+
         return user;
     }
 
-    void destroy(userImpl *user) {
-        int16 id = user->id();
+    void destroy(userImpl &user) {
+        int16 id = user.id();
         idGenerator_.insert(id);
-        objectsPool_.destroy(user);
+        objectsPool_.destroy(&user);
     }
 
 protected:

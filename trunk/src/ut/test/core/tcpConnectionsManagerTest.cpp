@@ -49,5 +49,5 @@ TEST_F(tcpConnectionsManagerTest_t, release) {
 
     connectionsManagerEvents_.connection_->socket().expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
     connectionsManagerEvents_.connection_->socket().expectCall_close();
-    connectionsManager_.release(connectionsManagerEvents_.connection_);
+    connectionsManager_.release(*connectionsManagerEvents_.connection_);
 }

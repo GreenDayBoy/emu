@@ -17,17 +17,17 @@ void eMU::connectServer::server_t::onCleanup() {
     LOG_INFO << "Connect server goes down." << std::endl;
 }
 
-bool eMU::connectServer::server_t::onAccept(user_t *user) {
-    LOG_INFO << "Connected, user: " << *user << std::endl;
+bool eMU::connectServer::server_t::onAccept(user_t &user) {
+    LOG_INFO << "Connected, user: " << user << std::endl;
     return true;
 }
 
-void eMU::connectServer::server_t::onReceive(user_t *user) {
-    LOG_INFO << "Received, user: " << *user << std::endl;
+void eMU::connectServer::server_t::onReceive(user_t &user) {
+    LOG_INFO << "Received, user: " << user << std::endl;
 }
 
-void eMU::connectServer::server_t::onClose(user_t *user) {
-    LOG_INFO << "Closed, user: " << *user << std::endl;
+void eMU::connectServer::server_t::onClose(user_t &user) {
+    LOG_INFO << "Closed, user: " << user << std::endl;
 }
 
 void eMU::connectServer::server_t::onReceiveFrom(eMU::core::network::udp::connection_t<> *connection,

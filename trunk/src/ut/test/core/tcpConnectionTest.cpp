@@ -32,7 +32,7 @@ TEST_F(tcpConnectionTest_t, close) {
 }
 
 TEST_F(tcpConnectionTest_t, disconnect) {
-    connectionEvents_.expectCall_closeEvent(&connection_);
+    connectionEvents_.expectCall_closeEvent(connection_);
     connection_.disconnect();
 }
 
@@ -40,7 +40,7 @@ TEST_F(tcpConnectionTest_t, disconnect__remote) {
     connection_.socket().expectCall_async_receive();
     connection_.queueReceive();
 
-    connectionEvents_.expectCall_closeEvent(&connection_);
+    connectionEvents_.expectCall_closeEvent(connection_);
     connection_.socket().receiveHandler_(boost::asio::error::eof, 0);
 }
 
@@ -57,7 +57,7 @@ TEST_F(tcpConnectionTest_t, receive) {
     memcpy(connection_.socket().rbuf_, &payload[0], payload.size());
 
     connection_.socket().expectCall_async_receive();
-    connectionEvents_.expectCall_receiveEvent(&connection_);
+    connectionEvents_.expectCall_receiveEvent(connection_);
     connection_.socket().receiveHandler_(boost::system::error_code(), payload.size());
 
     // Check if we received exactly prepared payload.
@@ -70,7 +70,7 @@ TEST_F(tcpConnectionTest_t, receive__error) {
     connection_.socket().expectCall_async_receive();
     connection_.queueReceive();
 
-    connectionEvents_.expectCall_closeEvent(&connection_);
+    connectionEvents_.expectCall_closeEvent(connection_);
     connection_.socket().receiveHandler_(boost::asio::error::broken_pipe, 0);
 }
 
@@ -134,14 +134,14 @@ TEST_F(tcpConnectionTest_t, send__error) {
     connection_.socket().expectCall_async_send();
     connection_.send(&payload[0], payload.size());
 
-    connectionEvents_.expectCall_closeEvent(&connection_);
+    connectionEvents_.expectCall_closeEvent(connection_);
     connection_.socket().sendHandler_(boost::asio::error::connection_reset, 0);
 }
 
 TEST_F(tcpConnectionTest_t, send__overflow_primary_buffer) {
     eMU::core::network::payload_t payload(eMU::core::network::maxPayloadSize_c + 1, 0x10);
 
-    connectionEvents_.expectCall_closeEvent(&connection_);
+    connectionEvents_.expectCall_closeEvent(connection_);
     connection_.send(&payload[0], payload.size());
 }
 
@@ -152,7 +152,7 @@ TEST_F(tcpConnectionTest_t, send__overflow_secondary_buffer) {
     connection_.socket().expectCall_async_send();
     connection_.send(&payload1[0], payload1.size());
 
-    connectionEvents_.expectCall_closeEvent(&connection_);
+    connectionEvents_.expectCall_closeEvent(connection_);
     connection_.send(&payload2[0], payload2.size());
 }
 
@@ -171,7 +171,7 @@ TEST_F(tcpConnectionTest_t, connect) {
     connection_.socket().expectCall_async_connect(endpoint);
     connection_.connect(endpoint);
 
-    connectionEvents_.expectCall_connectEvent(&connection_);
+    connectionEvents_.expectCall_connectEvent(connection_);
     connection_.socket().connectHandler_(boost::system::error_code());
 }
 
@@ -181,6 +181,6 @@ TEST_F(tcpConnectionTest_t, connect__error) {
     connection_.socket().expectCall_async_connect(endpoint);
     connection_.connect(endpoint);
 
-    connectionEvents_.expectCall_closeEvent(&connection_);
+    connectionEvents_.expectCall_closeEvent(connection_);
     connection_.socket().connectHandler_(boost::asio::error::access_denied);
 }

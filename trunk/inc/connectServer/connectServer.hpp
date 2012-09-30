@@ -14,9 +14,9 @@ public:
     void onStartup();
     void onCleanup();
 
-    bool onAccept(user_t *user);
-    void onReceive(user_t *user);
-    void onClose(user_t *user);
+    bool onAccept(user_t &user);
+    void onReceive(user_t &user);
+    void onClose(user_t &user);
 
     void onReceiveFrom(eMU::core::network::udp::connection_t<> *connection,
                        const boost::asio::ip::udp::endpoint &endpoint);

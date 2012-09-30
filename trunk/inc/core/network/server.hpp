@@ -33,14 +33,14 @@ public:
     virtual void onStartup() {}
     virtual void onCleanup() {}
 
-    virtual bool onAccept(userImpl *user) = 0;
-    virtual void onReceive(userImpl *user) = 0;
-    virtual void onClose(userImpl *user) = 0;
+    virtual bool onAccept(userImpl &user) = 0;
+    virtual void onReceive(userImpl &user) = 0;
+    virtual void onClose(userImpl &user) = 0;
 
 protected:
     server_t();
 
-    void acceptEvent(tcp::connection_t<> *connection) {
+    void acceptEvent(tcp::connection_t<> &connection) {
         if(usersList_.size() >= maxNumOfUsers_) {
             LOG_INFO << "Reached max number of users." << std::endl;
 
@@ -50,57 +50,56 @@ protected:
 
         userImpl *user = usersFactory_.construct();
         if(NULL == user) {
-            LOG_ERROR << "Error in allocating new user object, address: " << connection->address() << std::endl;
+            LOG_ERROR << "Error in allocating new user object, address: " << connection.address() << std::endl;
 
             connectionsManager_.release(connection);
             return;
         }
-
-        connection->receiveEventCallback(boost::bind(&server_t::receiveEvent, this, _1));
-        connection->closeEventCallback(boost::bind(&server_t::closeEvent, this, _1));
 
         user->connection(connection);
+        //user->connection().receiveEventCallback(boost::bind(&server_t::receiveEvent, this, _1));
+        //user->connection().closeEventCallback(boost::bind(&server_t::closeEvent, this, _1));
 
-        if(this->onAccept(user)) {
+        if(this->onAccept(*user)) {
             usersList_.push_back(user);
-            connection->queueReceive();
+            connection.queueReceive();
         } else {
-            LOG_ERROR << "Error from onAccept() callback, address: " << connection->address() << std::endl;
+            LOG_ERROR << "Error from onAccept() callback, address: " << connection.address() << std::endl;
 
             connectionsManager_.release(connection);
-            usersFactory_.destroy(user);
+            usersFactory_.destroy(*user);
         }
     }
 
-    void receiveEvent(tcp::connection_t<> *connection) {
+    void receiveEvent(tcp::connection_t<> &connection) {
         std::vector<userImpl*>::iterator userIter = std::find_if(usersList_.begin(), usersList_.end(), *boost::lambda::_1 == connection);
 
         if(usersList_.end() == userIter) {
-            LOG_ERROR << "Could not find user by connection, address: " << connection->address() << std::endl;
+            LOG_ERROR << "Could not find user by connection, address: " << connection.address() << std::endl;
             
-            connection->disconnect();
+            connection.disconnect();
             return;
         }
 
         userImpl *user = *userIter;
-        this->onReceive(user);
+        this->onReceive(*user);
     }
 
-    void closeEvent(tcp::connection_t<> *connection) {
+    void closeEvent(tcp::connection_t<> &connection) {
         std::vector<userImpl*>::iterator userIter = std::find_if(usersList_.begin(), usersList_.end(), *boost::lambda::_1 == connection);
 
         if(usersList_.end() == userIter) {
-            LOG_ERROR << "Could not find user by connection, address: " << connection->address() << std::endl;
+            LOG_ERROR << "Could not find user by connection, address: " << connection.address() << std::endl;
 
             connectionsManager_.release(connection);
             return;
         }
 
         userImpl *user = *userIter;
-        this->onClose(user);
+        this->onClose(*user);
 
         connectionsManager_.release(connection);
-        usersFactory_.destroy(user);
+        usersFactory_.destroy(*user);
         usersList_.erase(userIter);
     }
 

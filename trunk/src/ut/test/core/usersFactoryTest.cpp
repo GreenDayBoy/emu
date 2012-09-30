@@ -48,7 +48,7 @@ TEST_F(usersFactoryTest_t, destroy) {
 
     // Destroy the last created user.
     // Now we should have space for one new user.
-    factory_.destroy(lastUser);
+    factory_.destroy(*lastUser);
 
     user = factory_.construct();
     ASSERT_THAT(user, ::testing::NotNull());

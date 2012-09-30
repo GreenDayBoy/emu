@@ -22,7 +22,7 @@ template<typename ioServiceImpl = boost::asio::io_service,
 #endif
 class connectionsManager_t: public objectsFactory_t<connection_t<> > {
 public:
-    typedef boost::function1<void, connection_t<>* > eventCallback_t;
+    typedef boost::function1<void, connection_t<>& > eventCallback_t;
 
     connectionsManager_t(ioServiceImpl &ioService, int16 port):
       ioService_(ioService),
@@ -43,29 +43,28 @@ public:
         acceptor_.async_accept(connection->socket(),
                                boost::bind(&connectionsManager_t::acceptHandler,
                                            this,
-                                           connection,
+                                           boost::ref(*connection),
                                            boost::asio::placeholders::error));
     }
 
-    void release(connection_t<> *connection) {
-        connection->close();
+    void release(connection_t<> &connection) {
+        connection.close();
 
-        if(objectsPool_.is_from(connection)) {
-            objectsPool_.destroy(connection);
+        if(objectsPool_.is_from(&connection)) {
+            objectsPool_.destroy(&connection);
         }
     }
 
 protected:
     connectionsManager_t();
 
-    void acceptHandler(connection_t<> *connection,
-                       const boost::system::error_code &ec) {
+    void acceptHandler(connection_t<> &connection, const boost::system::error_code &ec) {
         if(!ec) {
             acceptEventCallback_(connection);
         } else {
             LOG_ERROR << "Error during establishing connection, error: " << ec.message() << std::endl;
 
-            objectsPool_.destroy(connection);
+            objectsPool_.destroy(&connection);
         }
 
         this->queueAccept();

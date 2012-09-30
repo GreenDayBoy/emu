@@ -1,5 +1,4 @@
-#ifndef __ut_tcpConnectionEventCallbacksMock_hpp__
-#define __ut_tcpConnectionEventCallbacksMock_hpp__
+#pragma once
 
 #include <gmock/gmock.h>
 
@@ -15,14 +14,14 @@ namespace tcp {
 
 class connectionEventCallbacksMock_t {
 public:
-    MOCK_METHOD1(connectEvent, void(eMU::core::network::tcp::connection_t<> *connection));
-    void expectCall_connectEvent(eMU::core::network::tcp::connection_t<> *connection);
+    MOCK_METHOD1(connectEvent, void(eMU::core::network::tcp::connection_t<> &connection));
+    void expectCall_connectEvent(eMU::core::network::tcp::connection_t<> &connection);
 
-    MOCK_METHOD1(receiveEvent, void(eMU::core::network::tcp::connection_t<> *connection));
-    void expectCall_receiveEvent(eMU::core::network::tcp::connection_t<> *connection);
+    MOCK_METHOD1(receiveEvent, void(eMU::core::network::tcp::connection_t<> &connection));
+    void expectCall_receiveEvent(eMU::core::network::tcp::connection_t<> &connection);
 
-    MOCK_METHOD1(closeEvent, void(eMU::core::network::tcp::connection_t<> *connection));
-    void expectCall_closeEvent(eMU::core::network::tcp::connection_t<> *connection);
+    MOCK_METHOD1(closeEvent, void(eMU::core::network::tcp::connection_t<> &connection));
+    void expectCall_closeEvent(eMU::core::network::tcp::connection_t<> &connection);
 };
 
 }
@@ -30,5 +29,3 @@ public:
 }
 }
 }
-
-#endif

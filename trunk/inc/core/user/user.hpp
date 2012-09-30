@@ -15,15 +15,15 @@ public:
     virtual ~user_t() {}
 
     int16 id() { return id_; }
-    network::tcp::connection_t<>* connection() { return connection_; }
-    void connection(network::tcp::connection_t<> *connection) { connection_ = connection; }
+    network::tcp::connection_t<>& connection() { return *connection_; }
+    void connection(network::tcp::connection_t<> &connection) { connection_ = &connection; }
 
     friend std::ostream& operator<<(std::ostream &out, const user_t &user) {
         out << "id: " << user.id_ << ", address: " << user.connection_->address();
         return out;
     }
 
-    bool operator==(const network::tcp::connection_t<> *connection) { return connection_ == connection; }
+    bool operator==(const network::tcp::connection_t<> &connection) { return connection_ == &connection; }
 
 protected:
     user_t();

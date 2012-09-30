@@ -33,7 +33,7 @@ template<typename socketImpl = boost::asio::ip::tcp::socket,
 #endif
 class connection_t: private boost::noncopyable {
 public:
-    typedef boost::function1<void, connection_t*> eventCallback_t;
+    typedef boost::function1<void, connection_t<>& > eventCallback_t;
 
     connection_t(ioServiceImpl &ioService):
       socket_(ioService),
@@ -55,7 +55,7 @@ public:
         closeOngoing_ = true;
 
         ioServiceImpl &ioService = socket_.get_io_service();
-        ioService.post(strand_.wrap(boost::bind(closeEventCallback_, this)));
+        ioService.post(strand_.wrap(boost::bind(closeEventCallback_, boost::ref(*this))));
     }
 
     void close() {
@@ -104,8 +104,7 @@ private:
                                                      boost::asio::placeholders::bytes_transferred))); 
     }
 
-    void receiveHandler(const boost::system::error_code& ec,
-                        size_t bytesTransferred) {
+    void receiveHandler(const boost::system::error_code &ec, size_t bytesTransferred) {
         if(boost::asio::error::eof == ec) {
             this->disconnect();
             return;
@@ -115,15 +114,14 @@ private:
         }
 
         rbuf_.payloadSize_ = bytesTransferred;
-        receiveEventCallback_(this);
+        receiveEventCallback_(*this);
 
         if(!closeOngoing_) {
             this->queueReceive();
         }
     }
 
-    void sendHandler(const boost::system::error_code& ec,
-                     size_t bytesTransferred) {
+    void sendHandler(const boost::system::error_code& ec, size_t bytesTransferred) {
         if(ec) {
             this->errorHandler(ec, "send");
             return;
@@ -155,7 +153,7 @@ private:
             return;
         }
 
-        connectEventCallback_(this);
+        connectEventCallback_(*this);
     }
 
     socketImpl socket_;

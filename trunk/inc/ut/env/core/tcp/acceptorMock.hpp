@@ -1,5 +1,4 @@
-#ifndef __ut_acceptorMock_hpp__
-#define __ut_acceptorMock_hpp__
+#pragma once
 
 #include <gmock/gmock.h>
 #include <boost/noncopyable.hpp>
@@ -38,5 +37,3 @@ private:
 }
 }
 }
-
-#endif
