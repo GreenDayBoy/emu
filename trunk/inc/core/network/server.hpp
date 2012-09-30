@@ -57,8 +57,8 @@ protected:
         }
 
         user->connection(connection);
-        //user->connection().receiveEventCallback(boost::bind(&server_t::receiveEvent, this, _1));
-        //user->connection().closeEventCallback(boost::bind(&server_t::closeEvent, this, _1));
+        user->connection().receiveEventCallback(boost::bind(&server_t::receiveEvent, this, _1));
+        user->connection().closeEventCallback(boost::bind(&server_t::closeEvent, this, _1));
 
         if(this->onAccept(*user)) {
             usersList_.push_back(user);
@@ -72,7 +72,7 @@ protected:
     }
 
     void receiveEvent(tcp::connection_t<> &connection) {
-        std::vector<userImpl*>::iterator userIter = std::find_if(usersList_.begin(), usersList_.end(), *boost::lambda::_1 == connection);
+        std::vector<userImpl*>::iterator userIter = std::find_if(usersList_.begin(), usersList_.end(), *boost::lambda::_1 == boost::ref(connection));
 
         if(usersList_.end() == userIter) {
             LOG_ERROR << "Could not find user by connection, address: " << connection.address() << std::endl;
@@ -86,7 +86,7 @@ protected:
     }
 
     void closeEvent(tcp::connection_t<> &connection) {
-        std::vector<userImpl*>::iterator userIter = std::find_if(usersList_.begin(), usersList_.end(), *boost::lambda::_1 == connection);
+        std::vector<userImpl*>::iterator userIter = std::find_if(usersList_.begin(), usersList_.end(), *boost::lambda::_1 == boost::ref(connection));
 
         if(usersList_.end() == userIter) {
             LOG_ERROR << "Could not find user by connection, address: " << connection.address() << std::endl;

@@ -22,7 +22,7 @@ TEST_F(serverTest_t, onAccept) {
     server_.connectionsManager().acceptor().expectCall_async_accept();
     server_.queueAccept();
 
-    server_.expectCall_onAccept(true);
+    server_.expectCall_onAccept();
     server_.connectionsManager().acceptor().socket_->expectCall_async_receive();
     server_.connectionsManager().acceptor().expectCall_async_accept();
     server_.connectionsManager().acceptor().acceptHandler_(boost::system::error_code());
@@ -32,7 +32,8 @@ TEST_F(serverTest_t, onAccept__failed) {
     server_.connectionsManager().acceptor().expectCall_async_accept();
     server_.queueAccept();
 
-    server_.expectCall_onAccept(false);
+    server_.acceptStatus_ = false;
+    server_.expectCall_onAccept();
     server_.connectionsManager().acceptor().socket_->expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
     server_.connectionsManager().acceptor().socket_->expectCall_close();
     server_.connectionsManager().acceptor().expectCall_async_accept();
@@ -43,7 +44,7 @@ TEST_F(serverTest_t, onReceive) {
     server_.connectionsManager().acceptor().expectCall_async_accept();
     server_.queueAccept();
 
-    server_.expectCall_onAccept(true);
+    server_.expectCall_onAccept();
     server_.connectionsManager().acceptor().socket_->expectCall_async_receive();
     server_.connectionsManager().acceptor().expectCall_async_accept();
     server_.connectionsManager().acceptor().acceptHandler_(boost::system::error_code());
@@ -60,7 +61,7 @@ TEST_F(serverTest_t, onReceive__unknown_socket) {
     server_.connectionsManager().acceptor().expectCall_async_accept();
     server_.queueAccept();
 
-    server_.expectCall_onAccept(true);
+    server_.expectCall_onAccept();
     server_.connectionsManager().acceptor().socket_->expectCall_async_receive();
     server_.connectionsManager().acceptor().expectCall_async_accept();
     server_.connectionsManager().acceptor().acceptHandler_(boost::system::error_code());
@@ -82,7 +83,7 @@ TEST_F(serverTest_t, onClose) {
     server_.connectionsManager().acceptor().expectCall_async_accept();
     server_.queueAccept();
 
-    server_.expectCall_onAccept(true);
+    server_.expectCall_onAccept();
     server_.connectionsManager().acceptor().socket_->expectCall_async_receive();
     server_.connectionsManager().acceptor().expectCall_async_accept();
     server_.connectionsManager().acceptor().acceptHandler_(boost::system::error_code());
@@ -100,7 +101,7 @@ TEST_F(serverTest_t, onClose__unknown_socket) {
     server_.connectionsManager().acceptor().expectCall_async_accept();
     server_.queueAccept();
 
-    server_.expectCall_onAccept(true);
+    server_.expectCall_onAccept();
     server_.connectionsManager().acceptor().socket_->expectCall_async_receive();
     server_.connectionsManager().acceptor().expectCall_async_accept();
     server_.connectionsManager().acceptor().acceptHandler_(boost::system::error_code());
@@ -123,7 +124,7 @@ TEST_F(serverTest_t, reachedMaxNumberOfUsers) {
     server_.queueAccept();
 
     for(size_t i = 0; i < maxNumOfUsers_; ++i) {
-        server_.expectCall_onAccept(true);
+        server_.expectCall_onAccept();
         server_.connectionsManager().acceptor().socket_->expectCall_async_receive();
         server_.connectionsManager().acceptor().expectCall_async_accept();
         server_.connectionsManager().acceptor().acceptHandler_(boost::system::error_code());
@@ -148,7 +149,7 @@ TEST_F(serverTest_t, reachedMaxNumberOfUsers) {
     user->connection().socket().receiveHandler_(boost::asio::error::eof, 0);
 
     // 2. Accept new user - it should succeed. After this maximum is reached again.
-    server_.expectCall_onAccept(true);
+    server_.expectCall_onAccept();
     server_.connectionsManager().acceptor().socket_->expectCall_async_receive();
     server_.connectionsManager().acceptor().expectCall_async_accept();
     server_.connectionsManager().acceptor().acceptHandler_(boost::system::error_code());

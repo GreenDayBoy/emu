@@ -16,7 +16,7 @@ public:
     serverMock_t(ioServiceStub_t &ioService, uint16 port, size_t maxNumOfUsers);
 
     MOCK_METHOD1(onAccept, bool(user::userStub_t &user));
-    void expectCall_onAccept(bool retValue);
+    void expectCall_onAccept();
     bool impl_onAccept(user::userStub_t &user);
 
     MOCK_METHOD1(onReceive, void(user::userStub_t &user));

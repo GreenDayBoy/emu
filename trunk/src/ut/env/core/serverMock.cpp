@@ -9,9 +9,10 @@ serverMock_t::serverMock_t(ioServiceStub_t &ioService, uint16 port, size_t maxNu
   server_t(ioService, port, maxNumOfUsers),
   user_(NULL),
   acceptStatus_(true) {
+    ON_CALL(*this, onAccept(::testing::_)).WillByDefault(::testing::Invoke(this, &serverMock_t::impl_onAccept));
 }
 
-void serverMock_t::expectCall_onAccept(bool retValue) {
+void serverMock_t::expectCall_onAccept() {
     EXPECT_CALL(*this, onAccept(::testing::_));
 }
 
