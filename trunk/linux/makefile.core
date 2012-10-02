@@ -16,10 +16,10 @@
 ##############################################################################
 
 EXEC      = core
-SRC_FILES = ../src/core/*.cpp
-SRC_FILES += ../src/core/common/*.cpp
-SRC_FILES += ../src/core/network/*.cpp
-SRC_FILES += ../src/core/user/*.cpp
+SRC_FILES := $(wildcard ../src/core/*.cpp)
+SRC_FILES += $(wildcard ../src/core/common/*.cpp)
+SRC_FILES += $(wildcard ../src/core/network/*.cpp)
+SRC_FILES += $(wildcard ../src/core/user/*.cpp)
 
 
 ##############################################################################
@@ -33,8 +33,8 @@ SRC_FILES += ../src/core/user/*.cpp
 # LIB_DIR     = /usr/local/lib
 
 # for acpub machines
-INCLUDE_DIR = ../inc/core/
-INCLUDE_DIR = ../inc/
+INCLUDE_DIR := $(wildcard ../inc/core)
+INCLUDE_DIR += $(wildcard ../inc)
 LIB_DIR     = 
 
 ##############################################################################
