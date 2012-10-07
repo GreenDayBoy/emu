@@ -1,6 +1,6 @@
 #include <iomanip>
 #include <sstream>
-#include <time.h>
+#include <ctime>
 
 #include <common/log.hpp>
 

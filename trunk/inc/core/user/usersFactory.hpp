@@ -1,5 +1,5 @@
-#ifndef __core_usersFactory_hpp__
-#define __core_usersFactory_hpp__
+#pragma once
+
 
 #include <common/objectsFactory.hpp>
 #include <common/log.hpp>
@@ -23,7 +23,7 @@ public:
             return NULL;
         }
 
-        userImpl *user = objectsPool_.construct(id);
+        userImpl *user = this->objectsPool_.construct(id);
 
         if(NULL == user) {
             LOG_ERROR << "Error in allocating new user object." << std::endl;
@@ -35,7 +35,7 @@ public:
     void destroy(userImpl &user) {
         int16 id = user.id();
         idGenerator_.insert(id);
-        objectsPool_.destroy(&user);
+        this->objectsPool_.destroy(&user);
     }
 
 protected:
@@ -45,5 +45,3 @@ protected:
 }
 }
 }
-
-#endif

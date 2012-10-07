@@ -29,7 +29,7 @@ void socketMock_t::expectCall_async_receive() {
     EXPECT_CALL(*this, async_receive(::testing::_, ::testing::_));
 }
 
-void socketMock_t::impl_async_receive(boost::asio::mutable_buffers_1 &buffer, const ioServiceStub_t::ioHandler_t &handler) {
+void socketMock_t::impl_async_receive(const boost::asio::mutable_buffers_1 &buffer, const ioServiceStub_t::ioHandler_t &handler) {
     rbuf_ = boost::asio::buffer_cast<uint8*>(buffer);
     rbufSize_ = boost::asio::buffer_size(buffer);
     receiveHandler_ = handler;
@@ -39,7 +39,7 @@ void socketMock_t::expectCall_async_send() {
     EXPECT_CALL(*this, async_send(::testing::_, ::testing::_));
 }
 
-void socketMock_t::impl_async_send(boost::asio::mutable_buffers_1 &buffer, const ioServiceStub_t::ioHandler_t &handler) {
+void socketMock_t::impl_async_send(const boost::asio::mutable_buffers_1 &buffer, const ioServiceStub_t::ioHandler_t &handler) {
     wbuf_ = boost::asio::buffer_cast<uint8*>(buffer);
     wbufSize_ = boost::asio::buffer_size(buffer);
     sendHandler_ = handler;

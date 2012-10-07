@@ -2,7 +2,9 @@
 
 #include <boost/noncopyable.hpp>
 #include <boost/function.hpp>
+#include <gmock/gmock.h>
 
+#include <env/core/ioServiceStub.hpp>
 #include <env/core/user/userStub.hpp>
 #include <core/network/server.hpp>
 

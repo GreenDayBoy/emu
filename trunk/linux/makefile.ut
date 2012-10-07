@@ -1,0 +1,33 @@
+UT_SRC = ../src/ut
+SRC_FILES := $(wildcard $(UT_SRC)/*.cpp)
+SRC_FILES += $(wildcard $(UT_SRC)/env/*.cpp)
+SRC_FILES += $(wildcard $(UT_SRC)/env/core/*.cpp)
+SRC_FILES += $(wildcard $(UT_SRC)/env/core/tcp/*.cpp)
+SRC_FILES += $(wildcard $(UT_SRC)/env/core/udp/*.cpp)
+SRC_FILES += $(wildcard $(UT_SRC)/env/core/user/*.cpp)
+SRC_FILES += $(wildcard $(UT_SRC)/test/*.cpp)
+SRC_FILES += $(wildcard $(UT_SRC)/test/core/*.cpp)
+
+INCLUDE_DIR	:= -I$(wildcard ../inc/)
+INCLUDE_DIR	+= -I$(wildcard ../inc/core/)
+INCLUDE_DIR	+= -I$(wildcard ../inc/ut/)
+
+LIBS = -L bin/ -lcore -lgmock -lgtest -lboost_system -lboost_thread -lpthread
+
+CC = g++
+
+DEBUG_LEVEL     = 
+EXTRA_CCFLAGS   = -Wall
+CCFLAGS       	= $(DEBUG_LEVEL) $(EXTRA_CCFLAGS)
+CPPFLAGS        = -DeMU_UT $(INCLUDE_DIR)
+		  
+LDFLAGS         = $(LIBS)
+
+O_FILES         = $(SRC_FILES:%.cpp=%.o)
+
+Debug:
+	$(CC) $(CCFLAGS) $(CPPFLAGS) $(SRC_FILES) $(LDFLAGS)  -o bin/ut
+
+clean:
+	$(RM) $(O_FILES)
+	$(RM) bin/ut

@@ -35,13 +35,13 @@ public:
     MOCK_METHOD1(shutdown, void(boost::asio::ip::tcp::socket::shutdown_type type));
     void expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_type type);
 
-    MOCK_METHOD2(async_receive, void(boost::asio::mutable_buffers_1 &buffer, const ioServiceStub_t::ioHandler_t &handler));
+    MOCK_METHOD2(async_receive, void(const boost::asio::mutable_buffers_1 &buffer, const ioServiceStub_t::ioHandler_t &handler));
     void expectCall_async_receive();
-    void impl_async_receive(boost::asio::mutable_buffers_1 &buffer, const ioServiceStub_t::ioHandler_t &handler);
+    void impl_async_receive(const boost::asio::mutable_buffers_1 &buffer, const ioServiceStub_t::ioHandler_t &handler);
 
-    MOCK_METHOD2(async_send, void(boost::asio::mutable_buffers_1 &buffer, const ioServiceStub_t::ioHandler_t &handler));
+    MOCK_METHOD2(async_send, void(const boost::asio::mutable_buffers_1 &buffer, const ioServiceStub_t::ioHandler_t &handler));
     void expectCall_async_send();
-    void impl_async_send(boost::asio::mutable_buffers_1 &buffer, const ioServiceStub_t::ioHandler_t &handler);
+    void impl_async_send(const boost::asio::mutable_buffers_1 &buffer, const ioServiceStub_t::ioHandler_t &handler);
 
     MOCK_METHOD2(async_connect, void(const boost::asio::ip::tcp::endpoint &endpoint, const connectHandler_t &handler));
     void expectCall_async_connect(const boost::asio::ip::tcp::endpoint &endpoint);

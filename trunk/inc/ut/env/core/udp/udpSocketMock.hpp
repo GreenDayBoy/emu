@@ -17,21 +17,21 @@ public:
     socketMock_t(ioServiceStub_t &ioService,
                     const boost::asio::ip::udp::endpoint &endpoint);
 
-    MOCK_METHOD3(async_receive_from, void(boost::asio::mutable_buffers_1 &buffer,
+    MOCK_METHOD3(async_receive_from, void(const boost::asio::mutable_buffers_1 &buffer,
                                           boost::asio::ip::udp::endpoint &senderEndpoint,
                                           const ioServiceStub_t::ioHandler_t &handler));
     void expectCall_async_receive_from();
 
-    void impl_async_receive_from(boost::asio::mutable_buffers_1 &buffer,
+    void impl_async_receive_from(const boost::asio::mutable_buffers_1 &buffer,
                                  boost::asio::ip::udp::endpoint &senderEndpoint,
                                  const ioServiceStub_t::ioHandler_t &handler);
 
-    MOCK_METHOD3(async_send_to, void(boost::asio::mutable_buffers_1 &buffer,
+    MOCK_METHOD3(async_send_to, void(const boost::asio::mutable_buffers_1 &buffer,
                                      boost::asio::ip::udp::endpoint endpoint,
                                      const ioServiceStub_t::ioHandler_t &handler));
     void expectCall_async_send_to();
 
-    void impl_async_send_to(boost::asio::mutable_buffers_1 &buffer,
+    void impl_async_send_to(const boost::asio::mutable_buffers_1 &buffer,
                             boost::asio::ip::udp::endpoint endpoint,
                             const ioServiceStub_t::ioHandler_t &handler);
 

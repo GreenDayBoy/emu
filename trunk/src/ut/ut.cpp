@@ -3,9 +3,9 @@
 
 #include <ut.hpp>
 
-void main(int count, char *args[]) {
+int main(int count, char *args[]) {
     testing::InitGoogleMock(&count, args);
     testing::InitGoogleTest(&count, args);
 
-    RUN_ALL_TESTS();
+    return RUN_ALL_TESTS();
 }

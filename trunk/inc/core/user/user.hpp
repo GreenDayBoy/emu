@@ -28,8 +28,8 @@ public:
 protected:
     user_t();
 
-    network::tcp::connection_t<> *connection_;
     int16 id_;
+    network::tcp::connection_t<> *connection_;
 };
 
 }

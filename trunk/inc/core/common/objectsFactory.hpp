@@ -12,7 +12,7 @@ public:
     virtual ~objectsFactory_t() {}
 
 protected:
-    boost::object_pool<objectImpl> objectsPool_;
+    typename boost::object_pool<objectImpl> objectsPool_;
 };
 
 }

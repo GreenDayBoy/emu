@@ -1,7 +1,7 @@
 #pragma once
 
 #include <gmock/gmock.h>
-#include <boost/asio/ip/udp.hpp>
+#include <boost/asio.hpp>
 
 #include <core/network/buffer.hpp>
 #include <core/network/udp/udpConnection.hpp>

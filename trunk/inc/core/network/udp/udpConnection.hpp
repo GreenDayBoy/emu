@@ -2,10 +2,16 @@
 
 #include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/bind.hpp>
 
 #include <network/buffer.hpp>
 #include <network/udp/udpWriteBufferManager.hpp>
 #include <common/log.hpp>
+
+#ifdef eMU_UT
+#include <ut/env/core/ioServiceStub.hpp>
+#include <ut/env/core/udp/udpSocketMock.hpp>
+#endif
 
 #ifdef WIN32
 #pragma warning(disable: 4275)

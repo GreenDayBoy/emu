@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include <network/buffer.hpp>
 #include <common/log.hpp>
 

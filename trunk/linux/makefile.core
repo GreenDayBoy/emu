@@ -2,47 +2,30 @@ CORE_SRC = ../src/core
 SRC_FILES := $(wildcard $(CORE_SRC)/*.cpp)
 SRC_FILES += $(wildcard $(CORE_SRC)/common/*.cpp)
 SRC_FILES += $(wildcard $(CORE_SRC)/network/*.cpp)
+SRC_FILES += $(wildcard $(CORE_SRC)/network/tcp/*.cpp)
+SRC_FILES += $(wildcard $(CORE_SRC)/network/udp/*.cpp)
 SRC_FILES += $(wildcard $(CORE_SRC)/user/*.cpp)
 
-INCLUDE_DIR	:= -I$(wildcard /usr/include)
-INCLUDE_DIR	:= -I$(wildcard ../inc/core/)
-INCLUDE_DIR	+= -I$(wildcard ../inc/)
-LIB_DIR		=  /usr/lib
+INCLUDE_DIR	:= -I$(wildcard ../inc/)
+INCLUDE_DIR	+= -I$(wildcard ../inc/core/)
+INCLUDE_DIR	+= -I$(wildcard ../inc/ut/)
+
+LIBS = -l boost_system -l boost_thread
 
 CC = g++
 
 DEBUG_LEVEL     = 
-EXTRA_CCFLAGS   = -Wall
-CCFLAGS        = $(DEBUG_LEVEL) $(EXTRA_CCFLAGS)
-CPPFLAGS        = $(INCLUDE_DIR)
+EXTRA_CCFLAGS   = -fPIC -Wall -shared
+CCFLAGS       	= $(DEBUG_LEVEL) $(EXTRA_CCFLAGS)
+CPPFLAGS        = -DeMU_UT $(INCLUDE_DIR)
 		  
-LDFLAGS         = -L$(LIB_DIR)
+LDFLAGS         = $(LIBS)
 
-O_FILES         = $(SRC_FILES:%.cc=%.o)
+O_FILES         = $(SRC_FILES:%.cpp=%.o)
 
-
-###########################################################################
-# Additional rules make should know about in order to compile our files
-###########################################################################
-# all is the default rule
 all:
-	$(CC) $(CCFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) $(SRC_FILES) -o $(O_FILES)
+	$(CC) $(CCFLAGS) $(CPPFLAGS) $(SRC_FILES) $(LDFLAGS)  -o bin/libcore.so
 
-
-# exec depends on the object files
-# It is made automagically using the LDFLAGS and LOADLIBES variables.
-# The .o files are made automagically using the CXXFLAGS variable.
-$(EXEC): $(O_FILES)
-
-# to use `makedepend', the target is `depend'
-depend:
-	makedepend -- $(CXXFLAGS) -- -Y $(SRC_FILES)
-
-
-
-# clean up after you're done
 clean:
-	$(RM) $(O_FILES) core *.rpo
-
-very-clean: clean
-	$(RM) $(EXEC)
+	$(RM) $(O_FILES)
+	$(RM) bin/libcore.so

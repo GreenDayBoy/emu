@@ -16,7 +16,7 @@ public:
 
     MOCK_METHOD1(acceptEvent, void(eMU::core::network::tcp::connection_t<> &connection));
     void expectCall_acceptEvent();
-    void connectionsManagerEventCallbacksMock_t::impl_acceptEvent(eMU::core::network::tcp::connection_t<> &connection) ;
+    void impl_acceptEvent(eMU::core::network::tcp::connection_t<> &connection) ;
 
     eMU::core::network::tcp::connection_t<> *connection_;
 };
