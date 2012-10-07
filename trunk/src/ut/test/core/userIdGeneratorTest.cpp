@@ -9,7 +9,7 @@ public:
     void SetUp() {}
     void TearDown() {}
 
-    static const size_t maxNumOfIds_ = 10;
+    static const int16 maxNumOfIds_ = 10;
     eMU::core::user::idGenerator_t idGenerator_;
 };
 
