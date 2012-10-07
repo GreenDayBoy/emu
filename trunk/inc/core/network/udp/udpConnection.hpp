@@ -3,6 +3,7 @@
 #include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 
 #include <network/buffer.hpp>
 #include <network/udp/udpWriteBufferManager.hpp>

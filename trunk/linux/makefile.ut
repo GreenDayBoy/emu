@@ -1,12 +1,12 @@
-UT_SRC = ../src/ut
-SRC_FILES := $(wildcard $(UT_SRC)/*.cpp)
-SRC_FILES += $(wildcard $(UT_SRC)/env/*.cpp)
-SRC_FILES += $(wildcard $(UT_SRC)/env/core/*.cpp)
-SRC_FILES += $(wildcard $(UT_SRC)/env/core/tcp/*.cpp)
-SRC_FILES += $(wildcard $(UT_SRC)/env/core/udp/*.cpp)
-SRC_FILES += $(wildcard $(UT_SRC)/env/core/user/*.cpp)
-SRC_FILES += $(wildcard $(UT_SRC)/test/*.cpp)
-SRC_FILES += $(wildcard $(UT_SRC)/test/core/*.cpp)
+SRC_DIR = ../src/ut
+SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+SRC_FILES += $(wildcard $(SRC_DIR)/env/*.cpp)
+SRC_FILES += $(wildcard $(SRC_DIR)/env/core/*.cpp)
+SRC_FILES += $(wildcard $(SRC_DIR)/env/core/tcp/*.cpp)
+SRC_FILES += $(wildcard $(SRC_DIR)/env/core/udp/*.cpp)
+SRC_FILES += $(wildcard $(SRC_DIR)/env/core/user/*.cpp)
+SRC_FILES += $(wildcard $(SRC_DIR)/test/*.cpp)
+SRC_FILES += $(wildcard $(SRC_DIR)/test/core/*.cpp)
 
 INCLUDE_DIR	:= -I$(wildcard ../inc/)
 INCLUDE_DIR	+= -I$(wildcard ../inc/core/)
@@ -25,7 +25,7 @@ LDFLAGS         = $(LIBS)
 
 O_FILES         = $(SRC_FILES:%.cpp=%.o)
 
-Debug:
+all:
 	$(CC) $(CCFLAGS) $(CPPFLAGS) $(SRC_FILES) $(LDFLAGS)  -o bin/ut
 
 clean:

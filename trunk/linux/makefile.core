@@ -1,10 +1,10 @@
-CORE_SRC = ../src/core
-SRC_FILES := $(wildcard $(CORE_SRC)/*.cpp)
-SRC_FILES += $(wildcard $(CORE_SRC)/common/*.cpp)
-SRC_FILES += $(wildcard $(CORE_SRC)/network/*.cpp)
-SRC_FILES += $(wildcard $(CORE_SRC)/network/tcp/*.cpp)
-SRC_FILES += $(wildcard $(CORE_SRC)/network/udp/*.cpp)
-SRC_FILES += $(wildcard $(CORE_SRC)/user/*.cpp)
+SRC_DIR = ../src/core
+SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+SRC_FILES += $(wildcard $(SRC_DIR)/common/*.cpp)
+SRC_FILES += $(wildcard $(SRC_DIR)/network/*.cpp)
+SRC_FILES += $(wildcard $(SRC_DIR)/network/tcp/*.cpp)
+SRC_FILES += $(wildcard $(SRC_DIR)/network/udp/*.cpp)
+SRC_FILES += $(wildcard $(SRC_DIR)/user/*.cpp)
 
 INCLUDE_DIR	:= -I$(wildcard ../inc/)
 INCLUDE_DIR	+= -I$(wildcard ../inc/core/)
@@ -17,7 +17,11 @@ CC = g++
 DEBUG_LEVEL     = 
 EXTRA_CCFLAGS   = -fPIC -Wall -shared
 CCFLAGS       	= $(DEBUG_LEVEL) $(EXTRA_CCFLAGS)
-CPPFLAGS        = -DeMU_UT $(INCLUDE_DIR)
+CPPFLAGS        := $(INCLUDE_DIR)
+
+ifeq ($(UT), true)
+	CPPFLAGS += -DeMU_UT
+endif
 		  
 LDFLAGS         = $(LIBS)
 
