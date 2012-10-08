@@ -48,9 +48,9 @@ public:
 
 protected:
     boost::asio::io_service ioService_;
+    serverImpl server_;
     boost::asio::signal_set signalSet_;
     serviceThreading_t serviceThreading_;
-    serverImpl server_;
 };
 
 }

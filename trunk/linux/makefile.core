@@ -10,26 +10,27 @@ INCLUDE_DIR	:= -I$(wildcard ../inc/)
 INCLUDE_DIR	+= -I$(wildcard ../inc/core/)
 INCLUDE_DIR	+= -I$(wildcard ../inc/ut/)
 
-LIBS = -l boost_system -l boost_thread
+LIB_DIR =
+LIB 	= -lboost_system -lboost_thread
 
 CC = g++
 
-DEBUG_LEVEL     = 
-EXTRA_CCFLAGS   = -fPIC -Wall -shared
-CCFLAGS       	= $(DEBUG_LEVEL) $(EXTRA_CCFLAGS)
-CPPFLAGS        := $(INCLUDE_DIR)
+OPTIMIZATION_FLAGS     	= 
+EXTRA_CCFLAGS			= -Wall -fPIC -shared
+CCFLAGS       			= $(OPTIMIZATION_FLAGS) $(EXTRA_CCFLAGS)
+CPPFLAGS        		:= $(INCLUDE_DIR)
+LDFLAGS         		= $(LIB_DIR) $(LIB)
+O_FILES         		= $(SRC_FILES:%.cpp=%.o)
+
+OUTPUT_FILE 			= bin/libcore.so
 
 ifeq ($(UT), true)
 	CPPFLAGS += -DeMU_UT
 endif
-		  
-LDFLAGS         = $(LIBS)
-
-O_FILES         = $(SRC_FILES:%.cpp=%.o)
 
 all:
-	$(CC) $(CCFLAGS) $(CPPFLAGS) $(SRC_FILES) $(LDFLAGS)  -o bin/libcore.so
+	$(CC) $(CCFLAGS) $(CPPFLAGS) $(SRC_FILES) $(LDFLAGS) -o $(OUTPUT_FILE)
 
 clean:
 	$(RM) $(O_FILES)
-	$(RM) bin/libcore.so
+	$(RM) $(OUTPUT_FILE)

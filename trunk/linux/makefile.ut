@@ -12,22 +12,23 @@ INCLUDE_DIR	:= -I$(wildcard ../inc/)
 INCLUDE_DIR	+= -I$(wildcard ../inc/core/)
 INCLUDE_DIR	+= -I$(wildcard ../inc/ut/)
 
-LIBS = -L bin/ -lcore -lgmock -lgtest -lboost_system -lboost_thread -lpthread
+LIB_DIR = -L bin/ 
+LIB 	= -lcore -lgmock -lgtest -lboost_system -lboost_thread -lpthread
 
 CC = g++
 
-DEBUG_LEVEL     = 
-EXTRA_CCFLAGS   = -Wall
-CCFLAGS       	= $(DEBUG_LEVEL) $(EXTRA_CCFLAGS)
-CPPFLAGS        = -DeMU_UT $(INCLUDE_DIR)
-		  
-LDFLAGS         = $(LIBS)
+OPTIMIZATION_FLAGS  = 
+EXTRA_CCFLAGS   	= -Wall
+CCFLAGS       		= $(OPTIMIZATION_FLAGS) $(EXTRA_CCFLAGS)
+CPPFLAGS        	= -DeMU_UT $(INCLUDE_DIR)
+LDFLAGS         	= $(LIB_DIR) $(LIB)
+O_FILES         	= $(SRC_FILES:%.cpp=%.o)
 
-O_FILES         = $(SRC_FILES:%.cpp=%.o)
+OUTPUT_FILE 		= bin/ut
 
 all:
-	$(CC) $(CCFLAGS) $(CPPFLAGS) $(SRC_FILES) $(LDFLAGS)  -o bin/ut
+	$(CC) $(CCFLAGS) $(CPPFLAGS) $(SRC_FILES) $(LDFLAGS) -o $(OUTPUT_FILE)
 
 clean:
 	$(RM) $(O_FILES)
-	$(RM) bin/ut
+	$(RM) $(OUTPUT_FILE)

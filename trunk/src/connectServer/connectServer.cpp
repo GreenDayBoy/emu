@@ -34,10 +34,10 @@ void eMU::connectServer::server_t::onReceiveFrom(eMU::core::network::udp::connec
                                                  const boost::asio::ip::udp::endpoint &endpoint) {
 }
 
-void main(int argsCount, char *args[]) {
+int main(int argsCount, char *args[]) {
     if(argsCount != 4) {
         LOG_ERROR << "Invalid command line for start ConnectServer instance." << std::endl;
-        return;
+        return 0;
     }
 
     size_t maxNumOfUsers = boost::lexical_cast<size_t>(args[1]);
@@ -50,4 +50,6 @@ void main(int argsCount, char *args[]) {
 #ifdef WIN32
     system("PAUSE");
 #endif
+
+    return 0;
 }

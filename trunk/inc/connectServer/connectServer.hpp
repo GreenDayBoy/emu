@@ -28,4 +28,4 @@ private:
 }
 }
 
-void main(int argsCount, char *args[]);
+int main(int argsCount, char *args[]);

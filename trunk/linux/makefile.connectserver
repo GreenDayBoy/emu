@@ -1,0 +1,34 @@
+SRC_DIR = ../src/connectServer
+SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+
+INCLUDE_DIR	:= -I$(wildcard ../inc/)
+INCLUDE_DIR	+= -I$(wildcard ../inc/core/)
+INCLUDE_DIR	+= -I$(wildcard ../inc/ut/)
+INCLUDE_DIR	+= -I$(wildcard ../inc/connectServer/)
+
+LIB_DIR = -L bin/
+LIB 	= -lcore -lboost_system -lboost_thread 
+
+CC = g++
+
+OPTIMIZATION_FLAGS  = 
+EXTRA_CCFLAGS	    = -Wall
+CCFLAGS       		= $(OPTIMIZATION_FLAGS) $(EXTRA_CCFLAGS)
+CPPFLAGS			:= $(INCLUDE_DIR)
+LDFLAGS         	= $(LIB_DIR) $(LIB)
+O_FILES  	        = $(SRC_FILES:%.cpp=%.o)
+
+OUTPUT_FILE 		= bin/connectserver
+
+ifeq ($(UT), true)
+	CPPFLAGS += -DeMU_UT
+	EXTRA_CCFLAGS += -fPIC -shared
+	OUTPUT_FILE = bin/libconnectserver.so
+endif
+
+all:
+	$(CC) $(CCFLAGS) $(CPPFLAGS) $(SRC_FILES) $(LDFLAGS) -o $(OUTPUT_FILE)
+
+clean:
+	$(RM) $(O_FILES)
+	$(RM) $(OUTPUT_FILE)
