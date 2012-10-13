@@ -16,8 +16,6 @@ public:
 };
 
 TEST_F(usersFactoryTest_t, construct_and_destroy) {
-    eMU::ut::env::core::user::userStub_t *user = NULL;
-
     for(size_t i = 0; i < numOfIds_ * 2; ++i) {
         eMU::ut::env::core::user::userStub_t &user = factory_.construct();
 
