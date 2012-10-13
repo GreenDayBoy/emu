@@ -18,7 +18,7 @@ void eMU::connectServer::server_t::onCleanup() {
 }
 
 bool eMU::connectServer::server_t::onAccept(user_t &user) {
-    LOG_INFO << "Connected, user: " << user << std::endl;
+    LOG_INFO << "Connected, user: " << user << " from: " << user.connection().address() << std::endl;
     return true;
 }
 
