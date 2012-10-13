@@ -6,9 +6,9 @@ namespace env {
 namespace core {
 namespace udp {
 
-void connectionEventCallbacksMock_t::expectCall_receiveFromEvent(eMU::core::network::udp::connection_t<> *connection,
+void connectionEventCallbacksMock_t::expectCall_receiveFromEvent(eMU::core::network::udp::connection_t<> &connection,
                                                                  const boost::asio::ip::udp::endpoint &endpoint) {
-    EXPECT_CALL(*this, receiveFromEvent(connection, endpoint));
+    EXPECT_CALL(*this, receiveFromEvent(::testing::Ref(connection), endpoint));
 }
 
 }

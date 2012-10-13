@@ -30,7 +30,7 @@ void eMU::connectServer::server_t::onClose(user_t &user) {
     LOG_INFO << "Closed, user: " << user << std::endl;
 }
 
-void eMU::connectServer::server_t::onReceiveFrom(eMU::core::network::udp::connection_t<> *connection,
+void eMU::connectServer::server_t::onReceiveFrom(eMU::core::network::udp::connection_t<> &connection,
                                                  const boost::asio::ip::udp::endpoint &endpoint) {
 }
 

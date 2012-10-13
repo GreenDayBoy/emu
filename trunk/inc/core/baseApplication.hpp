@@ -3,6 +3,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <typeinfo>
 
 #include <serviceThreading.hpp>
 #include <common/log.hpp>
@@ -28,22 +29,30 @@ public:
     virtual ~baseApplication_t() {}
 
     void start() {
-        LOG_INFO << "Starting server." << std::endl;
+        try {
+            LOG_INFO << "Starting server." << std::endl;
 
-        signalSet_.add(SIGTERM);
-        signalSet_.add(SIGINT);
+            signalSet_.add(SIGTERM);
+            signalSet_.add(SIGINT);
 
-        signalSet_.async_wait(boost::bind(&baseApplication_t::stopHandler, this));
-        server_.onStartup();
-        server_.queueAccept();
+            signalSet_.async_wait(boost::bind(&baseApplication_t::stopHandler, this));
+            server_.onStartup();
+            server_.queueAccept();
 
-        serviceThreading_.initialize(ioService_);
-        serviceThreading_.join();
+            serviceThreading_.initialize(ioService_);
+            serviceThreading_.join();
+        } catch(std::exception &e) {
+            LOG_ERROR << "Caught exception: " << e.what() << std::endl;
+        }
     }
 
     void stopHandler() {
-        server_.onCleanup();
-        ioService_.stop();
+        try {
+            server_.onCleanup();
+            ioService_.stop();
+        } catch(std::exception &e) {
+            LOG_ERROR << "Caught exception: " << e.what() << std::endl;
+        }
     }
 
 protected:

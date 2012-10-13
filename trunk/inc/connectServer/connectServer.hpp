@@ -18,7 +18,7 @@ public:
     void onReceive(user_t &user);
     void onClose(user_t &user);
 
-    void onReceiveFrom(eMU::core::network::udp::connection_t<> *connection,
+    void onReceiveFrom(eMU::core::network::udp::connection_t<> &connection,
                        const boost::asio::ip::udp::endpoint &endpoint);
 
 private:

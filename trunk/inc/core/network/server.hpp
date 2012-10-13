@@ -48,26 +48,20 @@ protected:
             return;
         }
 
-        userImpl *user = usersFactory_.construct();
-        if(NULL == user) {
-            LOG_ERROR << "Error in allocating new user object, address: " << connection.address() << std::endl;
+        userImpl &user = usersFactory_.construct();
 
-            connectionsManager_.release(connection);
-            return;
-        }
+        user.connection(connection);
+        user.connection().receiveEventCallback(boost::bind(&server_t::receiveEvent, this, _1));
+        user.connection().closeEventCallback(boost::bind(&server_t::closeEvent, this, _1));
 
-        user->connection(connection);
-        user->connection().receiveEventCallback(boost::bind(&server_t::receiveEvent, this, _1));
-        user->connection().closeEventCallback(boost::bind(&server_t::closeEvent, this, _1));
-
-        if(this->onAccept(*user)) {
-            usersList_.push_back(user);
+        if(this->onAccept(user)) {
+            usersList_.push_back(&user);
             connection.queueReceive();
         } else {
             LOG_ERROR << "Error from onAccept() callback, address: " << connection.address() << std::endl;
 
             connectionsManager_.release(connection);
-            usersFactory_.destroy(*user);
+            usersFactory_.destroy(user);
         }
     }
 
@@ -75,10 +69,11 @@ protected:
         typename std::vector<userImpl*>::iterator userIter = std::find_if(usersList_.begin(), usersList_.end(), *boost::lambda::_1 == boost::ref(connection));
 
         if(usersList_.end() == userIter) {
-            LOG_ERROR << "Could not find user by connection, address: " << connection.address() << std::endl;
-            
-            connection.disconnect();
-            return;
+            exception_t e;
+            e.in() << "Could not find user by connection, address: " << connection.address();
+
+            connectionsManager_.release(connection);
+            throw e;
         }
 
         userImpl *user = *userIter;
@@ -89,10 +84,11 @@ protected:
         typename std::vector<userImpl*>::iterator userIter = std::find_if(usersList_.begin(), usersList_.end(), *boost::lambda::_1 == boost::ref(connection));
 
         if(usersList_.end() == userIter) {
-            LOG_ERROR << "Could not find user by connection, address: " << connection.address() << std::endl;
+            exception_t e;
+            e.in() << "Could not find user by connection, address: " << connection.address();
 
             connectionsManager_.release(connection);
-            return;
+            throw e;
         }
 
         userImpl *user = *userIter;

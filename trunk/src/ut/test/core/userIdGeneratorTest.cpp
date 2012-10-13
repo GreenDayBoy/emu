@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
+
 #include <core/user/userIdGenerator.hpp>
+#include <core/common/exception.hpp>
 
 class userIdGeneratorTest_t: public ::testing::Test {
 public:
@@ -22,8 +24,15 @@ TEST_F(userIdGeneratorTest_t, get) {
         ASSERT_EQ(i, id);
     }
 
-    id = idGenerator_.get();
-    EXPECT_EQ(eMU::core::user::invalidId_c, id);
+    bool exceptionThrown = false;
+
+    try {
+        id = idGenerator_.get();
+    } catch(eMU::core::exception_t&) {
+        exceptionThrown = true;
+    }
+
+    EXPECT_TRUE(exceptionThrown);
 }
 
 TEST_F(userIdGeneratorTest_t, insert) {
@@ -37,6 +46,13 @@ TEST_F(userIdGeneratorTest_t, insert) {
     EXPECT_EQ(9, id);
 
     // Make sure that we have no free ids again.
-    id = idGenerator_.get();
-    EXPECT_EQ(eMU::core::user::invalidId_c, id);
+    bool exceptionThrown = false;
+
+    try {
+        id = idGenerator_.get();
+    } catch(eMU::core::exception_t&) {
+        exceptionThrown = true;
+    }
+
+    EXPECT_TRUE(exceptionThrown);
 }

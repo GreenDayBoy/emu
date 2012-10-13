@@ -76,7 +76,16 @@ TEST_F(serverTest_t, onReceive__unknown_socket) {
 
     connection.socket().expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
     connection.socket().expectCall_close();
-    connection.socket().receiveHandler_(boost::system::error_code(), 43);
+
+    bool exceptionThrown = false;
+
+    try {
+        connection.socket().receiveHandler_(boost::asio::error::eof, 0);
+    } catch(eMU::core::exception_t&) {
+        exceptionThrown = true;
+    }
+
+    ASSERT_TRUE(exceptionThrown);
 }
 
 TEST_F(serverTest_t, onClose) {
@@ -116,7 +125,16 @@ TEST_F(serverTest_t, onClose__unknown_socket) {
 
     connection.socket().expectCall_shutdown(boost::asio::ip::tcp::socket::shutdown_both);
     connection.socket().expectCall_close();
-    connection.socket().receiveHandler_(boost::asio::error::eof, 0);
+
+    bool exceptionThrown = false;
+
+    try {
+        connection.socket().receiveHandler_(boost::asio::error::eof, 0);
+    } catch(eMU::core::exception_t&) {
+        exceptionThrown = true;
+    }
+
+    ASSERT_TRUE(exceptionThrown);
 }
 
 TEST_F(serverTest_t, reachedMaxNumberOfUsers) {

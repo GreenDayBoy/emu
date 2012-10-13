@@ -1,4 +1,5 @@
 #include <user/userIdGenerator.hpp>
+#include <common/exception.hpp>
 
 namespace eMU {
 namespace core {
@@ -17,7 +18,7 @@ int16 idGenerator_t::get() {
         return id;
     }
     
-    return invalidId_c;
+    throw exception_t("Ids pool is empty!");
 }
 
 void idGenerator_t::insert(int16 id) {

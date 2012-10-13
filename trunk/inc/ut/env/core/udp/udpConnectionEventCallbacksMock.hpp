@@ -16,10 +16,10 @@ namespace udp {
 
 class connectionEventCallbacksMock_t {
 public:
-    MOCK_METHOD2(receiveFromEvent, void(eMU::core::network::udp::connection_t<> *connection,
+    MOCK_METHOD2(receiveFromEvent, void(eMU::core::network::udp::connection_t<> &connection,
                                         const boost::asio::ip::udp::endpoint &endpoint));
 
-    void expectCall_receiveFromEvent(eMU::core::network::udp::connection_t<> *connection,
+    void expectCall_receiveFromEvent(eMU::core::network::udp::connection_t<> &connection,
                                      const boost::asio::ip::udp::endpoint &endpoint);
 };
 

@@ -3,6 +3,7 @@
 
 #include <common/objectsFactory.hpp>
 #include <common/log.hpp>
+#include <common/exception.hpp>
 #include <user/userIdGenerator.hpp>
 
 namespace eMU {
@@ -15,21 +16,16 @@ public:
     factory_t(size_t maxNumOfUsers):
       idGenerator_(maxNumOfUsers) {}
 
-    userImpl* construct() {
+    userImpl& construct() {
         int16 id = idGenerator_.get();
-
-        if(id == invalidId_c) {
-            LOG_ERROR << "Generated invalid id!" << std::endl;
-            return NULL;
-        }
 
         userImpl *user = this->objectsPool_.construct(id);
 
         if(NULL == user) {
-            LOG_ERROR << "Error in allocating new user object." << std::endl;
+            throw exception_t("Error in allocating new user object!");
         }
 
-        return user;
+        return *user;
     }
 
     void destroy(userImpl &user) {

@@ -2,6 +2,7 @@
 
 #include <common/objectsFactory.hpp>
 #include <network/tcp/tcpConnection.hpp>
+#include <common/exception.hpp>
 
 #ifdef eMU_UT
 #include <ut/env/core/ioServiceStub.hpp>
@@ -36,8 +37,7 @@ public:
         connection_t<> *connection = objectsPool_.construct(boost::ref(ioService_));
 
         if(NULL == connection) {
-            LOG_ERROR << "Error in allocating new connection object!" << std::endl;
-            return;
+            throw exception_t("Error in allocating new connection object!");
         }
 
         acceptor_.async_accept(connection->socket(),
@@ -48,10 +48,14 @@ public:
     }
 
     void release(connection_t<> &connection) {
-        connection.close();
+        try {
+            connection.close();
 
-        if(objectsPool_.is_from(&connection)) {
-            objectsPool_.destroy(&connection);
+            if(objectsPool_.is_from(&connection)) {
+                objectsPool_.destroy(&connection);
+            }
+        } catch(boost::system::system_error &e) {
+            LOG_ERROR << "Caught exception during connection release, message: " << e.what() << std::endl;
         }
     }
 

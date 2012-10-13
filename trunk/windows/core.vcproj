@@ -266,6 +266,14 @@
 			Name="common"
 			>
 			<File
+				RelativePath="..\src\core\common\exception.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\inc\core\common\exception.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\core\common\log.cpp"
 				>
 			</File>

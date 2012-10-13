@@ -33,7 +33,7 @@ template<typename socketImpl = boost::asio::ip::udp::socket,
 #endif
 class connection_t: private boost::noncopyable {
 public:
-    typedef boost::function2<void, connection_t*, const boost::asio::ip::udp::endpoint&> receiveFromEventCallback_t;
+    typedef boost::function2<void, connection_t&, const boost::asio::ip::udp::endpoint&> receiveFromEventCallback_t;
 
     connection_t(ioServiceImpl &ioService, uint16 port):
       socket_(ioService,
@@ -50,7 +50,7 @@ public:
         socket_.async_receive_from(boost::asio::buffer(&rbuf_.payload_[0], maxPayloadSize_c),
                                    senderEndpoint_,
                                    strand_.wrap(boost::bind(&connection_t::receiveFromHandler,
-                                                            this,
+                                                            boost::ref(*this),
                                                             boost::asio::placeholders::error,
                                                             boost::asio::placeholders::bytes_transferred)));
     }
@@ -79,7 +79,7 @@ private:
             this->errorHandler(ec, "receiveFrom");
         } else {
             rbuf_.payloadSize_ = bytesTransferred;
-            receiveFromEventCallback_(this, senderEndpoint_);
+            receiveFromEventCallback_(boost::ref(*this), senderEndpoint_);
         }
 
         this->queueReceiveFrom();
@@ -90,7 +90,7 @@ private:
         socket_.async_send_to(boost::asio::buffer(&wbuf->payload_[0], wbuf->payloadSize_),
                               endpoint,
                               strand_.wrap(boost::bind(&connection_t::sendToHandler,
-                                                       this,
+                                                       boost::ref(*this),
                                                        endpoint,
                                                        boost::asio::placeholders::error,
                                                        boost::asio::placeholders::bytes_transferred))); 

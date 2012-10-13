@@ -43,7 +43,7 @@ TEST_F(udpConnectionTest_t, receiveFrom) {
     *connection_.socket().senderEndpoint_ = senderEndpoint;
 
     connection_.socket().expectCall_async_receive_from();
-    connectionEvents_.expectCall_receiveFromEvent(&connection_, senderEndpoint);
+    connectionEvents_.expectCall_receiveFromEvent(connection_, senderEndpoint);
     connection_.socket().receiveFromHandler_(boost::system::error_code(), payload.size());
 
     // Check if we received exactly prepared payload.

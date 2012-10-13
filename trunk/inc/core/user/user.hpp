@@ -19,7 +19,7 @@ public:
     void connection(network::tcp::connection_t<> &connection) { connection_ = &connection; }
 
     friend std::ostream& operator<<(std::ostream &out, const user_t &user) {
-        out << "id: " << user.id_ << ", address: " << user.connection_->address();
+        out << "id: " << user.id_;
         return out;
     }
 
