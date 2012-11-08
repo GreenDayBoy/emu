@@ -1,36 +1,49 @@
-SRC_DIR = ../src/core
-SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
-SRC_FILES += $(wildcard $(SRC_DIR)/common/*.cpp)
-SRC_FILES += $(wildcard $(SRC_DIR)/network/*.cpp)
-SRC_FILES += $(wildcard $(SRC_DIR)/network/tcp/*.cpp)
-SRC_FILES += $(wildcard $(SRC_DIR)/network/udp/*.cpp)
-SRC_FILES += $(wildcard $(SRC_DIR)/user/*.cpp)
+CXX = g++
 
-INCLUDE_DIR	:= -I$(wildcard ../inc/)
-INCLUDE_DIR	+= -I$(wildcard ../inc/core/)
-INCLUDE_DIR	+= -I$(wildcard ../inc/ut/)
+CXXFLAGS := -Wall -fPIC
+ifeq ($(GCOV), true)
+	CXXFLAGS += -fprofile-arcs -ftest-coverage
+endif
 
-LIB_DIR =
-LIB 	= -lboost_system -lboost_thread
-
-CC = g++
-
-OPTIMIZATION_FLAGS     	= 
-EXTRA_CCFLAGS			= -Wall -fPIC -shared
-CCFLAGS       			= $(OPTIMIZATION_FLAGS) $(EXTRA_CCFLAGS)
-CPPFLAGS        		:= $(INCLUDE_DIR)
-LDFLAGS         		= $(LIB_DIR) $(LIB)
-O_FILES         		= $(SRC_FILES:%.cpp=%.o)
-
-OUTPUT_FILE 			= bin/libcore.so
-
+CPPFLAGS :=
 ifeq ($(UT), true)
 	CPPFLAGS += -DeMU_UT
 endif
 
-all:
-	$(CC) $(CCFLAGS) $(CPPFLAGS) $(SRC_FILES) $(LDFLAGS) -o $(OUTPUT_FILE)
+SOURCES_DIR = ../src/core
+SOURCES += $(wildcard $(SOURCES_DIR)/common/*.cpp)
+SOURCES += $(wildcard $(SOURCES_DIR)/network/*.cpp)
+SOURCES += $(wildcard $(SOURCES_DIR)/network/tcp/*.cpp)
+SOURCES += $(wildcard $(SOURCES_DIR)/network/udp/*.cpp)
+SOURCES += $(wildcard $(SOURCES_DIR)/user/*.cpp)
+
+INCLUDES := -I$(wildcard ../inc/)
+INCLUDES += -I$(wildcard ../inc/core/)
+INCLUDES += -I$(wildcard ../inc/ut/)
+
+LIBS := -lboost_system -lboost_thread -lpthread
+ifeq ($(GCOV), true)
+	LIBS+= -lgcov
+endif
+
+LDFLAGS :=  -shared
+OBJECTS := $(SOURCES:%.cpp=%.o)
+OUTPUT_DIR := bin
+
+GCOVR_FILES := $(SOURCES:%.cpp=%.gcda)
+GCOVR_FILES += $(SOURCES:%.cpp=%.gcno)
+
+all: libcore
+
+libcore: $(OBJECTS)
+	$(CXX) $^ $(LDFLAGS) $(LIBS) -o $(OUTPUT_DIR)/$@.so
+	
+%.o: %.cpp
+	$(CXX) $(CPPFLAGS) $(INCLUDES) $(CXXFLAGS)  -c $< -o $@
 
 clean:
-	$(RM) $(O_FILES)
-	$(RM) $(OUTPUT_FILE)
+	$(RM) $(OBJECTS)
+	
+clean_gcovr:
+	$(RM) $(GCOVR_FILES)
+	
