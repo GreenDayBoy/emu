@@ -1,1 +1,0 @@
-#include <common/objectsFactory.hpp>
