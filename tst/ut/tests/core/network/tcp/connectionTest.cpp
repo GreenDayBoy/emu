@@ -45,7 +45,7 @@ public:
     boost::asio::mutable_buffer sendBuffer_;
     eMU::core::network::Payload defaultPayload_;
     eMU::ut::env::asioStub::ip::tcp::socket::ConnectHandler connectHandler_;
-    eMU::ut::env::asioStub::ip::tcp::endpoint endpoint_;
+    boost::asio::ip::tcp::endpoint endpoint_;
 };
 
 TEST_F(TcpConnectionTest, close) {

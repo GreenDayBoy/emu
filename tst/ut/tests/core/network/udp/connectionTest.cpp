@@ -47,11 +47,11 @@ public:
 
     boost::asio::mutable_buffer receiveBuffer_;
     eMU::ut::env::asioStub::io_service::IoHandler receiveFromHandler_;
-    eMU::ut::env::asioStub::ip::udp::endpoint* senderEndpoint_;
+    boost::asio::ip::udp::endpoint* senderEndpoint_;
 
     boost::asio::mutable_buffer sendBuffer_;
     eMU::ut::env::asioStub::io_service::IoHandler sendToHandler_;
-    eMU::ut::env::asioStub::ip::udp::endpoint receiverEndpoint_;
+    boost::asio::ip::udp::endpoint receiverEndpoint_;
 };
 
 TEST_F(UdpConnectionTest, receiveFrom) {
@@ -66,7 +66,7 @@ TEST_F(UdpConnectionTest, receiveFrom) {
     memcpy(boost::asio::buffer_cast<uint8_t*>(receiveBuffer_), &payload[0], payload.size());
 
     // Prepare fake sender endpoint.
-    eMU::ut::env::asioStub::ip::udp::endpoint senderEndpoint(boost::asio::ip::address::from_string("1.2.3.4"), 1234);
+    boost::asio::ip::udp::endpoint senderEndpoint(boost::asio::ip::address::from_string("1.2.3.4"), 1234);
 
     // Set fake endpoint.
     *senderEndpoint_ = senderEndpoint;

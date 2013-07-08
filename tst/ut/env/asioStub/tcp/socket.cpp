@@ -14,8 +14,8 @@ io_service& socket::get_io_service() {
     return service_;
 }
 
-endpoint socket::remote_endpoint() const {
-    return endpoint();
+boost::asio::ip::tcp::endpoint socket::remote_endpoint() const {
+    return boost::asio::ip::tcp::endpoint();
 }
 
 }

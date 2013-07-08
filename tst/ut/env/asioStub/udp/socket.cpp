@@ -7,7 +7,7 @@ namespace asioStub {
 namespace ip {
 namespace udp {
 
-socket::socket(io_service &service, const endpoint &endpoint):
+socket::socket(io_service &service, const boost::asio::ip::udp::endpoint &endpoint):
     service_(service),
     endpoint_(endpoint) {}
 
