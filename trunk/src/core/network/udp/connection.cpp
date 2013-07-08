@@ -8,7 +8,7 @@ namespace udp {
 
 Connection::Connection(asio::io_service &ioService, uint16_t port):
   socket_(ioService,
-          asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), port)),
+          boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), port)),
   strand_(ioService) {}
 
 Connection::~Connection() {}
@@ -34,7 +34,7 @@ void Connection::queueReceiveFrom() {
                                                       std::placeholders::_2)));
 }
 
-void Connection::sendTo(const asio::ip::udp::endpoint &endpoint, const Payload &payload) {
+void Connection::sendTo(const boost::asio::ip::udp::endpoint &endpoint, const Payload &payload) {
     WriteBuffer &writeBuffer = writeBufferFactory_.get(endpoint);
 
     bool result = writeBuffer.insert(payload);
@@ -61,7 +61,7 @@ void Connection::receiveFromHandler(const boost::system::error_code &errorCode, 
     this->queueReceiveFrom();
 }
 
-void Connection::queueSendTo(const asio::ip::udp::endpoint &endpoint, WriteBuffer &writeBuffer) {
+void Connection::queueSendTo(const boost::asio::ip::udp::endpoint &endpoint, WriteBuffer &writeBuffer) {
     socket_.async_send_to(boost::asio::buffer(&writeBuffer.payload_[0], writeBuffer.payloadSize_),
                           endpoint,
                           strand_.wrap(std::bind(&Connection::sendToHandler,
@@ -71,7 +71,7 @@ void Connection::queueSendTo(const asio::ip::udp::endpoint &endpoint, WriteBuffe
                                                  std::placeholders::_2)));
 }
 
-void Connection::sendToHandler(const asio::ip::udp::endpoint &endpoint, const boost::system::error_code& errorCode, size_t bytesTransferred) {
+void Connection::sendToHandler(const boost::asio::ip::udp::endpoint &endpoint, const boost::system::error_code& errorCode, size_t bytesTransferred) {
     if(errorCode) {
         this->errorHandler(errorCode, "sendTo");
     }

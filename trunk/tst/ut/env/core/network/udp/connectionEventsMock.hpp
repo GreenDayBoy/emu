@@ -11,7 +11,7 @@ namespace udp {
 
 class ConnectionEventsMock {
 public:
-    MOCK_METHOD2(receiveFromEvent, void(eMU::core::network::udp::Connection&, const asioStub::ip::udp::endpoint&));
+    MOCK_METHOD2(receiveFromEvent, void(eMU::core::network::udp::Connection&, const boost::asio::ip::udp::endpoint&));
 };
 
 }
