@@ -1,14 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(eMU CXX)
 
-# Compiler detection ----------------------------
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    if(GCC_VERSION VERSION_LESS 4.7)
-        message(FATAL_ERROR "Sorry, GCC 4.7 or higher is required")
-    endif()
-endif()
-# -----------------------------------------------
-
 # Common variables --------------
 set(eMU_base_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -67,8 +59,15 @@ target_link_libraries(mt gtest pthread glog)
 # Compiler flags ----------------
 set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -pedantic")
 
+if(NOT COVERAGE)
+    set(COVERAGE_FLAGS "")
+else()
+    message(STATUS "Build will be configured with coverage flags")
+    set(COVERAGE_FLAGS "-fprofile-arcs -ftest-coverage")
+endif()
+
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -DeMU_TARGET")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DeMU_TARGET")
-set(CMAKE_CXX_FLAGS_UT "-g -O0 -DeMU_UT")
-set(CMAKE_CXX_FLAGS_MT "-g -O0 -DeMU_MT")
+set(CMAKE_CXX_FLAGS_UT "-g -O0 -DeMU_UT ${COVERAGE_FLAGS}")
+set(CMAKE_CXX_FLAGS_MT "-g -O0 -DeMU_MT ${COVERAGE_FLAGS}")
 # -------------------------------

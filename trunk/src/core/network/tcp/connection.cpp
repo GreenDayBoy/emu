@@ -21,10 +21,6 @@ asio::ip::tcp::socket& Connection::socket() {
     return socket_;
 }
 
-bool Connection::opened() {
-    return socket_.is_open();
-}
-
 std::string Connection::address() const {
     return socket_.remote_endpoint().address().to_string();
 }
@@ -141,6 +137,10 @@ void Connection::connectHandler(const boost::system::error_code &errorCode) {
     }
 
     connectEventCallback_(*this);
+}
+
+size_t Connection::hash() const {
+    return reinterpret_cast<size_t>(this);
 }
 
 }

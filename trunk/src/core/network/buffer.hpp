@@ -14,7 +14,6 @@ const size_t kMaxPayloadSize = 4096;
 class ReadBuffer {
 public:
     ReadBuffer();
-    virtual ~ReadBuffer();
 
     void clear();
 
@@ -25,7 +24,6 @@ public:
 class WriteBuffer {
 public:
     WriteBuffer();
-    virtual ~WriteBuffer();
 
     void clear();
     bool insert(const Payload& payload);
