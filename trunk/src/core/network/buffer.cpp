@@ -46,9 +46,9 @@ bool WriteBuffer::insert(const Payload& payload) {
     size_t &destinationPayloadSize = pending_ ? secondPayloadSize_ : payloadSize_;
 
     if((destinationPayloadSize + payload.size()) > kMaxPayloadSize) {
-        LOG(INFO) << "buffer overflow! pending: " << pending_
-                  << ", current size: " << destinationPayloadSize
-                  << ", size: " << payload.size();
+        LOG(ERROR) << "buffer overflow! pending: " << pending_
+                   << ", current size: " << destinationPayloadSize
+                   << ", size: " << payload.size();
 
         return false;
     }
