@@ -9,8 +9,6 @@ ReadBuffer::ReadBuffer():
   payload_(kMaxPayloadSize, 0),
   payloadSize_(0) {}
 
-ReadBuffer::~ReadBuffer() {}
-
 void ReadBuffer::clear() {
     payload_.clear();
     payload_.resize(kMaxPayloadSize, 0);
@@ -23,8 +21,6 @@ WriteBuffer::WriteBuffer():
   pending_(false),
   secondPayload_(kMaxPayloadSize, 0),
   secondPayloadSize_(0) {}
-
-WriteBuffer::~WriteBuffer() {}
 
 void WriteBuffer::clear() {
     this->clearFirstPayload();

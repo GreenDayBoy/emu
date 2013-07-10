@@ -208,3 +208,11 @@ TEST_F(UdpConnectionTest, sendTo_different_endpoints) {
     EXPECT_CALL(connection_.socket(), async_send_to(::testing::_, ::testing::_, ::testing::_));
     connection_.sendTo(endpoint2, payload3);
 }
+
+TEST_F(UdpConnectionTest, sendTo_overflow_buffer) {
+    boost::asio::ip::udp::endpoint endpoint(boost::asio::ip::address::from_string("1.2.3.4"), 1234);
+    eMU::core::network::Payload payload(eMU::core::network::kMaxPayloadSize + 1, 0x10);
+
+    EXPECT_CALL(connection_.socket(), async_send_to(_, _, _)).Times(0);
+    connection_.sendTo(endpoint, payload);
+}

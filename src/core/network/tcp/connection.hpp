@@ -32,12 +32,12 @@ namespace asio = boost::asio;
 class Connection: boost::noncopyable {
 public:
     typedef std::function<void(Connection&)> EventCallback;
+    typedef std::shared_ptr<Connection> Pointer;
 
     Connection(asio::io_service &ioService);
     virtual ~Connection();
 
     ReadBuffer& readBuffer();
-    bool opened();
     std::string address() const;
 
     void setConnectEventCallback(const EventCallback &callback);
@@ -50,6 +50,7 @@ public:
     void queueReceive();
     void connect(const boost::asio::ip::tcp::endpoint &endpoint);
     asio::ip::tcp::socket& socket();
+    size_t hash() const;
 
 private:
     Connection();
