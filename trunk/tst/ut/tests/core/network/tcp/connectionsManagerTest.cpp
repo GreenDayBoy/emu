@@ -59,18 +59,17 @@ public:
 
 TEST_F(ConnectionsManagerTest, triggerReceiveEvent) {
     expectAsyncAcceptCallAndSaveArguments();
+
     connectionsManager_.queueAccept();
 
     size_t connectionHash = 11111;
     EXPECT_CALL(connectionsManagerEventsMock_, generateConnectionHash()).WillOnce(Return(connectionHash));
     EXPECT_CALL(connectionsManagerEventsMock_, acceptEvent(connectionHash));
     EXPECT_CALL(connectionsManager_.acceptor(), async_accept(_, _));
-
     expectAsyncReceiveCallAndSaveCallback();
 
     acceptHandler_(boost::system::error_code());
 
-    // Insert prepared payload to connection rbuf.
     eMU::core::network::Payload payload(100, 0x14);
     memcpy(boost::asio::buffer_cast<uint8_t*>(receiveBuffer_), &payload[0], payload.size());
 
@@ -81,13 +80,13 @@ TEST_F(ConnectionsManagerTest, triggerReceiveEvent) {
 
 TEST_F(ConnectionsManagerTest, triggerCloseEvent) {
     expectAsyncAcceptCallAndSaveArguments();
+
     connectionsManager_.queueAccept();
 
     size_t connectionHash = 11111;
     EXPECT_CALL(connectionsManagerEventsMock_, generateConnectionHash()).WillOnce(Return(connectionHash));
     EXPECT_CALL(connectionsManagerEventsMock_, acceptEvent(connectionHash));
     EXPECT_CALL(connectionsManager_.acceptor(), async_accept(_, _));
-
     expectAsyncReceiveCallAndSaveCallback();
 
     acceptHandler_(boost::system::error_code());
@@ -99,6 +98,7 @@ TEST_F(ConnectionsManagerTest, triggerCloseEvent) {
 
 TEST_F(ConnectionsManagerTest, errorOccuredDuringConnectionAccept) {
     expectAsyncAcceptCallAndSaveArguments();
+
     connectionsManager_.queueAccept();
 
     EXPECT_CALL(connectionsManagerEventsMock_, generateConnectionHash()).Times(0);
@@ -110,6 +110,7 @@ TEST_F(ConnectionsManagerTest, errorOccuredDuringConnectionAccept) {
 
 TEST_F(ConnectionsManagerTest, exceptionOccuredDuringConnectionAccept) {
     expectAsyncAcceptCallAndSaveArguments();
+
     connectionsManager_.queueAccept();
 
     eMU::core::common::Exception exception; exception.in() << "Test";
@@ -122,13 +123,13 @@ TEST_F(ConnectionsManagerTest, exceptionOccuredDuringConnectionAccept) {
 
 TEST_F(ConnectionsManagerTest, disconnectShouldTriggerCloseEvent) {
     expectAsyncAcceptCallAndSaveArguments();
+
     connectionsManager_.queueAccept();
 
     size_t connectionHash = 11111;
     EXPECT_CALL(connectionsManagerEventsMock_, generateConnectionHash()).WillOnce(Return(connectionHash));
     EXPECT_CALL(connectionsManagerEventsMock_, acceptEvent(connectionHash));
     EXPECT_CALL(connectionsManager_.acceptor(), async_accept(_, _));
-
     expectAsyncReceiveCallAndSaveCallback();
 
     acceptHandler_(boost::system::error_code());
@@ -140,13 +141,13 @@ TEST_F(ConnectionsManagerTest, disconnectShouldTriggerCloseEvent) {
 
 TEST_F(ConnectionsManagerTest, send) {
     expectAsyncAcceptCallAndSaveArguments();
+
     connectionsManager_.queueAccept();
 
     size_t connectionHash = 11111;
     EXPECT_CALL(connectionsManagerEventsMock_, generateConnectionHash()).WillOnce(Return(connectionHash));
     EXPECT_CALL(connectionsManagerEventsMock_, acceptEvent(connectionHash));
     EXPECT_CALL(connectionsManager_.acceptor(), async_accept(_, _));
-
     expectAsyncReceiveCallAndSaveCallback();
 
     acceptHandler_(boost::system::error_code());
@@ -157,7 +158,6 @@ TEST_F(ConnectionsManagerTest, send) {
     eMU::core::network::Payload payload(100, 0x14);
     connectionsManager_.send(connectionHash, payload);
 
-    // Check if payload set to socket is the same as payload requested to send.
     ASSERT_EQ(payload.size(), boost::asio::buffer_size(sendBuffer));
     int32_t result = memcmp(boost::asio::buffer_cast<const uint8_t*>(sendBuffer), &payload[0], payload.size());
     ASSERT_EQ(0, result);
