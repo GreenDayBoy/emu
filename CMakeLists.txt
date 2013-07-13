@@ -8,6 +8,7 @@ set(eMU_tmp_DIR ${eMU_base_DIR}/tmp)
 
 set(eMU_src_DIR ${eMU_base_DIR}/src)
 set(eMU_core_DIR ${eMU_src_DIR}/core)
+set(eMU_connectserver_DIR ${eMU_src_DIR}/connectserver)
 
 set(eMU_tst_DIR ${eMU_base_DIR}/tst)
 set(eMU_ut_DIR ${eMU_tst_DIR}/ut)
@@ -25,6 +26,7 @@ message(STATUS "Configuring build type ${CMAKE_BUILD_TYPE}")
 # Includes ----------------------
 include_directories(${eMU_src_DIR})
 include_directories(${eMU_core_DIR})
+include_directories(${eMU_connectserver_DIR})
 
 include_directories(${eMU_tst_DIR})
 #--------------------------------
@@ -38,17 +40,24 @@ file(GLOB_RECURSE core_SOURCES "${eMU_core_DIR}/*.cpp")
 
 add_library(core SHARED ${core_SOURCES})
 
-target_link_libraries(core glog boost_system)
+target_link_libraries(core glog boost_system boost_thread)
 add_dependencies(core asioStub)
 # -------------------------------
+
+# connectserver setup ----------------
+file(GLOB_RECURSE connectserver_SOURCES "${eMU_connectserver_DIR}/*.cpp")
+add_executable(connectserver ${connectserver_SOURCES})
+target_link_libraries(connectserver core)
+add_dependencies(connectserver core)
+# ------------------------------------
 
 # mt/ut tests setup ----------------
 file(GLOB_RECURSE asioStub_SOURCES "${eMU_asioStub_DIR}/*.cpp")
 
 # ut -------
 file(GLOB_RECURSE ut_SOURCES "${eMU_ut_DIR}/*.cpp")
-add_executable(ut EXCLUDE_FROM_ALL ${ut_SOURCES} ${core_SOURCES})
-target_link_libraries(ut gmock gtest pthread glog boost_system)
+add_executable(ut EXCLUDE_FROM_ALL ${ut_SOURCES} ${core_SOURCES} ${connectserver_SOURCES})
+target_link_libraries(ut gmock gtest pthread glog boost_system boost_thread)
 
 # mt -------
 file(GLOB_RECURSE mt_SOURCES "${eMU_mt_DIR}/*.cpp")

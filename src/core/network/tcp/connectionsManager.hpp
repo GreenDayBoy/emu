@@ -61,7 +61,7 @@ private:
     void closeEvent(Connection &connection);
     size_t findConnectionHash(const Connection &connection) const;
 
-    asio::io_service ioService_;
+    asio::io_service &ioService_;
     asio::ip::tcp::acceptor acceptor_;
     std::map<size_t, Connection::Pointer> connections_;
 
