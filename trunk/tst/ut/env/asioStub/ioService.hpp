@@ -22,6 +22,7 @@ public:
 
     template<typename CompletionHandler>
     void post(const CompletionHandler &handler) { handler(); }
+    void run();
 };
 
 }

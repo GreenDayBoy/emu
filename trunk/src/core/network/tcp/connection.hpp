@@ -14,6 +14,7 @@
 #include <functional>
 
 #include <network/buffer.hpp>
+#include <common/hashableObject.hpp>
 
 
 namespace eMU {
@@ -29,7 +30,7 @@ namespace asio = eMU::mt::env::asioStub;
 namespace asio = boost::asio;
 #endif
 
-class Connection: boost::noncopyable {
+class Connection: boost::noncopyable, public common::HashableObject {
 public:
     typedef std::function<void(Connection&)> EventCallback;
     typedef std::shared_ptr<Connection> Pointer;
@@ -50,7 +51,6 @@ public:
     void queueReceive();
     void connect(const boost::asio::ip::tcp::endpoint &endpoint);
     asio::ip::tcp::socket& socket();
-    size_t hash() const;
 
 private:
     Connection();

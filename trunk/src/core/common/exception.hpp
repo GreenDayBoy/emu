@@ -3,8 +3,6 @@
 #include <sstream>
 #include <string>
 
-#include <core.hpp>
-
 namespace eMU {
 namespace core {
 namespace common {

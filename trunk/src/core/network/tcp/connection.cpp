@@ -139,10 +139,6 @@ void Connection::connectHandler(const boost::system::error_code &errorCode) {
     connectEventCallback_(*this);
 }
 
-size_t Connection::hash() const {
-    return reinterpret_cast<size_t>(this);
-}
-
 }
 }
 }

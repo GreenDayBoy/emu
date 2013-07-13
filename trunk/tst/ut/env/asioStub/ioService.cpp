@@ -7,6 +7,8 @@ namespace asioStub {
 
 io_service::strand::strand(io_service& service) {}
 
+void io_service::run() {}
+
 }
 }
 }
