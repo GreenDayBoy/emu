@@ -33,15 +33,15 @@ TEST_F(UsersFactoryTest, WhenMaxNumberOfUsersReachedShouldThrowException) {
 
     ASSERT_TRUE(exceptionThrown);
 
-    usersFactory_.destroy(user1);
-    usersFactory_.destroy(user2);
+    usersFactory_.destroy(user1.hash());
+    usersFactory_.destroy(user2.hash());
 }
 
 TEST_F(UsersFactoryTest, WhenUserDestroyedShouldBeErasedFromFactory) {
     FakeUser &user1 = usersFactory_.create();
     ASSERT_EQ(1, usersFactory_.users().size());
 
-    usersFactory_.destroy(user1);
+    usersFactory_.destroy(user1.hash());
     ASSERT_EQ(0, usersFactory_.users().size());
 }
 
@@ -58,8 +58,8 @@ TEST_F(UsersFactoryTest, WhenInvalidHashWasGiven_FindShouldThrowException) {
 
     ASSERT_TRUE(exceptionThrown);
 
-    usersFactory_.destroy(user1);
-    usersFactory_.destroy(user2);
+    usersFactory_.destroy(user1.hash());
+    usersFactory_.destroy(user2.hash());
 }
 
 TEST_F(UsersFactoryTest, find) {
@@ -72,6 +72,6 @@ TEST_F(UsersFactoryTest, find) {
     FakeUser &foundUser2 = usersFactory_.find(user2.hash());
     ASSERT_EQ(user2.hash(), foundUser2.hash());
 
-    usersFactory_.destroy(user1);
-    usersFactory_.destroy(user2);
+    usersFactory_.destroy(user1.hash());
+    usersFactory_.destroy(user2.hash());
 }

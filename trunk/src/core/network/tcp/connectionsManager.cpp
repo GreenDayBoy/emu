@@ -8,22 +8,20 @@ namespace network {
 namespace tcp {
 
 ConnectionsManager::ConnectionsManager(asio::io_service &ioService, int16_t port):
+    ConnectionsManager(ConnectionsFactory::Pointer(new ConnectionsFactory), ioService, port) {}
+
+ConnectionsManager::ConnectionsManager(ConnectionsFactory::Pointer connectionsFactory, asio::io_service &ioService, int16_t port):
   ioService_(ioService),
-  acceptor_(ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)) {
-
-}
-
-ConnectionsManager::~ConnectionsManager() {
-
-}
+  acceptor_(ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
+  connectionsFactory_(connectionsFactory) {}
 
 void ConnectionsManager::queueAccept() {
-    Connection::Pointer connection(new Connection(ioService_));
+    Connection::SocketPointer socket(new asio::ip::tcp::socket(ioService_));
 
-    acceptor_.async_accept(connection->socket(),
+    acceptor_.async_accept(*socket,
                            std::bind(&ConnectionsManager::acceptHandler,
                                      this,
-                                     connection,
+                                     socket,
                                      std::placeholders::_1));
 }
 
@@ -31,24 +29,26 @@ void ConnectionsManager::setGenerateConnectionHashCallback(const GenerateConnect
     generateConnectionHashCallback_ = callback;
 }
 
-void ConnectionsManager::acceptHandler(Connection::Pointer connection, const boost::system::error_code &errorCode) {
+void ConnectionsManager::acceptHandler(Connection::SocketPointer socket, const boost::system::error_code &errorCode) {
     if(errorCode) {
         LOG(ERROR) << "Error during establishing connection, error: " << errorCode.message();
     } else {
-        this->registerConnection(connection);
+        this->registerConnection(socket);
     }
 
     this->queueAccept();
 }
 
-void ConnectionsManager::registerConnection(Connection::Pointer connection) {
+void ConnectionsManager::registerConnection(Connection::SocketPointer socket) {
     try {
         size_t hash = generateConnectionHashCallback_();
-        connections_[hash] = connection;
+        Connection &connection = connectionsFactory_->create(hash, socket);
 
-        connection->setReceiveEventCallback(std::bind(&ConnectionsManager::receiveEvent, this, std::placeholders::_1));
-        connection->setCloseEventCallback(std::bind(&ConnectionsManager::closeEvent, this, std::placeholders::_1));
-        connection->queueReceive();
+        LOG(INFO) << "Connection registered, hash: " << hash;
+
+        connection.setReceiveEventCallback(std::bind(&ConnectionsManager::receiveEvent, this, std::placeholders::_1));
+        connection.setCloseEventCallback(std::bind(&ConnectionsManager::closeEvent, this, std::placeholders::_1));
+        connection.queueReceive();
 
         acceptEventCallback_(hash);
     } catch(common::Exception &exception) {
@@ -68,15 +68,18 @@ void ConnectionsManager::setCloseEventCallback(const CloseEventCallback &callbac
     closeEventCallback_ = callback;
 }
 
-void ConnectionsManager::send(size_t hash, const Payload &payload)
-{
-    connections_[hash]->send(payload);
+void ConnectionsManager::send(size_t hash, const Payload &payload) {
+    try {
+        Connection &connection = connectionsFactory_->get(hash);
+        connection.send(payload);
+    } catch(common::Exception &exception) {
+        LOG(ERROR) << "Exception during send, reason: " << exception.what();
+    }
 }
 
 void ConnectionsManager::receiveEvent(Connection &connection) {
     try {
-        size_t hash = this->findConnectionHash(connection);
-
+        size_t hash = connectionsFactory_->getHash(connection);
         Payload payload(connection.readBuffer().payload_.begin(), connection.readBuffer().payload_.begin() + connection.readBuffer().payloadSize_);
 
         receiveEventCallback_(hash, payload);
@@ -87,26 +90,15 @@ void ConnectionsManager::receiveEvent(Connection &connection) {
 
 void ConnectionsManager::closeEvent(Connection &connection) {
     try {
-        size_t hash = this->findConnectionHash(connection);
+        LOG(INFO) << "Closing connection: " << connection;
+
+        size_t hash = connectionsFactory_->getHash(connection);
+
         closeEventCallback_(hash);
-        connections_.erase(hash);
+        connectionsFactory_->destroy(hash);
     } catch(common::Exception &exception) {
         LOG(ERROR) << "Exception during closeEvent, reason: " << exception.what();
     }
-}
-
-size_t ConnectionsManager::findConnectionHash(const Connection &connection) const {
-    std::map<size_t, Connection::Pointer>::const_iterator it = connections_.begin();
-
-    for(; it != connections_.end(); it++) {
-        if(it->second->hash() == connection.hash()) {
-            return it->first;
-        }
-    }
-
-    common::Exception exception;
-    exception.in() << "Could not find connection, hash: " << connection.hash() << ", address: " << connection.address();
-    throw exception;
 }
 
 #ifdef eMU_UT
@@ -116,7 +108,12 @@ asio::ip::tcp::acceptor& ConnectionsManager::acceptor() {
 #endif
 
 void ConnectionsManager::disconnect(size_t hash) {
-    connections_[hash]->disconnect();
+    try {
+        Connection &connection = connectionsFactory_->get(hash);
+        connection.disconnect();
+    } catch(common::Exception &exception) {
+        LOG(ERROR) << "Exception during send, reason: " << exception.what();
+    }
 }
 
 }

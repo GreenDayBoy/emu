@@ -7,7 +7,11 @@ namespace asioStub {
 
 io_service::strand::strand(io_service& service) {}
 
-void io_service::run() {}
+size_t io_service::run() {
+    return 0;
+}
+
+void io_service::stop() {}
 
 }
 }

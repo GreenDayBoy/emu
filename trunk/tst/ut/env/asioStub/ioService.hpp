@@ -22,7 +22,8 @@ public:
 
     template<typename CompletionHandler>
     void post(const CompletionHandler &handler) { handler(); }
-    void run();
+    size_t run();
+    void stop();
 };
 
 }

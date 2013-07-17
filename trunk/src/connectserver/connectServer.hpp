@@ -28,10 +28,11 @@ class Server: boost::noncopyable {
 public:
     Server(asio::io_service &ioService, int16_t port, size_t maxNumberOfUsers);
     void startup();
+    void cleanup();
 
     size_t generateConnectionHash();
     void onAccept(size_t hash);
-    void onReceive(size_t hash);
+    void onReceive(size_t hash, const eMU::core::network::Payload &payload);
     void onClose(size_t hash);
     void onReceiveFrom(core::network::udp::Connection &connection);
 

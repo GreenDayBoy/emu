@@ -1,5 +1,5 @@
 #include <connectserver/connectServer.hpp>
-#include <core/common/serviceThreading.hpp>
+#include <core/application/starter.hpp>
 #include <glog/logging.h>
 #include <boost/lexical_cast.hpp>
 
@@ -11,7 +11,7 @@ Server::Server(asio::io_service &ioService, int16_t port, size_t maxNumberOfUser
   udpConnection_(ioService, port),
   usersFactory_(maxNumberOfUsers) {
     connectionsManager_.setAcceptEventCallback(std::bind(&Server::onAccept, this, std::placeholders::_1));
-    connectionsManager_.setReceiveEventCallback(std::bind(&Server::onReceive, this, std::placeholders::_1));
+    connectionsManager_.setReceiveEventCallback(std::bind(&Server::onReceive, this, std::placeholders::_1, std::placeholders::_2));
     connectionsManager_.setCloseEventCallback(std::bind(&Server::onClose, this, std::placeholders::_1));
     connectionsManager_.setGenerateConnectionHashCallback(std::bind(&Server::generateConnectionHash, this));
 
@@ -19,28 +19,44 @@ Server::Server(asio::io_service &ioService, int16_t port, size_t maxNumberOfUser
 }
 
 void Server::startup() {
-
+    connectionsManager_.queueAccept();
 }
 
 size_t Server::generateConnectionHash() {
-    User &user = usersFactory_.create();
+    try {
+        User &user = usersFactory_.create();
 
-    return user.hash();
+        return user.hash();
+    } catch(eMU::core::common::Exception &exception) {
+        throw exception;
+    }
 }
 
 void Server::onAccept(size_t hash) {
     User &user = usersFactory_.find(hash);
+
+    LOG(INFO) << "User registered, hash: " << hash;
 }
 
-void Server::onReceive(size_t hash) {
+void Server::onReceive(size_t hash, const eMU::core::network::Payload &payload) {
     User &user = usersFactory_.find(hash);
+
+    LOG(INFO) << "User received, hash: " << hash << ", size: " << payload.size();
 }
 
 void Server::onClose(size_t hash) {
     User &user = usersFactory_.find(hash);
+
+    LOG(INFO) << "User closed, hash: " << hash;
+
+    usersFactory_.destroy(hash);
 }
 
 void Server::onReceiveFrom(core::network::udp::Connection &connection) {
+
+}
+
+void Server::cleanup() {
 
 }
 
@@ -58,9 +74,9 @@ int main(int argsCount, char *args[]) {
 
     size_t maxNumberOfUsers = boost::lexical_cast<size_t>(args[1]);
     uint16_t port = boost::lexical_cast<uint16_t>(args[2]);
-
     size_t maxNumberOfThreads = boost::lexical_cast<size_t>(args[3]);
-    eMU::core::common::ServiceThreading serviceThreading(maxNumberOfThreads);
+    eMU::core::application::Starter<eMU::connectserver::Server> starter(maxNumberOfThreads, port, maxNumberOfUsers);
+    starter.start();
 
     return 0;
 }
