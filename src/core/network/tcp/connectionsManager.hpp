@@ -14,8 +14,7 @@
 #include <functional>
 
 #include <network/buffer.hpp>
-#include <network/tcp/connection.hpp>
-
+#include <network/tcp/connectionsFactory.hpp>
 
 namespace eMU {
 namespace core {
@@ -38,7 +37,7 @@ public:
     typedef std::function<void(size_t)> AcceptEventCallback;
 
     ConnectionsManager(asio::io_service &ioService, int16_t port);
-    virtual ~ConnectionsManager();
+    ConnectionsManager(ConnectionsFactory::Pointer connectionsFactory, asio::io_service &ioService, int16_t port);
 
     void queueAccept();
 
@@ -55,15 +54,16 @@ public:
     #endif
 
 private:
-    void acceptHandler(Connection::Pointer connection, const boost::system::error_code &errorCode);
-    void registerConnection(Connection::Pointer connection);
+    void acceptHandler(Connection::SocketPointer socket, const boost::system::error_code &errorCode);
+    void registerConnection(Connection::SocketPointer socket);
+
     void receiveEvent(Connection &connection);
     void closeEvent(Connection &connection);
-    size_t findConnectionHash(const Connection &connection) const;
 
     asio::io_service &ioService_;
     asio::ip::tcp::acceptor acceptor_;
-    std::map<size_t, Connection::Pointer> connections_;
+
+    ConnectionsFactory::Pointer connectionsFactory_;
 
     GenerateConnectionHashCallback generateConnectionHashCallback_;
     AcceptEventCallback acceptEventCallback_;

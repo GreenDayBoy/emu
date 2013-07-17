@@ -29,11 +29,11 @@ public:
         return *user;
     }
 
-    void destroy(User &user) {
+    void destroy(size_t hash) {
         typename UsersContainer::iterator it;
          it = std::find_if(users_.begin(),
                            users_.end(),
-                           [&user](const User *userFromVector) { return user.hash() == userFromVector->hash(); });
+                           [&hash](const User *userFromVector) { return hash == userFromVector->hash(); });
 
         if(it != users_.end())
         {

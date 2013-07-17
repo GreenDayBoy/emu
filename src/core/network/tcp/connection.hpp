@@ -16,7 +16,6 @@
 #include <network/buffer.hpp>
 #include <common/hashableObject.hpp>
 
-
 namespace eMU {
 namespace core {
 namespace network {
@@ -34,12 +33,12 @@ class Connection: boost::noncopyable, public common::HashableObject {
 public:
     typedef std::function<void(Connection&)> EventCallback;
     typedef std::shared_ptr<Connection> Pointer;
+    typedef std::shared_ptr<asio::ip::tcp::socket> SocketPointer;
 
-    Connection(asio::io_service &ioService);
+    Connection(SocketPointer socket);
     virtual ~Connection();
 
     ReadBuffer& readBuffer();
-    std::string address() const;
 
     void setConnectEventCallback(const EventCallback &callback);
     void setReceiveEventCallback(const EventCallback &callback);
@@ -50,7 +49,8 @@ public:
     void send(const Payload &payload);
     void queueReceive();
     void connect(const boost::asio::ip::tcp::endpoint &endpoint);
-    asio::ip::tcp::socket& socket();
+
+    friend std::ostream& operator<<(std::ostream &stream, const Connection &connection);
 
 private:
     Connection();
@@ -62,7 +62,7 @@ private:
     void errorHandler(const boost::system::error_code &errorCode, const std::string &operationName);
     void connectHandler(const boost::system::error_code &errorCode);
 
-    asio::ip::tcp::socket socket_;
+    SocketPointer socket_;
 
     ReadBuffer readBuffer_;
     WriteBuffer writeBuffer_;

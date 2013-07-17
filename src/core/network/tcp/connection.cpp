@@ -6,23 +6,15 @@ namespace core {
 namespace network {
 namespace tcp {
 
-Connection::Connection(asio::io_service &ioService):
-  socket_(ioService),
-  strand_(ioService),
+Connection::Connection(SocketPointer socket):
+  socket_(socket),
+  strand_(socket_->get_io_service()),
   closeOngoing_(false) {}
 
 Connection::~Connection() {}
 
 ReadBuffer& Connection::readBuffer() {
     return readBuffer_;
-}
-
-asio::ip::tcp::socket& Connection::socket() {
-    return socket_;
-}
-
-std::string Connection::address() const {
-    return socket_.remote_endpoint().address().to_string();
 }
 
 void Connection::setConnectEventCallback(const EventCallback &callback) {
@@ -38,17 +30,17 @@ void Connection::setCloseEventCallback(const EventCallback &callback) {
 }
 
 void Connection::disconnect() {
-    if(socket_.is_open()) {
+    if(socket_->is_open()) {
         closeOngoing_ = true;
 
-        asio::io_service &service = socket_.get_io_service();
+        asio::io_service &service = socket_->get_io_service();
         service.post(strand_.wrap(std::bind(closeEventCallback_, std::ref(*this))));
     }
 }
 
 void Connection::close() {
-    socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-    socket_.close();
+    socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+    socket_->close();
 }
 
 void Connection::send(const Payload &payload) {
@@ -66,7 +58,7 @@ void Connection::send(const Payload &payload) {
 }
 
 void Connection::queueReceive() {
-    socket_.async_receive(boost::asio::buffer(&readBuffer_.payload_[0], kMaxPayloadSize),
+    socket_->async_receive(boost::asio::buffer(&readBuffer_.payload_[0], kMaxPayloadSize),
                           strand_.wrap(std::bind(&Connection::receiveHandler,
                                                  this,
                                                  std::placeholders::_1,
@@ -74,13 +66,13 @@ void Connection::queueReceive() {
 }
 
 void Connection::connect(const boost::asio::ip::tcp::endpoint &endpoint) {
-    socket_.async_connect(endpoint, std::bind(&Connection::connectHandler,
+    socket_->async_connect(endpoint, std::bind(&Connection::connectHandler,
                                               this,
                                               std::placeholders::_1));
 }
 
 void Connection::queueSend() {
-    socket_.async_send(boost::asio::buffer(&writeBuffer_.payload_[0], writeBuffer_.payloadSize_),
+    socket_->async_send(boost::asio::buffer(&writeBuffer_.payload_[0], writeBuffer_.payloadSize_),
                        strand_.wrap(std::bind(&Connection::sendHandler,
                                               this,
                                               std::placeholders::_1,
@@ -137,6 +129,12 @@ void Connection::connectHandler(const boost::system::error_code &errorCode) {
     }
 
     connectEventCallback_(*this);
+}
+
+std::ostream& operator<<(std::ostream &stream, const Connection &connection) {
+    stream << "address: " << connection.socket_->remote_endpoint().address().to_string();
+
+    return stream;
 }
 
 }
