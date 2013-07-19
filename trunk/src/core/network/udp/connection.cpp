@@ -7,9 +7,12 @@ namespace network {
 namespace udp {
 
 Connection::Connection(asio::io_service &ioService, uint16_t port):
-  socket_(ioService,
-          boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), port)),
-  strand_(ioService) {}
+  Connection(SocketPointer(new asio::ip::udp::socket(ioService, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), port)))) {}
+
+
+Connection::Connection(SocketPointer socket):
+  socket_(socket),
+  strand_(socket_->get_io_service()) {}
 
 Connection::~Connection() {}
 
@@ -17,21 +20,17 @@ ReadBuffer& Connection::readBuffer() {
     return readBuffer_;
 }
 
-asio::ip::udp::socket& Connection::socket() {
-    return socket_;
-}
-
 void Connection::setReceiveFromEventCallback(const ReceiveFromEventCallback &callback) {
     receiveFromEventCallback_ = callback;
 }
 
 void Connection::queueReceiveFrom() {
-    socket_.async_receive_from(boost::asio::buffer(&readBuffer_.payload_[0], kMaxPayloadSize),
-                               senderEndpoint_,
-                               strand_.wrap(std::bind(&Connection::receiveFromHandler,
-                                                      this,
-                                                      std::placeholders::_1,
-                                                      std::placeholders::_2)));
+    socket_->async_receive_from(boost::asio::buffer(&readBuffer_.payload_[0], kMaxPayloadSize),
+                                senderEndpoint_,
+                                strand_.wrap(std::bind(&Connection::receiveFromHandler,
+                                                       this,
+                                                       std::placeholders::_1,
+                                                       std::placeholders::_2)));
 }
 
 void Connection::sendTo(const boost::asio::ip::udp::endpoint &endpoint, const Payload &payload) {
@@ -62,13 +61,13 @@ void Connection::receiveFromHandler(const boost::system::error_code &errorCode, 
 }
 
 void Connection::queueSendTo(const boost::asio::ip::udp::endpoint &endpoint, WriteBuffer &writeBuffer) {
-    socket_.async_send_to(boost::asio::buffer(&writeBuffer.payload_[0], writeBuffer.payloadSize_),
-                          endpoint,
-                          strand_.wrap(std::bind(&Connection::sendToHandler,
-                                                 this,
-                                                 endpoint,
-                                                 std::placeholders::_1,
-                                                 std::placeholders::_2)));
+    socket_->async_send_to(boost::asio::buffer(&writeBuffer.payload_[0], writeBuffer.payloadSize_),
+                           endpoint,
+                           strand_.wrap(std::bind(&Connection::sendToHandler,
+                                                  this,
+                                                  endpoint,
+                                                  std::placeholders::_1,
+                                                  std::placeholders::_2)));
 }
 
 void Connection::sendToHandler(const boost::asio::ip::udp::endpoint &endpoint, const boost::system::error_code& errorCode, size_t bytesTransferred) {

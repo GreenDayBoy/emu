@@ -35,9 +35,10 @@ public:
     typedef std::function<void(size_t, const Payload&)> ReceiveEventCallback;
     typedef std::function<void(size_t)> CloseEventCallback;
     typedef std::function<void(size_t)> AcceptEventCallback;
+    typedef std::shared_ptr<asio::ip::tcp::acceptor> AcceptorPointer;
 
     ConnectionsManager(asio::io_service &ioService, int16_t port);
-    ConnectionsManager(ConnectionsFactory::Pointer connectionsFactory, asio::io_service &ioService, int16_t port);
+    ConnectionsManager(ConnectionsFactory::Pointer connectionsFactory, asio::io_service &ioService, AcceptorPointer acceptor);
 
     void queueAccept();
 
@@ -49,10 +50,6 @@ public:
     void send(size_t hash, const Payload &payload);
     void disconnect(size_t hash);
 
-    #ifdef eMU_UT
-    asio::ip::tcp::acceptor& acceptor();
-    #endif
-
 private:
     void acceptHandler(Connection::SocketPointer socket, const boost::system::error_code &errorCode);
     void registerConnection(Connection::SocketPointer socket);
@@ -60,10 +57,9 @@ private:
     void receiveEvent(Connection &connection);
     void closeEvent(Connection &connection);
 
-    asio::io_service &ioService_;
-    asio::ip::tcp::acceptor acceptor_;
-
     ConnectionsFactory::Pointer connectionsFactory_;
+    asio::io_service &ioService_;
+    AcceptorPointer acceptor_;
 
     GenerateConnectionHashCallback generateConnectionHashCallback_;
     AcceptEventCallback acceptEventCallback_;

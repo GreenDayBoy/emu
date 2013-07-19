@@ -24,6 +24,8 @@ public:
                                      boost::asio::ip::udp::endpoint endpoint,
                                      const io_service::IoHandler &handler));
 
+    io_service& get_io_service();
+
     io_service service_;
     boost::asio::ip::udp::endpoint endpoint_;
 };

@@ -15,6 +15,7 @@
 
 #include <network/buffer.hpp>
 #include <common/hashableObject.hpp>
+#include <common/mockable.hpp>
 
 namespace eMU {
 namespace core {
@@ -41,13 +42,13 @@ public:
     ReadBuffer& readBuffer();
 
     void setConnectEventCallback(const EventCallback &callback);
-    void setReceiveEventCallback(const EventCallback &callback);
-    void setCloseEventCallback(const EventCallback &callback);
+    MOCKABLE void setReceiveEventCallback(const EventCallback &callback);
+    MOCKABLE void setCloseEventCallback(const EventCallback &callback);
 
-    void disconnect();
-    void close();
-    void send(const Payload &payload);
-    void queueReceive();
+    MOCKABLE void disconnect();
+    MOCKABLE void close();
+    MOCKABLE void send(const Payload &payload);
+    MOCKABLE void queueReceive();
     void connect(const boost::asio::ip::tcp::endpoint &endpoint);
 
     friend std::ostream& operator<<(std::ostream &stream, const Connection &connection);

@@ -4,14 +4,17 @@
 #include <core/common/exception.hpp>
 #include <ut/env/asioStub/ioService.hpp>
 #include <ut/env/asioStub/tcp/acceptor.hpp>
-#include <ut/env/asioStub/tcp/socket.hpp>
 #include <ut/env/core/network/tcp/connectionsManagerEventsMock.hpp>
+#include <ut/env/core/network/tcp/connectionsFactoryMock.hpp>
+#include <ut/env/core/network/tcp/connectionMock.hpp>
 
 using ::testing::_;
 using ::testing::SaveArg;
 using ::testing::Return;
 using ::testing::Throw;
-using ::testing::DoAll;
+using ::testing::NotNull;
+using ::testing::ReturnRef;
+using ::testing::Ref;
 
 ACTION_TEMPLATE(SaveArgToPointer,
                 HAS_1_TEMPLATE_PARAMS(int, k),
@@ -19,146 +22,170 @@ ACTION_TEMPLATE(SaveArgToPointer,
   *pointer = &(::std::tr1::get<k>(args));
 }
 
+namespace asioStub = eMU::ut::env::asioStub;
+namespace network = eMU::core::network;
+namespace tcpEnv = eMU::ut::env::core::tcp;
+
 class ConnectionsManagerTest: public ::testing::Test {
 public:
     ConnectionsManagerTest():
-      connectionsManager_(ioService_, 55962) {
-        connectionsManager_.setGenerateConnectionHashCallback(std::bind(&eMU::ut::env::core::tcp::ConnectionsManagerEventsMock::generateConnectionHash,
+      port_(55962),
+      acceptor_(new asioStub::ip::tcp::acceptor(ioService_, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port_))),
+      connectionsFactory_(new tcpEnv::ConnectionsFactoryMock()),
+      connectionsManager_(connectionsFactory_, ioService_, acceptor_),
+      connection_(tcpEnv::ConnectionMock::SocketPointer(new asioStub::ip::tcp::socket(ioService_))),
+      connectionHash_(1234) {
+        connectionsManager_.setGenerateConnectionHashCallback(std::bind(&tcpEnv::ConnectionsManagerEventsMock::generateConnectionHash,
                                                                         &connectionsManagerEventsMock_));
 
-        connectionsManager_.setAcceptEventCallback(std::bind(&eMU::ut::env::core::tcp::ConnectionsManagerEventsMock::acceptEvent,
+        connectionsManager_.setAcceptEventCallback(std::bind(&tcpEnv::ConnectionsManagerEventsMock::acceptEvent,
                                                              &connectionsManagerEventsMock_,
                                                              std::placeholders::_1));
 
-        connectionsManager_.setReceiveEventCallback(std::bind(&eMU::ut::env::core::tcp::ConnectionsManagerEventsMock::receiveEvent,
-                                                    &connectionsManagerEventsMock_,
-                                                    std::placeholders::_1,
-                                                    std::placeholders::_2));
+        connectionsManager_.setReceiveEventCallback(std::bind(&tcpEnv::ConnectionsManagerEventsMock::receiveEvent,
+                                                              &connectionsManagerEventsMock_,
+                                                              std::placeholders::_1,
+                                                              std::placeholders::_2));
 
-        connectionsManager_.setCloseEventCallback(std::bind(&eMU::ut::env::core::tcp::ConnectionsManagerEventsMock::closeEvent,
-                                                  &connectionsManagerEventsMock_,
-                                                  std::placeholders::_1));
+        connectionsManager_.setCloseEventCallback(std::bind(&tcpEnv::ConnectionsManagerEventsMock::closeEvent,
+                                                            &connectionsManagerEventsMock_,
+                                                            std::placeholders::_1));
     }
 
     void expectAsyncAcceptCallAndSaveArguments() {
-        EXPECT_CALL(connectionsManager_.acceptor(), async_accept(_, _)).WillOnce(DoAll(SaveArgToPointer<0>(&socket_), SaveArg<1>(&acceptHandler_)));
+        EXPECT_CALL(*acceptor_, async_accept(_, _)).WillOnce(SaveArg<1>(&acceptHandler_));
     }
 
-    void expectAsyncReceiveCallAndSaveCallback() {
-        EXPECT_CALL(*socket_, async_receive(_, _)).WillOnce(DoAll(SaveArg<0>(&receiveBuffer_), SaveArg<1>(&receiveHandler_)));
+    void acceptScenario() {
+        expectAsyncAcceptCallAndSaveArguments();
+
+        connectionsManager_.queueAccept();
+
+        EXPECT_CALL(connectionsManagerEventsMock_, generateConnectionHash()).WillOnce(Return(connectionHash_));
+        EXPECT_CALL(connectionsManagerEventsMock_, acceptEvent(connectionHash_));
+
+        EXPECT_CALL(connection_, queueReceive());
+        EXPECT_CALL(connection_, setReceiveEventCallback(_)).WillOnce(SaveArg<0>(&receiveCallback_));
+        EXPECT_CALL(connection_, setCloseEventCallback(_)).WillOnce(SaveArg<0>(&closeCallback_));
+        EXPECT_CALL(*connectionsFactory_, create(connectionHash_, NotNull())).WillOnce(ReturnRef(connection_));
+        EXPECT_CALL(*acceptor_, async_accept(_, _));
+
+        acceptHandler_(boost::system::error_code());
     }
 
-    eMU::ut::env::asioStub::ip::tcp::acceptor::AcceptHandler acceptHandler_;
-    eMU::ut::env::asioStub::ip::tcp::socket *socket_;
-    eMU::ut::env::asioStub::io_service ioService_;
-    eMU::ut::env::core::tcp::ConnectionsManagerEventsMock connectionsManagerEventsMock_;
-    eMU::core::network::tcp::ConnectionsManager connectionsManager_;
-    eMU::ut::env::asioStub::io_service::IoHandler receiveHandler_;
-    boost::asio::mutable_buffer receiveBuffer_;
+    asioStub::io_service ioService_;
+    int16_t port_;
+    network::tcp::ConnectionsManager::AcceptorPointer acceptor_;
+    std::shared_ptr<tcpEnv::ConnectionsFactoryMock> connectionsFactory_;
+
+    asioStub::ip::tcp::acceptor::AcceptHandler acceptHandler_;
+    tcpEnv::ConnectionsManagerEventsMock connectionsManagerEventsMock_;
+    network::tcp::ConnectionsManager connectionsManager_;
+    tcpEnv::ConnectionMock connection_;
+    size_t connectionHash_;
+
+    network::tcp::Connection::EventCallback receiveCallback_;
+    network::tcp::Connection::EventCallback closeCallback_;
 };
 
-TEST_F(ConnectionsManagerTest, triggerReceiveEvent) {
-    expectAsyncAcceptCallAndSaveArguments();
+TEST_F(ConnectionsManagerTest, accept) {
+    acceptScenario();
+}
 
-    connectionsManager_.queueAccept();
-
-    size_t connectionHash = 11111;
-    EXPECT_CALL(connectionsManagerEventsMock_, generateConnectionHash()).WillOnce(Return(connectionHash));
-    EXPECT_CALL(connectionsManagerEventsMock_, acceptEvent(connectionHash));
-    EXPECT_CALL(connectionsManager_.acceptor(), async_accept(_, _));
-    expectAsyncReceiveCallAndSaveCallback();
-
-    acceptHandler_(boost::system::error_code());
+TEST_F(ConnectionsManagerTest, send) {
+    acceptScenario();
 
     eMU::core::network::Payload payload(100, 0x14);
-    memcpy(boost::asio::buffer_cast<uint8_t*>(receiveBuffer_), &payload[0], payload.size());
+    EXPECT_CALL(connection_, send(payload));
+    EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(ReturnRef(connection_));
 
-    EXPECT_CALL(connectionsManagerEventsMock_, receiveEvent(connectionHash, payload));
-    EXPECT_CALL(*socket_, async_receive(_, _));
-    receiveHandler_(boost::system::error_code(), 100);
+    connectionsManager_.send(connectionHash_, payload);
 }
 
-TEST_F(ConnectionsManagerTest, triggerCloseEvent) {
-    expectAsyncAcceptCallAndSaveArguments();
+TEST_F(ConnectionsManagerTest, getThrowExceptionDuringSend) {
+    acceptScenario();
 
-    connectionsManager_.queueAccept();
+    eMU::core::common::Exception exception; exception.in() << "Test";
+    EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(exception));
 
-    size_t connectionHash = 11111;
-    EXPECT_CALL(connectionsManagerEventsMock_, generateConnectionHash()).WillOnce(Return(connectionHash));
-    EXPECT_CALL(connectionsManagerEventsMock_, acceptEvent(connectionHash));
-    EXPECT_CALL(connectionsManager_.acceptor(), async_accept(_, _));
-    expectAsyncReceiveCallAndSaveCallback();
-
-    acceptHandler_(boost::system::error_code());
-
-    EXPECT_CALL(*socket_, is_open()).WillOnce(Return(true));
-    EXPECT_CALL(connectionsManagerEventsMock_, closeEvent(connectionHash));
-    receiveHandler_(boost::asio::error::eof, 0);
+    eMU::core::network::Payload payload(100, 0x14);
+    connectionsManager_.send(connectionHash_, payload);
 }
 
-TEST_F(ConnectionsManagerTest, errorOccuredDuringConnectionAccept) {
-    expectAsyncAcceptCallAndSaveArguments();
+TEST_F(ConnectionsManagerTest, disconnect) {
+    acceptScenario();
 
+    EXPECT_CALL(connection_, disconnect());
+    EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(ReturnRef(connection_));
+
+    connectionsManager_.disconnect(connectionHash_);
+
+    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Return(connectionHash_));
+    EXPECT_CALL(*connectionsFactory_, destroy(connectionHash_));
+    EXPECT_CALL(connectionsManagerEventsMock_, closeEvent(connectionHash_));
+    EXPECT_CALL(connection_, close());
+
+    closeCallback_(connection_);
+}
+
+TEST_F(ConnectionsManagerTest, getThrowExceptionDuringDisconnect) {
+    acceptScenario();
+
+    eMU::core::common::Exception exception; exception.in() << "Test";
+    EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(exception));
+
+    connectionsManager_.disconnect(connectionHash_);
+}
+
+TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringCloseEvent) {
+    acceptScenario();
+
+    EXPECT_CALL(connection_, disconnect());
+    EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(ReturnRef(connection_));
+    connectionsManager_.disconnect(connectionHash_);
+
+    eMU::core::common::Exception exception; exception.in() << "Test";
+    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Throw(exception));
+    closeCallback_(connection_);
+}
+
+TEST_F(ConnectionsManagerTest, errorOccuredDuringAccept) {
+    expectAsyncAcceptCallAndSaveArguments();
     connectionsManager_.queueAccept();
 
-    EXPECT_CALL(connectionsManagerEventsMock_, generateConnectionHash()).Times(0);
-    EXPECT_CALL(connectionsManagerEventsMock_, acceptEvent(_)).Times(0);
-    EXPECT_CALL(connectionsManager_.acceptor(), async_accept(_, _));
-
+    EXPECT_CALL(*acceptor_, async_accept(_, _));
     acceptHandler_(boost::asio::error::host_not_found_try_again);
 }
 
-TEST_F(ConnectionsManagerTest, exceptionOccuredDuringConnectionAccept) {
+TEST_F(ConnectionsManagerTest, exceptionOccuredDuringGeneratingHash) {
     expectAsyncAcceptCallAndSaveArguments();
-
     connectionsManager_.queueAccept();
 
     eMU::core::common::Exception exception; exception.in() << "Test";
     EXPECT_CALL(connectionsManagerEventsMock_, generateConnectionHash()).WillOnce(Throw(exception));
-    EXPECT_CALL(connectionsManagerEventsMock_, acceptEvent(_)).Times(0);
-    EXPECT_CALL(connectionsManager_.acceptor(), async_accept(_, _));
+    EXPECT_CALL(*acceptor_, async_accept(_, _));
 
     acceptHandler_(boost::system::error_code());
 }
 
-TEST_F(ConnectionsManagerTest, disconnectShouldTriggerCloseEvent) {
-    expectAsyncAcceptCallAndSaveArguments();
+TEST_F(ConnectionsManagerTest, receive) {
+    acceptScenario();
 
-    connectionsManager_.queueAccept();
+    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Return(connectionHash_));
+    EXPECT_CALL(connectionsManagerEventsMock_, receiveEvent(connectionHash_, _));
 
-    size_t connectionHash = 11111;
-    EXPECT_CALL(connectionsManagerEventsMock_, generateConnectionHash()).WillOnce(Return(connectionHash));
-    EXPECT_CALL(connectionsManagerEventsMock_, acceptEvent(connectionHash));
-    EXPECT_CALL(connectionsManager_.acceptor(), async_accept(_, _));
-    expectAsyncReceiveCallAndSaveCallback();
-
-    acceptHandler_(boost::system::error_code());
-
-    EXPECT_CALL(*socket_, is_open()).WillOnce(Return(true));
-    EXPECT_CALL(connectionsManagerEventsMock_, closeEvent(connectionHash));
-    connectionsManager_.disconnect(connectionHash);
+    receiveCallback_(connection_);
 }
 
-TEST_F(ConnectionsManagerTest, send) {
-    expectAsyncAcceptCallAndSaveArguments();
+TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringReceive) {
+    acceptScenario();
 
-    connectionsManager_.queueAccept();
+    eMU::core::common::Exception exception; exception.in() << "Test";
+    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Throw(exception));
 
-    size_t connectionHash = 11111;
-    EXPECT_CALL(connectionsManagerEventsMock_, generateConnectionHash()).WillOnce(Return(connectionHash));
-    EXPECT_CALL(connectionsManagerEventsMock_, acceptEvent(connectionHash));
-    EXPECT_CALL(connectionsManager_.acceptor(), async_accept(_, _));
-    expectAsyncReceiveCallAndSaveCallback();
+    receiveCallback_(connection_);
+}
 
-    acceptHandler_(boost::system::error_code());
-
-    boost::asio::mutable_buffer sendBuffer;
-    EXPECT_CALL(*socket_, async_send(_, _)).WillOnce(SaveArg<0>(&sendBuffer));
-
-    eMU::core::network::Payload payload(100, 0x14);
-    connectionsManager_.send(connectionHash, payload);
-
-    ASSERT_EQ(payload.size(), boost::asio::buffer_size(sendBuffer));
-    int32_t result = memcmp(boost::asio::buffer_cast<const uint8_t*>(sendBuffer), &payload[0], payload.size());
-    ASSERT_EQ(0, result);
+TEST_F(ConnectionsManagerTest, CheckConstructor) {
+    network::tcp::ConnectionsManager ConnectionsManager(ioService_, port_);
 }

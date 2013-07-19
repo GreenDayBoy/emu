@@ -29,12 +29,13 @@ namespace asio = boost::asio;
 class Connection: private boost::noncopyable {
 public:
     typedef std::function<void(Connection&, const boost::asio::ip::udp::endpoint&)> ReceiveFromEventCallback;
+    typedef std::shared_ptr<asio::ip::udp::socket> SocketPointer;
 
     Connection(asio::io_service &ioService, uint16_t port);
+    Connection(SocketPointer socket);
     virtual ~Connection();
 
     ReadBuffer& readBuffer();
-    asio::ip::udp::socket& socket();
     void setReceiveFromEventCallback(const ReceiveFromEventCallback &callback);
     void queueReceiveFrom();
     void sendTo(const boost::asio::ip::udp::endpoint &endpoint, const Payload &payload);
@@ -48,7 +49,7 @@ private:
 
     void errorHandler(const boost::system::error_code &errorCode, const std::string &operationName);
 
-    asio::ip::udp::socket socket_;
+    SocketPointer socket_;
     asio::io_service::strand strand_;
     ReadBuffer readBuffer_;
     WriteBufferFactory writeBufferFactory_;

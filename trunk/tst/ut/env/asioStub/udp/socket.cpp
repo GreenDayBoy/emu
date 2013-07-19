@@ -11,7 +11,12 @@ socket::socket(io_service &service, const boost::asio::ip::udp::endpoint &endpoi
     service_(service),
     endpoint_(endpoint) {}
 
+io_service& socket::get_io_service() {
+    return service_;
 }
+
+}
+
 }
 }
 }

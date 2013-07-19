@@ -6,6 +6,10 @@ namespace core {
 namespace network {
 namespace tcp {
 
+ConnectionsFactory::~ConnectionsFactory() {
+
+}
+
 Connection& ConnectionsFactory::create(size_t hash, Connection::SocketPointer socket) {
     if(connections_.count(hash) > 0) {
         eMU::core::common::Exception exception;
