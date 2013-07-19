@@ -8,21 +8,23 @@ namespace network {
 namespace tcp {
 
 ConnectionsManager::ConnectionsManager(asio::io_service &ioService, int16_t port):
-    ConnectionsManager(ConnectionsFactory::Pointer(new ConnectionsFactory), ioService, port) {}
+  ConnectionsManager(ConnectionsFactory::Pointer(new ConnectionsFactory),
+                     ioService,
+                     AcceptorPointer(new asio::ip::tcp::acceptor(ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)))) {}
 
-ConnectionsManager::ConnectionsManager(ConnectionsFactory::Pointer connectionsFactory, asio::io_service &ioService, int16_t port):
+ConnectionsManager::ConnectionsManager(ConnectionsFactory::Pointer connectionsFactory, asio::io_service &ioService, AcceptorPointer acceptor):
+  connectionsFactory_(connectionsFactory),
   ioService_(ioService),
-  acceptor_(ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
-  connectionsFactory_(connectionsFactory) {}
+  acceptor_(acceptor) {}
 
 void ConnectionsManager::queueAccept() {
     Connection::SocketPointer socket(new asio::ip::tcp::socket(ioService_));
 
-    acceptor_.async_accept(*socket,
-                           std::bind(&ConnectionsManager::acceptHandler,
-                                     this,
-                                     socket,
-                                     std::placeholders::_1));
+    acceptor_->async_accept(*socket,
+                            std::bind(&ConnectionsManager::acceptHandler,
+                                      this,
+                                      socket,
+                                      std::placeholders::_1));
 }
 
 void ConnectionsManager::setGenerateConnectionHashCallback(const GenerateConnectionHashCallback &callback) {
@@ -95,24 +97,19 @@ void ConnectionsManager::closeEvent(Connection &connection) {
         size_t hash = connectionsFactory_->getHash(connection);
 
         closeEventCallback_(hash);
+        connection.close();
         connectionsFactory_->destroy(hash);
     } catch(common::Exception &exception) {
         LOG(ERROR) << "Exception during closeEvent, reason: " << exception.what();
     }
 }
 
-#ifdef eMU_UT
-asio::ip::tcp::acceptor& ConnectionsManager::acceptor() {
-    return acceptor_;
-}
-#endif
-
 void ConnectionsManager::disconnect(size_t hash) {
     try {
         Connection &connection = connectionsFactory_->get(hash);
         connection.disconnect();
     } catch(common::Exception &exception) {
-        LOG(ERROR) << "Exception during send, reason: " << exception.what();
+        LOG(ERROR) << "Exception during send, disconnect: " << exception.what();
     }
 }
 

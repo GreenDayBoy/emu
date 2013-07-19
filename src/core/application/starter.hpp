@@ -55,7 +55,7 @@ public:
         }
     }
 
-protected:
+private:
     ServiceThreading serviceThreading_;
     boost::asio::signal_set signalSet_;
     Server server_;
