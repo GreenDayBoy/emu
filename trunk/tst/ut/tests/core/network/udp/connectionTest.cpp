@@ -48,6 +48,14 @@ public:
                                                                                  SaveArg<2>(&sendToHandler_)));
     }
 
+    void insertFakePayload(const network::Payload &payload, boost::asio::mutable_buffer &buffer) {
+        memcpy(boost::asio::buffer_cast<uint8_t*>(buffer), &payload[0], payload.size());
+    }
+
+    bool isPayloadTheSame(const network::Payload &payload, const uint8_t *sourceBuffer) {
+        return memcmp(&payload[0], sourceBuffer, payload.size()) == 0;
+    }
+
     int16_t port_;
     network::udp::Connection::SocketPointer socket_;
     network::udp::Connection connection_;
@@ -72,7 +80,7 @@ TEST_F(UdpConnectionTest, receiveFrom) {
     ASSERT_EQ(boost::asio::buffer_size(receiveBuffer_), network::kMaxPayloadSize);
 
     network::Payload payload(100, 0x14);
-    memcpy(boost::asio::buffer_cast<uint8_t*>(receiveBuffer_), &payload[0], payload.size());
+    insertFakePayload(payload, receiveBuffer_);
 
     boost::asio::ip::udp::endpoint senderEndpoint(boost::asio::ip::address::from_string("1.2.3.4"), 1234);
 
@@ -84,8 +92,7 @@ TEST_F(UdpConnectionTest, receiveFrom) {
     receiveFromHandler_(boost::system::error_code(), payload.size());
 
     ASSERT_EQ(payload.size(), connection_.readBuffer().payloadSize_);
-    int result = memcmp(&payload[0], &connection_.readBuffer().payload_[0], payload.size());
-    EXPECT_EQ(0, result);
+    EXPECT_TRUE(isPayloadTheSame(payload, &connection_.readBuffer().payload_[0]));
 }
 
 TEST_F(UdpConnectionTest, receiveFrom_error) {
@@ -109,9 +116,7 @@ TEST_F(UdpConnectionTest, sendTo) {
     EXPECT_EQ(receiverEndpoint_, endpoint);
 
     ASSERT_EQ(boost::asio::buffer_size(sendBuffer_), payload.size());
-
-    int32_t result = memcmp(boost::asio::buffer_cast<const uint8_t*>(sendBuffer_), &payload[0], payload.size());
-    ASSERT_EQ(0, result);
+    EXPECT_TRUE(isPayloadTheSame(payload, boost::asio::buffer_cast<const uint8_t*>(sendBuffer_)));
 }
 
 TEST_F(UdpConnectionTest, sendTo_pending) {
@@ -129,8 +134,7 @@ TEST_F(UdpConnectionTest, sendTo_pending) {
         connection_.sendTo(endpoint, payload1);
 
         ASSERT_EQ(boost::asio::buffer_size(sendBuffer1), payload1.size());
-        int result = memcmp(boost::asio::buffer_cast<const uint8_t*>(sendBuffer1), &payload1[0], payload1.size());
-        ASSERT_EQ(0, result);
+        EXPECT_TRUE(isPayloadTheSame(payload1, boost::asio::buffer_cast<const uint8_t*>(sendBuffer1)));
 
         network::Payload payload2(100, 0x11);
         connection_.sendTo(endpoint, payload2);
@@ -146,15 +150,12 @@ TEST_F(UdpConnectionTest, sendTo_pending) {
 
         sendToHandler1(boost::system::error_code(), payload1.size());
 
-        network::Payload payload2And3;
-        payload2And3.insert(payload2And3.end(), payload2.begin(), payload2.end());
-        payload2And3.insert(payload2And3.end(), payload3.begin(), payload3.end());
+        payload2.insert(payload2.end(), payload3.begin(), payload3.end());
 
-        ASSERT_EQ(boost::asio::buffer_size(sendBuffer2), payload2And3.size());
-        result = memcmp(boost::asio::buffer_cast<const uint8_t*>(sendBuffer2), &payload2And3[0], payload2And3.size());
-        ASSERT_EQ(0, result);
+        ASSERT_EQ(boost::asio::buffer_size(sendBuffer2), payload2.size());
+        EXPECT_TRUE(isPayloadTheSame(payload2, boost::asio::buffer_cast<const uint8_t*>(sendBuffer2)));
 
-        sendToHandler2(boost::system::error_code(), payload2And3.size());
+        sendToHandler2(boost::system::error_code(), payload2.size());
     }
 }
 
@@ -184,8 +185,7 @@ TEST_F(UdpConnectionTest, sendTo_error_with_pending) {
     sendToHandler_(boost::asio::error::connection_reset, 0);
 
     ASSERT_EQ(boost::asio::buffer_size(sendBuffer_), payload2.size());
-    int32_t result = memcmp(boost::asio::buffer_cast<const uint8_t*>(sendBuffer_), &payload2[0], payload2.size());
-    ASSERT_EQ(0, result);
+    EXPECT_TRUE(isPayloadTheSame(payload2, boost::asio::buffer_cast<const uint8_t*>(sendBuffer_)));
 
     sendToHandler_(boost::system::error_code(), payload2.size());
 }

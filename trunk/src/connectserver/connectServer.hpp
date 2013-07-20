@@ -27,6 +27,10 @@ namespace asio = boost::asio;
 class Server: boost::noncopyable {
 public:
     Server(asio::io_service &ioService, int16_t port, size_t maxNumberOfUsers);
+    Server(core::network::tcp::ConnectionsManager::Pointer connectionsManager,
+           core::common::UsersFactory<User>::Pointer usersFactory,
+           core::network::udp::Connection::Pointer udpConnection);
+
     void startup();
     void cleanup();
 
@@ -37,10 +41,9 @@ public:
     void onReceiveFrom(core::network::udp::Connection &connection);
 
 private:
-    core::network::tcp::ConnectionsManager connectionsManager_;
-    core::network::udp::Connection udpConnection_;
-    core::common::UsersFactory<User> usersFactory_;
-
+    core::network::tcp::ConnectionsManager::Pointer connectionsManager_;
+    core::common::UsersFactory<User>::Pointer usersFactory_;
+    core::network::udp::Connection::Pointer udpConnection_;
 };
 
 }

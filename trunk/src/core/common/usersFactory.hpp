@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <memory>
 #include <common/exception.hpp>
 
 namespace eMU {
@@ -12,6 +13,7 @@ template<typename User>
 class UsersFactory {
 public:
     typedef std::vector<User*> UsersContainer;
+    typedef std::shared_ptr<UsersFactory<User> > Pointer;
 
     UsersFactory(size_t maxNumberOfUsers):
       maxNumberOfUsers_(maxNumberOfUsers) {}
