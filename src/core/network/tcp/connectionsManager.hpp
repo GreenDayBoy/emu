@@ -36,6 +36,7 @@ public:
     typedef std::function<void(size_t)> CloseEventCallback;
     typedef std::function<void(size_t)> AcceptEventCallback;
     typedef std::shared_ptr<asio::ip::tcp::acceptor> AcceptorPointer;
+    typedef std::shared_ptr<ConnectionsManager> Pointer;
 
     ConnectionsManager(asio::io_service &ioService, int16_t port);
     ConnectionsManager(ConnectionsFactory::Pointer connectionsFactory, asio::io_service &ioService, AcceptorPointer acceptor);

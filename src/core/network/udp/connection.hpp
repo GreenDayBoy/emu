@@ -30,6 +30,7 @@ class Connection: private boost::noncopyable {
 public:
     typedef std::function<void(Connection&, const boost::asio::ip::udp::endpoint&)> ReceiveFromEventCallback;
     typedef std::shared_ptr<asio::ip::udp::socket> SocketPointer;
+    typedef std::shared_ptr<Connection> Pointer;
 
     Connection(asio::io_service &ioService, uint16_t port);
     Connection(SocketPointer socket);
