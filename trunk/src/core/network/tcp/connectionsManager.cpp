@@ -109,7 +109,7 @@ void ConnectionsManager::disconnect(size_t hash) {
         Connection &connection = connectionsFactory_->get(hash);
         connection.disconnect();
     } catch(common::Exception &exception) {
-        LOG(ERROR) << "Exception during send, disconnect: " << exception.what();
+        LOG(ERROR) << "Exception during disconnect, reason: " << exception.what();
     }
 }
 
