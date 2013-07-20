@@ -1,7 +1,6 @@
 #pragma once
 
 #include <boost/noncopyable.hpp>
-#include <boost/bind.hpp>
 #include <boost/asio.hpp>
 
 #include <glog/logging.h>
