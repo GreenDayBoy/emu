@@ -11,7 +11,7 @@
 #endif
 
 #include <boost/noncopyable.hpp>
-#include <network/udp/writeBufferFactory.hpp>
+#include <core/network/udp/writeBufferFactory.hpp>
 
 namespace eMU {
 namespace core {

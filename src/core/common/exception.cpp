@@ -1,4 +1,4 @@
-#include <common/exception.hpp>
+#include <core/common/exception.hpp>
 
 namespace eMU {
 namespace core {

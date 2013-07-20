@@ -3,7 +3,7 @@
 #include <core/network/tcp/connectionsManager.hpp>
 #include <core/network/udp/connection.hpp>
 #include <core/common/usersFactory.hpp>
-#include <user.hpp>
+#include <connectserver/user.hpp>
 
 #ifdef eMU_UT
 #include <ut/env/asioStub/ioService.hpp>

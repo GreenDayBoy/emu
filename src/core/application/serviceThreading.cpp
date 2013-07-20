@@ -1,4 +1,4 @@
-#include <application/serviceThreading.hpp>
+#include <core/application/serviceThreading.hpp>
 
 namespace eMU {
 namespace core {

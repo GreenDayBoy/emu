@@ -1,5 +1,5 @@
-#include <network/tcp/connectionsFactory.hpp>
-#include <common/exception.hpp>
+#include <core/network/tcp/connectionsFactory.hpp>
+#include <core/common/exception.hpp>
 
 namespace eMU {
 namespace core {

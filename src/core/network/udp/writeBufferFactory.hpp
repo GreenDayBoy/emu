@@ -3,7 +3,7 @@
 #include <boost/asio/ip/udp.hpp>
 #include <map>
 
-#include <network/buffer.hpp>
+#include <core/network/buffer.hpp>
 
 namespace eMU {
 namespace core {

@@ -5,8 +5,8 @@
 
 #include <glog/logging.h>
 
-#include <application/serviceThreading.hpp>
-#include <common/exception.hpp>
+#include <core/application/serviceThreading.hpp>
+#include <core/common/exception.hpp>
 
 namespace eMU {
 namespace core {
