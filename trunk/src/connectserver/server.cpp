@@ -1,4 +1,4 @@
-#include <connectserver/connectServer.hpp>
+#include <connectserver/server.hpp>
 #include <core/application/starter.hpp>
 #include <glog/logging.h>
 #include <boost/lexical_cast.hpp>

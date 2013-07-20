@@ -42,10 +42,9 @@ public:
                                                                                       SaveArg<2>(&receiveFromHandler_)));
     }
 
-    void expectAsyncSendToCallAndSaveArguments() {
-        EXPECT_CALL(*socket_, async_send_to(_, _, _)).WillOnce(DoAll(SaveArg<0>(&sendBuffer_),
-                                                                                 SaveArg<1>(&receiverEndpoint_),
-                                                                                 SaveArg<2>(&sendToHandler_)));
+    void expectAsyncSendToCallAndSaveArguments(const boost::asio::ip::udp::endpoint &expectedEndpoint) {
+        EXPECT_CALL(*socket_, async_send_to(_, expectedEndpoint, _)).WillOnce(DoAll(SaveArg<0>(&sendBuffer_),
+                                                                                    SaveArg<2>(&sendToHandler_)));
     }
 
     void insertFakePayload(const network::Payload &payload, boost::asio::mutable_buffer &buffer) {
@@ -68,7 +67,6 @@ public:
 
     boost::asio::mutable_buffer sendBuffer_;
     asioStub::io_service::IoHandler sendToHandler_;
-    boost::asio::ip::udp::endpoint receiverEndpoint_;
 };
 
 TEST_F(UdpConnectionTest, receiveFrom) {
@@ -109,11 +107,9 @@ TEST_F(UdpConnectionTest, sendTo) {
     boost::asio::ip::udp::endpoint endpoint(boost::asio::ip::address::from_string("1.2.3.4"), 1234);
     network::Payload payload(100, 0x14);
 
-    expectAsyncSendToCallAndSaveArguments();
+    expectAsyncSendToCallAndSaveArguments(endpoint);
 
     connection_.sendTo(endpoint, payload);
-
-    EXPECT_EQ(receiverEndpoint_, endpoint);
 
     ASSERT_EQ(boost::asio::buffer_size(sendBuffer_), payload.size());
     EXPECT_TRUE(isPayloadTheSame(payload, boost::asio::buffer_cast<const uint8_t*>(sendBuffer_)));
@@ -128,7 +124,7 @@ TEST_F(UdpConnectionTest, sendTo_pending) {
         boost::asio::mutable_buffer sendBuffer1;
         asioStub::io_service::IoHandler sendToHandler1;
 
-        EXPECT_CALL(*socket_, async_send_to(_, _, _)).WillOnce(DoAll(SaveArg<0>(&sendBuffer1),
+        EXPECT_CALL(*socket_, async_send_to(_, endpoint, _)).WillOnce(DoAll(SaveArg<0>(&sendBuffer1),
                                                                                  SaveArg<2>(&sendToHandler1)));
         network::Payload payload1(100, 0x10);
         connection_.sendTo(endpoint, payload1);
@@ -145,8 +141,8 @@ TEST_F(UdpConnectionTest, sendTo_pending) {
         boost::asio::mutable_buffer sendBuffer2;
         asioStub::io_service::IoHandler sendToHandler2;
 
-        EXPECT_CALL(*socket_, async_send_to(_, _, _)).WillOnce(DoAll(SaveArg<0>(&sendBuffer2),
-                                                                                 SaveArg<2>(&sendToHandler2)));
+        EXPECT_CALL(*socket_, async_send_to(_, endpoint, _)).WillOnce(DoAll(SaveArg<0>(&sendBuffer2),
+                                                                            SaveArg<2>(&sendToHandler2)));
 
         sendToHandler1(boost::system::error_code(), payload1.size());
 
@@ -163,7 +159,7 @@ TEST_F(UdpConnectionTest, sendTo_error) {
     boost::asio::ip::udp::endpoint endpoint(boost::asio::ip::address::from_string("1.2.3.4"), 1234);
     network::Payload payload(100, 0x10);
 
-    expectAsyncSendToCallAndSaveArguments();
+    expectAsyncSendToCallAndSaveArguments(endpoint);
 
     connection_.sendTo(endpoint, payload);
 
@@ -171,16 +167,16 @@ TEST_F(UdpConnectionTest, sendTo_error) {
 }
 
 TEST_F(UdpConnectionTest, sendTo_error_with_pending) {
-    expectAsyncSendToCallAndSaveArguments();
-
     boost::asio::ip::udp::endpoint endpoint(boost::asio::ip::address::from_string("1.2.3.4"), 1234);
+    expectAsyncSendToCallAndSaveArguments(endpoint);
+
     network::Payload payload(100, 0x10);
     connection_.sendTo(endpoint, payload);
 
     network::Payload payload2(100, 0x11);
     connection_.sendTo(endpoint, payload2);
 
-    expectAsyncSendToCallAndSaveArguments();
+    expectAsyncSendToCallAndSaveArguments(endpoint);
 
     sendToHandler_(boost::asio::error::connection_reset, 0);
 
@@ -191,26 +187,26 @@ TEST_F(UdpConnectionTest, sendTo_error_with_pending) {
 }
 
 TEST_F(UdpConnectionTest, sendTo_different_endpoints) {
-    EXPECT_CALL(*socket_, async_send_to(_, _, _));
-
     boost::asio::ip::udp::endpoint endpoint(boost::asio::ip::address::from_string("1.2.3.4"), 1234);
+    EXPECT_CALL(*socket_, async_send_to(_, endpoint, _));
+
     network::Payload payload(100, 0x10);
     connection_.sendTo(endpoint, payload);
 
     network::Payload payload2(100, 0x10);
     connection_.sendTo(endpoint, payload2);
 
-    EXPECT_CALL(*socket_, async_send_to(_, _, _));
-
     boost::asio::ip::udp::endpoint endpoint2(boost::asio::ip::address::from_string("4.3.2.1"), 1234);
+    EXPECT_CALL(*socket_, async_send_to(_, endpoint2, _));
+
     network::Payload payload3(100, 0x12);
     connection_.sendTo(endpoint2, payload3);
 }
 
 TEST_F(UdpConnectionTest, sendTo_overflow_buffer) {
-    EXPECT_CALL(*socket_, async_send_to(_, _, _)).Times(0);
-
     boost::asio::ip::udp::endpoint endpoint(boost::asio::ip::address::from_string("1.2.3.4"), 1234);
+    EXPECT_CALL(*socket_, async_send_to(_, endpoint, _)).Times(0);
+
     network::Payload payload(network::kMaxPayloadSize + 1, 0x10);
     connection_.sendTo(endpoint, payload);
 }
