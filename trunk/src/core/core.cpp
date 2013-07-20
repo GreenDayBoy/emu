@@ -1,5 +1,5 @@
 #include <glog/logging.h>
-#include <core.hpp>
+#include <core/core.hpp>
 
 #ifdef eMU_TARGET
 int main(int count, char *args[]) {

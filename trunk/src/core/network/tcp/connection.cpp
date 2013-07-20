@@ -1,5 +1,5 @@
 #include <glog/logging.h>
-#include <network/tcp/connection.hpp>
+#include <core/network/tcp/connection.hpp>
 
 namespace eMU {
 namespace core {

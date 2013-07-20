@@ -1,7 +1,7 @@
 #pragma once
 
 #include <boost/noncopyable.hpp>
-#include <network/tcp/connection.hpp>
+#include <core/network/tcp/connection.hpp>
 #include <common/mockable.hpp>
 
 namespace eMU {

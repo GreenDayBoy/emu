@@ -1,4 +1,4 @@
-#include <network/udp/connection.hpp>
+#include <core/network/udp/connection.hpp>
 #include <glog/logging.h>
 
 namespace eMU {

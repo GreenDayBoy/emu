@@ -1,6 +1,6 @@
 #include <glog/logging.h>
-#include <network/tcp/connectionsManager.hpp>
-#include <common/exception.hpp>
+#include <core/network/tcp/connectionsManager.hpp>
+#include <core/common/exception.hpp>
 
 namespace eMU {
 namespace core {

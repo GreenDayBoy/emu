@@ -13,8 +13,8 @@
 #include <boost/noncopyable.hpp>
 #include <functional>
 
-#include <network/buffer.hpp>
-#include <network/tcp/connectionsFactory.hpp>
+#include <core/network/buffer.hpp>
+#include <core/network/tcp/connectionsFactory.hpp>
 
 namespace eMU {
 namespace core {

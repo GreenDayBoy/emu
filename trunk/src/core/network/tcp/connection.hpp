@@ -13,8 +13,8 @@
 #include <boost/noncopyable.hpp>
 #include <functional>
 
-#include <network/buffer.hpp>
-#include <common/hashableObject.hpp>
+#include <core/network/buffer.hpp>
+#include <core/common/hashableObject.hpp>
 #include <common/mockable.hpp>
 
 namespace eMU {

@@ -25,9 +25,6 @@ message(STATUS "Configuring build type ${CMAKE_BUILD_TYPE}")
 
 # Includes ----------------------
 include_directories(${eMU_src_DIR})
-include_directories(${eMU_core_DIR})
-include_directories(${eMU_connectserver_DIR})
-
 include_directories(${eMU_tst_DIR})
 #--------------------------------
 
