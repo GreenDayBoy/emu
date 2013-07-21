@@ -33,7 +33,7 @@ public:
     typedef std::shared_ptr<Connection> Pointer;
 
     Connection(asio::io_service &ioService, uint16_t port);
-    Connection(SocketPointer socket);
+    explicit Connection(SocketPointer socket);
     virtual ~Connection();
 
     ReadBuffer& readBuffer();
