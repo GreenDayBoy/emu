@@ -4,6 +4,7 @@
 #include <core/network/udp/connection.hpp>
 #include <core/common/usersFactory.hpp>
 #include <connectserver/user.hpp>
+#include <connectserver/gameServersList.hpp>
 
 #ifdef eMU_UT
 #include <ut/env/asioStub/ioService.hpp>
@@ -26,10 +27,17 @@ namespace asio = boost::asio;
 
 class Server: boost::noncopyable {
 public:
-    Server(asio::io_service &ioService, int16_t port, size_t maxNumberOfUsers);
+    struct Configuration {
+        int16_t port_;
+        size_t maxNumberOfUsers_;
+        std::string gameServersListContent_;
+    };
+
+    Server(asio::io_service &ioService, const Configuration &configuration);
     Server(core::network::tcp::ConnectionsManager::Pointer connectionsManager,
            core::common::UsersFactory<User>::Pointer usersFactory,
-           core::network::udp::Connection::Pointer udpConnection);
+           core::network::udp::Connection::Pointer udpConnection,
+           const Configuration &configuration);
 
     void startup();
     void cleanup();
@@ -44,6 +52,8 @@ private:
     core::network::tcp::ConnectionsManager::Pointer connectionsManager_;
     core::common::UsersFactory<User>::Pointer usersFactory_;
     core::network::udp::Connection::Pointer udpConnection_;
+    std::string gameServersListContent_;
+    GameServersList gameServersList_;
 };
 
 }
