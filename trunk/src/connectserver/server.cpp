@@ -1,22 +1,25 @@
 #include <connectserver/server.hpp>
-#include <core/application/starter.hpp>
+
 #include <glog/logging.h>
 #include <boost/lexical_cast.hpp>
 
 namespace eMU {
 namespace connectserver {
 
-Server::Server(asio::io_service &ioService, int16_t port, size_t maxNumberOfUsers):
-  Server(core::network::tcp::ConnectionsManager::Pointer(new core::network::tcp::ConnectionsManager(ioService, port)),
-         core::common::UsersFactory<User>::Pointer(new core::common::UsersFactory<User>(maxNumberOfUsers)),
-         core::network::udp::Connection::Pointer(new core::network::udp::Connection(ioService, port))) {}
+Server::Server(asio::io_service &ioService, const Configuration &configuration):
+  Server(core::network::tcp::ConnectionsManager::Pointer(new core::network::tcp::ConnectionsManager(ioService, configuration.port_)),
+         core::common::UsersFactory<User>::Pointer(new core::common::UsersFactory<User>(configuration.maxNumberOfUsers_)),
+         core::network::udp::Connection::Pointer(new core::network::udp::Connection(ioService, configuration.port_)),
+         configuration) {}
 
 Server::Server(core::network::tcp::ConnectionsManager::Pointer connectionsManager,
                core::common::UsersFactory<User>::Pointer usersFactory,
-               core::network::udp::Connection::Pointer udpConnection):
+               core::network::udp::Connection::Pointer udpConnection,
+               const Configuration &configuration):
   connectionsManager_(connectionsManager),
   usersFactory_(usersFactory),
-  udpConnection_(udpConnection) {
+  udpConnection_(udpConnection),
+  gameServersListContent_(configuration.gameServersListContent_) {
     connectionsManager_->setAcceptEventCallback(std::bind(&Server::onAccept, this, std::placeholders::_1));
     connectionsManager_->setReceiveEventCallback(std::bind(&Server::onReceive, this, std::placeholders::_1, std::placeholders::_2));
     connectionsManager_->setCloseEventCallback(std::bind(&Server::onClose, this, std::placeholders::_1));
@@ -26,7 +29,15 @@ Server::Server(core::network::tcp::ConnectionsManager::Pointer connectionsManage
 }
 
 void Server::startup() {
-    connectionsManager_->queueAccept();
+    try {
+        core::common::XmlReader xmlReader;
+        xmlReader.parse(gameServersListContent_, "servers");
+
+        gameServersList_.initialize(xmlReader);
+        connectionsManager_->queueAccept();
+    } catch(core::common::Exception &exception) {
+        LOG(ERROR) << "Caught exception during connect server startup, message: " << exception.what();
+    }
 }
 
 size_t Server::generateConnectionHash() {
@@ -66,18 +77,18 @@ void Server::cleanup() {
 
 #ifdef eMU_TARGET
 int main(int argsCount, char *args[]) {
-    if(argsCount != 4) {
+    if(argsCount < 4) {
         LOG(ERROR) << "Invalid command line to start ConnectServer instance.";
         return 1;
     }
 
     google::InitGoogleLogging(args[0]);
 
-    size_t maxNumberOfUsers = boost::lexical_cast<size_t>(args[1]);
-    uint16_t port = boost::lexical_cast<uint16_t>(args[2]);
-    size_t maxNumberOfThreads = boost::lexical_cast<size_t>(args[3]);
-    eMU::core::application::Starter<eMU::connectserver::Server> starter(maxNumberOfThreads, port, maxNumberOfUsers);
-    starter.start();
+//    size_t maxNumberOfUsers = boost::lexical_cast<size_t>(args[1]);
+//    uint16_t port = boost::lexical_cast<uint16_t>(args[2]);
+//    size_t maxNumberOfThreads = boost::lexical_cast<size_t>(args[3]);
+
+//    eMU::connectserver::Server::Configuration configuration = {port, maxNumberOfUsers, ""}
 
     return 0;
 }

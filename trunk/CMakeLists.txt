@@ -58,8 +58,8 @@ target_link_libraries(ut gmock gtest pthread glog boost_system boost_thread)
 
 # mt -------
 file(GLOB_RECURSE mt_SOURCES "${eMU_mt_DIR}/*.cpp")
-add_executable(mt EXCLUDE_FROM_ALL ${mt_SOURCES} ${core_SOURCES})
-target_link_libraries(mt gtest pthread glog)
+add_executable(mt EXCLUDE_FROM_ALL ${mt_SOURCES} ${core_SOURCES} ${connectserver_SOURCES})
+target_link_libraries(mt gtest pthread glog boost_system boost_thread)
 # -------------------------------
 
 # Compiler flags ----------------

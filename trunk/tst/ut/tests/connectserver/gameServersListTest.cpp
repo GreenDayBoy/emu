@@ -88,4 +88,6 @@ TEST_F(GameServersListTest, updateLoadWithInvalidCodeShouldThrownAnException) {
     } catch(eMU::core::common::Exception &exception) {
         exceptionThrown = true;
     }
+
+    EXPECT_TRUE(exceptionThrown);
 }
