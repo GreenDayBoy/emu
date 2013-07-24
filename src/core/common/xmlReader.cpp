@@ -10,7 +10,7 @@ XmlReader::XmlReader():
 
 void XmlReader::parse(std::string content, std::string firstNodeName) {
     if(content.empty()) {
-        Exception exception; exception.in() << "Got empty content!";
+        Exception exception("Got empty content!");
         throw exception;
     }
 

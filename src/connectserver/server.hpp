@@ -3,6 +3,7 @@
 #include <core/network/tcp/connectionsManager.hpp>
 #include <core/network/udp/connection.hpp>
 #include <core/common/usersFactory.hpp>
+#include <core/transactions/manager.hpp>
 #include <connectserver/user.hpp>
 #include <connectserver/gameServersList.hpp>
 
@@ -52,6 +53,7 @@ private:
     core::network::tcp::ConnectionsManager::Pointer connectionsManager_;
     core::common::UsersFactory<User>::Pointer usersFactory_;
     core::network::udp::Connection::Pointer udpConnection_;
+    core::transactions::Manager transactionsManager_;
     std::string gameServersListContent_;
     GameServersList gameServersList_;
 };

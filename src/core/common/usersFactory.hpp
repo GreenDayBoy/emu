@@ -20,8 +20,7 @@ public:
 
     User& create() {
         if(users_.size() >= maxNumberOfUsers_) {
-            Exception exception;
-            exception.in() << "Max number of users reached!";
+            Exception exception("Max number of users reached!");
 
             throw exception;
         }
@@ -51,8 +50,7 @@ public:
                           [hash](const User *userFromVector) { return hash == userFromVector->hash(); });
 
         if(it == users_.end()) {
-            Exception exception;
-            exception.in() << "Max number of users reached!";
+            Exception exception; exception.in() << "Cannot find user by hash: " << hash;
 
             throw exception;
         }

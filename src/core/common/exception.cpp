@@ -6,6 +6,10 @@ namespace common {
 
 Exception::Exception() {}
 
+Exception::Exception(const std::string &message) {
+    stream_ << message;
+}
+
 Exception::Exception(const Exception &exception) {
     stream_ << exception.stream_.rdbuf();
 }

@@ -56,6 +56,8 @@ void Server::onAccept(size_t hash) {
 
 void Server::onReceive(size_t hash, const eMU::core::network::Payload &payload) {
     LOG(INFO) << "User received, hash: " << hash << ", size: " << payload.size();
+
+    transactionsManager_.dequeueAll();
 }
 
 void Server::onClose(size_t hash) {
