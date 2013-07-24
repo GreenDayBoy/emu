@@ -37,7 +37,7 @@ protected:
     {
         uint8_t value = 0;
 
-for(auto &field : patternBuffer_.payload_)
+        for(auto &field : patternBuffer_.payload_)
         {
             field = value++;
         }
