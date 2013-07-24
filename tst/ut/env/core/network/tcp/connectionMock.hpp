@@ -3,15 +3,21 @@
 #include <gmock/gmock.h>
 #include <core/network/tcp/connection.hpp>
 
-namespace eMU {
-namespace ut {
-namespace env {
-namespace core {
-namespace tcp {
+namespace eMU
+{
+namespace ut
+{
+namespace env
+{
+namespace core
+{
+namespace tcp
+{
 
 namespace network = eMU::core::network;
 
-class ConnectionMock: public eMU::core::network::tcp::Connection {
+class ConnectionMock: public eMU::core::network::tcp::Connection
+{
 public:
     ConnectionMock(Connection::SocketPointer socket);
 

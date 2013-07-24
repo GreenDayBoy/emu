@@ -1,33 +1,39 @@
 #include <glog/logging.h>
 #include <core/network/buffer.hpp>
 
-namespace eMU {
-namespace core {
-namespace network {
+namespace eMU
+{
+namespace core
+{
+namespace network
+{
 
 ReadBuffer::ReadBuffer():
-  payload_(kMaxPayloadSize, 0),
-  payloadSize_(0) {}
+    payload_(kMaxPayloadSize, 0),
+    payloadSize_(0) {}
 
-void ReadBuffer::clear() {
+void ReadBuffer::clear()
+{
     payload_.clear();
     payload_.resize(kMaxPayloadSize, 0);
     payloadSize_ = 0;
 }
 
 WriteBuffer::WriteBuffer():
-  payload_(kMaxPayloadSize, 0),
-  payloadSize_(0),
-  pending_(false),
-  secondPayload_(kMaxPayloadSize, 0),
-  secondPayloadSize_(0) {}
+    payload_(kMaxPayloadSize, 0),
+    payloadSize_(0),
+    pending_(false),
+    secondPayload_(kMaxPayloadSize, 0),
+    secondPayloadSize_(0) {}
 
-void WriteBuffer::clear() {
+void WriteBuffer::clear()
+{
     this->clearFirstPayload();
     this->clearSecondPayload();
 }
 
-void WriteBuffer::clearFirstPayload() {
+void WriteBuffer::clearFirstPayload()
+{
     pending_ = false;
 
     payload_.clear();
@@ -35,17 +41,20 @@ void WriteBuffer::clearFirstPayload() {
     payloadSize_ = 0;
 }
 
-void WriteBuffer::clearSecondPayload() {
+void WriteBuffer::clearSecondPayload()
+{
     secondPayload_.clear();
     secondPayload_.resize(kMaxPayloadSize, 0);
     secondPayloadSize_ = 0;
 }
 
-bool WriteBuffer::insert(const Payload& payload) {
+bool WriteBuffer::insert(const Payload& payload)
+{
     Payload &destinationPayload = pending_ ? secondPayload_ : payload_;
     size_t &destinationPayloadSize = pending_ ? secondPayloadSize_ : payloadSize_;
 
-    if((destinationPayloadSize + payload.size()) > kMaxPayloadSize) {
+    if((destinationPayloadSize + payload.size()) > kMaxPayloadSize)
+    {
         LOG(ERROR) << "buffer overflow! pending: " << pending_
                    << ", current size: " << destinationPayloadSize
                    << ", size: " << payload.size();
@@ -59,7 +68,8 @@ bool WriteBuffer::insert(const Payload& payload) {
     return true;
 }
 
-void WriteBuffer::swap() {
+void WriteBuffer::swap()
+{
     payload_ = secondPayload_;
     payloadSize_ = secondPayloadSize_;
     this->clearSecondPayload();

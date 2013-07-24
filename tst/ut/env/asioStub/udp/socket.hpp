@@ -5,14 +5,21 @@
 
 #include <ut/env/asioStub/ioService.hpp>
 
-namespace eMU {
-namespace ut {
-namespace env {
-namespace asioStub {
-namespace ip {
-namespace udp {
+namespace eMU
+{
+namespace ut
+{
+namespace env
+{
+namespace asioStub
+{
+namespace ip
+{
+namespace udp
+{
 
-class socket {
+class socket
+{
 public:
     socket(io_service &service, const boost::asio::ip::udp::endpoint &endpoint);
 

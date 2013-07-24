@@ -1,17 +1,24 @@
 #include <core/network/tcp/connectionsFactory.hpp>
 #include <core/common/exception.hpp>
 
-namespace eMU {
-namespace core {
-namespace network {
-namespace tcp {
+namespace eMU
+{
+namespace core
+{
+namespace network
+{
+namespace tcp
+{
 
-ConnectionsFactory::~ConnectionsFactory() {
+ConnectionsFactory::~ConnectionsFactory()
+{
 
 }
 
-Connection& ConnectionsFactory::create(size_t hash, Connection::SocketPointer socket) {
-    if(connections_.count(hash) > 0) {
+Connection& ConnectionsFactory::create(size_t hash, Connection::SocketPointer socket)
+{
+    if(connections_.count(hash) > 0)
+    {
         eMU::core::common::Exception exception;
         exception.in() << "Connection with hash: " << hash << " has already been created! Connection: " << *connections_[hash];
 
@@ -24,8 +31,10 @@ Connection& ConnectionsFactory::create(size_t hash, Connection::SocketPointer so
     return *connection;
 }
 
-void ConnectionsFactory::destroy(size_t hash) {
-    if(connections_.count(hash) == 0) {
+void ConnectionsFactory::destroy(size_t hash)
+{
+    if(connections_.count(hash) == 0)
+    {
         eMU::core::common::Exception exception;
         exception.in() << "Connection with hash: " << hash << " does not exist!";
 
@@ -36,8 +45,10 @@ void ConnectionsFactory::destroy(size_t hash) {
     connections_.erase(hash);
 }
 
-Connection& ConnectionsFactory::get(size_t hash) {
-    if(connections_.count(hash) == 0) {
+Connection& ConnectionsFactory::get(size_t hash)
+{
+    if(connections_.count(hash) == 0)
+    {
         eMU::core::common::Exception exception;
         exception.in() << "Connection with hash: " << hash << " does not exist!";
 
@@ -47,11 +58,14 @@ Connection& ConnectionsFactory::get(size_t hash) {
     return *connections_[hash];
 }
 
-size_t ConnectionsFactory::getHash(Connection &connection) const {
+size_t ConnectionsFactory::getHash(Connection &connection) const
+{
     ConnectionsContainer::const_iterator it = connections_.begin();
 
-    for(; it != connections_.end(); it++) {
-        if(it->second->hash() == connection.hash()) {
+    for(; it != connections_.end(); it++)
+    {
+        if(it->second->hash() == connection.hash())
+        {
             return it->first;
         }
     }

@@ -1,20 +1,27 @@
 #include <core/transactions/transaction.hpp>
 
-namespace eMU {
-namespace core {
-namespace transactions {
+namespace eMU
+{
+namespace core
+{
+namespace transactions
+{
 
-Transaction::~Transaction() {
+Transaction::~Transaction()
+{
 
 }
 
-void Transaction::handle() {
-    if(validate()) {
+void Transaction::handle()
+{
+    if(validate())
+    {
         this->handleSelf();
     }
 }
 
-bool Transaction::validate() const {
+bool Transaction::validate() const
+{
     return true;
 }
 

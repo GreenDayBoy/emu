@@ -6,13 +6,15 @@
 namespace asioStub = eMU::ut::env::asioStub;
 namespace network = eMU::core::network;
 
-class TcpConnectionsFactoryTest: public ::testing::Test {
+class TcpConnectionsFactoryTest: public ::testing::Test
+{
 public:
     asioStub::io_service ioService_;
     network::tcp::ConnectionsFactory connectionsFactory_;
 };
 
-TEST_F(TcpConnectionsFactoryTest, createConnectionWithSameHashTwiceShouldThrowException) {
+TEST_F(TcpConnectionsFactoryTest, createConnectionWithSameHashTwiceShouldThrowException)
+{
     size_t hash = 1234;
     network::tcp::Connection::SocketPointer socket1(new asioStub::ip::tcp::socket(ioService_));
     connectionsFactory_.create(hash, socket1);
@@ -21,16 +23,20 @@ TEST_F(TcpConnectionsFactoryTest, createConnectionWithSameHashTwiceShouldThrowEx
 
     bool exceptionThrown = false;
 
-    try {
+    try
+    {
         connectionsFactory_.create(hash, socket2);
-    } catch(eMU::core::common::Exception&) {
+    }
+    catch(eMU::core::common::Exception&)
+    {
         exceptionThrown = true;
     }
 
     ASSERT_TRUE(exceptionThrown);
 }
 
-TEST_F(TcpConnectionsFactoryTest, create) {
+TEST_F(TcpConnectionsFactoryTest, create)
+{
     size_t hash = 1234;
     network::tcp::Connection::SocketPointer socket(new asioStub::ip::tcp::socket(ioService_));
     network::tcp::Connection &connection = connectionsFactory_.create(hash, socket);
@@ -38,7 +44,8 @@ TEST_F(TcpConnectionsFactoryTest, create) {
     EXPECT_EQ(hash, connectionsFactory_.getHash(connection));
 }
 
-TEST_F(TcpConnectionsFactoryTest, destroy) {
+TEST_F(TcpConnectionsFactoryTest, destroy)
+{
     size_t hash = 1234;
     network::tcp::Connection::SocketPointer socket(new asioStub::ip::tcp::socket(ioService_));
     connectionsFactory_.create(hash, socket);
@@ -48,19 +55,24 @@ TEST_F(TcpConnectionsFactoryTest, destroy) {
     connectionsFactory_.create(hash, socket);
 }
 
-TEST_F(TcpConnectionsFactoryTest, destroyNotExistingConnectionShouldThrowException) {
+TEST_F(TcpConnectionsFactoryTest, destroyNotExistingConnectionShouldThrowException)
+{
     bool exceptionThrown = false;
 
-    try {
+    try
+    {
         connectionsFactory_.destroy(4321);
-    } catch(eMU::core::common::Exception&) {
+    }
+    catch(eMU::core::common::Exception&)
+    {
         exceptionThrown = true;
     }
 
     ASSERT_TRUE(exceptionThrown);
 }
 
-TEST_F(TcpConnectionsFactoryTest, get) {
+TEST_F(TcpConnectionsFactoryTest, get)
+{
     size_t hash = 1234;
     network::tcp::Connection::SocketPointer socket(new asioStub::ip::tcp::socket(ioService_));
     network::tcp::Connection &connection = connectionsFactory_.create(hash, socket);
@@ -70,27 +82,35 @@ TEST_F(TcpConnectionsFactoryTest, get) {
     ASSERT_EQ(connection.hash(), gotConnection.hash());
 }
 
-TEST_F(TcpConnectionsFactoryTest, getNotExisitngConnectionShouldThrowException) {
+TEST_F(TcpConnectionsFactoryTest, getNotExisitngConnectionShouldThrowException)
+{
     bool exceptionThrown = false;
 
-    try {
+    try
+    {
         connectionsFactory_.get(4321);
-    } catch(eMU::core::common::Exception&) {
+    }
+    catch(eMU::core::common::Exception&)
+    {
         exceptionThrown = true;
     }
 
     ASSERT_TRUE(exceptionThrown);
 }
 
-TEST_F(TcpConnectionsFactoryTest, getHashForNotExistingConnectionShouldThrowException) {
+TEST_F(TcpConnectionsFactoryTest, getHashForNotExistingConnectionShouldThrowException)
+{
     network::tcp::Connection::SocketPointer socket(new asioStub::ip::tcp::socket(ioService_));
     network::tcp::Connection connection(socket);
 
     bool exceptionThrown = false;
 
-    try {
+    try
+    {
         connectionsFactory_.getHash(connection);
-    } catch(eMU::core::common::Exception&) {
+    }
+    catch(eMU::core::common::Exception&)
+    {
         exceptionThrown = true;
     }
 

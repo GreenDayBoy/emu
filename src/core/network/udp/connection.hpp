@@ -13,10 +13,14 @@
 #include <boost/noncopyable.hpp>
 #include <core/network/udp/writeBufferFactory.hpp>
 
-namespace eMU {
-namespace core {
-namespace network {
-namespace udp {
+namespace eMU
+{
+namespace core
+{
+namespace network
+{
+namespace udp
+{
 
 #ifdef eMU_UT
 namespace asio = eMU::ut::env::asioStub;
@@ -26,7 +30,8 @@ namespace asio = eMU::mt::env::asioStub;
 namespace asio = boost::asio;
 #endif
 
-class Connection: private boost::noncopyable {
+class Connection: private boost::noncopyable
+{
 public:
     typedef std::function<void(Connection&, const boost::asio::ip::udp::endpoint&)> ReceiveFromEventCallback;
     typedef std::shared_ptr<asio::ip::udp::socket> SocketPointer;

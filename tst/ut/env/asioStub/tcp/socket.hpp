@@ -5,14 +5,21 @@
 
 #include <ut/env/asioStub/ioService.hpp>
 
-namespace eMU {
-namespace ut {
-namespace env {
-namespace asioStub {
-namespace ip {
-namespace tcp {
+namespace eMU
+{
+namespace ut
+{
+namespace env
+{
+namespace asioStub
+{
+namespace ip
+{
+namespace tcp
+{
 
-class socket {
+class socket
+{
 public:
     typedef std::function<void(const boost::system::error_code&)> ConnectHandler;
 

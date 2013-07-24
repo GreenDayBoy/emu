@@ -2,14 +2,16 @@
 
 #include <core/network/buffer.hpp>
 
-TEST(readBufferTest, construct) {
+TEST(readBufferTest, construct)
+{
     eMU::core::network::ReadBuffer readBuffer;
 
     EXPECT_EQ(eMU::core::network::kMaxPayloadSize, readBuffer.payload_.size());
     EXPECT_EQ(0u, readBuffer.payloadSize_);
 }
 
-TEST(readBufferTest, clear) {
+TEST(readBufferTest, clear)
+{
     eMU::core::network::ReadBuffer readBuffer;
     readBuffer.payload_[0] = 0x01;
     readBuffer.payload_[eMU::core::network::kMaxPayloadSize - 1] = 0x02;
@@ -23,16 +25,19 @@ TEST(readBufferTest, clear) {
     EXPECT_EQ(0u, readBuffer.payloadSize_);
 }
 
-class WriteBufferTest: public ::testing::Test {
+class WriteBufferTest: public ::testing::Test
+{
 protected:
-    virtual void SetUp() {
+    virtual void SetUp()
+    {
         this->initializePatternBuffer();
     }
 
-    void initializePatternBuffer() {
+    void initializePatternBuffer()
+    {
         uint8_t value = 0;
 
-        for(auto &field : patternBuffer_.payload_)
+for(auto &field : patternBuffer_.payload_)
         {
             field = value++;
         }
@@ -43,7 +48,8 @@ protected:
     eMU::core::network::WriteBuffer patternBuffer_;
 };
 
-TEST_F(WriteBufferTest, construct) {
+TEST_F(WriteBufferTest, construct)
+{
     eMU::core::network::WriteBuffer writeBuffer;
 
     EXPECT_FALSE(writeBuffer.pending_);
@@ -55,7 +61,8 @@ TEST_F(WriteBufferTest, construct) {
     EXPECT_EQ(0u, writeBuffer.secondPayloadSize_);
 }
 
-TEST_F(WriteBufferTest, clear) {
+TEST_F(WriteBufferTest, clear)
+{
     eMU::core::network::WriteBuffer writeBuffer;
     writeBuffer.payload_[0] = 0x01;
     writeBuffer.payload_[eMU::core::network::kMaxPayloadSize - 1] = 0x02;
@@ -82,7 +89,8 @@ TEST_F(WriteBufferTest, clear) {
     EXPECT_FALSE(writeBuffer.pending_);
 }
 
-TEST_F(WriteBufferTest, swap) {
+TEST_F(WriteBufferTest, swap)
+{
     eMU::core::network::WriteBuffer writeBuffer;
     writeBuffer.secondPayload_ = patternBuffer_.payload_;
     writeBuffer.secondPayloadSize_ = patternBuffer_.payloadSize_;
@@ -93,7 +101,8 @@ TEST_F(WriteBufferTest, swap) {
     EXPECT_EQ(patternBuffer_.payloadSize_, writeBuffer.payloadSize_);
 }
 
-TEST_F(WriteBufferTest, insert) {
+TEST_F(WriteBufferTest, insert)
+{
     eMU::core::network::WriteBuffer writeBuffer;
 
     size_t half_payload = eMU::core::network::kMaxPayloadSize / 2;
@@ -110,7 +119,8 @@ TEST_F(WriteBufferTest, insert) {
     EXPECT_EQ(patternBuffer_.payloadSize_, writeBuffer.payloadSize_);
 }
 
-TEST_F(WriteBufferTest, insertBufferWhenPendingState) {
+TEST_F(WriteBufferTest, insertBufferWhenPendingState)
+{
     eMU::core::network::WriteBuffer writeBuffer;
 
     writeBuffer.pending_ = true;
@@ -128,7 +138,8 @@ TEST_F(WriteBufferTest, insertBufferWhenPendingState) {
     EXPECT_EQ(patternBuffer_.payloadSize_, writeBuffer.secondPayloadSize_);
 }
 
-TEST_F(WriteBufferTest, insert_OverflowPrimaryBuffer) {
+TEST_F(WriteBufferTest, insert_OverflowPrimaryBuffer)
+{
     eMU::core::network::WriteBuffer writeBuffer;
     writeBuffer.pending_ = false;
 
@@ -142,7 +153,8 @@ TEST_F(WriteBufferTest, insert_OverflowPrimaryBuffer) {
     EXPECT_FALSE(result);
 }
 
-TEST_F(WriteBufferTest, insert_overflowSecondaryBuffer) {
+TEST_F(WriteBufferTest, insert_overflowSecondaryBuffer)
+{
     eMU::core::network::WriteBuffer writeBuffer;
     writeBuffer.pending_ = true;
     bool result = writeBuffer.insert(patternBuffer_.payload_);

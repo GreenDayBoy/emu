@@ -17,10 +17,14 @@
 #include <core/common/hashableObject.hpp>
 #include <common/mockable.hpp>
 
-namespace eMU {
-namespace core {
-namespace network {
-namespace tcp {
+namespace eMU
+{
+namespace core
+{
+namespace network
+{
+namespace tcp
+{
 
 #ifdef eMU_UT
 namespace asio = eMU::ut::env::asioStub;
@@ -30,7 +34,8 @@ namespace asio = eMU::mt::env::asioStub;
 namespace asio = boost::asio;
 #endif
 
-class Connection: boost::noncopyable, public common::HashableObject {
+class Connection: boost::noncopyable, public common::HashableObject
+{
 public:
     typedef std::function<void(Connection&)> EventCallback;
     typedef std::shared_ptr<Connection> Pointer;

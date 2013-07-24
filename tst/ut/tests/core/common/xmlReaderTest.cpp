@@ -3,16 +3,19 @@
 #include <core/common/xmlReader.hpp>
 #include <core/common/exception.hpp>
 
-class XmlReaderTest: public ::testing::Test {
+class XmlReaderTest: public ::testing::Test
+{
 protected:
-    void prepareContent() {
+    void prepareContent()
+    {
         content_ = "<servers> \
                         <server code=\"21\" name=\"eMU_Test\" address=\"localhost\" port=\"55901\" /> \
                         <server code=\"22\" name=\"eMU_Test2\" address=\"127.0.0.1\" port=\"55902\" /> \
                    </servers>";
     }
 
-    void checkRecord(uint16_t code, const std::string &name, const std::string &address, uint16_t port) {
+    void checkRecord(uint16_t code, const std::string &name, const std::string &address, uint16_t port)
+    {
         EXPECT_EQ(code, xmlReader_.get<uint16_t>("server", "code"));
         EXPECT_EQ(name, xmlReader_.get<std::string>("server", "name"));
         EXPECT_EQ(address, xmlReader_.get<std::string>("server", "address"));
@@ -23,7 +26,8 @@ protected:
     std::string content_;
 };
 
-TEST_F(XmlReaderTest, parseCorrectContent) {
+TEST_F(XmlReaderTest, parseCorrectContent)
+{
     prepareContent();
 
     xmlReader_.parse(content_, "servers");
@@ -43,26 +47,34 @@ TEST_F(XmlReaderTest, parseCorrectContent) {
     xmlReader_.clear();
 }
 
-TEST_F(XmlReaderTest, exceptionShouldBeThrownWhenContentIsEmpty) {
+TEST_F(XmlReaderTest, exceptionShouldBeThrownWhenContentIsEmpty)
+{
     bool exceptionThrown = false;
 
-    try {
+    try
+    {
         xmlReader_.parse(content_, "servers");
-    } catch(eMU::core::common::Exception &exception) {
+    }
+    catch(eMU::core::common::Exception &exception)
+    {
         exceptionThrown = true;
     }
 
     ASSERT_TRUE(exceptionThrown);
 }
 
-TEST_F(XmlReaderTest, exceptionShouldBeThrownWhenFirstNodeDoesNotMatch) {
+TEST_F(XmlReaderTest, exceptionShouldBeThrownWhenFirstNodeDoesNotMatch)
+{
     prepareContent();
 
     bool exceptionThrown = false;
 
-    try {
+    try
+    {
         xmlReader_.parse(content_, "ssservverrs");
-    } catch(eMU::core::common::Exception &exception) {
+    }
+    catch(eMU::core::common::Exception &exception)
+    {
         exceptionThrown = true;
     }
 
@@ -79,7 +91,8 @@ TEST_F(XmlReaderTest, parseContentWithoutRecords)
     xmlReader_.clear();
 }
 
-TEST_F(XmlReaderTest, getShouldReturnDefaultValueWhenContentDoesNotHaveAtributes) {
+TEST_F(XmlReaderTest, getShouldReturnDefaultValueWhenContentDoesNotHaveAtributes)
+{
     content_ = "<servers><server /></servers>";
     xmlReader_.parse(content_, "servers");
 
