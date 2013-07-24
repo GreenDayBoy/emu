@@ -1,16 +1,16 @@
 #include <gtest/gtest.h>
 #include <ut/env/connectserver/gameServersListMock.hpp>
-#include <connectserver/transactions/gameServerLoadTransaction.hpp>
-#include <interface/gameServerLoadMessage.hpp>
+#include <connectserver/transactions/gameServerLoadIndicationTransaction.hpp>
+#include <interface/gameServerLoadIndication.hpp>
 
 namespace connectserverEnv = eMU::ut::env::connectserver;
 using ::testing::Return;
 using ::testing::_;
 
-class GameServersLoadTransactionTest: public ::testing::Test
+class GameServerLoadIndicationTransactionTest: public ::testing::Test
 {
 protected:
-    GameServersLoadTransactionTest()
+    GameServerLoadIndicationTransactionTest()
     {
         message_.serverCode_ = 11;
         message_.load_ = 30;
@@ -18,12 +18,12 @@ protected:
 
     connectserverEnv::GameServersListMock gameServersList_;
 
-    eMU::interface::GameServerLoadMessage message_;
+    eMU::interface::GameServerLoadIndication message_;
 };
 
-TEST_F(GameServersLoadTransactionTest, whenServerCodeExistsThenGameServerLoadShouldBeUpdate)
+TEST_F(GameServerLoadIndicationTransactionTest, whenServerCodeExistsThenShouldBeHandled)
 {
-    eMU::connectserver::transactions::GameServerLoadTransaction transaction(message_, gameServersList_);
+    eMU::connectserver::transactions::GameServerLoadIndicationTransaction transaction(message_, gameServersList_);
 
     EXPECT_CALL(gameServersList_, hasGameServer(message_.serverCode_)).WillOnce(Return(true));
     EXPECT_CALL(gameServersList_, updateGameServerLoad(message_.serverCode_, message_.load_));
@@ -31,9 +31,9 @@ TEST_F(GameServersLoadTransactionTest, whenServerCodeExistsThenGameServerLoadSho
     transaction.handle();
 }
 
-TEST_F(GameServersLoadTransactionTest, whenServerCodeExistsThenGameServerLoadShouldNotBeUpdated)
+TEST_F(GameServerLoadIndicationTransactionTest, whenServerCodeExistsThenShouldBeNotHandled)
 {
-    eMU::connectserver::transactions::GameServerLoadTransaction transaction(message_, gameServersList_);
+    eMU::connectserver::transactions::GameServerLoadIndicationTransaction transaction(message_, gameServersList_);
 
     EXPECT_CALL(gameServersList_, hasGameServer(message_.serverCode_)).WillOnce(Return(false));
     EXPECT_CALL(gameServersList_, updateGameServerLoad(_, _)).Times(0);

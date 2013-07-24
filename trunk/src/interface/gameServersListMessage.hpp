@@ -7,7 +7,7 @@ namespace eMU
 namespace interface
 {
 
-struct GameServerLoadMessage
+struct GameServersListResponse
 {
     SmallMessageHeader header_;
     uint16_t serverCode_;
