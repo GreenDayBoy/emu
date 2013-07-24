@@ -60,13 +60,11 @@ Connection& ConnectionsFactory::get(size_t hash)
 
 size_t ConnectionsFactory::getHash(Connection &connection) const
 {
-    ConnectionsContainer::const_iterator it = connections_.begin();
-
-    for(; it != connections_.end(); it++)
+    for(auto &it : connections_)
     {
-        if(it->second->hash() == connection.hash())
+        if(it.second->hash() == connection.hash())
         {
-            return it->first;
+            return it.first;
         }
     }
 
