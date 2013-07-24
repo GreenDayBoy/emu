@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string>
 #include <core/common/xmlReader.hpp>
+#include <common/mockable.hpp>
 
 namespace eMU
 {
@@ -11,7 +12,7 @@ namespace connectserver
 
 class GameServersList
 {
-public:
+public:  
     struct GameServerInfo
     {
         uint16_t code_;
@@ -23,9 +24,11 @@ public:
 
     typedef std::vector<GameServerInfo> GameServersListContainer;
 
+    virtual ~GameServersList();
     void initialize(eMU::core::common::XmlReader &xmlReader);
     const GameServersListContainer& list() const;
-    void updateGameServerLoad(uint32_t code, uint32_t load);
+    MOCKABLE void updateGameServerLoad(uint16_t code, uint32_t load);
+    MOCKABLE bool hasGameServer(uint16_t code) const;
 
 private:
     GameServersListContainer servers_;
