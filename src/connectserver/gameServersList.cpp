@@ -6,6 +6,8 @@ namespace eMU
 namespace connectserver
 {
 
+GameServersList::~GameServersList() {}
+
 void GameServersList::initialize(eMU::core::common::XmlReader &xmlReader)
 {
     while(!xmlReader.end())
@@ -28,9 +30,9 @@ const GameServersList::GameServersListContainer &GameServersList::list() const
     return servers_;
 }
 
-void GameServersList::updateGameServerLoad(uint32_t code, uint32_t load)
+void GameServersList::updateGameServerLoad(uint16_t code, uint32_t load)
 {
-for(auto &info : servers_)
+    for(auto &info : servers_)
     {
         if(info.code_ == code)
         {
@@ -39,10 +41,13 @@ for(auto &info : servers_)
             return;
         }
     }
+}
 
-    core::common::Exception exception;
-    exception.in() << "Unknown server code: " << code;
-    throw exception;
+bool GameServersList::hasGameServer(uint16_t code) const
+{
+    return std::find_if(servers_.begin(),
+                        servers_.end(),
+                        [code](const GameServerInfo &info) { return info.code_ == code; }) != servers_.end();
 }
 
 }

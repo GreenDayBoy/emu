@@ -47,6 +47,13 @@ protected:
 
     void SetUp() {}
 
+    void initialize()
+    {
+        prepareXmlContent();
+        prepareSampleServers();
+        gameServersList_.initialize(xmlReader_);
+    }
+
     std::string xmlContent_;
     eMU::core::common::XmlReader xmlReader_;
 
@@ -56,10 +63,7 @@ protected:
 
 TEST_F(GameServersListTest, initialize)
 {
-    prepareXmlContent();
-    prepareSampleServers();
-
-    gameServersList_.initialize(xmlReader_);
+    initialize();
 
     ASSERT_EQ(sampleServers_.size(), gameServersList_.list().size());
 
@@ -71,10 +75,7 @@ TEST_F(GameServersListTest, initialize)
 
 TEST_F(GameServersListTest, updateLoad)
 {
-    prepareXmlContent();
-    prepareSampleServers();
-
-    gameServersList_.initialize(xmlReader_);
+    initialize();
 
     gameServersList_.updateGameServerLoad(0, 95);
     gameServersList_.updateGameServerLoad(20, 35);
@@ -83,22 +84,23 @@ TEST_F(GameServersListTest, updateLoad)
     EXPECT_EQ(35, gameServersList_.list()[1].load_);
 }
 
-TEST_F(GameServersListTest, updateLoadWithInvalidCodeShouldThrownAnException)
+TEST_F(GameServersListTest, updateLoadWithInvalidCodeShouldDoNothing)
 {
-    prepareXmlContent();
-    prepareSampleServers();
+    initialize();
 
-    gameServersList_.initialize(xmlReader_);
+    gameServersList_.updateGameServerLoad(1, 30);
 
-    bool exceptionThrown = false;
-    try
-    {
-        gameServersList_.updateGameServerLoad(1, 30);
-    }
-    catch(eMU::core::common::Exception &exception)
-    {
-        exceptionThrown = true;
-    }
+    EXPECT_EQ(0, gameServersList_.list()[0].load_);
+    EXPECT_EQ(0, gameServersList_.list()[1].load_);
+}
 
-    EXPECT_TRUE(exceptionThrown);
+TEST_F(GameServersListTest, hasGameServer)
+{
+    initialize();
+
+    EXPECT_TRUE(gameServersList_.hasGameServer(0));
+    EXPECT_TRUE(gameServersList_.hasGameServer(20));
+
+    EXPECT_FALSE(gameServersList_.hasGameServer(21));
+    EXPECT_FALSE(gameServersList_.hasGameServer(3));
 }
