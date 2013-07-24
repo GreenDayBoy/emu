@@ -105,7 +105,7 @@ TEST_F(ConnectionsManagerTest, send) {
 TEST_F(ConnectionsManagerTest, getThrowExceptionDuringSend) {
     acceptScenario();
 
-    eMU::core::common::Exception exception; exception.in() << "Test";
+    eMU::core::common::Exception exception("Test");
     EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(exception));
 
     eMU::core::network::Payload payload(100, 0x14);
@@ -131,7 +131,7 @@ TEST_F(ConnectionsManagerTest, disconnect) {
 TEST_F(ConnectionsManagerTest, getThrowExceptionDuringDisconnect) {
     acceptScenario();
 
-    eMU::core::common::Exception exception; exception.in() << "Test";
+    eMU::core::common::Exception exception("Test");
     EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(exception));
 
     connectionsManager_.disconnect(connectionHash_);
@@ -144,7 +144,7 @@ TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringCloseEvent) {
     EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(ReturnRef(connection_));
     connectionsManager_.disconnect(connectionHash_);
 
-    eMU::core::common::Exception exception; exception.in() << "Test";
+    eMU::core::common::Exception exception("Test");
     EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Throw(exception));
     closeCallback_(connection_);
 }
@@ -161,7 +161,7 @@ TEST_F(ConnectionsManagerTest, exceptionOccuredDuringGeneratingHash) {
     expectAsyncAcceptCallAndSaveArguments();
     connectionsManager_.queueAccept();
 
-    eMU::core::common::Exception exception; exception.in() << "Test";
+    eMU::core::common::Exception exception("Test");
     EXPECT_CALL(connectionsManagerEventsMock_, generateConnectionHash()).WillOnce(Throw(exception));
     EXPECT_CALL(*acceptor_, async_accept(_, _));
 
@@ -180,7 +180,7 @@ TEST_F(ConnectionsManagerTest, receive) {
 TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringReceive) {
     acceptScenario();
 
-    eMU::core::common::Exception exception; exception.in() << "Test";
+    eMU::core::common::Exception exception("Test");
     EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Throw(exception));
 
     receiveCallback_(connection_);

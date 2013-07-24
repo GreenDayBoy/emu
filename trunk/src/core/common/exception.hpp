@@ -10,6 +10,7 @@ namespace common {
 class Exception {
 public:
     Exception();
+    explicit Exception(const std::string &message);
     Exception(const Exception &exception);
 
     std::stringstream& in();
