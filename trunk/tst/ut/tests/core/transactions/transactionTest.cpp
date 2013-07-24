@@ -4,23 +4,28 @@
 
 using ::testing::_;
 
-class TransactionTest: public ::testing::Test {
+class TransactionTest: public ::testing::Test
+{
 public:
-    class SimpleTransaction: public eMU::core::transactions::Transaction {
+    class SimpleTransaction: public eMU::core::transactions::Transaction
+    {
     public:
         SimpleTransaction(bool isValid):
-          isValid_(isValid),
-          executed_(false) {}
+            isValid_(isValid),
+            executed_(false) {}
 
-        bool validate() const {
+        bool validate() const
+        {
             return isValid_;
         }
 
-        void handleSelf() {
+        void handleSelf()
+        {
             executed_ = true;
         }
 
-        bool executed() const {
+        bool executed() const
+        {
             return executed_;
         }
 
@@ -30,14 +35,16 @@ public:
     };
 };
 
-TEST_F(TransactionTest, TransactionShouldBeExecutedWhenValidateIsSucceed) {
+TEST_F(TransactionTest, TransactionShouldBeExecutedWhenValidateIsSucceed)
+{
     SimpleTransaction transaction(true);
     transaction.handle();
 
     EXPECT_TRUE(transaction.executed());
 }
 
-TEST_F(TransactionTest, TransactionShouldNotBeExecutedWhenValidationIsFailed) {
+TEST_F(TransactionTest, TransactionShouldNotBeExecutedWhenValidationIsFailed)
+{
     SimpleTransaction transaction(false);
     transaction.handle();
 

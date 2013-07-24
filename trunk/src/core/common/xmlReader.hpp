@@ -4,11 +4,15 @@
 #include <boost/lexical_cast.hpp>
 #include <rapidxml.hpp>
 
-namespace eMU {
-namespace core {
-namespace common {
+namespace eMU
+{
+namespace core
+{
+namespace common
+{
 
-class XmlReader {
+class XmlReader
+{
 public:
     XmlReader();
 
@@ -18,17 +22,22 @@ public:
     void clear();
 
     template<typename DataType>
-    DataType get(const std::string &nodeName, const std::string &attributeName, const DataType &defaultValue = DataType()) {
-        if(this->end()) {
+    DataType get(const std::string &nodeName, const std::string &attributeName, const DataType &defaultValue = DataType())
+    {
+        if(this->end())
+        {
             return defaultValue;
         }
 
-        if(currentNode_->name() != nodeName) {
+        if(currentNode_->name() != nodeName)
+        {
             return defaultValue;
         }
 
-        for (rapidxml::xml_attribute<> *attribute = currentNode_->first_attribute(); attribute != nullptr; attribute = attribute->next_attribute()) {
-            if(attribute->name() == attributeName) {
+        for (rapidxml::xml_attribute<> *attribute = currentNode_->first_attribute(); attribute != nullptr; attribute = attribute->next_attribute())
+        {
+            if(attribute->name() == attributeName)
+            {
                 return boost::lexical_cast<DataType>(attribute->value());
             }
         }
@@ -37,8 +46,8 @@ public:
     }
 
 private:
-   rapidxml::xml_document<> document_;
-   rapidxml::xml_node<> *currentNode_;
+    rapidxml::xml_document<> document_;
+    rapidxml::xml_node<> *currentNode_;
 };
 
 }

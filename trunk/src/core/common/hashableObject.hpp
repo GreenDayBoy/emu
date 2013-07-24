@@ -2,11 +2,15 @@
 
 #include <cstddef>
 
-namespace eMU {
-namespace core {
-namespace common {
+namespace eMU
+{
+namespace core
+{
+namespace common
+{
 
-class HashableObject {
+class HashableObject
+{
 public:
     virtual ~HashableObject();
 

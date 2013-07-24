@@ -18,45 +18,50 @@ using ::testing::Ref;
 
 ACTION_TEMPLATE(SaveArgToPointer,
                 HAS_1_TEMPLATE_PARAMS(int, k),
-                AND_1_VALUE_PARAMS(pointer)) {
-  *pointer = &(::std::tr1::get<k>(args));
+                AND_1_VALUE_PARAMS(pointer))
+{
+    *pointer = &(::std::tr1::get<k>(args));
 }
 
 namespace asioStub = eMU::ut::env::asioStub;
 namespace network = eMU::core::network;
 namespace tcpEnv = eMU::ut::env::core::tcp;
 
-class ConnectionsManagerTest: public ::testing::Test {
+class ConnectionsManagerTest: public ::testing::Test
+{
 public:
     ConnectionsManagerTest():
-      port_(55962),
-      acceptor_(new asioStub::ip::tcp::acceptor(ioService_, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port_))),
-      connectionsFactory_(new tcpEnv::ConnectionsFactoryMock()),
-      connectionsManager_(connectionsFactory_, ioService_, acceptor_),
-      connection_(tcpEnv::ConnectionMock::SocketPointer(new asioStub::ip::tcp::socket(ioService_))),
-      connectionHash_(1234) {
+        port_(55962),
+        acceptor_(new asioStub::ip::tcp::acceptor(ioService_, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port_))),
+        connectionsFactory_(new tcpEnv::ConnectionsFactoryMock()),
+        connectionsManager_(connectionsFactory_, ioService_, acceptor_),
+        connection_(tcpEnv::ConnectionMock::SocketPointer(new asioStub::ip::tcp::socket(ioService_))),
+        connectionHash_(1234)
+    {
         connectionsManager_.setGenerateConnectionHashCallback(std::bind(&tcpEnv::ConnectionsManagerEventsMock::generateConnectionHash,
-                                                                        &connectionsManagerEventsMock_));
+                &connectionsManagerEventsMock_));
 
         connectionsManager_.setAcceptEventCallback(std::bind(&tcpEnv::ConnectionsManagerEventsMock::acceptEvent,
-                                                             &connectionsManagerEventsMock_,
-                                                             std::placeholders::_1));
+                &connectionsManagerEventsMock_,
+                std::placeholders::_1));
 
         connectionsManager_.setReceiveEventCallback(std::bind(&tcpEnv::ConnectionsManagerEventsMock::receiveEvent,
-                                                              &connectionsManagerEventsMock_,
-                                                              std::placeholders::_1,
-                                                              std::placeholders::_2));
+                &connectionsManagerEventsMock_,
+                std::placeholders::_1,
+                std::placeholders::_2));
 
         connectionsManager_.setCloseEventCallback(std::bind(&tcpEnv::ConnectionsManagerEventsMock::closeEvent,
-                                                            &connectionsManagerEventsMock_,
-                                                            std::placeholders::_1));
+                &connectionsManagerEventsMock_,
+                std::placeholders::_1));
     }
 
-    void expectAsyncAcceptCallAndSaveArguments() {
+    void expectAsyncAcceptCallAndSaveArguments()
+    {
         EXPECT_CALL(*acceptor_, async_accept(_, _)).WillOnce(SaveArg<1>(&acceptHandler_));
     }
 
-    void acceptScenario() {
+    void acceptScenario()
+    {
         expectAsyncAcceptCallAndSaveArguments();
 
         connectionsManager_.queueAccept();
@@ -88,11 +93,13 @@ public:
     network::tcp::Connection::EventCallback closeCallback_;
 };
 
-TEST_F(ConnectionsManagerTest, accept) {
+TEST_F(ConnectionsManagerTest, accept)
+{
     acceptScenario();
 }
 
-TEST_F(ConnectionsManagerTest, send) {
+TEST_F(ConnectionsManagerTest, send)
+{
     acceptScenario();
 
     eMU::core::network::Payload payload(100, 0x14);
@@ -102,7 +109,8 @@ TEST_F(ConnectionsManagerTest, send) {
     connectionsManager_.send(connectionHash_, payload);
 }
 
-TEST_F(ConnectionsManagerTest, getThrowExceptionDuringSend) {
+TEST_F(ConnectionsManagerTest, getThrowExceptionDuringSend)
+{
     acceptScenario();
 
     eMU::core::common::Exception exception("Test");
@@ -112,7 +120,8 @@ TEST_F(ConnectionsManagerTest, getThrowExceptionDuringSend) {
     connectionsManager_.send(connectionHash_, payload);
 }
 
-TEST_F(ConnectionsManagerTest, disconnect) {
+TEST_F(ConnectionsManagerTest, disconnect)
+{
     acceptScenario();
 
     EXPECT_CALL(connection_, disconnect());
@@ -128,7 +137,8 @@ TEST_F(ConnectionsManagerTest, disconnect) {
     closeCallback_(connection_);
 }
 
-TEST_F(ConnectionsManagerTest, getThrowExceptionDuringDisconnect) {
+TEST_F(ConnectionsManagerTest, getThrowExceptionDuringDisconnect)
+{
     acceptScenario();
 
     eMU::core::common::Exception exception("Test");
@@ -137,7 +147,8 @@ TEST_F(ConnectionsManagerTest, getThrowExceptionDuringDisconnect) {
     connectionsManager_.disconnect(connectionHash_);
 }
 
-TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringCloseEvent) {
+TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringCloseEvent)
+{
     acceptScenario();
 
     EXPECT_CALL(connection_, disconnect());
@@ -149,7 +160,8 @@ TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringCloseEvent) {
     closeCallback_(connection_);
 }
 
-TEST_F(ConnectionsManagerTest, errorOccuredDuringAccept) {
+TEST_F(ConnectionsManagerTest, errorOccuredDuringAccept)
+{
     expectAsyncAcceptCallAndSaveArguments();
     connectionsManager_.queueAccept();
 
@@ -157,7 +169,8 @@ TEST_F(ConnectionsManagerTest, errorOccuredDuringAccept) {
     acceptHandler_(boost::asio::error::host_not_found_try_again);
 }
 
-TEST_F(ConnectionsManagerTest, exceptionOccuredDuringGeneratingHash) {
+TEST_F(ConnectionsManagerTest, exceptionOccuredDuringGeneratingHash)
+{
     expectAsyncAcceptCallAndSaveArguments();
     connectionsManager_.queueAccept();
 
@@ -168,7 +181,8 @@ TEST_F(ConnectionsManagerTest, exceptionOccuredDuringGeneratingHash) {
     acceptHandler_(boost::system::error_code());
 }
 
-TEST_F(ConnectionsManagerTest, receive) {
+TEST_F(ConnectionsManagerTest, receive)
+{
     acceptScenario();
 
     EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Return(connectionHash_));
@@ -177,7 +191,8 @@ TEST_F(ConnectionsManagerTest, receive) {
     receiveCallback_(connection_);
 }
 
-TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringReceive) {
+TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringReceive)
+{
     acceptScenario();
 
     eMU::core::common::Exception exception("Test");
@@ -186,6 +201,7 @@ TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringReceive) {
     receiveCallback_(connection_);
 }
 
-TEST_F(ConnectionsManagerTest, CheckConstructor) {
+TEST_F(ConnectionsManagerTest, CheckConstructor)
+{
     network::tcp::ConnectionsManager ConnectionsManager(ioService_, port_);
 }

@@ -5,21 +5,27 @@
 #include <memory>
 #include <core/common/exception.hpp>
 
-namespace eMU {
-namespace core {
-namespace common {
+namespace eMU
+{
+namespace core
+{
+namespace common
+{
 
 template<typename User>
-class UsersFactory {
+class UsersFactory
+{
 public:
     typedef std::vector<User*> UsersContainer;
     typedef std::shared_ptr<UsersFactory<User> > Pointer;
 
     UsersFactory(size_t maxNumberOfUsers):
-      maxNumberOfUsers_(maxNumberOfUsers) {}
+        maxNumberOfUsers_(maxNumberOfUsers) {}
 
-    User& create() {
-        if(users_.size() >= maxNumberOfUsers_) {
+    User& create()
+    {
+        if(users_.size() >= maxNumberOfUsers_)
+        {
             Exception exception("Max number of users reached!");
 
             throw exception;
@@ -30,11 +36,15 @@ public:
         return *user;
     }
 
-    void destroy(size_t hash) {
+    void destroy(size_t hash)
+    {
         typename UsersContainer::iterator it;
-         it = std::find_if(users_.begin(),
-                           users_.end(),
-                           [&hash](const User *userFromVector) { return hash == userFromVector->hash(); });
+        it = std::find_if(users_.begin(),
+                          users_.end(),
+                          [&hash](const User *userFromVector)
+        {
+            return hash == userFromVector->hash();
+        });
 
         if(it != users_.end())
         {
@@ -43,14 +53,20 @@ public:
         }
     }
 
-    User& find(size_t hash) {
+    User& find(size_t hash)
+    {
         typename UsersContainer::iterator it;
         it = std::find_if(users_.begin(),
                           users_.end(),
-                          [hash](const User *userFromVector) { return hash == userFromVector->hash(); });
+                          [hash](const User *userFromVector)
+        {
+            return hash == userFromVector->hash();
+        });
 
-        if(it == users_.end()) {
-            Exception exception; exception.in() << "Cannot find user by hash: " << hash;
+        if(it == users_.end())
+        {
+            Exception exception;
+            exception.in() << "Cannot find user by hash: " << hash;
 
             throw exception;
         }
@@ -58,7 +74,10 @@ public:
         return *(*it);
     }
 
-    UsersContainer& users() { return users_; }
+    UsersContainer& users()
+    {
+        return users_;
+    }
 
 private:
     size_t maxNumberOfUsers_;

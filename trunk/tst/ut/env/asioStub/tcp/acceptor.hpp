@@ -6,14 +6,21 @@
 #include <ut/env/asioStub/ioService.hpp>
 #include <ut/env/asioStub/tcp/socket.hpp>
 
-namespace eMU {
-namespace ut {
-namespace env {
-namespace asioStub {
-namespace ip {
-namespace tcp {
+namespace eMU
+{
+namespace ut
+{
+namespace env
+{
+namespace asioStub
+{
+namespace ip
+{
+namespace tcp
+{
 
-class acceptor {
+class acceptor
+{
 public:
     typedef std::function<void(const boost::system::error_code&)> AcceptHandler;
 

@@ -3,7 +3,8 @@
 
 #include <core/network/udp/writeBufferFactory.hpp>
 
-bool operator==(const eMU::core::network::WriteBuffer &left, const eMU::core::network::WriteBuffer &right) {
+bool operator==(const eMU::core::network::WriteBuffer &left, const eMU::core::network::WriteBuffer &right)
+{
     return left.payload_ == right.payload_ &&
            left.payloadSize_ == right.payloadSize_ &&
            left.secondPayload_ == right.secondPayload_&&
@@ -11,7 +12,8 @@ bool operator==(const eMU::core::network::WriteBuffer &left, const eMU::core::ne
            left.pending_ == right.pending_;
 }
 
-TEST(writeBufferFactoryTest, ShouldReturnSameBufferForSameEndpoint) {
+TEST(writeBufferFactoryTest, ShouldReturnSameBufferForSameEndpoint)
+{
     eMU::core::network::udp::WriteBufferFactory writeBufferFactory;
 
     boost::asio::ip::udp::endpoint endpoint(boost::asio::ip::address::from_string("1.2.3.4"), 1234);
@@ -27,7 +29,8 @@ TEST(writeBufferFactoryTest, ShouldReturnSameBufferForSameEndpoint) {
     EXPECT_TRUE(writeBuffer == writeBuffer2);
 }
 
-TEST(writeBufferFactoryTest, ShouldRemoveBufferForGivenEndpoint) {
+TEST(writeBufferFactoryTest, ShouldRemoveBufferForGivenEndpoint)
+{
     eMU::core::network::udp::WriteBufferFactory writeBufferFactory;
 
     boost::asio::ip::udp::endpoint endpoint(boost::asio::ip::address::from_string("1.2.3.4"), 1234);

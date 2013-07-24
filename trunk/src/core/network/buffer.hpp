@@ -4,14 +4,18 @@
 #include <stdint.h>
 #include <cstdlib>
 
-namespace eMU {
-namespace core {
-namespace network {
+namespace eMU
+{
+namespace core
+{
+namespace network
+{
 
 typedef std::vector<uint8_t> Payload;
 const size_t kMaxPayloadSize = 4096;
 
-class ReadBuffer {
+class ReadBuffer
+{
 public:
     ReadBuffer();
 
@@ -21,7 +25,8 @@ public:
     size_t payloadSize_;
 };
 
-class WriteBuffer {
+class WriteBuffer
+{
 public:
     WriteBuffer();
 

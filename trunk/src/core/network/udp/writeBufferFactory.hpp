@@ -5,12 +5,17 @@
 
 #include <core/network/buffer.hpp>
 
-namespace eMU {
-namespace core {
-namespace network {
-namespace udp {
+namespace eMU
+{
+namespace core
+{
+namespace network
+{
+namespace udp
+{
 
-class WriteBufferFactory {
+class WriteBufferFactory
+{
 public:
     WriteBuffer& get(const boost::asio::ip::udp::endpoint &endpoint);
     bool erase(const boost::asio::ip::udp::endpoint &endpoint);

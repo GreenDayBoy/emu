@@ -3,12 +3,17 @@
 #include <mt/env/asioStub/ioService.hpp>
 #include <core/network/buffer.hpp>
 
-namespace eMU {
-namespace mt {
-namespace env {
-namespace networkStub {
+namespace eMU
+{
+namespace mt
+{
+namespace env
+{
+namespace networkStub
+{
 
-class Stub {
+class Stub
+{
 public:
     size_t createConnection();
 

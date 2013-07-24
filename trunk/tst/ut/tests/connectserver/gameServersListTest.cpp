@@ -3,9 +3,11 @@
 #include <core/common/xmlReader.hpp>
 #include <core/common/exception.hpp>
 
-class GameServersListTest: public ::testing::Test {
+class GameServersListTest: public ::testing::Test
+{
 protected:
-    void prepareXmlContent() {
+    void prepareXmlContent()
+    {
         xmlContent_ = "<servers> \
                             <server code=\"0\" name=\"eMU_Test\" address=\"localhost\" port=\"55901\" /> \
                             <server code=\"20\" name=\"eMU_Test2\" address=\"127.0.0.1\" port=\"55902\" /> \
@@ -14,7 +16,8 @@ protected:
         xmlReader_.parse(xmlContent_, "servers");
     }
 
-    void prepareSampleServers() {
+    void prepareSampleServers()
+    {
         eMU::connectserver::GameServersList::GameServerInfo info = {0};
 
         info.address_ = "localhost";
@@ -33,7 +36,8 @@ protected:
     }
 
     void compareGameServerInfo(const eMU::connectserver::GameServersList::GameServerInfo &left,
-                               const eMU::connectserver::GameServersList::GameServerInfo &right) {
+                               const eMU::connectserver::GameServersList::GameServerInfo &right)
+    {
         EXPECT_EQ(left.address_, right.address_);
         EXPECT_EQ(left.code_, right.code_);
         EXPECT_EQ(left.load_, right.load_);
@@ -50,7 +54,8 @@ protected:
     eMU::connectserver::GameServersList gameServersList_;
 };
 
-TEST_F(GameServersListTest, initialize) {
+TEST_F(GameServersListTest, initialize)
+{
     prepareXmlContent();
     prepareSampleServers();
 
@@ -58,12 +63,14 @@ TEST_F(GameServersListTest, initialize) {
 
     ASSERT_EQ(sampleServers_.size(), gameServersList_.list().size());
 
-    for(size_t i = 0; i < sampleServers_.size(); ++i) {
+    for(size_t i = 0; i < sampleServers_.size(); ++i)
+    {
         compareGameServerInfo(sampleServers_[i], gameServersList_.list()[i]);
     }
 }
 
-TEST_F(GameServersListTest, updateLoad) {
+TEST_F(GameServersListTest, updateLoad)
+{
     prepareXmlContent();
     prepareSampleServers();
 
@@ -76,16 +83,20 @@ TEST_F(GameServersListTest, updateLoad) {
     EXPECT_EQ(35, gameServersList_.list()[1].load_);
 }
 
-TEST_F(GameServersListTest, updateLoadWithInvalidCodeShouldThrownAnException) {
+TEST_F(GameServersListTest, updateLoadWithInvalidCodeShouldThrownAnException)
+{
     prepareXmlContent();
     prepareSampleServers();
 
     gameServersList_.initialize(xmlReader_);
 
     bool exceptionThrown = false;
-    try {
+    try
+    {
         gameServersList_.updateGameServerLoad(1, 30);
-    } catch(eMU::core::common::Exception &exception) {
+    }
+    catch(eMU::core::common::Exception &exception)
+    {
         exceptionThrown = true;
     }
 

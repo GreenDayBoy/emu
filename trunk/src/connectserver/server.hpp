@@ -15,8 +15,10 @@
 #include <boost/asio.hpp>
 #endif
 
-namespace eMU {
-namespace connectserver {
+namespace eMU
+{
+namespace connectserver
+{
 
 #ifdef eMU_UT
 namespace asio = eMU::ut::env::asioStub;
@@ -26,9 +28,11 @@ namespace asio = eMU::mt::env::asioStub;
 namespace asio = boost::asio;
 #endif
 
-class Server: boost::noncopyable {
+class Server: boost::noncopyable
+{
 public:
-    struct Configuration {
+    struct Configuration
+    {
         int16_t port_;
         size_t maxNumberOfUsers_;
         std::string gameServersListContent_;

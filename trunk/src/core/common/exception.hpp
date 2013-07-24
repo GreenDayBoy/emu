@@ -3,11 +3,15 @@
 #include <sstream>
 #include <string>
 
-namespace eMU {
-namespace core {
-namespace common {
+namespace eMU
+{
+namespace core
+{
+namespace common
+{
 
-class Exception {
+class Exception
+{
 public:
     Exception();
     explicit Exception(const std::string &message);

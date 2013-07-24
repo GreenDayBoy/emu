@@ -1,10 +1,14 @@
 #pragma once
 
-namespace eMU {
-namespace core {
-namespace transactions {
+namespace eMU
+{
+namespace core
+{
+namespace transactions
+{
 
-class Transaction {
+class Transaction
+{
 public:
     void handle();
     virtual ~Transaction();

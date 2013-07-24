@@ -9,12 +9,14 @@ namespace transactionsEnv = eMU::ut::env::core::transactions;
 using ::testing::_;
 
 
-class TransactionsManagerTest: public ::testing::Test {
+class TransactionsManagerTest: public ::testing::Test
+{
 public:
     transactions::Manager transactionsManager_;
 };
 
-TEST_F(TransactionsManagerTest, allQueuedTransactionsShouldBeExecuted) {
+TEST_F(TransactionsManagerTest, allQueuedTransactionsShouldBeExecuted)
+{
     transactionsEnv::TransactionMock *transaction1 = new transactionsEnv::TransactionMock();
     EXPECT_CALL(*transaction1, handleSelf());
     transactionsManager_.queue(transaction1);

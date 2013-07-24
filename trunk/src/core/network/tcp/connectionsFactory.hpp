@@ -4,12 +4,17 @@
 #include <core/network/tcp/connection.hpp>
 #include <common/mockable.hpp>
 
-namespace eMU {
-namespace core {
-namespace network {
-namespace tcp {
+namespace eMU
+{
+namespace core
+{
+namespace network
+{
+namespace tcp
+{
 
-class ConnectionsFactory: boost::noncopyable {
+class ConnectionsFactory: boost::noncopyable
+{
 public:
     typedef std::shared_ptr<ConnectionsFactory> Pointer;
     typedef std::map<size_t, Connection::Pointer> ConnectionsContainer;

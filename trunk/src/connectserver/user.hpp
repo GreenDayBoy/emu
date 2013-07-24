@@ -2,10 +2,13 @@
 
 #include <core/common/hashableObject.hpp>
 
-namespace eMU {
-namespace connectserver {
+namespace eMU
+{
+namespace connectserver
+{
 
-class User: public eMU::core::common::HashableObject {
+class User: public eMU::core::common::HashableObject
+{
 public:
 
 private:

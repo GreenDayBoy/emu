@@ -4,12 +4,16 @@
 #include <string>
 #include <core/common/xmlReader.hpp>
 
-namespace eMU {
-namespace connectserver {
+namespace eMU
+{
+namespace connectserver
+{
 
-class GameServersList {
+class GameServersList
+{
 public:
-    struct GameServerInfo {
+    struct GameServerInfo
+    {
         uint16_t code_;
         std::string name_;
         std::string address_;

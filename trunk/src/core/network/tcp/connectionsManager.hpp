@@ -16,10 +16,14 @@
 #include <core/network/buffer.hpp>
 #include <core/network/tcp/connectionsFactory.hpp>
 
-namespace eMU {
-namespace core {
-namespace network {
-namespace tcp {
+namespace eMU
+{
+namespace core
+{
+namespace network
+{
+namespace tcp
+{
 
 #ifdef eMU_UT
 namespace asio = eMU::ut::env::asioStub;
@@ -29,7 +33,8 @@ namespace asio = eMU::mt::env::asioStub;
 namespace asio = boost::asio;
 #endif
 
-class ConnectionsManager: boost::noncopyable {
+class ConnectionsManager: boost::noncopyable
+{
 public:
     typedef std::function<size_t()> GenerateConnectionHashCallback;
     typedef std::function<void(size_t, const Payload&)> ReceiveEventCallback;
