@@ -12,7 +12,7 @@ void GameServersList::initialize(eMU::core::common::XmlReader &xmlReader)
 {
     while(!xmlReader.end())
     {
-        GameServerInfo info = {0};
+        GameServerInfo info = {};
 
         info.address_ = xmlReader.get<std::string>("server", "address");
         info.code_ = xmlReader.get<uint16_t>("server", "code");
@@ -45,9 +45,19 @@ void GameServersList::updateGameServerLoad(uint16_t code, uint32_t load)
 
 bool GameServersList::hasGameServer(uint16_t code) const
 {
+    return findGameServerInfo(code) != servers_.end();
+}
+
+const GameServersList::GameServerInfo& GameServersList::getGameServerInfo(uint16_t code) const
+{
+    return *findGameServerInfo(code);
+}
+
+GameServersList::GameServersListContainer::const_iterator GameServersList::findGameServerInfo(uint16_t code) const
+{
     return std::find_if(servers_.begin(),
                         servers_.end(),
-                        [code](const GameServerInfo &info) { return info.code_ == code; }) != servers_.end();
+                        [code](const GameServerInfo &info) { return info.code_ == code; });
 }
 
 }

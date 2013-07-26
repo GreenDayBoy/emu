@@ -9,6 +9,9 @@ namespace env
 namespace connectserver
 {
 
+MessageSenderMock::MessageSenderMock():
+    MessageSender(MessageSender::SendFunctor()) {}
+
 }
 }
 }

@@ -24,7 +24,7 @@ protected:
 
     void prepareSampleServers()
     {
-        eMU::connectserver::GameServersList::GameServerInfo info = {0};
+        eMU::connectserver::GameServersList::GameServerInfo info = {};
 
         info.address_ = "localhost";
         info.code_ = 20;

@@ -1,3 +1,4 @@
+#include <glog/logging.h>
 #include <connectserver/transactions/gameServerLoadIndicationTransaction.hpp>
 
 namespace eMU
@@ -13,7 +14,13 @@ GameServerLoadIndicationTransaction::GameServerLoadIndicationTransaction(const i
 
 bool GameServerLoadIndicationTransaction::validate() const
 {
-    return gameServersList_.hasGameServer(message_.serverCode_);
+    if(!gameServersList_.hasGameServer(message_.serverCode_))
+    {
+        LOG(ERROR) << "code: " << message_.serverCode_ << ", Validate transaction failed.";
+        return false;
+    }
+
+    return true;
 }
 
 void GameServerLoadIndicationTransaction::handleSelf()

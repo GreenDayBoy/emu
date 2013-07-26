@@ -15,7 +15,10 @@ namespace connectserver
 class MessageSenderMock: public eMU::connectserver::MessageSender
 {
 public:
+    MessageSenderMock();
+
     MOCK_METHOD2(sendGameServersListResponse, void(size_t hash, const eMU::connectserver::GameServersList::GameServersListContainer &list));
+    MOCK_METHOD3(sendGameServerAddressResponse, void(size_t hash, const std::string &address, uint16_t port));
 };
 
 }
