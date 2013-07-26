@@ -29,8 +29,11 @@ public:
     const GameServersListContainer& list() const;
     MOCKABLE void updateGameServerLoad(uint16_t code, uint32_t load);
     MOCKABLE bool hasGameServer(uint16_t code) const;
+    MOCKABLE const GameServerInfo& getGameServerInfo(uint16_t code) const;
 
 private:
+    GameServersListContainer::const_iterator findGameServerInfo(uint16_t code) const;
+
     GameServersListContainer servers_;
 };
 

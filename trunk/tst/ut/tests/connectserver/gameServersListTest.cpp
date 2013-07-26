@@ -18,7 +18,7 @@ protected:
 
     void prepareSampleServers()
     {
-        eMU::connectserver::GameServersList::GameServerInfo info = {0};
+        eMU::connectserver::GameServersList::GameServerInfo info = {};
 
         info.address_ = "localhost";
         info.code_ = 0;
@@ -103,4 +103,13 @@ TEST_F(GameServersListTest, hasGameServer)
 
     EXPECT_FALSE(gameServersList_.hasGameServer(21));
     EXPECT_FALSE(gameServersList_.hasGameServer(3));
+}
+
+TEST_F(GameServersListTest, getGameServerInfo)
+{
+    initialize();
+
+    const eMU::connectserver::GameServersList::GameServerInfo &serverInfo = gameServersList_.getGameServerInfo(20);
+
+    compareGameServerInfo(sampleServers_[1], serverInfo);
 }

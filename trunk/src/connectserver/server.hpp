@@ -6,6 +6,7 @@
 #include <core/transactions/manager.hpp>
 #include <connectserver/user.hpp>
 #include <connectserver/gameServersList.hpp>
+#include <connectserver/messageSender.hpp>
 
 #ifdef eMU_UT
 #include <ut/env/asioStub/ioService.hpp>
@@ -60,6 +61,7 @@ private:
     core::transactions::Manager transactionsManager_;
     std::string gameServersListContent_;
     GameServersList gameServersList_;
+    MessageSender messageSender_;
 };
 
 }

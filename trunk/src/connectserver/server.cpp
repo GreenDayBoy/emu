@@ -21,7 +21,8 @@ Server::Server(core::network::tcp::ConnectionsManager::Pointer connectionsManage
     connectionsManager_(connectionsManager),
     usersFactory_(usersFactory),
     udpConnection_(udpConnection),
-    gameServersListContent_(configuration.gameServersListContent_)
+    gameServersListContent_(configuration.gameServersListContent_),
+    messageSender_(std::bind(&core::network::tcp::ConnectionsManager::send, connectionsManager_, std::placeholders::_1, std::placeholders::_2))
 {
     connectionsManager_->setAcceptEventCallback(std::bind(&Server::onAccept, this, std::placeholders::_1));
     connectionsManager_->setReceiveEventCallback(std::bind(&Server::onReceive, this, std::placeholders::_1, std::placeholders::_2));
