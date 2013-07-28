@@ -21,7 +21,7 @@ bool GameServerAddressRequestTransaction::validate() const
 {
     if(!gameServersList_.hasGameServer(code_))
     {
-        LOG(ERROR) << "hash: " << hash_ << ", Validate transaction failed.";
+        LOG(ERROR) << "hash: " << hash_ << ", Validate transaction failed, serverCode: " << code_;
         return false;
     }
 

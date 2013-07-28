@@ -1,4 +1,6 @@
+#include <glog/logging.h>
 #include <connectserver/transactions/gameServersListResponseTransaction.hpp>
+#include <interface/gameServersListResponse.hpp>
 
 namespace eMU
 {
@@ -16,6 +18,12 @@ GameServersListResponseTransaction::GameServersListResponseTransaction(size_t ha
 
 bool GameServersListResponseTransaction::validate() const
 {
+    if(servers_.size() > interface::kMaxNumberOfGameServers)
+    {
+        LOG(ERROR) << "hash: " << hash_ << ", Validate transaction failed, #servers: " << servers_.size();
+        return false;
+    }
+
     return true;
 }
 
