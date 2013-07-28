@@ -16,7 +16,7 @@ bool GameServerLoadIndicationTransaction::validate() const
 {
     if(!gameServersList_.hasGameServer(message_.serverCode_))
     {
-        LOG(ERROR) << "code: " << message_.serverCode_ << ", Validate transaction failed.";
+        LOG(ERROR) << "code: " << message_.serverCode_ << ", Validate transaction failed, serverCode: " << message_.serverCode_;
         return false;
     }
 
