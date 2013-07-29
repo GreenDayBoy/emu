@@ -11,7 +11,6 @@ namespace connectserver
 
 MessageSender::MessageSender(const SendFunctor &sendFunctor):
     sendFunctor_(sendFunctor) {}
-MessageSender::MessageSender() {}
 MessageSender::~MessageSender() {}
 
 void MessageSender::sendGameServersListResponse(size_t hash, const GameServersList::GameServersListContainer &servers)

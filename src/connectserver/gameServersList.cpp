@@ -25,7 +25,7 @@ void GameServersList::initialize(eMU::core::common::XmlReader &xmlReader)
     }
 }
 
-const GameServersList::GameServersListContainer &GameServersList::list() const
+const GameServersList::GameServersListContainer &GameServersList::servers() const
 {
     return servers_;
 }

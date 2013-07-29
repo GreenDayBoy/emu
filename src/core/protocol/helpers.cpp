@@ -75,23 +75,6 @@ bool hasValidHeader(const eMU::core::network::Payload &payload)
     return false;
 }
 
-bool hasValidSize(size_t maxSize, size_t minSize, size_t declaredSize)
-{
-    if(maxSize < declaredSize)
-    {
-        LOG(ERROR) << "Declared size: " << declaredSize << " is grater than max size: " << maxSize;
-        return false;
-    }
-
-    if(minSize > declaredSize)
-    {
-        LOG(ERROR) << "Declared size: " << declaredSize << " is less than min size: " << minSize;
-        return false;
-    }
-
-    return true;
-}
-
 }
 }
 }
