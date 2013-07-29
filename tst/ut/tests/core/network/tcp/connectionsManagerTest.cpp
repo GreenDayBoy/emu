@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <core/network/tcp/connectionsManager.hpp>
-#include <core/common/exception.hpp>
+#include <core/network/tcp/exceptions.hpp>
 #include <ut/env/asioStub/ioService.hpp>
 #include <ut/env/asioStub/tcp/acceptor.hpp>
 #include <ut/env/core/network/tcp/connectionsManagerEventsMock.hpp>
@@ -113,8 +113,7 @@ TEST_F(ConnectionsManagerTest, getThrowExceptionDuringSend)
 {
     acceptScenario();
 
-    eMU::core::common::Exception exception("Test");
-    EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(exception));
+    EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(network::tcp::exceptions::UnknownConnectionException()));
 
     eMU::core::network::Payload payload(100, 0x14);
     connectionsManager_.send(connectionHash_, payload);
@@ -129,9 +128,9 @@ TEST_F(ConnectionsManagerTest, disconnect)
 
     connectionsManager_.disconnect(connectionHash_);
 
-    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Return(connectionHash_));
-    EXPECT_CALL(*connectionsFactory_, destroy(connectionHash_));
-    EXPECT_CALL(connectionsManagerEventsMock_, closeEvent(connectionHash_));
+    EXPECT_CALL(*connectionsFactory_, exists(Ref(connection_))).WillOnce(Return(true));
+    EXPECT_CALL(*connectionsFactory_, destroy(connection_.hash()));
+    EXPECT_CALL(connectionsManagerEventsMock_, closeEvent(connection_.hash()));
     EXPECT_CALL(connection_, close());
 
     closeCallback_(connection_);
@@ -141,8 +140,7 @@ TEST_F(ConnectionsManagerTest, getThrowExceptionDuringDisconnect)
 {
     acceptScenario();
 
-    eMU::core::common::Exception exception("Test");
-    EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(exception));
+    EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(network::tcp::exceptions::UnknownConnectionException()));
 
     connectionsManager_.disconnect(connectionHash_);
 }
@@ -155,8 +153,7 @@ TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringCloseEvent)
     EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(ReturnRef(connection_));
     connectionsManager_.disconnect(connectionHash_);
 
-    eMU::core::common::Exception exception("Test");
-    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Throw(exception));
+    EXPECT_CALL(*connectionsFactory_, exists(Ref(connection_))).WillOnce(Return(false));
     closeCallback_(connection_);
 }
 
@@ -174,8 +171,7 @@ TEST_F(ConnectionsManagerTest, exceptionOccuredDuringGeneratingHash)
     expectAsyncAcceptCallAndSaveArguments();
     connectionsManager_.queueAccept();
 
-    eMU::core::common::Exception exception("Test");
-    EXPECT_CALL(connectionsManagerEventsMock_, generateConnectionHash()).WillOnce(Throw(exception));
+    EXPECT_CALL(connectionsManagerEventsMock_, generateConnectionHash()).WillOnce(Return(0));
     EXPECT_CALL(*acceptor_, async_accept(_, _));
 
     acceptHandler_(boost::system::error_code());
@@ -185,8 +181,8 @@ TEST_F(ConnectionsManagerTest, receive)
 {
     acceptScenario();
 
-    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Return(connectionHash_));
-    EXPECT_CALL(connectionsManagerEventsMock_, receiveEvent(connectionHash_, _));
+    EXPECT_CALL(*connectionsFactory_, exists(Ref(connection_))).WillOnce(Return(true));
+    EXPECT_CALL(connectionsManagerEventsMock_, receiveEvent(connection_.hash(), _));
 
     receiveCallback_(connection_);
 }
@@ -195,8 +191,7 @@ TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringReceive)
 {
     acceptScenario();
 
-    eMU::core::common::Exception exception("Test");
-    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Throw(exception));
+    EXPECT_CALL(*connectionsFactory_, exists(Ref(connection_))).WillOnce(Return(false));
 
     receiveCallback_(connection_);
 }

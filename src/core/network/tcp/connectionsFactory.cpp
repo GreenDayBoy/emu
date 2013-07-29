@@ -1,5 +1,5 @@
 #include <core/network/tcp/connectionsFactory.hpp>
-#include <core/common/exception.hpp>
+#include <core/network/tcp/exceptions.hpp>
 
 namespace eMU
 {
@@ -19,10 +19,7 @@ Connection& ConnectionsFactory::create(size_t hash, Connection::SocketPointer so
 {
     if(connections_.count(hash) > 0)
     {
-        eMU::core::common::Exception exception;
-        exception.in() << "Connection with hash: " << hash << " has already been created! Connection: " << *connections_[hash];
-
-        throw exception;
+        throw exceptions::AlreadyExistingConnectionException();
     }
 
     Connection::Pointer connection(new Connection(socket));
@@ -33,14 +30,6 @@ Connection& ConnectionsFactory::create(size_t hash, Connection::SocketPointer so
 
 void ConnectionsFactory::destroy(size_t hash)
 {
-    if(connections_.count(hash) == 0)
-    {
-        eMU::core::common::Exception exception;
-        exception.in() << "Connection with hash: " << hash << " does not exist!";
-
-        throw exception;
-    }
-
     connections_[hash].reset();
     connections_.erase(hash);
 }
@@ -49,29 +38,23 @@ Connection& ConnectionsFactory::get(size_t hash)
 {
     if(connections_.count(hash) == 0)
     {
-        eMU::core::common::Exception exception;
-        exception.in() << "Connection with hash: " << hash << " does not exist!";
-
-        throw exception;
+        throw exceptions::UnknownConnectionException();
     }
 
     return *connections_[hash];
 }
 
-size_t ConnectionsFactory::getHash(Connection &connection) const
+bool ConnectionsFactory::exists(Connection &connection) const
 {
     for(auto &it : connections_)
     {
         if(it.second->hash() == connection.hash())
         {
-            return it.first;
+            return true;
         }
     }
 
-    common::Exception exception;
-    exception.in() << "Could not find connection, hash: " << connection.hash() << ", connection: " << connection;
-
-    throw exception;
+    return false;
 }
 
 }

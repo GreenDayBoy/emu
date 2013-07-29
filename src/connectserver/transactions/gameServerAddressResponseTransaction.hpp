@@ -11,13 +11,13 @@ namespace connectserver
 namespace transactions
 {
 
-class GameServerAddressRequestTransaction: public eMU::core::transactions::Transaction
+class GameServerAddressResponseTransaction: public eMU::core::transactions::Transaction
 {
 public:
-    GameServerAddressRequestTransaction(size_t hash,
-                                        MessageSender &messageSender,
-                                        const GameServersList &gameServersList,
-                                        uint16_t code);
+    GameServerAddressResponseTransaction(size_t hash,
+                                         MessageSender &messageSender,
+                                         const GameServersList &gameServersList,
+                                         uint16_t code);
 
 private:
     bool validate() const;

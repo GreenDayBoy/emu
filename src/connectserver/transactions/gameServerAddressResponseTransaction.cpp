@@ -1,5 +1,5 @@
 #include <glog/logging.h>
-#include <connectserver/transactions/gameServerAddressRequestTransaction.hpp>
+#include <connectserver/transactions/gameServerAddressResponseTransaction.hpp>
 
 namespace eMU
 {
@@ -8,16 +8,16 @@ namespace connectserver
 namespace transactions
 {
 
-GameServerAddressRequestTransaction::GameServerAddressRequestTransaction(size_t hash,
-                                                                         MessageSender &messageSender,
-                                                                         const GameServersList &gameServersList,
-                                                                         uint16_t code):
+GameServerAddressResponseTransaction::GameServerAddressResponseTransaction(size_t hash,
+                                                                           MessageSender &messageSender,
+                                                                           const GameServersList &gameServersList,
+                                                                           uint16_t code):
     hash_(hash),
     messageSender_(messageSender),
     gameServersList_(gameServersList),
     code_(code) {}
 
-bool GameServerAddressRequestTransaction::validate() const
+bool GameServerAddressResponseTransaction::validate() const
 {
     if(!gameServersList_.hasGameServer(code_))
     {
@@ -28,7 +28,7 @@ bool GameServerAddressRequestTransaction::validate() const
     return true;
 }
 
-void GameServerAddressRequestTransaction::handleSelf()
+void GameServerAddressResponseTransaction::handleSelf()
 {
     const GameServersList::GameServerInfo &serverInfo = gameServersList_.getGameServerInfo(code_);
 

@@ -2,6 +2,9 @@
 
 #include <core/common/usersFactory.hpp>
 #include <core/common/hashableObject.hpp>
+#include <core/common/exceptions.hpp>
+
+namespace common = eMU::core::common;
 
 class UsersFactoryTest: public ::testing::Test
 {
@@ -10,7 +13,7 @@ protected:
         maxNumberOfUsers_(2),
         usersFactory_(maxNumberOfUsers_) {}
 
-    class FakeUser: public eMU::core::common::HashableObject
+    class FakeUser: public common::HashableObject
     {
 
     };
@@ -20,7 +23,7 @@ protected:
     }
 
     size_t maxNumberOfUsers_;
-    eMU::core::common::UsersFactory<FakeUser> usersFactory_;
+    common::UsersFactory<FakeUser> usersFactory_;
 };
 
 TEST_F(UsersFactoryTest, WhenMaxNumberOfUsersReachedShouldThrowException)
@@ -33,7 +36,7 @@ TEST_F(UsersFactoryTest, WhenMaxNumberOfUsersReachedShouldThrowException)
     {
         usersFactory_.create();
     }
-    catch(eMU::core::common::Exception &exception)
+    catch(common::exceptions::MaxNumberOfUsersReachedException &exception)
     {
         exceptionThrown = true;
     }
@@ -53,7 +56,7 @@ TEST_F(UsersFactoryTest, WhenUserDestroyedShouldBeErasedFromFactory)
     ASSERT_EQ(0, usersFactory_.users().size());
 }
 
-TEST_F(UsersFactoryTest, WhenInvalidHashWasGiven_FindShouldThrowException)
+TEST_F(UsersFactoryTest, WhenInvalidHashWasGivenThenFindShouldThrowException)
 {
     FakeUser &user1 = usersFactory_.create();
     FakeUser &user2 = usersFactory_.create();
@@ -63,7 +66,7 @@ TEST_F(UsersFactoryTest, WhenInvalidHashWasGiven_FindShouldThrowException)
     {
         usersFactory_.find(12345);
     }
-    catch(eMU::core::common::Exception &exception)
+    catch(common::exceptions::UnknownUserException &exception)
     {
         exceptionThrown = true;
     }

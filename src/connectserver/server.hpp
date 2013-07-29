@@ -55,6 +55,8 @@ public:
     void onReceiveFrom(core::network::udp::Connection &connection);
 
 private:
+    bool parse(size_t hash, const eMU::core::network::Payload &payload);
+
     core::network::tcp::ConnectionsManager::Pointer connectionsManager_;
     core::common::UsersFactory<User>::Pointer usersFactory_;
     core::network::udp::Connection::Pointer udpConnection_;

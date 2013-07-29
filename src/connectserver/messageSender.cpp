@@ -1,8 +1,8 @@
 #include <connectserver/messageSender.hpp>
 #include <interface/gameServerAddressResponse.hpp>
-#include <interface/Ids.hpp>
+#include <interface/ids.hpp>
 #include <interface/gameServersListResponse.hpp>
-#include <core/network/protocol/helpers.hpp>
+#include <core/protocol/helpers.hpp>
 
 namespace eMU
 {
@@ -24,7 +24,7 @@ void MessageSender::sendGameServersListResponse(size_t hash, const GameServersLi
     interface::GameServersListResponse *message = reinterpret_cast<interface::GameServersListResponse*>(&payload[0]);
 
     message->header_.typeId_ = interface::MessageType::LARGE_DECRYPTED;
-    message->header_.size_ = core::network::protocol::byteSwap(static_cast<uint16_t>(messageSize));
+    message->header_.size_ = core::protocol::byteSwap(static_cast<uint16_t>(messageSize));
     message->header_.protocolId_ = interface::ProtocolId::CONNECT_SERVER_PROTOCOL;
     message->id_ = interface::MessageId::GAME_SERVERS_LIST_RESPONSE;
     message->numberOfServers_ = static_cast<uint16_t>(servers.size());
