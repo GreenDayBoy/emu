@@ -10,7 +10,7 @@ namespace transactions
 {
 
 GameServersListResponseTransaction::GameServersListResponseTransaction(size_t hash,
-                                                                       GameServersList::GameServersListContainer &servers,
+                                                                       const GameServersList::GameServersListContainer &servers,
                                                                        MessageSender &messageSender):
     hash_(hash),
     servers_(servers),

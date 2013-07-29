@@ -1,6 +1,6 @@
 #include <glog/logging.h>
 #include <core/network/tcp/connectionsManager.hpp>
-#include <core/common/exception.hpp>
+#include <core/network/tcp/exceptions.hpp>
 
 namespace eMU
 {
@@ -53,22 +53,26 @@ void ConnectionsManager::acceptHandler(Connection::SocketPointer socket, const b
 
 void ConnectionsManager::registerConnection(Connection::SocketPointer socket)
 {
+    size_t hash = generateConnectionHashCallback_();
+
+    if(hash == 0)
+    {
+        LOG(ERROR) << "Generated invalid hash!";
+        return;
+    }
+
     try
     {
-        size_t hash = generateConnectionHashCallback_();
         Connection &connection = connectionsFactory_->create(hash, socket);
-
-        LOG(INFO) << "Connection registered, hash: " << hash;
-
         connection.setReceiveEventCallback(std::bind(&ConnectionsManager::receiveEvent, this, std::placeholders::_1));
         connection.setCloseEventCallback(std::bind(&ConnectionsManager::closeEvent, this, std::placeholders::_1));
         connection.queueReceive();
 
         acceptEventCallback_(hash);
     }
-    catch(common::Exception &exception)
+    catch(exceptions::AlreadyExistingConnectionException &exception)
     {
-        LOG(ERROR) << "Exception during regustering connection, reason: " << exception.what();
+        LOG(ERROR) << "hash: " << hash << ", connection already exists!";
     }
 }
 
@@ -94,43 +98,37 @@ void ConnectionsManager::send(size_t hash, const Payload &payload)
         Connection &connection = connectionsFactory_->get(hash);
         connection.send(payload);
     }
-    catch(common::Exception &exception)
+    catch(exceptions::UnknownConnectionException &exception)
     {
-        LOG(ERROR) << "Exception during send, reason: " << exception.what();
+        LOG(ERROR) << "hash: " << hash << ", connection does not exist!";
     }
 }
 
 void ConnectionsManager::receiveEvent(Connection &connection)
 {
-    try
+    if(!connectionsFactory_->exists(connection))
     {
-        size_t hash = connectionsFactory_->getHash(connection);
-        Payload payload(connection.readBuffer().payload_.begin(), connection.readBuffer().payload_.begin() + connection.readBuffer().payloadSize_);
+        LOG(ERROR) << "hash: " << connection.hash() << ", connection does not exist!";
+        return;
+    }
 
-        receiveEventCallback_(hash, payload);
-    }
-    catch(common::Exception &exception)
-    {
-        LOG(ERROR) << "Exception during receiveEvent, reason: " << exception.what();
-    }
+    Payload payload(connection.readBuffer().payload_.begin(), connection.readBuffer().payload_.begin() + connection.readBuffer().payloadSize_);
+    receiveEventCallback_(connection.hash(), payload);
 }
 
 void ConnectionsManager::closeEvent(Connection &connection)
 {
-    try
+    if(!connectionsFactory_->exists(connection))
     {
-        LOG(INFO) << "Closing connection: " << connection;
-
-        size_t hash = connectionsFactory_->getHash(connection);
-
-        closeEventCallback_(hash);
-        connection.close();
-        connectionsFactory_->destroy(hash);
+        LOG(ERROR) << "hash: " << connection.hash() << ", connection does not exist!";
+        return;
     }
-    catch(common::Exception &exception)
-    {
-        LOG(ERROR) << "Exception during closeEvent, reason: " << exception.what();
-    }
+
+    LOG(INFO) << "Closing connection: " << connection;
+
+    closeEventCallback_(connection.hash());
+    connection.close();
+    connectionsFactory_->destroy(connection.hash());
 }
 
 void ConnectionsManager::disconnect(size_t hash)
@@ -140,9 +138,9 @@ void ConnectionsManager::disconnect(size_t hash)
         Connection &connection = connectionsFactory_->get(hash);
         connection.disconnect();
     }
-    catch(common::Exception &exception)
+    catch(exceptions::UnknownConnectionException &exception)
     {
-        LOG(ERROR) << "Exception during disconnect, reason: " << exception.what();
+        LOG(ERROR) << "hash: " << hash << ", connection does not exist!";
     }
 }
 

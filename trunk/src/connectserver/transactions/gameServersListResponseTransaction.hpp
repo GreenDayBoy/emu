@@ -14,14 +14,14 @@ namespace transactions
 class GameServersListResponseTransaction: public eMU::core::transactions::Transaction
 {
 public:
-    GameServersListResponseTransaction(size_t hash, GameServersList::GameServersListContainer &servers, MessageSender &messageSender);
+    GameServersListResponseTransaction(size_t hash, const GameServersList::GameServersListContainer &servers, MessageSender &messageSender);
 
 private:
     bool validate() const;
     void handleSelf();
 
     size_t hash_;
-    GameServersList::GameServersListContainer &servers_;
+    const GameServersList::GameServersListContainer &servers_;
     MessageSender &messageSender_;
 };
 

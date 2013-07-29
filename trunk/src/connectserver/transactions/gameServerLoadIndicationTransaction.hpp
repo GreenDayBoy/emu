@@ -7,8 +7,7 @@
 namespace eMU
 {
 namespace connectserver
-{
-namespace transactions
+{ namespace transactions
 {
 
 class GameServerLoadIndicationTransaction: public eMU::core::transactions::Transaction

@@ -3,7 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <memory>
-#include <core/common/exception.hpp>
+#include <core/common/exceptions.hpp>
 
 namespace eMU
 {
@@ -26,9 +26,7 @@ public:
     {
         if(users_.size() >= maxNumberOfUsers_)
         {
-            Exception exception("Max number of users reached!");
-
-            throw exception;
+            throw exceptions::MaxNumberOfUsersReachedException();
         }
 
         User *user = new User();
@@ -65,10 +63,7 @@ public:
 
         if(it == users_.end())
         {
-            Exception exception;
-            exception.in() << "Cannot find user by hash: " << hash;
-
-            throw exception;
+            throw exceptions::UnknownUserException();
         }
 
         return *(*it);

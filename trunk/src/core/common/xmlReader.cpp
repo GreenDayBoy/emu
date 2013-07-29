@@ -1,5 +1,5 @@
 #include <core/common/xmlReader.hpp>
-#include <core/common/exception.hpp>
+#include <core/common/exceptions.hpp>
 
 namespace eMU
 {
@@ -15,8 +15,7 @@ void XmlReader::parse(std::string content, std::string firstNodeName)
 {
     if(content.empty())
     {
-        Exception exception("Got empty content!");
-        throw exception;
+        throw exceptions::EmptyXmlContentException();
     }
 
     document_.parse<0>(const_cast<char*>(content.c_str()));
@@ -24,9 +23,7 @@ void XmlReader::parse(std::string content, std::string firstNodeName)
 
     if(this->end())
     {
-        Exception exception;
-        exception.in() << "First node name does not match! name: " << firstNodeName;
-        throw exception;
+        throw exceptions::NotMatchedXmlNodeException();
     }
 
     currentNode_ = currentNode_->first_node();

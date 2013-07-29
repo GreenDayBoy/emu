@@ -3,8 +3,8 @@
 #include <connectserver/messageSender.hpp>
 #include <interface/gameServerAddressResponse.hpp>
 #include <interface/gameServersListResponse.hpp>
-#include <interface/Ids.hpp>
-#include <core/network/protocol/helpers.hpp>
+#include <interface/ids.hpp>
+#include <core/protocol/helpers.hpp>
 
 using ::testing::SaveArg;
 using ::testing::DoAll;
@@ -71,7 +71,7 @@ TEST_F(MessageSenderTest, sendGameServersListResponse)
     interface::GameServersListResponse *message = reinterpret_cast<interface::GameServersListResponse*>(&payload[0]);
 
     EXPECT_EQ(eMU::interface::MessageType::LARGE_DECRYPTED, message->header_.typeId_);
-    EXPECT_EQ(eMU::core::network::protocol::byteSwap(messageSize), message->header_.size_);
+    EXPECT_EQ(eMU::core::protocol::byteSwap(messageSize), message->header_.size_);
     EXPECT_EQ(eMU::interface::ProtocolId::CONNECT_SERVER_PROTOCOL, message->header_.protocolId_);
     EXPECT_EQ(eMU::interface::MessageId::GAME_SERVERS_LIST_RESPONSE, message->id_);
 
