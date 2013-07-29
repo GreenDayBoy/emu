@@ -15,6 +15,8 @@ class EmptyPayloadException: public common::Exception {};
 
 class InvalidPacketSizeException: public common::Exception {};
 
+class InvalidPacketHeaderException: public common::Exception {};
+
 }
 }
 }

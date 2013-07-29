@@ -65,11 +65,11 @@ TEST_F(GameServersListTest, initialize)
 {
     initialize();
 
-    ASSERT_EQ(sampleServers_.size(), gameServersList_.list().size());
+    ASSERT_EQ(sampleServers_.size(), gameServersList_.servers().size());
 
     for(size_t i = 0; i < sampleServers_.size(); ++i)
     {
-        compareGameServerInfo(sampleServers_[i], gameServersList_.list()[i]);
+        compareGameServerInfo(sampleServers_[i], gameServersList_.servers()[i]);
     }
 }
 
@@ -80,8 +80,8 @@ TEST_F(GameServersListTest, updateLoad)
     gameServersList_.updateGameServerLoad(0, 95);
     gameServersList_.updateGameServerLoad(20, 35);
 
-    EXPECT_EQ(95, gameServersList_.list()[0].load_);
-    EXPECT_EQ(35, gameServersList_.list()[1].load_);
+    EXPECT_EQ(95, gameServersList_.servers()[0].load_);
+    EXPECT_EQ(35, gameServersList_.servers()[1].load_);
 }
 
 TEST_F(GameServersListTest, updateLoadWithInvalidCodeShouldDoNothing)
@@ -90,8 +90,8 @@ TEST_F(GameServersListTest, updateLoadWithInvalidCodeShouldDoNothing)
 
     gameServersList_.updateGameServerLoad(1, 30);
 
-    EXPECT_EQ(0, gameServersList_.list()[0].load_);
-    EXPECT_EQ(0, gameServersList_.list()[1].load_);
+    EXPECT_EQ(0, gameServersList_.servers()[0].load_);
+    EXPECT_EQ(0, gameServersList_.servers()[1].load_);
 }
 
 TEST_F(GameServersListTest, hasGameServer)

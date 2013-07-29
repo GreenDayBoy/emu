@@ -21,20 +21,25 @@ void PacketsExtractor::extract()
 
     size_t totalSize = 0;
 
-    do
+    while(totalSize < payload_.size())
     {
-        network::Payload currentPayload(payload_.begin() + totalSize, payload_.end());
-        size_t packetSize = getSize(currentPayload);
+        network::Payload frame(payload_.begin() + totalSize, payload_.end());
 
-        if(currentPayload.size() < packetSize)
+        if(!hasValidHeader(frame))
+        {
+            throw exceptions::InvalidPacketHeaderException();
+        }
+
+        size_t size = getSize(frame);
+
+        if(frame.size() < size)
         {
             throw exceptions::InvalidPacketSizeException();
         }
 
-        payloads_.push_back(network::Payload(currentPayload.begin(), currentPayload.begin() + packetSize));
-        totalSize += packetSize;
+        payloads_.push_back(network::Payload(frame.begin(), frame.begin() + size));
+        totalSize += size;
     }
-    while(totalSize < payload_.size());
 }
 
 const PacketsExtractor::PayloadsContainer& PacketsExtractor::payloads() const

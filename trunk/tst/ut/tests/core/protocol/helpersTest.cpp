@@ -37,6 +37,13 @@ TEST(HelperTest, getersForLargePacket)
     EXPECT_EQ(0xFF30, protocol::getSize(payload));
 }
 
+TEST(HelperTest, getersForInvalidPacket)
+{
+    network::Payload payload = {0xFF, 0x30, 0xFF, 0xF4};
+    EXPECT_EQ(0, protocol::getProtocolId(payload));
+    EXPECT_EQ(0, protocol::getSize(payload));
+}
+
 TEST(HelperTest, isCrypted)
 {
     network::Payload payload = {0xC3, 0x04, 0x00, 0x00};
