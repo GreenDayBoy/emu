@@ -2,9 +2,7 @@
 
 #include <boost/asio.hpp>
 #include <gmock/gmock.h>
-
-#include <mt/env/asioStub/ioService.hpp>
-#include <mt/env/asioStub/tcp/socket.hpp>
+#include <mt/env/asioStub/types.hpp>
 
 namespace eMU
 {
@@ -14,16 +12,19 @@ namespace env
 {
 namespace asioStub
 {
+
+class io_service;
+
 namespace ip
 {
 namespace tcp
 {
 
+class socket;
+
 class acceptor
 {
 public:
-    typedef std::function<void(const boost::system::error_code&)> AcceptHandler;
-
     acceptor(io_service &ioService, const boost::asio::ip::tcp::endpoint &endpoint);
     void async_accept(socket &socket, const AcceptHandler &handler);
 

@@ -1,4 +1,5 @@
 #include <connectserver/server.hpp>
+#include <connectserver/exceptions.hpp>
 #include <connectserver/transactions/gameServersListResponseTransaction.hpp>
 #include <connectserver/transactions/gameServerAddressResponseTransaction.hpp>
 #include <connectserver/transactions/gameServerLoadIndicationTransaction.hpp>
@@ -10,6 +11,7 @@
 
 #include <core/protocol/packetsExtractor.hpp>
 #include <core/protocol/exceptions.hpp>
+#include <core/protocol/helpers.hpp>
 #include <core/common/exceptions.hpp>
 
 #include <glog/logging.h>
@@ -53,6 +55,7 @@ void Server::startup()
 
         gameServersList_.initialize(xmlReader);
         connectionsManager_->queueAccept();
+        udpConnection_->queueReceiveFrom();
     }
     catch(core::common::exceptions::EmptyXmlContentException&)
     {
@@ -88,14 +91,14 @@ void Server::onReceive(size_t hash, const eMU::core::network::Payload &payload)
 {
     try
     {
-        core::protocol::PacketsExtractor packetExtractor(payload);
-        packetExtractor.extract();
+        core::protocol::PacketsExtractor packetsExtractor(payload);
+        packetsExtractor.extract();
 
-        const core::protocol::PacketsExtractor::PayloadsContainer &payloads = packetExtractor.payloads();
+        const core::protocol::PacketsExtractor::PayloadsContainer &payloads = packetsExtractor.payloads();
 
         for(const auto &packet : payloads)
         {
-            parse(hash, packet);
+            handleMessage(hash, packet);
             transactionsManager_.dequeueAll();
         }
     }
@@ -112,6 +115,16 @@ void Server::onReceive(size_t hash, const eMU::core::network::Payload &payload)
     catch(core::protocol::exceptions::InvalidPacketSizeException&)
     {
         LOG(ERROR) << "hash: " << hash << ", invalid packet size detected!";
+        connectionsManager_->disconnect(hash);
+    }
+    catch(exceptions::InvalidProtocolIdException&)
+    {
+        LOG(ERROR) << "hash: " << hash << ", invalid protocol id!";
+        connectionsManager_->disconnect(hash);
+    }
+    catch(exceptions::UnknownMessageException&)
+    {
+        LOG(ERROR) << "hash: " << hash << ", unknown message!";
         connectionsManager_->disconnect(hash);
     }
 }
@@ -136,7 +149,7 @@ void Server::onReceiveFrom(core::network::udp::Connection &connection)
 
         for(const auto &packet : payloads)
         {
-            parse(0, packet);
+            handleMessage(0, packet);
             transactionsManager_.dequeueAll();
         }
     }
@@ -152,46 +165,45 @@ void Server::onReceiveFrom(core::network::udp::Connection &connection)
     {
         LOG(ERROR) << "udp, invalid packet size detected!";
     }
+    catch(exceptions::InvalidProtocolIdException&)
+    {
+        LOG(ERROR) << "udp, invalid protocol id!";
+    }
+    catch(exceptions::UnknownMessageException&)
+    {
+        LOG(ERROR) << "udp, unknown message!";
+    }
 }
 
-void Server::parse(size_t hash, const core::network::Payload &payload)
+void Server::handleMessage(size_t hash, const core::network::Payload &payload)
 {
-//    uint8_t protocolId = core::protocol::getProtocolId(payload);
-//    uint8_t messageId = payload[4];
-//    bool result = true;
+    uint8_t protocolId = core::protocol::getProtocolId(payload);
 
-//    if(protocolId == interface::ProtocolId::CONNECT_SERVER_PROTOCOL)
-//    {
-//        if(messageId == interface::MessageId::GAME_SERVERS_LIST_RESPONSE)
-//        {
-//            transactionsManager_.queue(new transactions::GameServersListResponseTransaction(hash, gameServersList_.list(), messageSender_));
-//        }
-//        else if(messageId == interface::MessageId::GAME_SERVER_ADDRESS_RESPONSE)
-//        {
-//            const interface::GameServerAddressRequest *request = reinterpret_cast<const interface::GameServerAddressRequest*>(&payload[0]);
-//            transactionsManager_.queue(new transactions::GameServerAddressResponseTransaction(hash, messageSender_, gameServersList_, request->serverCode_));
-//        }
-//        else if(messageId == interface::MessageId::GAME_SERVER_LOAD_INDICATION)
-//        {
-//            const interface::GameServerLoadIndication *message = reinterpret_cast<const interface::GameServerLoadIndication*>(&payload[0]);
-//            transactionsManager_.queue(new transactions::GameServerLoadIndicationTransaction(*message, gameServersList_));
-//        }
-//        else
-//        {
-//            result = false;
-//        }
-//    }
-//    else
-//    {
-//        result = false;
-//    }
+    if(protocolId != interface::ProtocolId::CONNECT_SERVER_PROTOCOL)
+    {
+        throw exceptions::InvalidProtocolIdException();
+    }
 
-//    if(!result)
-//    {
-//        LOG(ERROR) << "hash: " << hash << ", received unknown packet!";
-//    }
+    uint8_t messageId = payload[3];
 
-//    return result;
+    if(messageId == interface::MessageId::GAME_SERVERS_LIST_RESPONSE)
+    {
+        transactionsManager_.queue(new transactions::GameServersListResponseTransaction(hash, gameServersList_.servers(), messageSender_));
+    }
+    else if(messageId == interface::MessageId::GAME_SERVER_ADDRESS_RESPONSE)
+    {
+        const interface::GameServerAddressRequest *message = reinterpret_cast<const interface::GameServerAddressRequest*>(&payload[0]);
+        transactionsManager_.queue(new transactions::GameServerAddressResponseTransaction(hash, messageSender_, gameServersList_, message->serverCode_));
+    }
+    else if(messageId == interface::MessageId::GAME_SERVER_LOAD_INDICATION)
+    {
+        const interface::GameServerLoadIndication *message = reinterpret_cast<const interface::GameServerLoadIndication*>(&payload[0]);
+        transactionsManager_.queue(new transactions::GameServerLoadIndicationTransaction(*message, gameServersList_));
+    }
+    else
+    {
+        throw exceptions::UnknownMessageException();
+    }
 }
 
 void Server::cleanup()

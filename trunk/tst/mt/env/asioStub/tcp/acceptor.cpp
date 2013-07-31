@@ -1,4 +1,5 @@
 #include <mt/env/asioStub/tcp/acceptor.hpp>
+#include <mt/env/asioStub/ioService.hpp>
 
 namespace eMU
 {
@@ -18,7 +19,7 @@ acceptor::acceptor(io_service &ioService, const boost::asio::ip::tcp::endpoint &
 
 void acceptor::async_accept(socket &socket, const AcceptHandler &handler)
 {
-
+    ioService_.queueAccept(socket, handler);
 }
 
 }
