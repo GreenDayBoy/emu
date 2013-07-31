@@ -106,29 +106,33 @@ void ConnectionsManager::send(size_t hash, const Payload &payload)
 
 void ConnectionsManager::receiveEvent(Connection &connection)
 {
-    if(!connectionsFactory_->exists(connection))
+    try
     {
-        LOG(ERROR) << "hash: " << connection.hash() << ", connection does not exist!";
-        return;
-    }
+        size_t hash = connectionsFactory_->getHash(connection);
 
-    Payload payload(connection.readBuffer().payload_.begin(), connection.readBuffer().payload_.begin() + connection.readBuffer().payloadSize_);
-    receiveEventCallback_(connection.hash(), payload);
+        Payload payload(connection.readBuffer().payload_.begin(), connection.readBuffer().payload_.begin() + connection.readBuffer().payloadSize_);
+        receiveEventCallback_(hash, payload);
+    }
+    catch(exceptions::UnknownConnectionException &exception)
+    {
+        LOG(ERROR) << "connection does not exist!";
+    }
 }
 
 void ConnectionsManager::closeEvent(Connection &connection)
 {
-    if(!connectionsFactory_->exists(connection))
+    try
     {
-        LOG(ERROR) << "hash: " << connection.hash() << ", connection does not exist!";
-        return;
+        size_t hash = connectionsFactory_->getHash(connection);
+
+        closeEventCallback_(hash);
+        connection.close();
+        connectionsFactory_->destroy(hash);
     }
-
-    LOG(INFO) << "Closing connection: " << connection;
-
-    closeEventCallback_(connection.hash());
-    connection.close();
-    connectionsFactory_->destroy(connection.hash());
+    catch(exceptions::UnknownConnectionException &exception)
+    {
+        LOG(ERROR) << "connection does not exist!";
+    }
 }
 
 void ConnectionsManager::disconnect(size_t hash)

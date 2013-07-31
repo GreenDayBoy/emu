@@ -41,7 +41,7 @@ TEST_F(TcpConnectionsFactoryTest, create)
     network::tcp::Connection::SocketPointer socket(new asioStub::ip::tcp::socket(ioService_));
     network::tcp::Connection &connection = connectionsFactory_.create(hash, socket);
 
-    EXPECT_TRUE(connectionsFactory_.exists(connection));
+    EXPECT_EQ(hash, connectionsFactory_.getHash(connection));
 }
 
 TEST_F(TcpConnectionsFactoryTest, destroy)
@@ -53,6 +53,22 @@ TEST_F(TcpConnectionsFactoryTest, destroy)
     connectionsFactory_.destroy(hash);
 
     connectionsFactory_.create(hash, socket);
+}
+
+TEST_F(TcpConnectionsFactoryTest, destroyNotExistingConnectionShouldThrowException)
+{
+    bool exceptionThrown = false;
+
+    try
+    {
+        connectionsFactory_.destroy(4321);
+    }
+    catch(eMU::core::network::tcp::exceptions::UnknownConnectionException&)
+    {
+        exceptionThrown = true;
+    }
+
+    ASSERT_TRUE(exceptionThrown);
 }
 
 TEST_F(TcpConnectionsFactoryTest, get)
@@ -74,7 +90,7 @@ TEST_F(TcpConnectionsFactoryTest, getNotExisitngConnectionShouldThrowException)
     {
         connectionsFactory_.get(4321);
     }
-    catch(network::tcp::exceptions::UnknownConnectionException)
+    catch(eMU::core::network::tcp::exceptions::UnknownConnectionException&)
     {
         exceptionThrown = true;
     }
@@ -82,10 +98,21 @@ TEST_F(TcpConnectionsFactoryTest, getNotExisitngConnectionShouldThrowException)
     ASSERT_TRUE(exceptionThrown);
 }
 
-TEST_F(TcpConnectionsFactoryTest, existsForNonExistingConnectionShouldReturnFalse)
+TEST_F(TcpConnectionsFactoryTest, getHashForNotExistingConnectionShouldThrowException)
 {
     network::tcp::Connection::SocketPointer socket(new asioStub::ip::tcp::socket(ioService_));
     network::tcp::Connection connection(socket);
 
-    EXPECT_FALSE(connectionsFactory_.exists(connection));
+    bool exceptionThrown = false;
+
+    try
+    {
+        connectionsFactory_.getHash(connection);
+    }
+    catch(eMU::core::network::tcp::exceptions::UnknownConnectionException&)
+    {
+        exceptionThrown = true;
+    }
+
+    ASSERT_TRUE(exceptionThrown);
 }

@@ -30,6 +30,11 @@ Connection& ConnectionsFactory::create(size_t hash, Connection::SocketPointer so
 
 void ConnectionsFactory::destroy(size_t hash)
 {
+    if(connections_.count(hash) == 0)
+    {
+        throw exceptions::UnknownConnectionException();
+    }
+
     connections_[hash].reset();
     connections_.erase(hash);
 }
@@ -44,17 +49,17 @@ Connection& ConnectionsFactory::get(size_t hash)
     return *connections_[hash];
 }
 
-bool ConnectionsFactory::exists(Connection &connection) const
+size_t ConnectionsFactory::getHash(Connection &connection) const
 {
     for(auto &it : connections_)
     {
         if(it.second->hash() == connection.hash())
         {
-            return true;
+            return it.first;
         }
     }
 
-    return false;
+    throw exceptions::UnknownConnectionException();
 }
 
 }

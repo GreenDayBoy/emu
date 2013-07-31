@@ -22,7 +22,7 @@ public:
     MOCK_METHOD2(create, network::tcp::Connection&(size_t hash, network::tcp::Connection::SocketPointer socket));
     MOCK_METHOD1(destroy, void(size_t hash));
     MOCK_METHOD1(get, network::tcp::Connection&(size_t hash));
-    MOCK_CONST_METHOD1(exists, bool(network::tcp::Connection&));
+    MOCK_CONST_METHOD1(getHash, size_t(network::tcp::Connection&));
 };
 
 }

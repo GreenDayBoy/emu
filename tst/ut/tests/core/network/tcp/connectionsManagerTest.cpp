@@ -128,9 +128,9 @@ TEST_F(ConnectionsManagerTest, disconnect)
 
     connectionsManager_.disconnect(connectionHash_);
 
-    EXPECT_CALL(*connectionsFactory_, exists(Ref(connection_))).WillOnce(Return(true));
-    EXPECT_CALL(*connectionsFactory_, destroy(connection_.hash()));
-    EXPECT_CALL(connectionsManagerEventsMock_, closeEvent(connection_.hash()));
+    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Return(connectionHash_));
+    EXPECT_CALL(*connectionsFactory_, destroy(connectionHash_));
+    EXPECT_CALL(connectionsManagerEventsMock_, closeEvent(connectionHash_));
     EXPECT_CALL(connection_, close());
 
     closeCallback_(connection_);
@@ -153,7 +153,7 @@ TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringCloseEvent)
     EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(ReturnRef(connection_));
     connectionsManager_.disconnect(connectionHash_);
 
-    EXPECT_CALL(*connectionsFactory_, exists(Ref(connection_))).WillOnce(Return(false));
+    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Throw(network::tcp::exceptions::UnknownConnectionException()));
     closeCallback_(connection_);
 }
 
@@ -181,8 +181,8 @@ TEST_F(ConnectionsManagerTest, receive)
 {
     acceptScenario();
 
-    EXPECT_CALL(*connectionsFactory_, exists(Ref(connection_))).WillOnce(Return(true));
-    EXPECT_CALL(connectionsManagerEventsMock_, receiveEvent(connection_.hash(), _));
+    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Return(connectionHash_));
+    EXPECT_CALL(connectionsManagerEventsMock_, receiveEvent(connectionHash_, _));
 
     receiveCallback_(connection_);
 }
@@ -191,7 +191,7 @@ TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringReceive)
 {
     acceptScenario();
 
-    EXPECT_CALL(*connectionsFactory_, exists(Ref(connection_))).WillOnce(Return(false));
+    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Throw(network::tcp::exceptions::UnknownConnectionException()));
 
     receiveCallback_(connection_);
 }
