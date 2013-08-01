@@ -95,9 +95,9 @@ void Server::onReceive(size_t hash, const eMU::core::network::Payload &payload)
         core::protocol::MessagesExtractor messagesExtractor(payload);
         messagesExtractor.extract();
 
-        const core::protocol::MessagesExtractor::PayloadsContainer &payloads = messagesExtractor.payloads();
+        const core::protocol::MessagesExtractor::MessagesContainer &messages = messagesExtractor.messages();
 
-        for(const auto &message : payloads)
+        for(const auto &message : messages)
         {
             handleMessage(hash, message);
             transactionsManager_.dequeueAll();
@@ -146,9 +146,9 @@ void Server::onReceiveFrom(core::network::udp::Connection &connection)
         core::protocol::MessagesExtractor messageExtractor(payload);
         messageExtractor.extract();
 
-        const core::protocol::MessagesExtractor::PayloadsContainer &payloads = messageExtractor.payloads();
+        const core::protocol::MessagesExtractor::MessagesContainer &messages = messageExtractor.messages();
 
-        for(const auto &message : payloads)
+        for(const auto &message : messages)
         {
             handleMessage(0, message);
             transactionsManager_.dequeueAll();
