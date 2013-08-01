@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 
-#include <core/protocol/packetsExtractor.hpp>
+#include <core/protocol/messagesExtractor.hpp>
 #include <core/protocol/exceptions.hpp>
 
 namespace network = eMU::core::network;
 namespace protocol = eMU::core::protocol;
 
-TEST(PacketsExtractorTest, extract)
+TEST(MessagesExtractorTest, extract)
 {
     network::Payload payload1 = {0xC1, 0x05, 0x01, 0x02, 0x03};
     network::Payload payload2 = {0xC2, 0x08, 0x00, 0x04, 0x05, 0x06, 0x07, 0x08};
@@ -19,7 +19,7 @@ TEST(PacketsExtractorTest, extract)
     payload.insert(payload.end(), payload3.begin(), payload3.end());
     payload.insert(payload.end(), payload4.begin(), payload4.end());
 
-    protocol::PacketsExtractor extractor(payload);
+    protocol::MessagesExtractor extractor(payload);
     extractor.extract();
 
     ASSERT_EQ(4, extractor.payloads().size());
@@ -30,14 +30,14 @@ TEST(PacketsExtractorTest, extract)
     EXPECT_EQ(payload4, extractor.payloads()[3]);
 }
 
-TEST(PacketsExtractorTest, gotEmptyPayloadShouldThrowException)
+TEST(MessagesExtractorTest, gotEmptyPayloadShouldThrowException)
 {
     bool exceptionThrown = false;
 
     try
     {
         network::Payload payload;
-        protocol::PacketsExtractor exctractor(payload);
+        protocol::MessagesExtractor exctractor(payload);
         exctractor.extract();
 
     }
@@ -49,7 +49,7 @@ TEST(PacketsExtractorTest, gotEmptyPayloadShouldThrowException)
     ASSERT_TRUE(exceptionThrown);
 }
 
-TEST(PacketsExtractorTest, ToLargePacketSizeShouldThrowException)
+TEST(MessagesExtractorTest, ToLargeMessageSizeShouldThrowException)
 {
     network::Payload payload1 = {0xC1, 0x05, 0x01, 0x02, 0x03};
     network::Payload payload2 = {0xC2, 0x09, 0x00, 0x04, 0x05, 0x06, 0x07, 0x08};
@@ -62,11 +62,11 @@ TEST(PacketsExtractorTest, ToLargePacketSizeShouldThrowException)
 
     try
     {
-        protocol::PacketsExtractor exctractor(payload);
+        protocol::MessagesExtractor exctractor(payload);
         exctractor.extract();
 
     }
-    catch(protocol::exceptions::InvalidPacketSizeException&)
+    catch(protocol::exceptions::InvalidMessageSizeException&)
     {
         exceptionThrown = true;
     }
@@ -74,7 +74,7 @@ TEST(PacketsExtractorTest, ToLargePacketSizeShouldThrowException)
     ASSERT_TRUE(exceptionThrown);
 }
 
-TEST(PacketsExtractorTest, ToSmallPacketSizeShouldThrowException)
+TEST(MessagesExtractorTest, ToSmallMessageSizeShouldThrowException)
 {
     network::Payload payload1 = {0xC1, 0x04, 0x01, 0x02, 0x03};
     network::Payload payload2 = {0xC2, 0x09, 0x00, 0x04, 0x05, 0x06, 0x07, 0x08};
@@ -87,11 +87,11 @@ TEST(PacketsExtractorTest, ToSmallPacketSizeShouldThrowException)
 
     try
     {
-        protocol::PacketsExtractor exctractor(payload);
+        protocol::MessagesExtractor exctractor(payload);
         exctractor.extract();
 
     }
-    catch(protocol::exceptions::InvalidPacketHeaderException&)
+    catch(protocol::exceptions::InvalidMessageHeaderException&)
     {
         exceptionThrown = true;
     }
@@ -99,7 +99,7 @@ TEST(PacketsExtractorTest, ToSmallPacketSizeShouldThrowException)
     ASSERT_TRUE(exceptionThrown);
 }
 
-TEST(PacketsExtractorTest, InvalidPacketHeaderShouldThrowException)
+TEST(MessagesExtractorTest, InvalidMessageHeaderShouldThrowException)
 {
     network::Payload payload1 = {0xC1, 0x05, 0x01, 0x02, 0x03};
     network::Payload payload2 = {0xC5};
@@ -112,11 +112,11 @@ TEST(PacketsExtractorTest, InvalidPacketHeaderShouldThrowException)
 
     try
     {
-        protocol::PacketsExtractor exctractor(payload);
+        protocol::MessagesExtractor exctractor(payload);
         exctractor.extract();
 
     }
-    catch(protocol::exceptions::InvalidPacketHeaderException&)
+    catch(protocol::exceptions::InvalidMessageHeaderException&)
     {
         exceptionThrown = true;
     }

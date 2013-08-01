@@ -13,9 +13,9 @@ namespace exceptions
 
 class EmptyPayloadException: public common::Exception {};
 
-class InvalidPacketSizeException: public common::Exception {};
+class InvalidMessageSizeException: public common::Exception {};
 
-class InvalidPacketHeaderException: public common::Exception {};
+class InvalidMessageHeaderException: public common::Exception {};
 
 }
 }

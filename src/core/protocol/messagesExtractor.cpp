@@ -1,4 +1,4 @@
-#include <core/protocol/packetsExtractor.hpp>
+#include <core/protocol/messagesExtractor.hpp>
 #include <core/protocol/helpers.hpp>
 #include <core/protocol/exceptions.hpp>
 
@@ -9,10 +9,10 @@ namespace core
 namespace protocol
 {
 
-PacketsExtractor::PacketsExtractor(const network::Payload &payload):
+MessagesExtractor::MessagesExtractor(const network::Payload &payload):
     payload_(payload) {}
 
-void PacketsExtractor::extract()
+void MessagesExtractor::extract()
 {
     if(payload_.empty())
     {
@@ -27,14 +27,14 @@ void PacketsExtractor::extract()
 
         if(!hasValidHeader(frame))
         {
-            throw exceptions::InvalidPacketHeaderException();
+            throw exceptions::InvalidMessageHeaderException();
         }
 
         size_t size = getSize(frame);
 
         if(frame.size() < size)
         {
-            throw exceptions::InvalidPacketSizeException();
+            throw exceptions::InvalidMessageSizeException();
         }
 
         payloads_.push_back(network::Payload(frame.begin(), frame.begin() + size));
@@ -42,7 +42,7 @@ void PacketsExtractor::extract()
     }
 }
 
-const PacketsExtractor::PayloadsContainer& PacketsExtractor::payloads() const
+const MessagesExtractor::PayloadsContainer& MessagesExtractor::payloads() const
 {
     return payloads_;
 }
