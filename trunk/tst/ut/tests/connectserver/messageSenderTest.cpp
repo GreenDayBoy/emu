@@ -3,7 +3,9 @@
 #include <connectserver/messageSender.hpp>
 #include <interface/gameServerAddressResponse.hpp>
 #include <interface/gameServersListResponse.hpp>
-#include <interface/ids.hpp>
+#include <interface/messageIds.hpp>
+#include <interface/messageTypes.hpp>
+#include <interface/protocolIds.hpp>
 #include <core/protocol/helpers.hpp>
 
 using ::testing::SaveArg;
@@ -64,7 +66,7 @@ TEST_F(MessageSenderTest, sendGameServersListResponse)
     EXPECT_EQ(receivedHash, hash_);
 
     size_t messageSize = (sizeof(interface::GameServersListResponse) -
-                          interface::kMaxNumberOfGameServers * sizeof(interface::GameServerInfo)) +
+                          interface::constants::kMaxGameServersListLength * sizeof(interface::GameServerInfo)) +
                           sampleServers.size() * sizeof(interface::GameServerInfo);
     ASSERT_EQ(messageSize, payload.size());
 

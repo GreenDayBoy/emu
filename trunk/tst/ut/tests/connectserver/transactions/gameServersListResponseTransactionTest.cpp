@@ -66,7 +66,7 @@ TEST_F(GameServersListResponseTransactionTest, handle)
 
 TEST_F(GameServersListResponseTransactionTest, WhenServersListIsToBigThenTransactionShouldNotBeHandled)
 {
-    sampleServers_.resize(eMU::interface::kMaxNumberOfGameServers + 1);
+    sampleServers_.resize(eMU::interface::constants::kMaxGameServersListLength + 1);
     eMU::connectserver::transactions::GameServersListResponseTransaction transaction(hash_, sampleServers_, messageSender_);
     transaction.handle();
 }
