@@ -2,10 +2,10 @@
 #include <gmock/gmock.h>
 #include <mt/env/asioStub/ioService.hpp>
 #include <mt/env/asioStub/exceptions.hpp>
-#include <mt/env/exceptions.hpp>
 #include <mt/env/messages/builders/gameServerLoadIndicationBuilder.hpp>
 #include <mt/env/messages/builders/gameServersListRequestBuilder.hpp>
 #include <mt/env/messages/verifiers/gameServersListResponseVerifier.hpp>
+#include <core/protocol/exceptions.hpp>
 #include <connectserver/server.hpp>
 
 namespace mtEnv = eMU::mt::env;
@@ -74,7 +74,7 @@ TEST_F(ConnectServerTest, CheckGameServerLoadUpdate)
     {
         ASSERT_TRUE(false) << "udp socket not created.";
     }
-    catch(mtEnv::exceptions::EmptyPayloadException&)
+    catch(eMU::core::protocol::exceptions::EmptyPayloadException&)
     {
         ASSERT_TRUE(false) << "empty payload to verify!";
     }
