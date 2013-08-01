@@ -35,7 +35,7 @@ public:
     eMU::connectserver::Server::Configuration configuration_;
 };
 
-TEST_F(ConnectServerTest, test)
+TEST_F(ConnectServerTest, CheckGameServerLoadUpdate)
 {
     try
     {
