@@ -70,10 +70,11 @@ void socket::insertPayload(const core::network::Payload &payload)
     }
 
     memcpy(buffer, &payload[0], payload.size());
+    receiveBuffer_ = boost::asio::mutable_buffer();
     receiveHandler_(boost::system::error_code(), payload.size());
 }
 
-core::network::Payload socket::getPayload() const
+core::network::Payload socket::getPayload()
 {
     const uint8_t *buffer = boost::asio::buffer_cast<const uint8_t*>(sendBuffer_);
 
@@ -85,6 +86,7 @@ core::network::Payload socket::getPayload() const
     size_t size = boost::asio::buffer_size(sendBuffer_);
 
     core::network::Payload payload(buffer, buffer + size);
+    sendBuffer_ = boost::asio::mutable_buffer();
     sendHandler_(boost::system::error_code(), payload.size());
 
     return payload;
