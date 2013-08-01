@@ -33,7 +33,7 @@ public:
     void async_connect(const boost::asio::ip::tcp::endpoint &endpoint, const ConnectHandler &handler);
 
     void insertPayload(const core::network::Payload &payload);
-    core::network::Payload getPayload() const;
+    core::network::Payload getPayload();
 
     io_service& get_io_service();
 
