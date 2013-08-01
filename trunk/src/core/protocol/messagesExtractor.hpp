@@ -10,18 +10,18 @@ namespace core
 namespace protocol
 {
 
-class PacketsExtractor
+class MessagesExtractor
 {
 public:
     typedef std::vector<network::Payload> PayloadsContainer;
 
-    PacketsExtractor(const network::Payload &payload);
+    MessagesExtractor(const network::Payload &payload);
 
     void extract();
     const PayloadsContainer& payloads() const;
 
 private:
-    PacketsExtractor();
+    MessagesExtractor();
 
     const network::Payload &payload_;
     PayloadsContainer payloads_;

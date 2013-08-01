@@ -15,7 +15,7 @@ TEST(HelperTest, byteSwap)
     EXPECT_EQ(0x0000, protocol::byteSwap(0x0000));
 }
 
-TEST(HelperTest, getersForSmallPacket)
+TEST(HelperTest, getersForSmallMessage)
 {
     network::Payload payload = {0xC1, 0x30, 0xF4};
     EXPECT_EQ(payload[2], protocol::getProtocolId(payload));
@@ -26,7 +26,7 @@ TEST(HelperTest, getersForSmallPacket)
     EXPECT_EQ(payload[1], protocol::getSize(payload));
 }
 
-TEST(HelperTest, getersForLargePacket)
+TEST(HelperTest, getersForLargeMessage)
 {
     network::Payload payload = {0xC2, 0x30, 0xFF, 0xF4};
     EXPECT_EQ(payload[3], protocol::getProtocolId(payload));
@@ -37,7 +37,7 @@ TEST(HelperTest, getersForLargePacket)
     EXPECT_EQ(0xFF30, protocol::getSize(payload));
 }
 
-TEST(HelperTest, getersForInvalidPacket)
+TEST(HelperTest, getersForInvalidMessage)
 {
     network::Payload payload = {0xFF, 0x30, 0xFF, 0xF4};
     EXPECT_EQ(0, protocol::getProtocolId(payload));

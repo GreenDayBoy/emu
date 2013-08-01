@@ -4,6 +4,7 @@
 #include <interface/messageIds.hpp>
 #include <interface/protocolIds.hpp>
 #include <interface/messageTypes.hpp>
+#include <core/protocol/helpers.hpp>
 
 #include <gtest/gtest.h>
 
@@ -28,6 +29,11 @@ void GameServersListResponseVerifier::operator()(const core::network::Payload &p
     const interface::GameServersListResponse *message = reinterpret_cast<const interface::GameServersListResponse*>(&payload[0]);
 
     ASSERT_EQ(interface::MessageType::LARGE_DECRYPTED, message->header_.typeId_);
+
+    size_t messageSize = (sizeof(interface::GameServersListResponse) - sizeof(interface::GameServerInfo) * interface::constants::kMaxGameServersListLength) +
+                         sizeof(interface::GameServerInfo) * servers.size();
+    ASSERT_EQ(messageSize, core::protocol::byteSwap(message->header_.size_));
+
     ASSERT_EQ(interface::ProtocolId::CONNECT_SERVER_PROTOCOL, message->header_.protocolId_);
 
     ASSERT_EQ(servers.size(), message->numberOfServers_);

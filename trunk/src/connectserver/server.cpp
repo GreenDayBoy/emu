@@ -10,7 +10,7 @@
 #include <interface/gameServerAddressRequest.hpp>
 #include <interface/gameServerLoadIndication.hpp>
 
-#include <core/protocol/packetsExtractor.hpp>
+#include <core/protocol/messagesExtractor.hpp>
 #include <core/protocol/exceptions.hpp>
 #include <core/protocol/helpers.hpp>
 #include <core/common/exceptions.hpp>
@@ -92,14 +92,14 @@ void Server::onReceive(size_t hash, const eMU::core::network::Payload &payload)
 {
     try
     {
-        core::protocol::PacketsExtractor packetsExtractor(payload);
-        packetsExtractor.extract();
+        core::protocol::MessagesExtractor messagesExtractor(payload);
+        messagesExtractor.extract();
 
-        const core::protocol::PacketsExtractor::PayloadsContainer &payloads = packetsExtractor.payloads();
+        const core::protocol::MessagesExtractor::PayloadsContainer &payloads = messagesExtractor.payloads();
 
-        for(const auto &packet : payloads)
+        for(const auto &message : payloads)
         {
-            handleMessage(hash, packet);
+            handleMessage(hash, message);
             transactionsManager_.dequeueAll();
         }
     }
@@ -108,14 +108,14 @@ void Server::onReceive(size_t hash, const eMU::core::network::Payload &payload)
         LOG(ERROR) << "hash: " << hash << ", received empty payload!";
         connectionsManager_->disconnect(hash);
     }
-    catch(core::protocol::exceptions::InvalidPacketHeaderException&)
+    catch(core::protocol::exceptions::InvalidMessageHeaderException&)
     {
-        LOG(ERROR) << "hash: " << hash << ", invalid packet header detected!";
+        LOG(ERROR) << "hash: " << hash << ", invalid message header detected!";
         connectionsManager_->disconnect(hash);
     }
-    catch(core::protocol::exceptions::InvalidPacketSizeException&)
+    catch(core::protocol::exceptions::InvalidMessageSizeException&)
     {
-        LOG(ERROR) << "hash: " << hash << ", invalid packet size detected!";
+        LOG(ERROR) << "hash: " << hash << ", invalid message size detected!";
         connectionsManager_->disconnect(hash);
     }
     catch(exceptions::InvalidProtocolIdException&)
@@ -143,14 +143,14 @@ void Server::onReceiveFrom(core::network::udp::Connection &connection)
     {
         core::network::Payload payload(connection.readBuffer().payload_.begin(), connection.readBuffer().payload_.begin() + connection.readBuffer().payloadSize_);
 
-        core::protocol::PacketsExtractor packetExtractor(payload);
-        packetExtractor.extract();
+        core::protocol::MessagesExtractor messageExtractor(payload);
+        messageExtractor.extract();
 
-        const core::protocol::PacketsExtractor::PayloadsContainer &payloads = packetExtractor.payloads();
+        const core::protocol::MessagesExtractor::PayloadsContainer &payloads = messageExtractor.payloads();
 
-        for(const auto &packet : payloads)
+        for(const auto &message : payloads)
         {
-            handleMessage(0, packet);
+            handleMessage(0, message);
             transactionsManager_.dequeueAll();
         }
     }
@@ -158,13 +158,13 @@ void Server::onReceiveFrom(core::network::udp::Connection &connection)
     {
         LOG(ERROR) << "udp, received empty payload!";
     }
-    catch(core::protocol::exceptions::InvalidPacketHeaderException&)
+    catch(core::protocol::exceptions::InvalidMessageHeaderException&)
     {
-        LOG(ERROR) << "udp, invalid packet header detected!";
+        LOG(ERROR) << "udp, invalid message header detected!";
     }
-    catch(core::protocol::exceptions::InvalidPacketSizeException&)
+    catch(core::protocol::exceptions::InvalidMessageSizeException&)
     {
-        LOG(ERROR) << "udp, invalid packet size detected!";
+        LOG(ERROR) << "udp, invalid message size detected!";
     }
     catch(exceptions::InvalidProtocolIdException&)
     {
