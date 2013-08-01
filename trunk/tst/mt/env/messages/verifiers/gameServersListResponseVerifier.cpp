@@ -1,10 +1,10 @@
 #include <mt/env/messages/verifiers/gameServersListResponseVerifier.hpp>
-#include <mt/env/exceptions.hpp>
 #include <interface/gameServersListResponse.hpp>
 #include <interface/messageIds.hpp>
 #include <interface/protocolIds.hpp>
 #include <interface/messageTypes.hpp>
 #include <core/protocol/helpers.hpp>
+#include <core/protocol/exceptions.hpp>
 
 #include <gtest/gtest.h>
 
@@ -23,7 +23,7 @@ void GameServersListResponseVerifier::operator()(const core::network::Payload &p
 {
     if(payload.empty())
     {
-        throw mt::env::exceptions::EmptyPayloadException();
+        throw core::protocol::exceptions::EmptyPayloadException();
     }
 
     const interface::GameServersListResponse *message = reinterpret_cast<const interface::GameServersListResponse*>(&payload[0]);
