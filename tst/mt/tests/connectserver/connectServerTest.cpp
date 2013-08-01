@@ -2,9 +2,16 @@
 #include <gmock/gmock.h>
 #include <mt/env/asioStub/ioService.hpp>
 #include <mt/env/asioStub/exceptions.hpp>
+#include <mt/env/exceptions.hpp>
+#include <mt/env/messages/builders/gameServerLoadIndicationBuilder.hpp>
+#include <mt/env/messages/builders/gameServersListRequestBuilder.hpp>
+#include <mt/env/messages/verifiers/gameServersListResponseVerifier.hpp>
 #include <connectserver/server.hpp>
 
-namespace asioStub = eMU::mt::env::asioStub;
+namespace mtEnv = eMU::mt::env;
+namespace asioStub = mtEnv::asioStub;
+namespace builders = mtEnv::messages::builders;
+namespace verifiers = mtEnv::messages::verifiers;
 
 class ConnectServerTest: public ::testing::Test
 {
@@ -36,19 +43,19 @@ TEST_F(ConnectServerTest, test)
     eMU::connectserver::Server server(ioService_, configuration_);
     server.startup();
 
+    uint16_t firstServerCode = 0;
+    uint8_t firstServerLoad = 30;
+    ioService_.sendTo(builders::GameServerLoadIndicationBuilder()(firstServerCode, firstServerLoad));
+
+    uint16_t secondServerCode = 20;
+    uint8_t secondServerLoad = 5;
+    ioService_.sendTo(builders::GameServerLoadIndicationBuilder()(secondServerCode, secondServerLoad));
+
     size_t hash = ioService_.estabilishConnection();
+    ioService_.send(hash, builders::GameServersListRequestBuilder()());
 
-    eMU::core::network::Payload udpPayload = {0xC1, 0x07, 0xF4, 0x07, 0x00, 0x00, 0x30};
-    ioService_.sendTo(udpPayload);
-
-    udpPayload = {0xC1, 0x07, 0xF4, 0x07, 0x14, 0x00, 0x10};
-    ioService_.sendTo(udpPayload);
-
-    eMU::core::network::Payload payload = {0xC1, 0x04, 0xF4, 0x06};
-    ioService_.send(hash, payload);
-
-    eMU::core::network::Payload payload2 = ioService_.receive(hash);
-    ASSERT_TRUE(payload2.size() > 0);
+    verifiers::GameServersListResponseVerifier()(ioService_.receive(hash), {{firstServerCode, firstServerLoad, 0},
+                                                                            {secondServerCode, secondServerLoad, 0}});
 
     }
     catch(asioStub::exceptions::NullBufferException&)
@@ -66,5 +73,9 @@ TEST_F(ConnectServerTest, test)
     catch(asioStub::exceptions::NotCreatedUdpSocketException&)
     {
         ASSERT_TRUE(false) << "udp socket not created.";
+    }
+    catch(mtEnv::exceptions::EmptyPayloadException&)
+    {
+        ASSERT_TRUE(false) << "empty payload to verify!";
     }
 }
