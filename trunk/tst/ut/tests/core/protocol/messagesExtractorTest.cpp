@@ -22,12 +22,12 @@ TEST(MessagesExtractorTest, extract)
     protocol::MessagesExtractor extractor(payload);
     extractor.extract();
 
-    ASSERT_EQ(4, extractor.payloads().size());
+    ASSERT_EQ(4, extractor.messages().size());
 
-    EXPECT_EQ(payload1, extractor.payloads()[0]);
-    EXPECT_EQ(payload2, extractor.payloads()[1]);
-    EXPECT_EQ(payload3, extractor.payloads()[2]);
-    EXPECT_EQ(payload4, extractor.payloads()[3]);
+    EXPECT_EQ(payload1, extractor.messages()[0]);
+    EXPECT_EQ(payload2, extractor.messages()[1]);
+    EXPECT_EQ(payload3, extractor.messages()[2]);
+    EXPECT_EQ(payload4, extractor.messages()[3]);
 }
 
 TEST(MessagesExtractorTest, gotEmptyPayloadShouldThrowException)
@@ -117,6 +117,31 @@ TEST(MessagesExtractorTest, InvalidMessageHeaderShouldThrowException)
 
     }
     catch(protocol::exceptions::InvalidMessageHeaderException&)
+    {
+        exceptionThrown = true;
+    }
+
+    ASSERT_TRUE(exceptionThrown);
+}
+
+TEST(MessagesExtractorTest, WhenMessageSizeIsEqualToZeroShouldThrowException)
+{
+    network::Payload payload1 = {0xC1, 0x05, 0x01, 0x02, 0x03};
+    network::Payload payload2 = {0xC2, 0x00, 0x00, 0x04, 0x05, 0x06, 0x07, 0x08};
+
+    network::Payload payload;
+    payload.insert(payload.end(), payload1.begin(), payload1.end());
+    payload.insert(payload.end(), payload2.begin(), payload2.end());
+
+    bool exceptionThrown = false;
+
+    try
+    {
+        protocol::MessagesExtractor exctractor(payload);
+        exctractor.extract();
+
+    }
+    catch(protocol::exceptions::InvalidMessageSizeException&)
     {
         exceptionThrown = true;
     }

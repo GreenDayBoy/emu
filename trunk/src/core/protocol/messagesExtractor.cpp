@@ -23,28 +23,28 @@ void MessagesExtractor::extract()
 
     while(totalSize < payload_.size())
     {
-        network::Payload frame(payload_.begin() + totalSize, payload_.end());
+        network::Payload message(payload_.begin() + totalSize, payload_.end());
 
-        if(!hasValidHeader(frame))
+        if(!hasValidHeader(message))
         {
             throw exceptions::InvalidMessageHeaderException();
         }
 
-        size_t size = getSize(frame);
+        size_t messageSize = getSize(message);
 
-        if(frame.size() < size)
+        if(message.size() < messageSize || messageSize == 0)
         {
             throw exceptions::InvalidMessageSizeException();
         }
 
-        payloads_.push_back(network::Payload(frame.begin(), frame.begin() + size));
-        totalSize += size;
+        messages_.push_back(network::Payload(message.begin(), message.begin() + messageSize));
+        totalSize += messageSize;
     }
 }
 
-const MessagesExtractor::PayloadsContainer& MessagesExtractor::payloads() const
+const MessagesExtractor::MessagesContainer &MessagesExtractor::messages() const
 {
-    return payloads_;
+    return messages_;
 }
 
 }

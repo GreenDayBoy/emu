@@ -13,18 +13,18 @@ namespace protocol
 class MessagesExtractor
 {
 public:
-    typedef std::vector<network::Payload> PayloadsContainer;
+    typedef std::vector<network::Payload> MessagesContainer;
 
     MessagesExtractor(const network::Payload &payload);
 
     void extract();
-    const PayloadsContainer& payloads() const;
+    const MessagesContainer& messages() const;
 
 private:
     MessagesExtractor();
 
     const network::Payload &payload_;
-    PayloadsContainer payloads_;
+    MessagesContainer messages_;
 };
 
 }
