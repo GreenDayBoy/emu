@@ -1,5 +1,5 @@
 #include <core/protocol/helpers.hpp>
-#include <interface/header.hpp>
+#include <interface/messageTypes.hpp>
 #include <glog/logging.h>
 
 namespace eMU

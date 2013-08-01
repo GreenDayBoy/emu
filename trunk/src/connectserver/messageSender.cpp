@@ -1,6 +1,8 @@
 #include <connectserver/messageSender.hpp>
 #include <interface/gameServerAddressResponse.hpp>
-#include <interface/ids.hpp>
+#include <interface/messageIds.hpp>
+#include <interface/messageTypes.hpp>
+#include <interface/protocolIds.hpp>
 #include <interface/gameServersListResponse.hpp>
 #include <core/protocol/helpers.hpp>
 
@@ -16,7 +18,7 @@ MessageSender::~MessageSender() {}
 void MessageSender::sendGameServersListResponse(size_t hash, const GameServersList::GameServersListContainer &servers)
 {
     size_t serverDetailsListSize = servers.size() * sizeof(interface::GameServerInfo);
-    size_t maxServerDetailsListSize = interface::kMaxNumberOfGameServers * sizeof(interface::GameServerInfo);
+    size_t maxServerDetailsListSize = interface::constants::kMaxGameServersListLength * sizeof(interface::GameServerInfo);
     size_t messageSize = (sizeof(interface::GameServersListResponse) - maxServerDetailsListSize) + serverDetailsListSize;
 
     core::network::Payload payload; payload.resize(messageSize);

@@ -4,7 +4,8 @@
 #include <connectserver/transactions/gameServerAddressResponseTransaction.hpp>
 #include <connectserver/transactions/gameServerLoadIndicationTransaction.hpp>
 
-#include <interface/ids.hpp>
+#include <interface/protocolIds.hpp>
+#include <interface/messageIds.hpp>
 #include <interface/constants.hpp>
 #include <interface/gameServerAddressRequest.hpp>
 #include <interface/gameServerLoadIndication.hpp>

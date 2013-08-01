@@ -18,7 +18,7 @@ GameServersListResponseTransaction::GameServersListResponseTransaction(size_t ha
 
 bool GameServersListResponseTransaction::validate() const
 {
-    if(servers_.size() > interface::kMaxNumberOfGameServers)
+    if(servers_.size() > interface::constants::kMaxGameServersListLength)
     {
         LOG(ERROR) << "hash: " << hash_ << ", Validate transaction failed, #servers: " << servers_.size();
         return false;
