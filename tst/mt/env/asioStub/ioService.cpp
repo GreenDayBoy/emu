@@ -33,7 +33,7 @@ void io_service::queueAccept(ip::tcp::socket &socket, const AcceptHandler &handl
     acceptHandler_ = handler;
 }
 
-size_t io_service::estabilishConnection()
+size_t io_service::createConnection()
 {
     sockets_.push_back(incomingSocket_);
     acceptHandler_(boost::system::error_code());
@@ -111,6 +111,11 @@ core::network::Payload io_service::receiveFrom()
     }
 
     return udpSocket_->getPayload();
+}
+
+bool io_service::exists(size_t hash) const
+{
+    return const_cast<io_service*>(this)->find(hash) != sockets_.end();
 }
 
 }

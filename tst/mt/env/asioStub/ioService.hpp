@@ -49,7 +49,7 @@ public:
     void stop();
 
     void queueAccept(ip::tcp::socket &socket, const AcceptHandler &handler);
-    size_t estabilishConnection();
+    size_t createConnection();
 
     void send(size_t hash, const core::network::Payload &payload);
     core::network::Payload receive(size_t hash);
@@ -61,6 +61,8 @@ public:
 
     void sendTo(const core::network::Payload &payload);
     core::network::Payload receiveFrom();
+
+    bool exists(size_t hash) const;
 
 private:
     SocketsContainer::iterator find(size_t hash);
