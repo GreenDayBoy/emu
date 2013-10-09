@@ -1,13 +1,5 @@
 #pragma once
 
-#include <core/network/tcp/connectionsManager.hpp>
-#include <core/network/udp/connection.hpp>
-#include <core/common/usersFactory.hpp>
-#include <core/transactions/manager.hpp>
-#include <connectserver/user.hpp>
-#include <connectserver/gameServersList.hpp>
-#include <connectserver/messageSender.hpp>
-
 #ifdef eMU_UT
 #include <ut/env/asioStub/ioService.hpp>
 #elif eMU_MT
@@ -15,6 +7,15 @@
 #else
 #include <boost/asio.hpp>
 #endif
+
+#include <core/network/tcp/connectionsManager.hpp>
+#include <core/network/udp/connection.hpp>
+#include <core/network/server.hpp>
+#include <core/common/usersFactory.hpp>
+#include <core/transactions/manager.hpp>
+#include <connectserver/user.hpp>
+#include <connectserver/gameServersList.hpp>
+#include <connectserver/messageSender.hpp>
 
 namespace eMU
 {
@@ -29,12 +30,12 @@ namespace asio = eMU::mt::env::asioStub;
 namespace asio = boost::asio;
 #endif
 
-class Server: boost::noncopyable
+class Server: public core::network::Server<User>
 {
 public:
     struct Configuration
     {
-        int16_t port_;
+        uint16_t port_;
         size_t maxNumberOfUsers_;
         std::string gameServersListContent_;
     };
@@ -42,28 +43,23 @@ public:
     Server(asio::io_service &ioService, const Configuration &configuration);
     Server(core::network::tcp::ConnectionsManager::Pointer connectionsManager,
            core::common::UsersFactory<User>::Pointer usersFactory,
+           core::transactions::Manager::Pointer transactionsManager,
            core::network::udp::Connection::Pointer udpConnection,
            const Configuration &configuration);
 
     void startup();
     void cleanup();
-
-    size_t generateConnectionHash();
     void onAccept(size_t hash);
-    void onReceive(size_t hash, const eMU::core::network::Payload &payload);
     void onClose(size_t hash);
-    void onReceiveFrom(core::network::udp::Connection &connection);
 
 private:
     void handleMessage(size_t hash, const eMU::core::network::Payload &payload);
+    void onReceiveFrom(core::network::udp::Connection &connection);
 
-    core::network::tcp::ConnectionsManager::Pointer connectionsManager_;
-    core::common::UsersFactory<User>::Pointer usersFactory_;
     core::network::udp::Connection::Pointer udpConnection_;
-    core::transactions::Manager transactionsManager_;
-    std::string gameServersListContent_;
     GameServersList gameServersList_;
     MessageSender messageSender_;
+    std::string gameServersListContent_;
 };
 
 }

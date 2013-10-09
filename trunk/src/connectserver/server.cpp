@@ -17,6 +17,7 @@
 
 #include <glog/logging.h>
 #include <boost/lexical_cast.hpp>
+#include <fstream>
 
 namespace eMU
 {
@@ -26,24 +27,22 @@ namespace connectserver
 Server::Server(asio::io_service &ioService, const Configuration &configuration):
     Server(core::network::tcp::ConnectionsManager::Pointer(new core::network::tcp::ConnectionsManager(ioService, configuration.port_)),
            core::common::UsersFactory<User>::Pointer(new core::common::UsersFactory<User>(configuration.maxNumberOfUsers_)),
+           core::transactions::Manager::Pointer(new core::transactions::Manager()),
            core::network::udp::Connection::Pointer(new core::network::udp::Connection(ioService, configuration.port_)),
            configuration) {}
 
 Server::Server(core::network::tcp::ConnectionsManager::Pointer connectionsManager,
                core::common::UsersFactory<User>::Pointer usersFactory,
+               core::transactions::Manager::Pointer transactionsManager,
                core::network::udp::Connection::Pointer udpConnection,
                const Configuration &configuration):
-    connectionsManager_(connectionsManager),
-    usersFactory_(usersFactory),
+    core::network::Server<User>(connectionsManager,
+                                usersFactory,
+                                transactionsManager),
     udpConnection_(udpConnection),
-    gameServersListContent_(configuration.gameServersListContent_),
-    messageSender_(std::bind(&core::network::tcp::ConnectionsManager::send, connectionsManager_, std::placeholders::_1, std::placeholders::_2))
+    messageSender_(std::bind(&core::network::tcp::ConnectionsManager::send, connectionsManager_, std::placeholders::_1, std::placeholders::_2)),
+    gameServersListContent_(configuration.gameServersListContent_)
 {
-    connectionsManager_->setAcceptEventCallback(std::bind(&Server::onAccept, this, std::placeholders::_1));
-    connectionsManager_->setReceiveEventCallback(std::bind(&Server::onReceive, this, std::placeholders::_1, std::placeholders::_2));
-    connectionsManager_->setCloseEventCallback(std::bind(&Server::onClose, this, std::placeholders::_1));
-    connectionsManager_->setGenerateConnectionHashCallback(std::bind(&Server::generateConnectionHash, this));
-
     udpConnection_->setReceiveFromEventCallback(std::bind(&Server::onReceiveFrom, this, std::placeholders::_1));
 }
 
@@ -68,66 +67,9 @@ void Server::startup()
     }
 }
 
-size_t Server::generateConnectionHash()
-{
-    try
-    {
-        User &user = usersFactory_->create();
-
-        return user.hash();
-    }
-    catch(eMU::core::common::exceptions::MaxNumberOfUsersReachedException&)
-    {
-        LOG(WARNING) << "Max number of users reached.";
-        return 0;
-    }
-}
-
 void Server::onAccept(size_t hash)
 {
     LOG(INFO) << "hash: " << hash << ", user registered.";
-}
-
-void Server::onReceive(size_t hash, const eMU::core::network::Payload &payload)
-{
-    try
-    {
-        core::protocol::MessagesExtractor messagesExtractor(payload);
-        messagesExtractor.extract();
-
-        const core::protocol::MessagesExtractor::MessagesContainer &messages = messagesExtractor.messages();
-
-        for(const auto &message : messages)
-        {
-            handleMessage(hash, message);
-            transactionsManager_.dequeueAll();
-        }
-    }
-    catch(core::protocol::exceptions::EmptyPayloadException&)
-    {
-        LOG(ERROR) << "hash: " << hash << ", received empty payload!";
-        connectionsManager_->disconnect(hash);
-    }
-    catch(core::protocol::exceptions::InvalidMessageHeaderException&)
-    {
-        LOG(ERROR) << "hash: " << hash << ", invalid message header detected!";
-        connectionsManager_->disconnect(hash);
-    }
-    catch(core::protocol::exceptions::InvalidMessageSizeException&)
-    {
-        LOG(ERROR) << "hash: " << hash << ", invalid message size detected!";
-        connectionsManager_->disconnect(hash);
-    }
-    catch(exceptions::InvalidProtocolIdException&)
-    {
-        LOG(ERROR) << "hash: " << hash << ", invalid protocol id!";
-        connectionsManager_->disconnect(hash);
-    }
-    catch(exceptions::UnknownMessageException&)
-    {
-        LOG(ERROR) << "hash: " << hash << ", unknown message!";
-        connectionsManager_->disconnect(hash);
-    }
 }
 
 void Server::onClose(size_t hash)
@@ -151,7 +93,7 @@ void Server::onReceiveFrom(core::network::udp::Connection &connection)
         for(const auto &message : messages)
         {
             handleMessage(0, message);
-            transactionsManager_.dequeueAll();
+            transactionsManager_->dequeueAll();
         }
     }
     catch(core::protocol::exceptions::EmptyPayloadException&)
@@ -189,17 +131,17 @@ void Server::handleMessage(size_t hash, const core::network::Payload &payload)
 
     if(messageId == interface::MessageId::GAME_SERVERS_LIST_RESPONSE)
     {
-        transactionsManager_.queue(new transactions::GameServersListResponseTransaction(hash, gameServersList_.servers(), messageSender_));
+        transactionsManager_->queue(new transactions::GameServersListResponseTransaction(hash, gameServersList_.servers(), messageSender_));
     }
     else if(messageId == interface::MessageId::GAME_SERVER_ADDRESS_RESPONSE)
     {
         const interface::GameServerAddressRequest *message = reinterpret_cast<const interface::GameServerAddressRequest*>(&payload[0]);
-        transactionsManager_.queue(new transactions::GameServerAddressResponseTransaction(hash, messageSender_, gameServersList_, message->serverCode_));
+        transactionsManager_->queue(new transactions::GameServerAddressResponseTransaction(hash, messageSender_, gameServersList_, message->serverCode_));
     }
     else if(messageId == interface::MessageId::GAME_SERVER_LOAD_INDICATION)
     {
         const interface::GameServerLoadIndication *message = reinterpret_cast<const interface::GameServerLoadIndication*>(&payload[0]);
-        transactionsManager_.queue(new transactions::GameServerLoadIndicationTransaction(*message, gameServersList_));
+        transactionsManager_->queue(new transactions::GameServerLoadIndicationTransaction(*message, gameServersList_));
     }
     else
     {
@@ -216,6 +158,22 @@ void Server::cleanup()
 }
 
 #ifdef eMU_TARGET
+std::string getServersListContentFromFile(const std::string &fileName)
+{
+    std::ifstream file(fileName);
+
+    if(file.is_open())
+    {
+        std::stringstream content;
+        content << file.rdbuf();
+        file.close();
+
+        return content.str();
+    }
+
+    return "";
+}
+
 int main(int argsCount, char *args[])
 {
     if(argsCount < 4)
@@ -226,11 +184,12 @@ int main(int argsCount, char *args[])
 
     google::InitGoogleLogging(args[0]);
 
-//    size_t maxNumberOfUsers = boost::lexical_cast<size_t>(args[1]);
-//    uint16_t port = boost::lexical_cast<uint16_t>(args[2]);
-//    size_t maxNumberOfThreads = boost::lexical_cast<size_t>(args[3]);
+    eMU::connectserver::Server::Configuration configuration = {0};
+    configuration.port_ = boost::lexical_cast<uint16_t>(args[2]);
+    configuration.maxNumberOfUsers_ = boost::lexical_cast<size_t>(args[1]);
+    configuration.gameServersListContent_ = getServersListContentFromFile("data/serversList.xml");
 
-//    eMU::connectserver::Server::Configuration configuration = {port, maxNumberOfUsers, ""}
+//    size_t maxNumberOfThreads = boost::lexical_cast<size_t>(args[3]);
 
     return 0;
 }

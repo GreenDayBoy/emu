@@ -64,6 +64,8 @@ public:
 
     bool exists(size_t hash) const;
 
+    void disconnect(size_t hash);
+
 private:
     SocketsContainer::iterator find(size_t hash);
 

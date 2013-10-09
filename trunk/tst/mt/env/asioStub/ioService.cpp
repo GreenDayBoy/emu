@@ -118,6 +118,18 @@ bool io_service::exists(size_t hash) const
     return const_cast<io_service*>(this)->find(hash) != sockets_.end();
 }
 
+void io_service::disconnect(size_t hash)
+{
+    auto it = this->find(hash);
+
+    if(it == sockets_.end())
+    {
+        throw exceptions::UnknownSocketException();
+    }
+
+    (*it)->disconnect();
+}
+
 }
 }
 }
