@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <mt/env/testExceptionsCatch.hpp>
 #include <mt/env/asioStub/ioService.hpp>
 #include <mt/env/asioStub/exceptions.hpp>
 #include <mt/env/messages/builders/gameServerLoadIndicationBuilder.hpp>
@@ -37,7 +38,7 @@ public:
     eMU::connectserver::Server::Configuration configuration_;
 };
 
-TEST_F(ConnectServerTest, CheckGameServerLoadUpdate)
+TEST_F(ConnectServerTest, GameServerLoadUpdate_Check)
 {
     try
     {
@@ -59,30 +60,39 @@ TEST_F(ConnectServerTest, CheckGameServerLoadUpdate)
     verifiers::GameServersListResponseVerifier()(ioService_.receive(hash), {{firstServerCode, firstServerLoad, 0},
                                                                             {secondServerCode, secondServerLoad, 0}});
 
+    ioService_.disconnect(hash);
+
     }
-    catch(asioStub::exceptions::NullBufferException&)
-    {
-        ASSERT_TRUE(false) << "async operation was not queued.";
-    }
-    catch(asioStub::exceptions::TooBigPayloadException&)
-    {
-        ASSERT_TRUE(false) << "trying to insert too big payload to tested object.";
-    }
-    catch(asioStub::exceptions::UnknownSocketException&)
-    {
-        ASSERT_TRUE(false) << "socket does not exists.";
-    }
-    catch(asioStub::exceptions::NotCreatedUdpSocketException&)
-    {
-        ASSERT_TRUE(false) << "udp socket not created.";
-    }
-    catch(eMU::core::protocol::exceptions::EmptyPayloadException&)
-    {
-        ASSERT_TRUE(false) << "empty payload to verify!";
-    }
+    TEST_EXCEPTIONS_CATCH
 }
 
-TEST_F(ConnectServerTest, CheckGetGameServerAddress)
+TEST_F(ConnectServerTest, GameServerLoadUpdate_WhenServerCodeIsInvalidThenNothingShouldHappen)
+{
+    try
+    {
+
+    eMU::connectserver::Server server(ioService_, configuration_);
+    server.startup();
+
+    ioService_.sendTo(builders::GameServerLoadIndicationBuilder()(21, 55));
+
+    uint16_t secondServerCode = 20;
+    uint8_t secondServerLoad = 5;
+    ioService_.sendTo(builders::GameServerLoadIndicationBuilder()(secondServerCode, secondServerLoad));
+
+    size_t hash = ioService_.createConnection();
+    ioService_.send(hash, builders::GameServersListRequestBuilder()());
+
+    verifiers::GameServersListResponseVerifier()(ioService_.receive(hash), {{0, 0, 0},
+                                                                            {secondServerCode, secondServerLoad, 0}});
+
+    ioService_.disconnect(hash);
+
+    }
+    TEST_EXCEPTIONS_CATCH
+}
+
+TEST_F(ConnectServerTest, GetGameServerAddress_Check)
 {
     try
     {
@@ -98,25 +108,26 @@ TEST_F(ConnectServerTest, CheckGetGameServerAddress)
     ioService_.send(hash, builders::GameServerAddressRequestBuilder()(20));
     verifiers::GameServerAddressResponseVerifier()(ioService_.receive(hash), "127.0.0.1", 55902);
 
+    ioService_.disconnect(hash);
+
     }
-    catch(asioStub::exceptions::NullBufferException&)
+    TEST_EXCEPTIONS_CATCH
+}
+
+TEST_F(ConnectServerTest, GetGameServerAddress_WhenServerCodeIsInvalidThenNothingShouldHappen)
+{
+    try
     {
-        ASSERT_TRUE(false) << "async operation was not queued.";
+
+    eMU::connectserver::Server server(ioService_, configuration_);
+    server.startup();
+
+    size_t hash = ioService_.createConnection();
+
+    ioService_.send(hash, builders::GameServerAddressRequestBuilder()(23));
+
+    ioService_.disconnect(hash);
+
     }
-    catch(asioStub::exceptions::TooBigPayloadException&)
-    {
-        ASSERT_TRUE(false) << "trying to insert too big payload to tested object.";
-    }
-    catch(asioStub::exceptions::UnknownSocketException&)
-    {
-        ASSERT_TRUE(false) << "socket does not exists.";
-    }
-    catch(asioStub::exceptions::NotCreatedUdpSocketException&)
-    {
-        ASSERT_TRUE(false) << "udp socket not created.";
-    }
-    catch(eMU::core::protocol::exceptions::EmptyPayloadException&)
-    {
-        ASSERT_TRUE(false) << "empty payload to verify!";
-    }
+    TEST_EXCEPTIONS_CATCH
 }

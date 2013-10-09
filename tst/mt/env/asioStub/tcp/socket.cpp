@@ -50,6 +50,11 @@ boost::asio::ip::tcp::endpoint socket::remote_endpoint() const
     return boost::asio::ip::tcp::endpoint();
 }
 
+void socket::disconnect()
+{
+    receiveHandler_(boost::asio::error::eof, 0);
+}
+
 }
 }
 }
