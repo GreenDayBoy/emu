@@ -14,6 +14,7 @@
 #include <core/protocol/exceptions.hpp>
 #include <core/protocol/helpers.hpp>
 #include <core/common/exceptions.hpp>
+#include <core/common/serviceThreading.hpp>
 
 #include <glog/logging.h>
 #include <boost/lexical_cast.hpp>
@@ -185,11 +186,16 @@ int main(int argsCount, char *args[])
     google::InitGoogleLogging(args[0]);
 
     eMU::connectserver::Server::Configuration configuration = {0};
-    configuration.port_ = boost::lexical_cast<uint16_t>(args[2]);
     configuration.maxNumberOfUsers_ = boost::lexical_cast<size_t>(args[1]);
-    configuration.gameServersListContent_ = getServersListContentFromFile("data/serversList.xml");
+    configuration.port_ = boost::lexical_cast<uint16_t>(args[2]);
+    configuration.gameServersListContent_ = getServersListContentFromFile("data/gameServersList.xml");
 
-//    size_t maxNumberOfThreads = boost::lexical_cast<size_t>(args[3]);
+    size_t maxNumberOfThreads = boost::lexical_cast<size_t>(args[3]);
+
+    boost::asio::io_service service;
+    eMU::connectserver::Server server(service, configuration);
+    eMU::core::common::ServiceThreading<eMU::connectserver::User> serviceThreading(maxNumberOfThreads, service, server);
+    serviceThreading.start();
 
     return 0;
 }
