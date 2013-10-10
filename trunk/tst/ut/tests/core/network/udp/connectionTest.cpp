@@ -62,7 +62,7 @@ public:
         return memcmp(&payload[0], sourceBuffer, payload.size()) == 0;
     }
 
-    int16_t port_;
+    uint16_t port_;
     network::udp::Connection::SocketPointer socket_;
     network::udp::Connection connection_;
     asioStub::io_service ioService_;
