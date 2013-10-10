@@ -35,14 +35,19 @@ public:
         signalSet_.add(SIGINT);
         signalSet_.async_wait(std::bind(&ServiceThreading::stopHandler, this));
 
-        server_.startup();
-
-        for(size_t i = 0; i < maxNumberOfThreads_; ++i)
+        if(server_.startup())
         {
-            threads_.create_thread(std::bind(static_cast<size_t (boost::asio::io_service::*)()>(&boost::asio::io_service::run), &ioService_));
-        }
+            for(size_t i = 0; i < maxNumberOfThreads_; ++i)
+            {
+                threads_.create_thread(std::bind(static_cast<size_t (boost::asio::io_service::*)()>(&boost::asio::io_service::run), &ioService_));
+            }
 
-        threads_.join_all();
+            threads_.join_all();
+        }
+        else
+        {
+            LOG(ERROR) << "Startup server failed.";
+        }
     }
 
     void stopHandler()

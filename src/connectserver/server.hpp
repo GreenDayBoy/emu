@@ -47,14 +47,14 @@ public:
            core::network::udp::Connection::Pointer udpConnection,
            const Configuration &configuration);
 
-    void startup();
+    bool startup();
     void cleanup();
     void onAccept(size_t hash);
     void onClose(size_t hash);
+    void onReceiveFrom(core::network::udp::Connection &connection);
 
 private:
     void handleMessage(size_t hash, const eMU::core::network::Payload &payload);
-    void onReceiveFrom(core::network::udp::Connection &connection);
 
     core::network::udp::Connection::Pointer udpConnection_;
     GameServersList gameServersList_;

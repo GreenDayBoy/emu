@@ -79,7 +79,7 @@ public:
     }
 
     asioStub::io_service ioService_;
-    int16_t port_;
+    uint16_t port_;
     network::tcp::ConnectionsManager::AcceptorPointer acceptor_;
     std::shared_ptr<tcpEnv::ConnectionsFactoryMock> connectionsFactory_;
 

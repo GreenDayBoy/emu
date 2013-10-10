@@ -47,8 +47,10 @@ Server::Server(core::network::tcp::ConnectionsManager::Pointer connectionsManage
     udpConnection_->setReceiveFromEventCallback(std::bind(&Server::onReceiveFrom, this, std::placeholders::_1));
 }
 
-void Server::startup()
+bool Server::startup()
 {
+    bool succeed = false;
+
     try
     {
         core::common::XmlReader xmlReader;
@@ -57,6 +59,7 @@ void Server::startup()
         gameServersList_.initialize(xmlReader);
         connectionsManager_->queueAccept();
         udpConnection_->queueReceiveFrom();
+        succeed = true;
     }
     catch(core::common::exceptions::EmptyXmlContentException&)
     {
@@ -66,6 +69,8 @@ void Server::startup()
     {
         LOG(ERROR) << "Got corrupted xml servers list file!";
     }
+
+    return succeed;
 }
 
 void Server::onAccept(size_t hash)
