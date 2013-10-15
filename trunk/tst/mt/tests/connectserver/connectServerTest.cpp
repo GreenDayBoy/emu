@@ -66,7 +66,7 @@ TEST_F(ConnectServerTest, GameServerLoadUpdate_Check)
     TEST_EXCEPTIONS_CATCH
 }
 
-TEST_F(ConnectServerTest, GameServerLoadUpdate_WhenServerCodeIsInvalidThenNothingShouldHappen)
+TEST_F(ConnectServerTest, GameServerLoadUpdate_WhenServerCodeIsInvalidThenConnections)
 {
     try
     {
@@ -114,7 +114,7 @@ TEST_F(ConnectServerTest, GetGameServerAddress_Check)
     TEST_EXCEPTIONS_CATCH
 }
 
-TEST_F(ConnectServerTest, GetGameServerAddress_WhenServerCodeIsInvalidThenNothingShouldHappen)
+TEST_F(ConnectServerTest, GetGameServerAddress_WhenServerCodeIsInvalidThenConnectionShouldBeClosed)
 {
     try
     {
@@ -126,7 +126,7 @@ TEST_F(ConnectServerTest, GetGameServerAddress_WhenServerCodeIsInvalidThenNothin
 
     ioService_.send(hash, builders::GameServerAddressRequestBuilder()(23));
 
-    ioService_.disconnect(hash);
+    ASSERT_FALSE(ioService_.exists(hash));
 
     }
     TEST_EXCEPTIONS_CATCH
