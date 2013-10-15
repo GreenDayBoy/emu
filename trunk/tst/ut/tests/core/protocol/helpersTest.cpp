@@ -6,7 +6,7 @@
 namespace network = eMU::core::network;
 namespace protocol = eMU::core::protocol;
 
-TEST(HelperTest, byteSwap)
+TEST(HelpersTest, byteSwap)
 {
     EXPECT_EQ(0xFFFF, protocol::byteSwap(0xFFFF));
     EXPECT_EQ(0x30FF, protocol::byteSwap(0xFF30));
@@ -15,36 +15,36 @@ TEST(HelperTest, byteSwap)
     EXPECT_EQ(0x0000, protocol::byteSwap(0x0000));
 }
 
-TEST(HelperTest, getersForSmallMessage)
+TEST(HelpersTest, getersForSmallMessage)
 {
     network::Payload payload = {0xC1, 0x30, 0xF4};
     EXPECT_EQ(payload[2], protocol::getProtocolId(payload));
-    EXPECT_EQ(payload[1], protocol::getSize(payload));
+    EXPECT_EQ(payload[1], protocol::getMessageSize(payload));
 
     payload[0] = 0xC3;
     EXPECT_EQ(payload[2], protocol::getProtocolId(payload));
-    EXPECT_EQ(payload[1], protocol::getSize(payload));
+    EXPECT_EQ(payload[1], protocol::getMessageSize(payload));
 }
 
-TEST(HelperTest, getersForLargeMessage)
+TEST(HelpersTest, getersForLargeMessage)
 {
     network::Payload payload = {0xC2, 0x30, 0xFF, 0xF4};
     EXPECT_EQ(payload[3], protocol::getProtocolId(payload));
-    EXPECT_EQ(0xFF30, protocol::getSize(payload));
+    EXPECT_EQ(0xFF30, protocol::getMessageSize(payload));
 
     payload[0] = 0xC4;
     EXPECT_EQ(payload[3], protocol::getProtocolId(payload));
-    EXPECT_EQ(0xFF30, protocol::getSize(payload));
+    EXPECT_EQ(0xFF30, protocol::getMessageSize(payload));
 }
 
-TEST(HelperTest, getersForInvalidMessage)
+TEST(HelpersTest, getersForInvalidMessage)
 {
     network::Payload payload = {0xFF, 0x30, 0xFF, 0xF4};
     EXPECT_EQ(0, protocol::getProtocolId(payload));
-    EXPECT_EQ(0, protocol::getSize(payload));
+    EXPECT_EQ(0, protocol::getMessageSize(payload));
 }
 
-TEST(HelperTest, isCrypted)
+TEST(HelpersTest, isCrypted)
 {
     network::Payload payload = {0xC3, 0x04, 0x00, 0x00};
     EXPECT_TRUE(protocol::isCrypted(payload));
@@ -59,7 +59,7 @@ TEST(HelperTest, isCrypted)
     EXPECT_FALSE(protocol::isCrypted(payload));
 }
 
-TEST(HelperTest, isValid)
+TEST(HelpersTest, isValid)
 {
     network::Payload payload = {0xC1, 0x04, 0x00, 0x00};
     EXPECT_TRUE(protocol::hasValidHeader(payload));

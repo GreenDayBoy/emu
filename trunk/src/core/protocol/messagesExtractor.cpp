@@ -30,7 +30,7 @@ void MessagesExtractor::extract()
             throw exceptions::InvalidMessageHeaderException();
         }
 
-        size_t messageSize = getSize(message);
+        size_t messageSize = getMessageSize(message);
 
         if(message.size() < messageSize || messageSize == 0)
         {
