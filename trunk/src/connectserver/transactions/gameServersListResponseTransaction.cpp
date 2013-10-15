@@ -16,7 +16,7 @@ GameServersListResponseTransaction::GameServersListResponseTransaction(size_t ha
     servers_(servers),
     messageSender_(messageSender) {}
 
-bool GameServersListResponseTransaction::validate() const
+bool GameServersListResponseTransaction::isValid() const
 {
     if(servers_.size() > interface::constants::kMaxGameServersListLength)
     {
@@ -27,7 +27,7 @@ bool GameServersListResponseTransaction::validate() const
     return true;
 }
 
-void GameServersListResponseTransaction::handleSelf()
+void GameServersListResponseTransaction::handle()
 {
     messageSender_.sendGameServersListResponse(hash_, servers_);
 }

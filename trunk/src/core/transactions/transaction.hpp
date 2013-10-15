@@ -10,12 +10,10 @@ namespace transactions
 class Transaction
 {
 public:
-    void handle();
     virtual ~Transaction();
 
-protected:
-    virtual bool validate() const;
-    virtual void handleSelf() = 0;
+    virtual void handle() = 0;
+    virtual bool isValid() const = 0;
 };
 
 }

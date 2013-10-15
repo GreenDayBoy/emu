@@ -17,7 +17,8 @@ namespace transactions
 class TransactionMock: public eMU::core::transactions::Transaction
 {
 public:
-    MOCK_METHOD0(handleSelf, void());
+    MOCK_CONST_METHOD0(isValid, bool());
+    MOCK_METHOD0(handle, void());
 };
 
 }

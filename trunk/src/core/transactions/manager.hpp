@@ -17,7 +17,7 @@ public:
     typedef std::shared_ptr<Manager> Pointer;
 
     void queue(Transaction *transaction);
-    void dequeueAll();
+    bool dequeueAll();
 
 private:
     std::queue<Transaction*> transactions_;

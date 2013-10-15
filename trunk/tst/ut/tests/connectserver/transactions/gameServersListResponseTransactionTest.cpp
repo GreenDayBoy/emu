@@ -64,9 +64,20 @@ TEST_F(GameServersListResponseTransactionTest, handle)
     }
 }
 
-TEST_F(GameServersListResponseTransactionTest, WhenServersListIsToBigThenTransactionShouldNotBeHandled)
+TEST_F(GameServersListResponseTransactionTest, isValidShouldReturnTrueWhenServersListHasCorrectSize)
+{
+    sampleServers_.resize(eMU::interface::constants::kMaxGameServersListLength);
+
+    eMU::connectserver::transactions::GameServersListResponseTransaction transaction(hash_, sampleServers_, messageSender_);
+
+    ASSERT_TRUE(transaction.isValid());
+}
+
+TEST_F(GameServersListResponseTransactionTest, isValidShouldReturnFalseWhenServersListIsToBig)
 {
     sampleServers_.resize(eMU::interface::constants::kMaxGameServersListLength + 1);
+
     eMU::connectserver::transactions::GameServersListResponseTransaction transaction(hash_, sampleServers_, messageSender_);
-    transaction.handle();
+
+    ASSERT_FALSE(transaction.isValid());
 }
