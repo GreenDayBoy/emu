@@ -16,10 +16,10 @@ class GameServersListResponseTransaction: public eMU::core::transactions::Transa
 public:
     GameServersListResponseTransaction(size_t hash, const GameServersList::GameServersListContainer &servers, MessageSender &messageSender);
 
-private:
-    bool validate() const;
-    void handleSelf();
+    bool isValid() const;
+    void handle();
 
+private:
     size_t hash_;
     const GameServersList::GameServersListContainer &servers_;
     MessageSender &messageSender_;

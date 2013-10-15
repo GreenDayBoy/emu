@@ -17,7 +17,7 @@ GameServerAddressResponseTransaction::GameServerAddressResponseTransaction(size_
     gameServersList_(gameServersList),
     code_(code) {}
 
-bool GameServerAddressResponseTransaction::validate() const
+bool GameServerAddressResponseTransaction::isValid() const
 {
     if(!gameServersList_.hasGameServer(code_))
     {
@@ -28,7 +28,7 @@ bool GameServerAddressResponseTransaction::validate() const
     return true;
 }
 
-void GameServerAddressResponseTransaction::handleSelf()
+void GameServerAddressResponseTransaction::handle()
 {
     const GameServersList::GameServerInfo &serverInfo = gameServersList_.getGameServerInfo(code_);
 

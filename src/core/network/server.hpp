@@ -54,6 +54,7 @@ public:
     virtual bool startup() = 0;
     virtual void cleanup() = 0;
     virtual void onAccept(size_t hash) = 0;
+
     void onReceive(size_t hash, const eMU::core::network::Payload &payload)
     {
         try
@@ -66,7 +67,12 @@ public:
             for(const auto &message : messages)
             {
                 this->handleMessage(hash, message);
-                transactionsManager_->dequeueAll();
+
+                if(!transactionsManager_->dequeueAll())
+                {
+                    LOG(ERROR) << "hash: " << hash << ", some transactions were invalid. Disconnected.";
+                    connectionsManager_->disconnect(hash);
+                }
             }
         }
         catch(core::protocol::exceptions::EmptyPayloadException&)

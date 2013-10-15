@@ -12,19 +12,6 @@ Transaction::~Transaction()
 
 }
 
-void Transaction::handle()
-{
-    if(validate())
-    {
-        this->handleSelf();
-    }
-}
-
-bool Transaction::validate() const
-{
-    return true;
-}
-
 }
 }
 }

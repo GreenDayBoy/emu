@@ -21,22 +21,29 @@ protected:
     eMU::interface::GameServerLoadIndication message_;
 };
 
-TEST_F(GameServerLoadIndicationTransactionTest, whenServerCodeExistsThenShouldBeHandled)
+TEST_F(GameServerLoadIndicationTransactionTest, handle)
 {
-    eMU::connectserver::transactions::GameServerLoadIndicationTransaction transaction(message_, gameServersList_);
-
-    EXPECT_CALL(gameServersList_, hasGameServer(message_.serverCode_)).WillOnce(Return(true));
     EXPECT_CALL(gameServersList_, updateGameServerLoad(message_.serverCode_, message_.load_));
+
+    eMU::connectserver::transactions::GameServerLoadIndicationTransaction transaction(message_, gameServersList_);
 
     transaction.handle();
 }
 
-TEST_F(GameServerLoadIndicationTransactionTest, whenServerCodeExistsThenShouldBeNotHandled)
+TEST_F(GameServerLoadIndicationTransactionTest, isValidShouldReturnTrueWhenServerCodeExists)
 {
+    EXPECT_CALL(gameServersList_, hasGameServer(message_.serverCode_)).WillOnce(Return(true));
+
     eMU::connectserver::transactions::GameServerLoadIndicationTransaction transaction(message_, gameServersList_);
 
-    EXPECT_CALL(gameServersList_, hasGameServer(message_.serverCode_)).WillOnce(Return(false));
-    EXPECT_CALL(gameServersList_, updateGameServerLoad(_, _)).Times(0);
+    ASSERT_TRUE(transaction.isValid());
+}
 
-    transaction.handle();
+TEST_F(GameServerLoadIndicationTransactionTest, isValidShouldReturnFalseWhenServerCodeDoesNotExist)
+{
+    EXPECT_CALL(gameServersList_, hasGameServer(message_.serverCode_)).WillOnce(Return(false));
+
+    eMU::connectserver::transactions::GameServerLoadIndicationTransaction transaction(message_, gameServersList_);
+
+    ASSERT_FALSE(transaction.isValid());
 }

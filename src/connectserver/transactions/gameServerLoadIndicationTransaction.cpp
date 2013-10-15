@@ -12,7 +12,7 @@ GameServerLoadIndicationTransaction::GameServerLoadIndicationTransaction(const i
     message_(message),
     gameServersList_(gameServersList) {}
 
-bool GameServerLoadIndicationTransaction::validate() const
+bool GameServerLoadIndicationTransaction::isValid() const
 {
     if(!gameServersList_.hasGameServer(message_.serverCode_))
     {
@@ -23,7 +23,7 @@ bool GameServerLoadIndicationTransaction::validate() const
     return true;
 }
 
-void GameServerLoadIndicationTransaction::handleSelf()
+void GameServerLoadIndicationTransaction::handle()
 {
     gameServersList_.updateGameServerLoad(message_.serverCode_, message_.load_);
 }

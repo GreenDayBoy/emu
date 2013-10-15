@@ -15,10 +15,10 @@ class GameServerLoadIndicationTransaction: public eMU::core::transactions::Trans
 public:
     GameServerLoadIndicationTransaction(const interface::GameServerLoadIndication &message, GameServersList &gameServersList);
 
-private:
-    bool validate() const;
-    void handleSelf();
+    bool isValid() const;
+    void handle();
 
+private:
     interface::GameServerLoadIndication message_;
     GameServersList &gameServersList_;
 };

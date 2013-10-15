@@ -19,10 +19,10 @@ public:
                                          const GameServersList &gameServersList,
                                          uint16_t code);
 
-private:
-    bool validate() const;
-    void handleSelf();
+    bool isValid() const;
+    void handle();
 
+private:
     size_t hash_;
     MessageSender &messageSender_;
     const GameServersList &gameServersList_;

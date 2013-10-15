@@ -20,22 +20,32 @@ protected:
     connectserverEnv::GameServersListMock gameServersList_;
 };
 
-TEST_F(GameServerAddressResponseTransactionTest, whenServerCodeExistsThenShouldBeHandled)
+TEST_F(GameServerAddressResponseTransactionTest, handle)
 {
     eMU::connectserver::GameServersList::GameServerInfo serverInfo = {code_, "Test", "test.test", 44405, 0};
 
-    EXPECT_CALL(gameServersList_, hasGameServer(code_)).WillOnce(Return(true));
     EXPECT_CALL(gameServersList_, getGameServerInfo(code_)).WillOnce(ReturnRef(serverInfo));
     EXPECT_CALL(messageSender_, sendGameServerAddressResponse(hash_, serverInfo.address_, serverInfo.port_));
 
     eMU::connectserver::transactions::GameServerAddressResponseTransaction transaction(hash_, messageSender_, gameServersList_, code_);
+
     transaction.handle();
 }
 
-TEST_F(GameServerAddressResponseTransactionTest, whenServerCodeExistsThenShouldBeNotHandled)
+TEST_F(GameServerAddressResponseTransactionTest, isValidShouldReturnTrueWhenServerCodeExists)
+{
+    EXPECT_CALL(gameServersList_, hasGameServer(code_)).WillOnce(Return(true));
+
+    eMU::connectserver::transactions::GameServerAddressResponseTransaction transaction(hash_, messageSender_, gameServersList_, code_);
+
+    ASSERT_TRUE(transaction.isValid());
+}
+
+TEST_F(GameServerAddressResponseTransactionTest, isValidShouldReturnFalseWhenServerCodeDoesNotExist)
 {
     EXPECT_CALL(gameServersList_, hasGameServer(code_)).WillOnce(Return(false));
 
     eMU::connectserver::transactions::GameServerAddressResponseTransaction transaction(hash_, messageSender_, gameServersList_, code_);
-    transaction.handle();
+
+    ASSERT_FALSE(transaction.isValid());
 }
