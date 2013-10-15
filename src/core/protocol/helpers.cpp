@@ -33,7 +33,7 @@ uint8_t getProtocolId(const eMU::core::network::Payload &payload)
     return 0;
 }
 
-size_t getSize(const eMU::core::network::Payload &payload)
+size_t getMessageSize(const eMU::core::network::Payload &payload)
 {
     if(payload[0] == interface::MessageType::SMALL_CRYPTED ||
        payload[0] == interface::MessageType::SMALL_DECRYPTED)
