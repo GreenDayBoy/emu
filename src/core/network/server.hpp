@@ -15,7 +15,6 @@
 #include <core/transactions/manager.hpp>
 #include <core/network/tcp/connectionsManager.hpp>
 #include <core/protocol/messagesExtractor.hpp>
-#include <core/protocol/exceptions.hpp>
 
 namespace eMU
 {
@@ -75,17 +74,17 @@ public:
                 }
             }
         }
-        catch(core::protocol::exceptions::EmptyPayloadException&)
+        catch(core::protocol::MessagesExtractor::EmptyPayloadException&)
         {
             LOG(ERROR) << "hash: " << hash << ", received empty payload!";
             connectionsManager_->disconnect(hash);
         }
-        catch(core::protocol::exceptions::InvalidMessageHeaderException&)
+        catch(core::protocol::MessagesExtractor::InvalidMessageHeaderException&)
         {
             LOG(ERROR) << "hash: " << hash << ", invalid message header detected!";
             connectionsManager_->disconnect(hash);
         }
-        catch(core::protocol::exceptions::InvalidMessageSizeException&)
+        catch(core::protocol::MessagesExtractor::InvalidMessageSizeException&)
         {
             LOG(ERROR) << "hash: " << hash << ", invalid message size detected!";
             connectionsManager_->disconnect(hash);
@@ -103,7 +102,7 @@ protected:
 
             return user.hash();
         }
-        catch(eMU::core::common::exceptions::MaxNumberOfUsersReachedException&)
+        catch(typename core::common::UsersFactory<User>::MaxNumberOfUsersReachedException&)
         {
             LOG(WARNING) << "Max number of users reached.";
             return 0;

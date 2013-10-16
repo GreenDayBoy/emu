@@ -1,5 +1,4 @@
 #include <core/network/tcp/connectionsFactory.hpp>
-#include <core/network/tcp/exceptions.hpp>
 
 namespace eMU
 {
@@ -19,7 +18,7 @@ Connection& ConnectionsFactory::create(size_t hash, Connection::SocketPointer so
 {
     if(connections_.count(hash) > 0)
     {
-        throw exceptions::AlreadyExistingConnectionException();
+        throw AlreadyExistingConnectionException();
     }
 
     Connection::Pointer connection(new Connection(socket));
@@ -32,7 +31,7 @@ void ConnectionsFactory::destroy(size_t hash)
 {
     if(connections_.count(hash) == 0)
     {
-        throw exceptions::UnknownConnectionException();
+        throw UnknownConnectionException();
     }
 
     connections_[hash].reset();
@@ -43,7 +42,7 @@ Connection& ConnectionsFactory::get(size_t hash)
 {
     if(connections_.count(hash) == 0)
     {
-        throw exceptions::UnknownConnectionException();
+        throw UnknownConnectionException();
     }
 
     return *connections_[hash];
@@ -59,7 +58,7 @@ size_t ConnectionsFactory::getHash(Connection &connection) const
         }
     }
 
-    throw exceptions::UnknownConnectionException();
+    throw UnknownConnectionException();
 }
 
 }

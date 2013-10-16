@@ -1,6 +1,5 @@
 #include <glog/logging.h>
 #include <core/network/tcp/connectionsManager.hpp>
-#include <core/network/tcp/exceptions.hpp>
 
 namespace eMU
 {
@@ -70,7 +69,7 @@ void ConnectionsManager::registerConnection(Connection::SocketPointer socket)
 
         acceptEventCallback_(hash);
     }
-    catch(exceptions::AlreadyExistingConnectionException &exception)
+    catch(ConnectionsFactory::AlreadyExistingConnectionException &exception)
     {
         LOG(ERROR) << "hash: " << hash << ", connection already exists!";
     }
@@ -98,7 +97,7 @@ void ConnectionsManager::send(size_t hash, const Payload &payload)
         Connection &connection = connectionsFactory_->get(hash);
         connection.send(payload);
     }
-    catch(exceptions::UnknownConnectionException &exception)
+    catch(ConnectionsFactory::UnknownConnectionException &exception)
     {
         LOG(ERROR) << "hash: " << hash << ", connection does not exist!";
     }
@@ -113,7 +112,7 @@ void ConnectionsManager::receiveEvent(Connection &connection)
         Payload payload(connection.readBuffer().payload_.begin(), connection.readBuffer().payload_.begin() + connection.readBuffer().payloadSize_);
         receiveEventCallback_(hash, payload);
     }
-    catch(exceptions::UnknownConnectionException &exception)
+    catch(ConnectionsFactory::UnknownConnectionException &exception)
     {
         LOG(ERROR) << "connection does not exist!";
     }
@@ -129,7 +128,7 @@ void ConnectionsManager::closeEvent(Connection &connection)
         connection.close();
         connectionsFactory_->destroy(hash);
     }
-    catch(exceptions::UnknownConnectionException &exception)
+    catch(ConnectionsFactory::UnknownConnectionException &exception)
     {
         LOG(ERROR) << "connection does not exist!";
     }
@@ -142,7 +141,7 @@ void ConnectionsManager::disconnect(size_t hash)
         Connection &connection = connectionsFactory_->get(hash);
         connection.disconnect();
     }
-    catch(exceptions::UnknownConnectionException &exception)
+    catch(ConnectionsFactory::UnknownConnectionException &exception)
     {
         LOG(ERROR) << "hash: " << hash << ", connection does not exist!";
     }

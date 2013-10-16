@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <core/network/buffer.hpp>
+#include <core/common/exception.hpp>
 
 namespace eMU
 {
@@ -14,6 +15,10 @@ class MessagesExtractor
 {
 public:
     typedef std::vector<network::Payload> MessagesContainer;
+
+    class EmptyPayloadException: public common::Exception {};
+    class InvalidMessageSizeException: public common::Exception {};
+    class InvalidMessageHeaderException: public common::Exception {};
 
     MessagesExtractor(const network::Payload &payload);
 
