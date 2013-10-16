@@ -4,6 +4,8 @@
 #include <boost/lexical_cast.hpp>
 #include <rapidxml.hpp>
 
+#include <core/common/exception.hpp>
+
 namespace eMU
 {
 namespace core
@@ -14,6 +16,9 @@ namespace common
 class XmlReader
 {
 public:
+    class EmptyXmlContentException: public Exception {};
+    class NotMatchedXmlNodeException: public Exception {};
+
     XmlReader();
 
     void parse(std::string content, std::string firstNodeName);

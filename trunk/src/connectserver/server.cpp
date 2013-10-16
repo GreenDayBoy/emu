@@ -1,5 +1,4 @@
 #include <connectserver/server.hpp>
-#include <connectserver/exceptions.hpp>
 #include <connectserver/transactions/gameServersListResponseTransaction.hpp>
 #include <connectserver/transactions/gameServerAddressResponseTransaction.hpp>
 #include <connectserver/transactions/gameServerLoadIndicationTransaction.hpp>
@@ -11,9 +10,7 @@
 #include <interface/gameServerLoadIndication.hpp>
 
 #include <core/protocol/messagesExtractor.hpp>
-#include <core/protocol/exceptions.hpp>
 #include <core/protocol/helpers.hpp>
-#include <core/common/exceptions.hpp>
 #include <core/common/serviceThreading.hpp>
 
 #include <glog/logging.h>
@@ -61,11 +58,11 @@ bool Server::startup()
         udpConnection_->queueReceiveFrom();
         succeed = true;
     }
-    catch(core::common::exceptions::EmptyXmlContentException&)
+    catch(core::common::XmlReader::EmptyXmlContentException&)
     {
         LOG(ERROR) << "Got empty xml servers list file!";
     }
-    catch(core::common::exceptions::NotMatchedXmlNodeException&)
+    catch(core::common::XmlReader::NotMatchedXmlNodeException&)
     {
         LOG(ERROR) << "Got corrupted xml servers list file!";
     }
@@ -102,23 +99,23 @@ void Server::onReceiveFrom(core::network::udp::Connection &connection)
             transactionsManager_->dequeueAll();
         }
     }
-    catch(core::protocol::exceptions::EmptyPayloadException&)
+    catch(core::protocol::MessagesExtractor::EmptyPayloadException&)
     {
         LOG(ERROR) << "udp, received empty payload!";
     }
-    catch(core::protocol::exceptions::InvalidMessageHeaderException&)
+    catch(core::protocol::MessagesExtractor::InvalidMessageHeaderException&)
     {
         LOG(ERROR) << "udp, invalid message header detected!";
     }
-    catch(core::protocol::exceptions::InvalidMessageSizeException&)
+    catch(core::protocol::MessagesExtractor::InvalidMessageSizeException&)
     {
         LOG(ERROR) << "udp, invalid message size detected!";
     }
-    catch(exceptions::InvalidProtocolIdException&)
+    catch(InvalidProtocolIdException&)
     {
         LOG(ERROR) << "udp, invalid protocol id!";
     }
-    catch(exceptions::UnknownMessageException&)
+    catch(UnknownMessageException&)
     {
         LOG(ERROR) << "udp, unknown message!";
     }
@@ -130,7 +127,7 @@ void Server::handleMessage(size_t hash, const core::network::Payload &payload)
 
     if(protocolId != interface::ProtocolId::CONNECT_SERVER_PROTOCOL)
     {
-        throw exceptions::InvalidProtocolIdException();
+        throw InvalidProtocolIdException();
     }
 
     uint8_t messageId = payload[3];
@@ -151,7 +148,7 @@ void Server::handleMessage(size_t hash, const core::network::Payload &payload)
     }
     else
     {
-        throw exceptions::UnknownMessageException();
+        throw UnknownMessageException();
     }
 }
 

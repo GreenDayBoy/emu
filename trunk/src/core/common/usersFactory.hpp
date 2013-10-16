@@ -3,7 +3,8 @@
 #include <vector>
 #include <algorithm>
 #include <memory>
-#include <core/common/exceptions.hpp>
+
+#include <core/common/exception.hpp>
 
 namespace eMU
 {
@@ -19,6 +20,9 @@ public:
     typedef std::vector<User*> UsersContainer;
     typedef std::shared_ptr<UsersFactory<User> > Pointer;
 
+    class MaxNumberOfUsersReachedException: public Exception {};
+    class UnknownUserException: public Exception {};
+
     UsersFactory(size_t maxNumberOfUsers):
         maxNumberOfUsers_(maxNumberOfUsers) {}
 
@@ -26,7 +30,7 @@ public:
     {
         if(users_.size() >= maxNumberOfUsers_)
         {
-            throw exceptions::MaxNumberOfUsersReachedException();
+            throw MaxNumberOfUsersReachedException();
         }
 
         User *user = new User();
@@ -63,7 +67,7 @@ public:
 
         if(it == users_.end())
         {
-            throw exceptions::UnknownUserException();
+            throw UnknownUserException();
         }
 
         return *(*it);

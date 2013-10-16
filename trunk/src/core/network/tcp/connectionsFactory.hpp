@@ -3,6 +3,7 @@
 #include <boost/noncopyable.hpp>
 #include <core/network/tcp/connection.hpp>
 #include <common/mockable.hpp>
+#include <core/common/exception.hpp>
 
 namespace eMU
 {
@@ -18,6 +19,9 @@ class ConnectionsFactory: boost::noncopyable
 public:
     typedef std::shared_ptr<ConnectionsFactory> Pointer;
     typedef std::map<size_t, Connection::Pointer> ConnectionsContainer;
+
+    class UnknownConnectionException: public common::Exception {};
+    class AlreadyExistingConnectionException: public common::Exception {};
 
     virtual ~ConnectionsFactory();
 
