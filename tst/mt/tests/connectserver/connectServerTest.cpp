@@ -2,13 +2,11 @@
 #include <gmock/gmock.h>
 #include <mt/env/testExceptionsCatch.hpp>
 #include <mt/env/asioStub/ioService.hpp>
-#include <mt/env/asioStub/exceptions.hpp>
 #include <mt/env/messages/builders/gameServerLoadIndicationBuilder.hpp>
 #include <mt/env/messages/builders/gameServersListRequestBuilder.hpp>
 #include <mt/env/messages/verifiers/gameServersListResponseVerifier.hpp>
 #include <mt/env/messages/builders/gameServerAddressRequestBuilder.hpp>
 #include <mt/env/messages/verifiers/gameServerAddressResponseVerifier.hpp>
-#include <core/protocol/exceptions.hpp>
 #include <connectserver/server.hpp>
 
 namespace mtEnv = eMU::mt::env;

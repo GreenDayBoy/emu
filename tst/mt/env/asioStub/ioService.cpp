@@ -1,7 +1,6 @@
 #include <mt/env/asioStub/ioService.hpp>
 #include <mt/env/asioStub/tcp/socket.hpp>
 #include <mt/env/asioStub/udp/socket.hpp>
-#include <mt/env/asioStub/exceptions.hpp>
 #include <algorithm>
 #include <gtest/gtest.h>
 
@@ -47,7 +46,7 @@ void io_service::send(size_t hash, const core::network::Payload &payload)
 
     if(it == sockets_.end())
     {
-        throw exceptions::UnknownSocketException();
+        throw UnknownSocketException();
     }
 
     (*it)->insertPayload(payload);
@@ -59,7 +58,7 @@ core::network::Payload io_service::receive(size_t hash)
 
     if(it == sockets_.end())
     {
-        throw exceptions::UnknownSocketException();
+        throw UnknownSocketException();
     }
 
     return (*it)->getPayload();
@@ -77,7 +76,7 @@ void io_service::close(size_t hash)
 
     if(it == sockets_.end())
     {
-        throw exceptions::UnknownSocketException();
+        throw UnknownSocketException();
     }
 
     sockets_.erase(it);
@@ -97,7 +96,7 @@ void io_service::sendTo(const core::network::Payload &payload)
 {
     if(udpSocket_ == nullptr)
     {
-        throw exceptions::NotCreatedUdpSocketException();
+        throw NotCreatedUdpSocketException();
     }
 
     udpSocket_->insertPayload(payload);
@@ -107,7 +106,7 @@ core::network::Payload io_service::receiveFrom()
 {
     if(udpSocket_ == nullptr)
     {
-        throw exceptions::NotCreatedUdpSocketException();
+        throw NotCreatedUdpSocketException();
     }
 
     return udpSocket_->getPayload();
@@ -124,7 +123,7 @@ void io_service::disconnect(size_t hash)
 
     if(it == sockets_.end())
     {
-        throw exceptions::UnknownSocketException();
+        throw UnknownSocketException();
     }
 
     (*it)->disconnect();

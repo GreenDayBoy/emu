@@ -1,5 +1,4 @@
 #include <mt/env/asioStub/udp/socket.hpp>
-#include <mt/env/asioStub/exceptions.hpp>
 #include <mt/env/asioStub/ioService.hpp>
 
 namespace eMU

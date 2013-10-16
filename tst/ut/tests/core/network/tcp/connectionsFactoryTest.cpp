@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <core/network/tcp/connectionsFactory.hpp>
-#include <core/network/tcp/exceptions.hpp>
 
 namespace asioStub = eMU::ut::env::asioStub;
 namespace network = eMU::core::network;
@@ -27,7 +26,7 @@ TEST_F(TcpConnectionsFactoryTest, createConnectionWithSameHashTwiceShouldThrowEx
     {
         connectionsFactory_.create(hash, socket2);
     }
-    catch(network::tcp::exceptions::AlreadyExistingConnectionException&)
+    catch(network::tcp::ConnectionsFactory::AlreadyExistingConnectionException&)
     {
         exceptionThrown = true;
     }
@@ -63,7 +62,7 @@ TEST_F(TcpConnectionsFactoryTest, destroyNotExistingConnectionShouldThrowExcepti
     {
         connectionsFactory_.destroy(4321);
     }
-    catch(eMU::core::network::tcp::exceptions::UnknownConnectionException&)
+    catch(network::tcp::ConnectionsFactory::UnknownConnectionException&)
     {
         exceptionThrown = true;
     }
@@ -90,7 +89,7 @@ TEST_F(TcpConnectionsFactoryTest, getNotExisitngConnectionShouldThrowException)
     {
         connectionsFactory_.get(4321);
     }
-    catch(eMU::core::network::tcp::exceptions::UnknownConnectionException&)
+    catch(network::tcp::ConnectionsFactory::UnknownConnectionException&)
     {
         exceptionThrown = true;
     }
@@ -109,7 +108,7 @@ TEST_F(TcpConnectionsFactoryTest, getHashForNotExistingConnectionShouldThrowExce
     {
         connectionsFactory_.getHash(connection);
     }
-    catch(eMU::core::network::tcp::exceptions::UnknownConnectionException&)
+    catch(network::tcp::ConnectionsFactory::UnknownConnectionException&)
     {
         exceptionThrown = true;
     }

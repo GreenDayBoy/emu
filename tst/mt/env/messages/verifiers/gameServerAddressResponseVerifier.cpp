@@ -3,7 +3,6 @@
 #include <interface/messageIds.hpp>
 #include <interface/protocolIds.hpp>
 #include <interface/messageTypes.hpp>
-#include <core/protocol/exceptions.hpp>
 
 #include <gtest/gtest.h>
 
@@ -20,11 +19,6 @@ namespace verifiers
 
 void GameServerAddressResponseVerifier::operator()(const core::network::Payload &payload, std::string address, uint16_t port)
 {
-    if(payload.empty())
-    {
-        throw core::protocol::exceptions::EmptyPayloadException();
-    }
-
     const interface::GameServerAddressResponse *message = reinterpret_cast<const interface::GameServerAddressResponse*>(&payload[0]);
 
     ASSERT_EQ(interface::MessageType::SMALL_DECRYPTED, message->header_.typeId_);

@@ -1,7 +1,6 @@
 #include <mt/env/asioStub/baseSocket.hpp>
 #include <mt/env/asioStub/types.hpp>
 #include <mt/env/asioStub/ioService.hpp>
-#include <mt/env/asioStub/exceptions.hpp>
 
 namespace eMU
 {
@@ -22,14 +21,14 @@ void BaseSocket::insertPayload(const core::network::Payload &payload)
 {
     if(payload.size() > boost::asio::buffer_size(receiveBuffer_))
     {
-        throw exceptions::TooBigPayloadException();
+        throw TooBigPayloadException();
     }
 
     uint8_t *buffer = boost::asio::buffer_cast<uint8_t*>(receiveBuffer_);
 
     if(buffer == nullptr)
     {
-        throw exceptions::NullBufferException();
+        throw NullBufferException();
     }
 
     memcpy(buffer, &payload[0], payload.size());
@@ -43,7 +42,7 @@ core::network::Payload BaseSocket::getPayload()
 
     if(buffer == nullptr)
     {
-        throw exceptions::NullBufferException();
+        throw NullBufferException();
     }
 
     size_t size = boost::asio::buffer_size(sendBuffer_);

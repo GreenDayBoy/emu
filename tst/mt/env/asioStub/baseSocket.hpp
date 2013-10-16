@@ -18,6 +18,9 @@ class io_service;
 class BaseSocket
 {
 public:
+    class NullBufferException{};
+    class TooBigPayloadException{};
+
     BaseSocket(io_service &ioService);
 
     void insertPayload(const core::network::Payload &payload);

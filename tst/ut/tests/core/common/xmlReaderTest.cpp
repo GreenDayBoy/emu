@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <core/common/xmlReader.hpp>
-#include <core/common/exceptions.hpp>
 
 namespace common = eMU::core::common;
 
@@ -57,7 +56,7 @@ TEST_F(XmlReaderTest, exceptionShouldBeThrownWhenContentIsEmpty)
     {
         xmlReader_.parse(content_, "servers");
     }
-    catch(common::exceptions::EmptyXmlContentException &exception)
+    catch(common::XmlReader::EmptyXmlContentException &exception)
     {
         exceptionThrown = true;
     }
@@ -75,7 +74,7 @@ TEST_F(XmlReaderTest, exceptionShouldBeThrownWhenFirstNodeDoesNotMatch)
     {
         xmlReader_.parse(content_, "ssservverrs");
     }
-    catch(common::exceptions::NotMatchedXmlNodeException &exception)
+    catch(common::XmlReader::NotMatchedXmlNodeException &exception)
     {
         exceptionThrown = true;
     }

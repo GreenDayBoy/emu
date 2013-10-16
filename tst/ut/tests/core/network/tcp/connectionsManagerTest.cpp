@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <core/network/tcp/connectionsManager.hpp>
-#include <core/network/tcp/exceptions.hpp>
 #include <ut/env/asioStub/ioService.hpp>
 #include <ut/env/asioStub/tcp/acceptor.hpp>
 #include <ut/env/core/network/tcp/connectionsManagerEventsMock.hpp>
@@ -113,7 +112,7 @@ TEST_F(ConnectionsManagerTest, getThrowExceptionDuringSend)
 {
     acceptScenario();
 
-    EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(network::tcp::exceptions::UnknownConnectionException()));
+    EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(network::tcp::ConnectionsFactory::UnknownConnectionException()));
 
     eMU::core::network::Payload payload(100, 0x14);
     connectionsManager_.send(connectionHash_, payload);
@@ -140,7 +139,7 @@ TEST_F(ConnectionsManagerTest, getThrowExceptionDuringDisconnect)
 {
     acceptScenario();
 
-    EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(network::tcp::exceptions::UnknownConnectionException()));
+    EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(network::tcp::ConnectionsFactory::UnknownConnectionException()));
 
     connectionsManager_.disconnect(connectionHash_);
 }
@@ -153,7 +152,7 @@ TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringCloseEvent)
     EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(ReturnRef(connection_));
     connectionsManager_.disconnect(connectionHash_);
 
-    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Throw(network::tcp::exceptions::UnknownConnectionException()));
+    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Throw(network::tcp::ConnectionsFactory::UnknownConnectionException()));
     closeCallback_(connection_);
 }
 
@@ -191,7 +190,7 @@ TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringReceive)
 {
     acceptScenario();
 
-    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Throw(network::tcp::exceptions::UnknownConnectionException()));
+    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Throw(network::tcp::ConnectionsFactory::UnknownConnectionException()));
 
     receiveCallback_(connection_);
 }
