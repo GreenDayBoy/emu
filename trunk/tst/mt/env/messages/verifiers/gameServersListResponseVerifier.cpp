@@ -4,7 +4,6 @@
 #include <interface/protocolIds.hpp>
 #include <interface/messageTypes.hpp>
 #include <core/protocol/helpers.hpp>
-#include <core/protocol/exceptions.hpp>
 
 #include <gtest/gtest.h>
 
@@ -21,11 +20,6 @@ namespace verifiers
 
 void GameServersListResponseVerifier::operator()(const core::network::Payload &payload, const std::vector<interface::GameServerInfo> &servers)
 {
-    if(payload.empty())
-    {
-        throw core::protocol::exceptions::EmptyPayloadException();
-    }
-
     const interface::GameServersListResponse *message = reinterpret_cast<const interface::GameServersListResponse*>(&payload[0]);
 
     ASSERT_EQ(interface::MessageType::LARGE_DECRYPTED, message->header_.typeId_);

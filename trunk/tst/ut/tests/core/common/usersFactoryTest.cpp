@@ -2,7 +2,6 @@
 
 #include <core/common/usersFactory.hpp>
 #include <core/common/hashableObject.hpp>
-#include <core/common/exceptions.hpp>
 
 namespace common = eMU::core::common;
 
@@ -36,7 +35,7 @@ TEST_F(UsersFactoryTest, WhenMaxNumberOfUsersReachedShouldThrowException)
     {
         usersFactory_.create();
     }
-    catch(common::exceptions::MaxNumberOfUsersReachedException &exception)
+    catch(common::UsersFactory<FakeUser>::MaxNumberOfUsersReachedException &exception)
     {
         exceptionThrown = true;
     }
@@ -66,7 +65,7 @@ TEST_F(UsersFactoryTest, WhenInvalidHashWasGivenThenFindShouldThrowException)
     {
         usersFactory_.find(12345);
     }
-    catch(common::exceptions::UnknownUserException &exception)
+    catch(common::UsersFactory<FakeUser>::UnknownUserException &exception)
     {
         exceptionThrown = true;
     }

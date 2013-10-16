@@ -38,6 +38,9 @@ public:
         CompletionHandler wrap(const CompletionHandler &handler) { return handler; }
     };
 
+    class UnknownSocketException{};
+    class NotCreatedUdpSocketException{};
+
     typedef std::vector<ip::tcp::socket*> SocketsContainer;
 
     io_service();

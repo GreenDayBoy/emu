@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <core/protocol/messagesExtractor.hpp>
-#include <core/protocol/exceptions.hpp>
 
 namespace network = eMU::core::network;
 namespace protocol = eMU::core::protocol;
@@ -41,7 +40,7 @@ TEST(MessagesExtractorTest, gotEmptyPayloadShouldThrowException)
         exctractor.extract();
 
     }
-    catch(protocol::exceptions::EmptyPayloadException&)
+    catch(protocol::MessagesExtractor::EmptyPayloadException&)
     {
         exceptionThrown = true;
     }
@@ -66,7 +65,7 @@ TEST(MessagesExtractorTest, ToLargeMessageSizeShouldThrowException)
         exctractor.extract();
 
     }
-    catch(protocol::exceptions::InvalidMessageSizeException&)
+    catch(protocol::MessagesExtractor::InvalidMessageSizeException&)
     {
         exceptionThrown = true;
     }
@@ -91,7 +90,7 @@ TEST(MessagesExtractorTest, ToSmallMessageSizeShouldThrowException)
         exctractor.extract();
 
     }
-    catch(protocol::exceptions::InvalidMessageHeaderException&)
+    catch(protocol::MessagesExtractor::InvalidMessageHeaderException&)
     {
         exceptionThrown = true;
     }
@@ -116,7 +115,7 @@ TEST(MessagesExtractorTest, InvalidMessageHeaderShouldThrowException)
         exctractor.extract();
 
     }
-    catch(protocol::exceptions::InvalidMessageHeaderException&)
+    catch(protocol::MessagesExtractor::InvalidMessageHeaderException&)
     {
         exceptionThrown = true;
     }
@@ -141,7 +140,7 @@ TEST(MessagesExtractorTest, WhenMessageSizeIsEqualToZeroShouldThrowException)
         exctractor.extract();
 
     }
-    catch(protocol::exceptions::InvalidMessageSizeException&)
+    catch(protocol::MessagesExtractor::InvalidMessageSizeException&)
     {
         exceptionThrown = true;
     }
