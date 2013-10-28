@@ -19,6 +19,7 @@ public:
 
     MOCKABLE void sendGameServersListResponse(size_t hash, const GameServersList::GameServersListContainer &servers);
     MOCKABLE void sendGameServerAddressResponse(size_t hash, const std::string &address, uint16_t port);
+    MOCKABLE void sendHandshakeIndication(size_t hash);
 
 private:
     MessageSender();

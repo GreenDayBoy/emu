@@ -31,9 +31,7 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 # core setup -----------------
 file(GLOB_RECURSE core_SOURCES "${eMU_core_DIR}/*.cpp")
-
 add_library(core SHARED ${core_SOURCES})
-
 target_link_libraries(core glog boost_system boost_thread)
 # -------------------------------
 

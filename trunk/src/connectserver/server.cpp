@@ -2,6 +2,7 @@
 #include <connectserver/transactions/gameServersListResponseTransaction.hpp>
 #include <connectserver/transactions/gameServerAddressResponseTransaction.hpp>
 #include <connectserver/transactions/gameServerLoadIndicationTransaction.hpp>
+#include <connectserver/transactions/handshakeIndicationTransaction.hpp>
 
 #include <interface/protocolIds.hpp>
 #include <interface/messageIds.hpp>
@@ -72,7 +73,9 @@ bool Server::startup()
 
 void Server::onAccept(size_t hash)
 {
-    LOG(INFO) << "hash: " << hash << ", user registered.";
+	LOG(INFO) << "hash: " << hash << ", user registered.";
+
+	transactions::HandshakeIndicationTransaction(hash, messageSender_).handle();
 }
 
 void Server::onClose(size_t hash)

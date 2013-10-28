@@ -30,7 +30,7 @@ void GameServersListResponseVerifier::operator()(const core::network::Payload &p
 
     ASSERT_EQ(interface::ProtocolId::CONNECT_SERVER_PROTOCOL, message->header_.protocolId_);
 
-    ASSERT_EQ(servers.size(), message->numberOfServers_);
+    ASSERT_EQ(core::protocol::byteSwap(servers.size()), message->numberOfServers_);
 
     for(size_t i = 0; i < servers.size(); ++i)
     {

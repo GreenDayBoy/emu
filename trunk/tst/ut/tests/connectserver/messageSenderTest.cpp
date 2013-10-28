@@ -77,9 +77,9 @@ TEST_F(MessageSenderTest, sendGameServersListResponse)
     EXPECT_EQ(eMU::interface::ProtocolId::CONNECT_SERVER_PROTOCOL, message->header_.protocolId_);
     EXPECT_EQ(eMU::interface::MessageId::GAME_SERVERS_LIST_RESPONSE, message->id_);
 
-    ASSERT_EQ(sampleServers.size(), message->numberOfServers_);
+    ASSERT_EQ(eMU::core::protocol::byteSwap(sampleServers.size()), message->numberOfServers_);
 
-    for(size_t i = 0; i < message->numberOfServers_; ++i)
+    for(size_t i = 0; i < sampleServers.size(); ++i)
     {
         EXPECT_EQ(sampleServers[i].code_, message->servers_[i].code_);
         EXPECT_EQ(sampleServers[i].load_, message->servers_[i].load_);

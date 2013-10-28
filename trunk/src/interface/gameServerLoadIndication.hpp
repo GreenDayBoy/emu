@@ -7,6 +7,8 @@ namespace eMU
 namespace interface
 {
 
+#pragma pack(push, 1)
+
 struct GameServerLoadIndication
 {
     SmallMessageHeader header_;
@@ -14,6 +16,8 @@ struct GameServerLoadIndication
     uint16_t serverCode_;
     uint8_t load_;
 };
+
+#pragma pack(pop)
 
 }
 }

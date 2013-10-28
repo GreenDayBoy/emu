@@ -7,6 +7,7 @@
 #include <mt/env/messages/verifiers/gameServersListResponseVerifier.hpp>
 #include <mt/env/messages/builders/gameServerAddressRequestBuilder.hpp>
 #include <mt/env/messages/verifiers/gameServerAddressResponseVerifier.hpp>
+#include <mt/env/messages/verifiers/handshakeIndicationVerifier.hpp>
 #include <connectserver/server.hpp>
 
 namespace mtEnv = eMU::mt::env;
@@ -53,6 +54,9 @@ TEST_F(ConnectServerTest, GameServerLoadUpdate_Check)
     ioService_.sendTo(builders::GameServerLoadIndicationBuilder()(secondServerCode, secondServerLoad));
 
     size_t hash = ioService_.createConnection();
+
+    verifiers::HandshakeIndicationVerifier()(ioService_.receive(hash));
+
     ioService_.send(hash, builders::GameServersListRequestBuilder()());
 
     verifiers::GameServersListResponseVerifier()(ioService_.receive(hash), {{firstServerCode, firstServerLoad, 0},
@@ -79,6 +83,9 @@ TEST_F(ConnectServerTest, GameServerLoadUpdate_WhenServerCodeIsInvalidThenConnec
     ioService_.sendTo(builders::GameServerLoadIndicationBuilder()(secondServerCode, secondServerLoad));
 
     size_t hash = ioService_.createConnection();
+
+    verifiers::HandshakeIndicationVerifier()(ioService_.receive(hash));
+
     ioService_.send(hash, builders::GameServersListRequestBuilder()());
 
     verifiers::GameServersListResponseVerifier()(ioService_.receive(hash), {{0, 0, 0},
@@ -99,6 +106,8 @@ TEST_F(ConnectServerTest, GetGameServerAddress_Check)
     server.startup();
 
     size_t hash = ioService_.createConnection();
+
+    verifiers::HandshakeIndicationVerifier()(ioService_.receive(hash));
 
     ioService_.send(hash, builders::GameServerAddressRequestBuilder()(0));
     verifiers::GameServerAddressResponseVerifier()(ioService_.receive(hash), "192.168.0.1", 55901);
@@ -121,6 +130,8 @@ TEST_F(ConnectServerTest, GetGameServerAddress_WhenServerCodeIsInvalidThenConnec
     server.startup();
 
     size_t hash = ioService_.createConnection();
+
+    verifiers::HandshakeIndicationVerifier()(ioService_.receive(hash));
 
     ioService_.send(hash, builders::GameServerAddressRequestBuilder()(23));
 
