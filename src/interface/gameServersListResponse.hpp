@@ -8,6 +8,8 @@ namespace eMU
 namespace interface
 {
 
+#pragma pack(push, 1)
+
 struct GameServerInfo
 {
     uint16_t code_;
@@ -22,6 +24,8 @@ struct GameServersListResponse
     uint16_t numberOfServers_;
     GameServerInfo servers_[constants::kMaxGameServersListLength];
 };
+
+#pragma pack(pop)
 
 }
 }

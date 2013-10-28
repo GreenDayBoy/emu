@@ -7,6 +7,8 @@ namespace eMU
 namespace interface
 {
 
+#pragma pack(push, 1)
+
 struct SmallMessageHeader
 {
     uint8_t typeId_;
@@ -20,6 +22,8 @@ struct LargeMessageHeader
     uint16_t size_;
     uint8_t protocolId_;
 };
+
+#pragma pack(pop)
 
 }
 }
