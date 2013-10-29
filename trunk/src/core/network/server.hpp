@@ -35,6 +35,9 @@ template<typename User>
 class Server: boost::noncopyable
 {
 public:
+    class InvalidProtocolIdException: public core::common::Exception {};
+    class UnknownMessageException: public core::common::Exception {};
+
     Server(core::network::tcp::ConnectionsManager::Pointer connectionsManager,
            typename core::common::UsersFactory<User>::Pointer usersFactory,
            core::transactions::Manager::Pointer transactionsManager):
@@ -87,6 +90,16 @@ public:
         catch(core::protocol::MessagesExtractor::InvalidMessageSizeException&)
         {
             LOG(ERROR) << "hash: " << hash << ", invalid message size detected!";
+            connectionsManager_->disconnect(hash);
+        }
+        catch(InvalidProtocolIdException&)
+        {
+            LOG(ERROR) << "hash: " << hash << ", invalid protocol id!";
+            connectionsManager_->disconnect(hash);
+        }
+        catch(UnknownMessageException)
+        {
+            LOG(ERROR) << "hash: " << hash << ", unknown message!";
             connectionsManager_->disconnect(hash);
         }
     }

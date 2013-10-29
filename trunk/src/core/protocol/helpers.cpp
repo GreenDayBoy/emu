@@ -1,5 +1,6 @@
 #include <core/protocol/helpers.hpp>
 #include <interface/messageTypes.hpp>
+#include <interface/header.hpp>
 #include <glog/logging.h>
 
 namespace eMU
@@ -73,6 +74,39 @@ bool hasValidHeader(const eMU::core::network::Payload &payload)
     }
 
     return false;
+}
+
+size_t getHeaderSize(const eMU::core::network::Payload &payload)
+{
+    if(payload[0] == interface::MessageType::SMALL_DECRYPTED ||
+       payload[0] == interface::MessageType::SMALL_CRYPTED)
+    {
+        return sizeof(interface::SmallMessageHeader);
+    }
+    else if(payload[0] == interface::MessageType::LARGE_DECRYPTED ||
+            payload[0] == interface::MessageType::LARGE_CRYPTED)
+    {
+        return sizeof(interface::LargeMessageHeader);
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+uint8_t getMessageId(const eMU::core::network::Payload &payload)
+{
+    size_t messageSize = getMessageSize(payload);
+    size_t headerSize = getHeaderSize(payload);
+
+    if(messageSize > headerSize)
+    {
+        return payload[headerSize];
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 }

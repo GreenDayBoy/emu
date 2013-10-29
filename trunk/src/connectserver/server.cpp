@@ -133,7 +133,7 @@ void Server::handleMessage(size_t hash, const core::network::Payload &payload)
         throw InvalidProtocolIdException();
     }
 
-    uint8_t messageId = payload[3];
+    uint8_t messageId = core::protocol::getMessageId(payload);
 
     if(messageId == interface::MessageId::GAME_SERVERS_LIST_RESPONSE)
     {
