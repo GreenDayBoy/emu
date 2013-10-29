@@ -33,6 +33,20 @@ public:
                                                   </servers>";
     }
 
+    void checkInvalidMessageScenario(const eMU::core::network::Payload &payload)
+    {
+        eMU::connectserver::Server server(ioService_, configuration_);
+        server.startup();
+
+        size_t hash = ioService_.createConnection();
+
+        verifiers::HandshakeIndicationVerifier()(ioService_.receive(hash));
+
+        ioService_.send(hash, payload);
+
+        ASSERT_FALSE(ioService_.exists(hash));
+    }
+
     asioStub::io_service ioService_;
     eMU::connectserver::Server::Configuration configuration_;
 };
@@ -137,6 +151,33 @@ TEST_F(ConnectServerTest, GetGameServerAddress_WhenServerCodeIsInvalidThenConnec
 
     ASSERT_FALSE(ioService_.exists(hash));
 
+    }
+    TEST_EXCEPTIONS_CATCH
+}
+
+TEST_F(ConnectServerTest, WhenMessageWithInvalidHeaderIdWasReceivedThenConnectionShouldBeClosed)
+{
+    try
+    {
+        checkInvalidMessageScenario({0xC5, 0x04, 0x00, 0x01});
+    }
+    TEST_EXCEPTIONS_CATCH
+}
+
+TEST_F(ConnectServerTest, WhenMessageWithInvalidMessageIdWasReceivedThenConnectionShouldBeClosed)
+{
+    try
+    {
+        checkInvalidMessageScenario({0xC1, 0x04, 0x00, 0xF5});
+    }
+    TEST_EXCEPTIONS_CATCH
+}
+
+TEST_F(ConnectServerTest, WhenMessageWithInvalidSizeWasReceivedThenConnectionShouldBeClosed)
+{
+    try
+    {
+        checkInvalidMessageScenario({0xC1, 0x00, 0x00, 0xF4});
     }
     TEST_EXCEPTIONS_CATCH
 }
