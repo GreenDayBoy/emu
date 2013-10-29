@@ -7,6 +7,7 @@ using ::testing::SaveArg;
 using ::testing::Return;
 using ::testing::Ref;
 using ::testing::_;
+using ::testing::Throw;
 
 namespace asioStub = eMU::ut::env::asioStub;
 namespace network = eMU::core::network;
@@ -53,7 +54,7 @@ public:
     bool isPayloadTheSame(const network::Payload &payload, const uint8_t *sourceBuffer)
     {
         return memcmp(&payload[0], sourceBuffer, payload.size()) == 0;
-    }
+    }  
 
     asioStub::io_service ioService_;
     network::tcp::Connection::SocketPointer socket_;
@@ -164,6 +165,17 @@ TEST_F(TcpConnectionTest, receiveWithOperationAbortedErrorShouldNotTriggerCloseE
     receiveHandler_(boost::asio::error::operation_aborted, 0);
 }
 
+TEST_F(TcpConnectionTest, receiveWithConnectionResetErrorShouldNotTriggerCloseEvent)
+{
+    expectAsyncReceiveCallAndSaveArguments();
+
+    connection_.queueReceive();
+
+    EXPECT_CALL(connectionEvents_, closeEvent(_)).Times(0);
+
+    receiveHandler_(boost::asio::error::connection_reset, 0);
+}
+
 TEST_F(TcpConnectionTest, send)
 {
     expectAsyncSendCallAndSaveArguments();
@@ -220,7 +232,7 @@ TEST_F(TcpConnectionTest, sendErrorShouldTriggerCloseEvent)
     EXPECT_CALL(*socket_, is_open()).WillOnce(Return(true));
     EXPECT_CALL(connectionEvents_, closeEvent(Ref(connection_)));
 
-    sendHandler_(boost::asio::error::connection_reset, 0);
+    sendHandler_(boost::asio::error::bad_descriptor, 0);
 }
 
 TEST_F(TcpConnectionTest, sendErrorShouldNotTiggerCloseEventWhenSocketIsNotOpen)
@@ -232,7 +244,7 @@ TEST_F(TcpConnectionTest, sendErrorShouldNotTiggerCloseEventWhenSocketIsNotOpen)
     EXPECT_CALL(*socket_, is_open()).WillOnce(Return(false));
     EXPECT_CALL(connectionEvents_, closeEvent(_)).Times(0);
 
-    sendHandler_(boost::asio::error::connection_reset, 0);
+    sendHandler_(boost::asio::error::already_started, 0);
 }
 
 TEST_F(TcpConnectionTest, overflowPrimarySendBufferShouldTriggerCloseEvent)
@@ -301,4 +313,20 @@ TEST_F(TcpConnectionTest, connectErrorShouldNotTriggerCloseEventWhenSocketIsNotO
     EXPECT_CALL(connectionEvents_, closeEvent(_)).Times(0);
 
     connectHandler_(boost::asio::error::access_denied);
+}
+
+TEST_F(TcpConnectionTest, thrownExceptionFromShutdownDuringCloseOperationShouldBeCaught)
+{
+    EXPECT_CALL(*socket_, shutdown(boost::asio::ip::tcp::socket::shutdown_both)).WillOnce(Throw(boost::system::system_error(boost::asio::error::bad_descriptor)));
+
+    connection_.close();
+}
+
+
+TEST_F(TcpConnectionTest, thrownExceptionFromCloseDuringCloseOperationShouldBeCaught)
+{
+    EXPECT_CALL(*socket_, shutdown(boost::asio::ip::tcp::socket::shutdown_both));
+    EXPECT_CALL(*socket_, close()).WillOnce(Throw(boost::system::system_error(boost::asio::error::fd_set_failure)));
+
+    connection_.close();
 }

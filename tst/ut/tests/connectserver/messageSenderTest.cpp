@@ -3,6 +3,7 @@
 #include <connectserver/messageSender.hpp>
 #include <interface/gameServerAddressResponse.hpp>
 #include <interface/gameServersListResponse.hpp>
+#include <interface/handshakeIndication.hpp>
 #include <interface/messageIds.hpp>
 #include <interface/messageTypes.hpp>
 #include <interface/protocolIds.hpp>
@@ -84,4 +85,23 @@ TEST_F(MessageSenderTest, sendGameServersListResponse)
         EXPECT_EQ(sampleServers[i].code_, message->servers_[i].code_);
         EXPECT_EQ(sampleServers[i].load_, message->servers_[i].load_);
     }
+}
+
+TEST_F(MessageSenderTest, sendHandshakeIndication)
+{
+    size_t receivedHash = 0;
+    eMU::core::network::Payload payload;
+
+    EXPECT_CALL(*this, send(_, _)).WillOnce(DoAll(SaveArg<0>(&receivedHash), SaveArg<1>(&payload)));
+    messageSender_.sendHandshakeIndication(hash_);
+
+    EXPECT_EQ(receivedHash, hash_);
+    ASSERT_EQ(sizeof(interface::HandshakeIndication), payload.size());
+
+    eMU::interface::HandshakeIndication *message = reinterpret_cast<interface::HandshakeIndication*>(&payload[0]);
+
+    EXPECT_EQ(interface::MessageType::SMALL_DECRYPTED, message->header_.typeId_);
+    EXPECT_EQ(sizeof(interface::HandshakeIndication), message->header_.size_);
+    EXPECT_EQ(0x00, message->header_.protocolId_);
+    EXPECT_EQ(interface::MessageId::HANDSHAKE_INDICATION, message->id_);
 }
