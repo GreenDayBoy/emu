@@ -50,8 +50,16 @@ void Connection::disconnect()
 
 void Connection::close()
 {
-    socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-    socket_->close();
+    try
+    {
+        socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+        socket_->close();
+    }
+    catch(const boost::system::system_error &error)
+    {
+        LOG(ERROR) << "Error during closing socket, error: " << error.what()
+                   << ", code: " << error.code();
+    }
 }
 
 void Connection::send(const Payload &payload)
@@ -137,7 +145,8 @@ void Connection::sendHandler(const boost::system::error_code& errorCode, size_t 
 
 void Connection::errorHandler(const boost::system::error_code &errorCode, const std::string &operationName)
 {
-    if(boost::asio::error::operation_aborted == errorCode)
+    if(boost::asio::error::operation_aborted == errorCode ||
+       boost::asio::error::connection_reset == errorCode)
     {
         return;
     }
