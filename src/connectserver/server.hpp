@@ -33,10 +33,6 @@ namespace asio = boost::asio;
 class Server: public core::network::Server<User>
 {
 public:
-    class InvalidProtocolIdException: public core::common::Exception {};
-    class UnknownMessageException: public core::common::Exception {};
-    class TooShortMessageException: public core::common::Exception {};
-
     struct Configuration
     {
         uint16_t port_;

@@ -21,3 +21,9 @@ TEST_F(HandshakeIndicationTransactionTest, handle)
     eMU::connectserver::transactions::HandshakeIndicationTransaction transaction(hash_, messageSender_);
     transaction.handle();
 }
+
+TEST_F(HandshakeIndicationTransactionTest, isValidShouldAlwaysReturnTrue)
+{
+    ASSERT_TRUE(eMU::connectserver::transactions::HandshakeIndicationTransaction(0, messageSender_).isValid());
+    ASSERT_TRUE(eMU::connectserver::transactions::HandshakeIndicationTransaction(hash_, messageSender_).isValid());
+}
