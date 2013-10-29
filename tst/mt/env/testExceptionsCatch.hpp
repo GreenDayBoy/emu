@@ -16,4 +16,4 @@
     catch(asioStub::io_service::NotCreatedUdpSocketException&) \
     { \
         ASSERT_TRUE(false) << "udp socket not created."; \
-    } \
+    }
