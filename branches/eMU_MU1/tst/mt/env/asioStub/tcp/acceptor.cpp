@@ -1,0 +1,30 @@
+#include <mt/env/asioStub/tcp/acceptor.hpp>
+#include <mt/env/asioStub/ioService.hpp>
+
+namespace eMU
+{
+namespace mt
+{
+namespace env
+{
+namespace asioStub
+{
+namespace ip
+{
+namespace tcp
+{
+
+acceptor::acceptor(io_service &ioService, const boost::asio::ip::tcp::endpoint &endpoint):
+    ioService_(ioService) {}
+
+void acceptor::async_accept(socket &socket, const AcceptHandler &handler)
+{
+    ioService_.queueAccept(socket, handler);
+}
+
+}
+}
+}
+}
+}
+}
