@@ -1,7 +1,8 @@
 #pragma once
 
+#include <core/network/payload.hpp>
+
 #include <gmock/gmock.h>
-#include <core/network/buffer.hpp>
 
 namespace eMU
 {

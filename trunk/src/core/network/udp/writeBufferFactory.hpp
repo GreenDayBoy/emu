@@ -1,9 +1,9 @@
 #pragma once
 
+#include <core/network/writeBuffer.hpp>
+
 #include <boost/asio/ip/udp.hpp>
 #include <map>
-
-#include <core/network/buffer.hpp>
 
 namespace eMU
 {

@@ -81,7 +81,7 @@ void Connection::send(const Payload &payload)
 
 void Connection::queueReceive()
 {
-    socket_->async_receive(boost::asio::buffer(&readBuffer_.payload_[0], kMaxPayloadSize),
+    socket_->async_receive(boost::asio::buffer(&readBuffer_.payload_[0], Payload::getMaxSize()),
                            strand_.wrap(std::bind(&Connection::receiveHandler,
                                         this,
                                         std::placeholders::_1,
@@ -97,7 +97,7 @@ void Connection::connect(const boost::asio::ip::tcp::endpoint &endpoint)
 
 void Connection::queueSend()
 {
-    socket_->async_send(boost::asio::buffer(&writeBuffer_.payload_[0], writeBuffer_.payloadSize_),
+    socket_->async_send(boost::asio::buffer(&writeBuffer_.payload_[0], writeBuffer_.payload_.getSize()),
                         strand_.wrap(std::bind(&Connection::sendHandler,
                                      this,
                                      std::placeholders::_1,
@@ -117,7 +117,7 @@ void Connection::receiveHandler(const boost::system::error_code &errorCode, size
         return;
     }
 
-    readBuffer_.payloadSize_ = bytesTransferred;
+    readBuffer_.payload_.setSize(bytesTransferred);
     receiveEventCallback_(*this);
 
     if(!closeOngoing_)
@@ -134,7 +134,7 @@ void Connection::sendHandler(const boost::system::error_code& errorCode, size_t 
         return;
     }
 
-    if(writeBuffer_.secondPayloadSize_ > 0)
+    if(writeBuffer_.secondPayload_.getSize() > 0)
     {
         writeBuffer_.swap();
         this->queueSend();

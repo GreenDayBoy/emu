@@ -10,8 +10,10 @@
 #include <boost/asio.hpp>
 #endif
 
-#include <boost/noncopyable.hpp>
+#include <core/network/readBuffer.hpp>
 #include <core/network/udp/writeBufferFactory.hpp>
+
+#include <boost/noncopyable.hpp>
 
 namespace eMU
 {

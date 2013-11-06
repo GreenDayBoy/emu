@@ -1,1 +1,0 @@
-#include <gameserver/user.hpp>
