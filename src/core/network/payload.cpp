@@ -38,6 +38,11 @@ void Payload::clear()
     size_ = 0;
 }
 
+bool Payload::empty() const
+{
+    return size_ == 0;
+}
+
 uint8_t& Payload::operator[](size_t offset)
 {
     return data_[offset];

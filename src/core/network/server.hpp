@@ -14,7 +14,7 @@
 #include <core/common/usersFactory.hpp>
 #include <core/transactions/manager.hpp>
 #include <core/network/tcp/connectionsManager.hpp>
-#include <core/protocol/messagesExtractor.hpp>
+#include <core/protocol/packetsExtractor.hpp>
 
 namespace eMU
 {
@@ -61,35 +61,25 @@ public:
     {
         try
         {
-            core::protocol::MessagesExtractor messagesExtractor(payload);
-            messagesExtractor.extract();
+            core::protocol::PacketsExtractor packetsExtractor(payload);
+            packetsExtractor.extract();
 
-            const core::protocol::MessagesExtractor::MessagesContainer &messages = messagesExtractor.messages();
+//            const core::protocol::PacketsExtractor::PacketsContainer &packets = packetsExtractor.getPackets();
 
-            for(const auto &message : messages)
-            {
-                this->handleMessage(hash, message);
+//            for(const auto &payload : messages)
+//            {
+//                this->handleMessage(hash, message);
 
-                if(!transactionsManager_->dequeueAll())
-                {
-                    LOG(ERROR) << "hash: " << hash << ", some transactions were invalid. Disconnected.";
-                    connectionsManager_->disconnect(hash);
-                }
-            }
+//                if(!transactionsManager_->dequeueAll())
+//                {
+//                    LOG(ERROR) << "hash: " << hash << ", some transactions were invalid. Disconnected.";
+//                    connectionsManager_->disconnect(hash);
+//                }
+//            }
         }
-        catch(core::protocol::MessagesExtractor::EmptyPayloadException&)
+        catch(core::protocol::PacketsExtractor::EmptyPayloadException&)
         {
             LOG(ERROR) << "hash: " << hash << ", received empty payload!";
-            connectionsManager_->disconnect(hash);
-        }
-        catch(core::protocol::MessagesExtractor::InvalidMessageHeaderException&)
-        {
-            LOG(ERROR) << "hash: " << hash << ", invalid message header detected!";
-            connectionsManager_->disconnect(hash);
-        }
-        catch(core::protocol::MessagesExtractor::InvalidMessageSizeException&)
-        {
-            LOG(ERROR) << "hash: " << hash << ", invalid message size detected!";
             connectionsManager_->disconnect(hash);
         }
         catch(InvalidProtocolIdException&)

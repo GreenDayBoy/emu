@@ -11,9 +11,11 @@ public:
 
     void insertSampleDataToPayload()
     {
-        payload_.setValue<uint8_t>(0, 0x01);
-        payload_.setValue<uint16_t>(1, 0x0302);
-        payload_.setValue<uint32_t>(3, 0x07060504);
+        payload_.insert<uint8_t>(0x01);
+        payload_.insert<uint16_t>(0x0302);
+        payload_.insert<uint32_t>(0x07060504);
+
+        payload_.setSize(7);
     }
 
 protected:
@@ -23,6 +25,14 @@ protected:
 TEST_F(PayloadTest, checkMaxSize)
 {
     ASSERT_EQ(4096, network::Payload::getMaxSize());
+}
+
+TEST_F(PayloadTest, empty)
+{
+    ASSERT_TRUE(payload_.empty());
+
+    payload_.insert<uint8_t>(0x30);
+    ASSERT_FALSE(payload_.empty());
 }
 
 TEST_F(PayloadTest, setSizeShouldThrowExceptionWhenValueIsOutOfBound)
@@ -46,7 +56,7 @@ TEST_F(PayloadTest, construct)
     ASSERT_EQ(0, payload_.getSize());
 }
 
-TEST_F(PayloadTest, setValue)
+TEST_F(PayloadTest, insert)
 {
     network::Payload::Data data(7, 0);
     data[0] = 0x01;
@@ -63,15 +73,20 @@ TEST_F(PayloadTest, setValue)
     ASSERT_EQ(memcmp(&payload_[0], &data[0], payload_.getSize()), 0);
 }
 
-TEST_F(PayloadTest, throwExceptionWhenOffsetInSetValueIsOutOfBound)
+TEST_F(PayloadTest, throwExceptionWhenOffsetInInsertIsOutOfBound)
 {
     bool exceptionThrown = false;
 
     try
     {
-        payload_.setValue<uint16_t>(network::Payload::getMaxSize() - 1, 0xFFFF);
+        for(size_t i = 0; i < network::Payload::getMaxSize(); ++i)
+        {
+            payload_.insert<uint8_t>(0xFF);
+        }
+
+        payload_.insert<uint8_t>(0xFF);
     }
-    catch(const network::Payload::SetOverflowException&)
+    catch(const network::Payload::InsertOverflowException&)
     {
         exceptionThrown = true;
     }
@@ -94,7 +109,7 @@ TEST_F(PayloadTest, throwExceptionWhenOffsetInGetValueIsOutOfBound)
 
     try
     {
-        payload_.getValue<uint32_t>(network::Payload::getMaxSize() - 3);
+        payload_.getValue<uint32_t>(0);
     }
     catch(const network::Payload::GetOverflowException&)
     {

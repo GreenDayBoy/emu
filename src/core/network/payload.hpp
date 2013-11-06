@@ -18,7 +18,7 @@ class Payload
 public:                                                       
     typedef std::vector<uint8_t> Data;
 
-    class SetOverflowException: public common::Exception {};
+    class InsertOverflowException: public common::Exception {};
     class GetOverflowException: public common::Exception {};
     class SizeOutOfBoundException: public common::Exception {};
 
@@ -28,6 +28,7 @@ public:
     size_t getSize() const;
     void setSize(size_t newSize);
     void clear();
+    bool empty() const;
 
     uint8_t& operator[](size_t offset);
     const uint8_t& operator[](size_t offset) const;
@@ -35,7 +36,7 @@ public:
     template<typename T>
     T getValue(size_t offset) const
     {
-        if(sizeof(T) + offset > getMaxSize())
+        if(sizeof(T) + offset > getSize())
         {
             throw GetOverflowException();
         }
@@ -44,16 +45,16 @@ public:
     }
 
     template<typename T>
-    void setValue(size_t offset, const T &value)
+    void insert(const T &value)
     {
         size_t typeSize = sizeof(T);
 
-        if(typeSize + offset > getMaxSize())
+        if(typeSize + size_ > getMaxSize())
         {
-            throw SetOverflowException();
+            throw InsertOverflowException();
         }
 
-        T &destination = reinterpret_cast<T&>(data_[offset]);
+        T &destination = reinterpret_cast<T&>(data_[size_]);
         destination = value;
 
         size_ += typeSize;

@@ -24,7 +24,7 @@ void SamplePayloads::preparePayload(eMU::core::network::Payload &payload, size_t
 {
     for(size_t i = 0; i < bytes; ++i)
     {
-        payload.setValue<uint8_t>(i, static_cast<uint8_t>(i));
+        payload.insert<uint8_t>(static_cast<uint8_t>(i));
     }
 }
 
