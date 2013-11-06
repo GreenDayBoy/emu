@@ -1,4 +1,5 @@
 #include <core/network/udp/connection.hpp>
+
 #include <glog/logging.h>
 
 namespace eMU
@@ -32,7 +33,7 @@ void Connection::setReceiveFromEventCallback(const ReceiveFromEventCallback &cal
 
 void Connection::queueReceiveFrom()
 {
-    socket_->async_receive_from(boost::asio::buffer(&readBuffer_.payload_[0], kMaxPayloadSize),
+    socket_->async_receive_from(boost::asio::buffer(&readBuffer_.payload_[0], Payload::getMaxSize()),
                                 senderEndpoint_,
                                 strand_.wrap(std::bind(&Connection::receiveFromHandler,
                                         this,
@@ -67,7 +68,7 @@ void Connection::receiveFromHandler(const boost::system::error_code &errorCode, 
     }
     else
     {
-        readBuffer_.payloadSize_ = bytesTransferred;
+        readBuffer_.payload_.setSize(bytesTransferred);
         receiveFromEventCallback_(*this, senderEndpoint_);
     }
 
@@ -76,7 +77,7 @@ void Connection::receiveFromHandler(const boost::system::error_code &errorCode, 
 
 void Connection::queueSendTo(const boost::asio::ip::udp::endpoint &endpoint, WriteBuffer &writeBuffer)
 {
-    socket_->async_send_to(boost::asio::buffer(&writeBuffer.payload_[0], writeBuffer.payloadSize_),
+    socket_->async_send_to(boost::asio::buffer(&writeBuffer.payload_[0], writeBuffer.payload_.getSize()),
                            endpoint,
                            strand_.wrap(std::bind(&Connection::sendToHandler,
                                         this,
@@ -94,7 +95,7 @@ void Connection::sendToHandler(const boost::asio::ip::udp::endpoint &endpoint, c
 
     WriteBuffer &writeBuffer = writeBufferFactory_.get(endpoint);
 
-    if(writeBuffer.secondPayloadSize_ > 0)
+    if(writeBuffer.secondPayload_.getSize() > 0)
     {
         writeBuffer.swap();
         this->queueSendTo(endpoint, writeBuffer);

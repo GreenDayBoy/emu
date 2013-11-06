@@ -109,8 +109,7 @@ void ConnectionsManager::receiveEvent(Connection &connection)
     {
         size_t hash = connectionsFactory_->getHash(connection);
 
-        Payload payload(connection.readBuffer().payload_.begin(), connection.readBuffer().payload_.begin() + connection.readBuffer().payloadSize_);
-        receiveEventCallback_(hash, payload);
+        receiveEventCallback_(hash, connection.readBuffer().payload_);
     }
     catch(ConnectionsFactory::UnknownConnectionException &exception)
     {

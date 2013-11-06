@@ -14,6 +14,7 @@ using ::testing::Throw;
 using ::testing::NotNull;
 using ::testing::ReturnRef;
 using ::testing::Ref;
+using ::testing::SaveArg;
 
 ACTION_TEMPLATE(SaveArgToPointer,
                 HAS_1_TEMPLATE_PARAMS(int, k),
@@ -52,6 +53,9 @@ public:
         connectionsManager_.setCloseEventCallback(std::bind(&tcpEnv::ConnectionsManagerEventsMock::closeEvent,
                 &connectionsManagerEventsMock_,
                 std::placeholders::_1));
+
+        samplePayload_.setValue<uint32_t>(0, 0xFFFFFFFF);
+        samplePayload_.setValue<uint32_t>(4, 0xEEEEEEEE);
     }
 
     void expectAsyncAcceptCallAndSaveArguments()
@@ -90,6 +94,8 @@ public:
 
     network::tcp::Connection::EventCallback receiveCallback_;
     network::tcp::Connection::EventCallback closeCallback_;
+
+    network::Payload samplePayload_;
 };
 
 TEST_F(ConnectionsManagerTest, accept)
@@ -101,11 +107,14 @@ TEST_F(ConnectionsManagerTest, send)
 {
     acceptScenario();
 
-    eMU::core::network::Payload payload(100, 0x14);
-    EXPECT_CALL(connection_, send(payload));
+    eMU::core::network::Payload sentPayload;
+    EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&sentPayload));
     EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(ReturnRef(connection_));
 
-    connectionsManager_.send(connectionHash_, payload);
+    connectionsManager_.send(connectionHash_, samplePayload_);
+
+    ASSERT_EQ(samplePayload_.getSize(), sentPayload.getSize());
+    ASSERT_EQ(memcmp(&samplePayload_[0], &sentPayload[0], samplePayload_.getSize()), 0);
 }
 
 TEST_F(ConnectionsManagerTest, getThrowExceptionDuringSend)
@@ -114,8 +123,7 @@ TEST_F(ConnectionsManagerTest, getThrowExceptionDuringSend)
 
     EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(network::tcp::ConnectionsFactory::UnknownConnectionException()));
 
-    eMU::core::network::Payload payload(100, 0x14);
-    connectionsManager_.send(connectionHash_, payload);
+    connectionsManager_.send(connectionHash_, samplePayload_);
 }
 
 TEST_F(ConnectionsManagerTest, disconnect)

@@ -1,8 +1,9 @@
 #pragma once
 
-#include <stdint.h>
-#include <core/network/buffer.hpp>
+#include <core/network/payload.hpp>
 #include <core/common/exception.hpp>
+
+#include <stdint.h>
 
 namespace eMU
 {
