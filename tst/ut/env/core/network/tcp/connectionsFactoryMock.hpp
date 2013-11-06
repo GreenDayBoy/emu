@@ -11,6 +11,8 @@ namespace env
 {
 namespace core
 {
+namespace network
+{
 namespace tcp
 {
 
@@ -25,6 +27,7 @@ public:
     MOCK_CONST_METHOD1(getHash, size_t(network::tcp::Connection&));
 };
 
+}
 }
 }
 }

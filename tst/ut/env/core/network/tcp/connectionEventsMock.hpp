@@ -11,6 +11,8 @@ namespace env
 {
 namespace core
 {
+namespace network
+{
 namespace tcp
 {
 
@@ -22,6 +24,7 @@ public:
     MOCK_METHOD1(closeEvent, void(eMU::core::network::tcp::Connection &connection));
 };
 
+}
 }
 }
 }

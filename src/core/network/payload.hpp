@@ -20,6 +20,7 @@ public:
 
     class SetOverflowException: public common::Exception {};
     class GetOverflowException: public common::Exception {};
+    class SizeOutOfBoundException: public common::Exception {};
 
     Payload();
 

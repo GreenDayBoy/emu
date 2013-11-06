@@ -23,6 +23,11 @@ size_t Payload::getSize() const
 
 void Payload::setSize(size_t newSize)
 {
+    if(newSize > getMaxSize())
+    {
+        throw SizeOutOfBoundException();
+    }
+
     size_ = newSize;
 }
 

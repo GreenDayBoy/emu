@@ -8,12 +8,15 @@ namespace env
 {
 namespace core
 {
+namespace network
+{
 namespace tcp
 {
 
 ConnectionMock::ConnectionMock(Connection::SocketPointer socket):
     Connection(socket) {}
 
+}
 }
 }
 }

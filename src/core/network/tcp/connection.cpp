@@ -117,7 +117,7 @@ void Connection::receiveHandler(const boost::system::error_code &errorCode, size
         return;
     }
 
-    readBuffer_.payload_.setSize(bytesTransferred);
+    readBuffer_.payload_.setSize(bytesTransferred); // we should trust ASIO and belive that bytesTransfered never will be greater than maxSize
     receiveEventCallback_(*this);
 
     if(!closeOngoing_)
