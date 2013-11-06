@@ -6,6 +6,7 @@
 #include <ut/env/core/network/tcp/connectionsManagerEventsMock.hpp>
 #include <ut/env/core/network/tcp/connectionsFactoryMock.hpp>
 #include <ut/env/core/network/tcp/connectionMock.hpp>
+#include <ut/env/core/network/samplePayloads.hpp>
 
 using ::testing::_;
 using ::testing::SaveArg;
@@ -24,8 +25,9 @@ ACTION_TEMPLATE(SaveArgToPointer,
 }
 
 namespace asioStub = eMU::ut::env::asioStub;
+namespace networkEnv = eMU::ut::env::core::network;
+namespace tcpEnv = networkEnv::tcp;
 namespace network = eMU::core::network;
-namespace tcpEnv = eMU::ut::env::core::tcp;
 
 class ConnectionsManagerTest: public ::testing::Test
 {
@@ -53,9 +55,6 @@ public:
         connectionsManager_.setCloseEventCallback(std::bind(&tcpEnv::ConnectionsManagerEventsMock::closeEvent,
                 &connectionsManagerEventsMock_,
                 std::placeholders::_1));
-
-        samplePayload_.setValue<uint32_t>(0, 0xFFFFFFFF);
-        samplePayload_.setValue<uint32_t>(4, 0xEEEEEEEE);
     }
 
     void expectAsyncAcceptCallAndSaveArguments()
@@ -95,7 +94,7 @@ public:
     network::tcp::Connection::EventCallback receiveCallback_;
     network::tcp::Connection::EventCallback closeCallback_;
 
-    network::Payload samplePayload_;
+    networkEnv::SamplePayloads samplePayloads_;
 };
 
 TEST_F(ConnectionsManagerTest, accept)
@@ -107,14 +106,14 @@ TEST_F(ConnectionsManagerTest, send)
 {
     acceptScenario();
 
-    eMU::core::network::Payload sentPayload;
+    network::Payload sentPayload;
     EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&sentPayload));
     EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(ReturnRef(connection_));
 
-    connectionsManager_.send(connectionHash_, samplePayload_);
+    connectionsManager_.send(connectionHash_, samplePayloads_.payload1_);
 
-    ASSERT_EQ(samplePayload_.getSize(), sentPayload.getSize());
-    ASSERT_EQ(memcmp(&samplePayload_[0], &sentPayload[0], samplePayload_.getSize()), 0);
+    ASSERT_EQ(samplePayloads_.payload1_.getSize(), sentPayload.getSize());
+    ASSERT_EQ(memcmp(&samplePayloads_.payload1_[0], &sentPayload[0], samplePayloads_.payload1_.getSize()), 0);
 }
 
 TEST_F(ConnectionsManagerTest, getThrowExceptionDuringSend)
@@ -123,7 +122,7 @@ TEST_F(ConnectionsManagerTest, getThrowExceptionDuringSend)
 
     EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(network::tcp::ConnectionsFactory::UnknownConnectionException()));
 
-    connectionsManager_.send(connectionHash_, samplePayload_);
+    connectionsManager_.send(connectionHash_, samplePayloads_.payload1_);
 }
 
 TEST_F(ConnectionsManagerTest, disconnect)

@@ -11,8 +11,9 @@ using ::testing::_;
 using ::testing::Throw;
 
 namespace asioStub = eMU::ut::env::asioStub;
+namespace networkEnv = eMU::ut::env::core::network;
+namespace tcpEnv = networkEnv::tcp;
 namespace network = eMU::core::network;
-namespace tcpEnv = eMU::ut::env::core::tcp;
 
 class TcpConnectionTest: public ::testing::Test
 {
@@ -51,7 +52,7 @@ public:
     network::tcp::Connection connection_;
     boost::asio::ip::tcp::endpoint endpoint_;
 
-    eMU::ut::env::core::tcp::ConnectionEventsMock connectionEvents_;
+    tcpEnv::ConnectionEventsMock connectionEvents_;
 
     asioStub::io_service::IoHandler receiveHandler_;
     boost::asio::mutable_buffer receiveBuffer_;
@@ -61,7 +62,7 @@ public:
 
     asioStub::ip::tcp::socket::ConnectHandler connectHandler_;
 
-    eMU::ut::env::core::network::SamplePayloads samplePayloads_;
+    networkEnv::SamplePayloads samplePayloads_;
 };
 
 TEST_F(TcpConnectionTest, close)
@@ -231,28 +232,19 @@ TEST_F(TcpConnectionTest, sendErrorShouldNotTiggerCloseEventWhenSocketIsNotOpen)
     sendHandler_(boost::asio::error::already_started, 0);
 }
 
-//TEST_F(TcpConnectionTest, overflowPrimarySendBufferShouldTriggerCloseEvent)
-//{
-//    EXPECT_CALL(*socket_, is_open()).WillOnce(Return(true));
-//    EXPECT_CALL(connectionEvents_, closeEvent(Ref(connection_)));
+TEST_F(TcpConnectionTest, overflowSecondarySendBufferShouldTriggerCloseEvent)
+{
+    EXPECT_CALL(*socket_, async_send(_, _));
 
-//    eMU::core::network::Payload payload(eMU::core::network::Payload::DataContainer(eMU::core::network::Payload::getMaxSize() + 1, 0x10));
-//    connection_.send(payload);
-//}
+    network::Payload payload1(samplePayloads_.payload1_);
+    connection_.send(payload1);
 
-//TEST_F(TcpConnectionTest, overflowSecondarySendBufferShouldTriggerCloseEvent)
-//{
-//    EXPECT_CALL(*socket_, async_send(_, _));
+    EXPECT_CALL(*socket_, is_open()).WillOnce(Return(true));
+    EXPECT_CALL(connectionEvents_, closeEvent(Ref(connection_)));
 
-//    eMU::core::network::Payload payload1(eMU::core::network::Payload::DataContainer(eMU::core::network::Payload::getMaxSize(), 0x10));
-//    connection_.send(payload1);
-
-//    EXPECT_CALL(*socket_, is_open()).WillOnce(Return(true));
-//    EXPECT_CALL(connectionEvents_, closeEvent(Ref(connection_)));
-
-//    eMU::core::network::Payload payload2(eMU::core::network::Payload::DataContainer(eMU::core::network::Payload::getMaxSize() + 1, 0x11));
-//    connection_.send(payload2);
-//}
+    connection_.send(samplePayloads_.fullFilledPayload_);
+    connection_.send(samplePayloads_.halfFilledPayload_);
+}
 
 TEST_F(TcpConnectionTest, sendWithOperationAbortedErrorShouldNotTriggerCloseEvent)
 {

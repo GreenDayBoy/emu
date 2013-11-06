@@ -13,8 +13,9 @@ using ::testing::NotNull;
 using ::testing::ActionInterface;
 
 namespace asioStub = eMU::ut::env::asioStub;
+namespace networkEnv = eMU::ut::env::core::network;
+namespace udpEnv = networkEnv::udp;
 namespace network = eMU::core::network;
-namespace udpEnv = eMU::ut::env::core::udp;
 
 ACTION_TEMPLATE(SaveArgToPointer,
                 HAS_1_TEMPLATE_PARAMS(int, k),
@@ -33,7 +34,7 @@ public:
 
     void SetUp()
     {
-        connection_.setReceiveFromEventCallback(std::bind(&eMU::ut::env::core::udp::ConnectionEventsMock::receiveFromEvent,
+        connection_.setReceiveFromEventCallback(std::bind(&udpEnv::ConnectionEventsMock::receiveFromEvent,
                                                 &connectionEvents_,
                                                 std::placeholders::_1,
                                                 std::placeholders::_2));
@@ -67,7 +68,7 @@ public:
     boost::asio::mutable_buffer sendBuffer_;
     asioStub::io_service::IoHandler sendToHandler_;
 
-    eMU::ut::env::core::network::SamplePayloads samplePayloads_;
+    networkEnv::SamplePayloads samplePayloads_;
 };
 
 TEST_F(UdpConnectionTest, receiveFrom)
@@ -198,14 +199,24 @@ TEST_F(UdpConnectionTest, sendTo_different_endpoints)
     connection_.sendTo(endpoint2, samplePayloads_.payload3_);
 }
 
-//TEST_F(UdpConnectionTest, sendTo_overflow_buffer)
-//{
-//    boost::asio::ip::udp::endpoint endpoint(boost::asio::ip::address::from_string("1.2.3.4"), 1234);
-//    EXPECT_CALL(*socket_, async_send_to(_, endpoint, _)).Times(0);
+TEST_F(UdpConnectionTest, sendTo_overflow_buffer)
+{
+    boost::asio::ip::udp::endpoint endpoint(boost::asio::ip::address::from_string("1.2.3.4"), 1234);
 
-//    network::Payload payload(network::Payload::DataContainer(network::Payload::getMaxSize() + 1, 0x10));
-//    connection_.sendTo(endpoint, payload);
-//}
+    expectAsyncSendToCallAndSaveArguments(endpoint);
+    connection_.sendTo(endpoint, samplePayloads_.payload2_);
+
+    connection_.sendTo(endpoint, samplePayloads_.halfFilledPayload_);
+    connection_.sendTo(endpoint, samplePayloads_.fullFilledPayload_);
+
+    boost::asio::mutable_buffer pendingBuffer;
+    EXPECT_CALL(*socket_, async_send_to(_, endpoint, _)).WillOnce(SaveArg<0>(&pendingBuffer));
+
+    sendToHandler_(boost::system::error_code(), samplePayloads_.payload2_.getSize());
+
+    ASSERT_EQ(boost::asio::buffer_size(pendingBuffer), samplePayloads_.halfFilledPayload_.getSize());
+    ASSERT_EQ(memcmp(&samplePayloads_.halfFilledPayload_[0], boost::asio::buffer_cast<const uint8_t*>(pendingBuffer), samplePayloads_.halfFilledPayload_.getSize()), 0);
+}
 
 TEST_F(UdpConnectionTest, CheckConstructor)
 {
