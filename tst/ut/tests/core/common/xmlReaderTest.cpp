@@ -56,7 +56,7 @@ TEST_F(XmlReaderTest, exceptionShouldBeThrownWhenContentIsEmpty)
     {
         xmlReader_.parse(content_, "servers");
     }
-    catch(common::XmlReader::EmptyXmlContentException &exception)
+    catch(const common::XmlReader::EmptyXmlContentException&)
     {
         exceptionThrown = true;
     }
@@ -74,7 +74,7 @@ TEST_F(XmlReaderTest, exceptionShouldBeThrownWhenFirstNodeDoesNotMatch)
     {
         xmlReader_.parse(content_, "ssservverrs");
     }
-    catch(common::XmlReader::NotMatchedXmlNodeException &exception)
+    catch(const common::XmlReader::NotMatchedXmlNodeException&)
     {
         exceptionThrown = true;
     }

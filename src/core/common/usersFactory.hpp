@@ -26,7 +26,7 @@ public:
     UsersFactory(size_t maxNumberOfUsers):
         maxNumberOfUsers_(maxNumberOfUsers) {}
 
-    User& create()
+    size_t create()
     {
         if(users_.size() >= maxNumberOfUsers_)
         {
@@ -35,7 +35,7 @@ public:
 
         User *user = new User();
         users_.push_back(user);
-        return *user;
+        return user->getHash();
     }
 
     void destroy(size_t hash)
@@ -45,7 +45,7 @@ public:
                           users_.end(),
                           [&hash](const User *userFromVector)
         {
-            return hash == userFromVector->hash();
+            return hash == userFromVector->getHash();
         });
 
         if(it != users_.end())
@@ -62,7 +62,7 @@ public:
                           users_.end(),
                           [hash](const User *userFromVector)
         {
-            return hash == userFromVector->hash();
+            return hash == userFromVector->getHash();
         });
 
         if(it == users_.end())

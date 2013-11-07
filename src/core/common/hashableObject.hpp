@@ -14,7 +14,7 @@ class HashableObject
 public:
     virtual ~HashableObject();
 
-    virtual size_t hash() const;
+    virtual size_t getHash() const;
 };
 
 }

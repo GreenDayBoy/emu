@@ -1,19 +1,10 @@
 #pragma once
 
-#ifdef eMU_UT
-#include <ut/env/asioStub/ioService.hpp>
-#include <ut/env/asioStub/tcp/socket.hpp>
-#elif eMU_MT
-#include <mt/env/asioStub/ioService.hpp>
-#include <mt/env/asioStub/tcp/socket.hpp>
-#else
-#include <boost/asio.hpp>
-#endif
-
 #include <core/network/writeBuffer.hpp>
 #include <core/network/readBuffer.hpp>
 #include <core/common/hashableObject.hpp>
 #include <common/mockable.hpp>
+#include <common/asio.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <functional>
@@ -26,14 +17,6 @@ namespace network
 {
 namespace tcp
 {
-
-#ifdef eMU_UT
-namespace asio = eMU::ut::env::asioStub;
-#elif eMU_MT
-namespace asio = eMU::mt::env::asioStub;
-#else
-namespace asio = boost::asio;
-#endif
 
 class Connection: boost::noncopyable, public common::HashableObject
 {

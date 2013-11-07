@@ -63,7 +63,7 @@ TEST_F(PacketsExtractorTest, gotEmptyPayloadShouldThrowException)
     {
         extractor_.extract();
     }
-    catch(protocol::PacketsExtractor::EmptyPayloadException&)
+    catch(const protocol::PacketsExtractor::EmptyPayloadException&)
     {
         exceptionThrown = true;
     }
@@ -81,7 +81,7 @@ TEST_F(PacketsExtractorTest, PacketWithOutOfBoundSizeShouldThrowException)
     {
         extractor_.extract();
     }
-    catch(protocol::PacketsExtractor::PacketSizeOutOfBoundException&)
+    catch(const protocol::PacketsExtractor::PacketSizeOutOfBoundException&)
     {
         exceptionThrown = true;
     }
@@ -103,7 +103,7 @@ TEST_F(PacketsExtractorTest, WhenPacketSizeIsEqualToZeroShouldThrowException)
         extractor_.extract();
 
     }
-    catch(protocol::PacketsExtractor::NullPacketSizeException&)
+    catch(const protocol::PacketsExtractor::NullPacketSizeException&)
     {
         exceptionThrown = true;
     }
@@ -127,7 +127,7 @@ TEST_F(PacketsExtractorTest, TooSmallPacketSizeShouldThrowException)
         extractor_.extract();
 
     }
-    catch(protocol::PacketsExtractor::PacketSizeOutOfBoundException&)
+    catch(const protocol::PacketsExtractor::PacketSizeOutOfBoundException&)
     {
         exceptionThrown = true;
     }
@@ -151,7 +151,7 @@ TEST_F(PacketsExtractorTest, TooLargePacketSizeShouldThrowException)
         extractor_.extract();
 
     }
-    catch(protocol::PacketsExtractor::PacketSizeOutOfBoundException&)
+    catch(const protocol::PacketsExtractor::PacketSizeOutOfBoundException&)
     {
         exceptionThrown = true;
     }

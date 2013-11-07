@@ -26,7 +26,7 @@ TEST_F(TcpConnectionsFactoryTest, createConnectionWithSameHashTwiceShouldThrowEx
     {
         connectionsFactory_.create(hash, socket2);
     }
-    catch(network::tcp::ConnectionsFactory::AlreadyExistingConnectionException&)
+    catch(const network::tcp::ConnectionsFactory::AlreadyExistingConnectionException&)
     {
         exceptionThrown = true;
     }
@@ -62,7 +62,7 @@ TEST_F(TcpConnectionsFactoryTest, destroyNotExistingConnectionShouldThrowExcepti
     {
         connectionsFactory_.destroy(4321);
     }
-    catch(network::tcp::ConnectionsFactory::UnknownConnectionException&)
+    catch(const network::tcp::ConnectionsFactory::UnknownConnectionException&)
     {
         exceptionThrown = true;
     }
@@ -78,7 +78,7 @@ TEST_F(TcpConnectionsFactoryTest, get)
 
     network::tcp::Connection &gotConnection = connectionsFactory_.get(hash);
 
-    ASSERT_EQ(connection.hash(), gotConnection.hash());
+    ASSERT_EQ(connection.getHash(), gotConnection.getHash());
 }
 
 TEST_F(TcpConnectionsFactoryTest, getNotExisitngConnectionShouldThrowException)
@@ -89,7 +89,7 @@ TEST_F(TcpConnectionsFactoryTest, getNotExisitngConnectionShouldThrowException)
     {
         connectionsFactory_.get(4321);
     }
-    catch(network::tcp::ConnectionsFactory::UnknownConnectionException&)
+    catch(const network::tcp::ConnectionsFactory::UnknownConnectionException&)
     {
         exceptionThrown = true;
     }
@@ -108,7 +108,7 @@ TEST_F(TcpConnectionsFactoryTest, getHashForNotExistingConnectionShouldThrowExce
     {
         connectionsFactory_.getHash(connection);
     }
-    catch(network::tcp::ConnectionsFactory::UnknownConnectionException&)
+    catch(const network::tcp::ConnectionsFactory::UnknownConnectionException&)
     {
         exceptionThrown = true;
     }

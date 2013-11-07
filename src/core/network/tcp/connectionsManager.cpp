@@ -69,7 +69,7 @@ void ConnectionsManager::registerConnection(Connection::SocketPointer socket)
 
         acceptEventCallback_(hash);
     }
-    catch(ConnectionsFactory::AlreadyExistingConnectionException &exception)
+    catch(const ConnectionsFactory::AlreadyExistingConnectionException&)
     {
         LOG(ERROR) << "hash: " << hash << ", connection already exists!";
     }
@@ -97,7 +97,7 @@ void ConnectionsManager::send(size_t hash, const Payload &payload)
         Connection &connection = connectionsFactory_->get(hash);
         connection.send(payload);
     }
-    catch(ConnectionsFactory::UnknownConnectionException &exception)
+    catch(const ConnectionsFactory::UnknownConnectionException&)
     {
         LOG(ERROR) << "hash: " << hash << ", connection does not exist!";
     }
@@ -111,7 +111,7 @@ void ConnectionsManager::receiveEvent(Connection &connection)
 
         receiveEventCallback_(hash, connection.readBuffer().payload_);
     }
-    catch(ConnectionsFactory::UnknownConnectionException &exception)
+    catch(const ConnectionsFactory::UnknownConnectionException&)
     {
         LOG(ERROR) << "connection does not exist!";
     }
@@ -127,7 +127,7 @@ void ConnectionsManager::closeEvent(Connection &connection)
         connection.close();
         connectionsFactory_->destroy(hash);
     }
-    catch(ConnectionsFactory::UnknownConnectionException &exception)
+    catch(const ConnectionsFactory::UnknownConnectionException&)
     {
         LOG(ERROR) << "connection does not exist!";
     }
@@ -140,7 +140,7 @@ void ConnectionsManager::disconnect(size_t hash)
         Connection &connection = connectionsFactory_->get(hash);
         connection.disconnect();
     }
-    catch(ConnectionsFactory::UnknownConnectionException &exception)
+    catch(const ConnectionsFactory::UnknownConnectionException&)
     {
         LOG(ERROR) << "hash: " << hash << ", connection does not exist!";
     }
