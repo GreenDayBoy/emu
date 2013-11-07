@@ -52,7 +52,7 @@ size_t ConnectionsFactory::getHash(Connection &connection) const
 {
     for(auto &it : connections_)
     {
-        if(it.second->hash() == connection.hash())
+        if(it.second->getHash() == connection.getHash())
         {
             return it.first;
         }

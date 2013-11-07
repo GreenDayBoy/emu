@@ -27,66 +27,66 @@ protected:
 
 TEST_F(UsersFactoryTest, WhenMaxNumberOfUsersReachedShouldThrowException)
 {
-    FakeUser &user1 = usersFactory_.create();
-    FakeUser &user2 = usersFactory_.create();
+    size_t user1 = usersFactory_.create();
+    size_t user2 = usersFactory_.create();
 
     bool exceptionThrown = false;
     try
     {
         usersFactory_.create();
     }
-    catch(common::UsersFactory<FakeUser>::MaxNumberOfUsersReachedException &exception)
+    catch(const common::UsersFactory<FakeUser>::MaxNumberOfUsersReachedException&)
     {
         exceptionThrown = true;
     }
 
     ASSERT_TRUE(exceptionThrown);
 
-    usersFactory_.destroy(user1.hash());
-    usersFactory_.destroy(user2.hash());
+    usersFactory_.destroy(user1);
+    usersFactory_.destroy(user2);
 }
 
 TEST_F(UsersFactoryTest, WhenUserDestroyedShouldBeErasedFromFactory)
 {
-    FakeUser &user1 = usersFactory_.create();
+    size_t user1 = usersFactory_.create();
     ASSERT_EQ(1, usersFactory_.users().size());
 
-    usersFactory_.destroy(user1.hash());
+    usersFactory_.destroy(user1);
     ASSERT_EQ(0, usersFactory_.users().size());
 }
 
 TEST_F(UsersFactoryTest, WhenInvalidHashWasGivenThenFindShouldThrowException)
 {
-    FakeUser &user1 = usersFactory_.create();
-    FakeUser &user2 = usersFactory_.create();
+    size_t user1 = usersFactory_.create();
+    size_t user2 = usersFactory_.create();
 
     bool exceptionThrown = false;
     try
     {
         usersFactory_.find(12345);
     }
-    catch(common::UsersFactory<FakeUser>::UnknownUserException &exception)
+    catch(const common::UsersFactory<FakeUser>::UnknownUserException&)
     {
         exceptionThrown = true;
     }
 
     ASSERT_TRUE(exceptionThrown);
 
-    usersFactory_.destroy(user1.hash());
-    usersFactory_.destroy(user2.hash());
+    usersFactory_.destroy(user1);
+    usersFactory_.destroy(user2);
 }
 
 TEST_F(UsersFactoryTest, find)
 {
-    FakeUser &user1 = usersFactory_.create();
-    FakeUser &user2 = usersFactory_.create();
+    size_t user1 = usersFactory_.create();
+    size_t user2 = usersFactory_.create();
 
-    FakeUser &foundUser1 = usersFactory_.find(user1.hash());
-    ASSERT_EQ(user1.hash(), foundUser1.hash());
+    FakeUser &foundUser1 = usersFactory_.find(user1);
+    ASSERT_EQ(user1, foundUser1.getHash());
 
-    FakeUser &foundUser2 = usersFactory_.find(user2.hash());
-    ASSERT_EQ(user2.hash(), foundUser2.hash());
+    FakeUser &foundUser2 = usersFactory_.find(user2);
+    ASSERT_EQ(user2, foundUser2.getHash());
 
-    usersFactory_.destroy(user1.hash());
-    usersFactory_.destroy(user2.hash());
+    usersFactory_.destroy(user1);
+    usersFactory_.destroy(user2);
 }

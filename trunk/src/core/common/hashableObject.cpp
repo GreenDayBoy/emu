@@ -9,7 +9,7 @@ namespace common
 
 HashableObject::~HashableObject() {}
 
-size_t HashableObject::hash() const
+size_t HashableObject::getHash() const
 {
     return reinterpret_cast<size_t>(this);
 }
