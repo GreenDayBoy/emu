@@ -48,15 +48,15 @@ int main(int argsCount, char *args[])
 
     google::InitGoogleLogging(args[0]);
 
-    eMU::gameserver::Server::Configuration configuration = {0};
+    eMU::dataserver::Server::Configuration configuration = {0};
     configuration.maxNumberOfUsers_ = boost::lexical_cast<size_t>(args[1]);
     configuration.port_ = boost::lexical_cast<uint16_t>(args[2]);
 
     size_t maxNumberOfThreads = boost::lexical_cast<size_t>(args[3]);
 
     boost::asio::io_service service;
-    eMU::gameserver::Server server(service, configuration);
-    eMU::core::common::ServiceThreading<eMU::gameserver::User> serviceThreading(maxNumberOfThreads, service, server);
+    eMU::dataserver::Server server(service, configuration);
+    eMU::core::common::ServiceThreading<eMU::dataserver::User> serviceThreading(maxNumberOfThreads, service, server);
     serviceThreading.start();
 
     return 0;

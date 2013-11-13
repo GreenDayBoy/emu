@@ -28,7 +28,7 @@ public:
     MOCKABLE Connection& create(size_t hash, Connection::SocketPointer socket);
     MOCKABLE void destroy(size_t hash);
     MOCKABLE Connection& get(size_t hash);
-    MOCKABLE size_t getHash(Connection &connection) const;
+    MOCKABLE size_t getHash(const Connection &connection) const;
 
 private:
     ConnectionsContainer connections_;

@@ -38,7 +38,7 @@ target_link_libraries(core glog boost_system boost_thread)
 # dataserver setup ----------------
 file(GLOB_RECURSE dataserver_SOURCES "${eMU_dataserver_DIR}/*.cpp")
 add_executable(dataserver ${dataserver_SOURCES})
-target_link_libraries(dataserver core)
+target_link_libraries(dataserver core mysqlclient)
 add_dependencies(dataserver core)
 # ------------------------------------
 
@@ -46,7 +46,7 @@ add_dependencies(dataserver core)
 # ut -------
 file(GLOB_RECURSE ut_SOURCES "${eMU_ut_DIR}/*.cpp")
 add_executable(ut EXCLUDE_FROM_ALL ${ut_SOURCES} ${core_SOURCES} ${dataserver_SOURCES})
-target_link_libraries(ut gmock gtest pthread glog boost_system boost_thread)
+target_link_libraries(ut gmock gtest pthread glog boost_system boost_thread mysqlclient)
 
 # mt -------
 file(GLOB_RECURSE mt_SOURCES "${eMU_mt_DIR}/*.cpp")
