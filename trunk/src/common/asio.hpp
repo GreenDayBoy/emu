@@ -9,6 +9,8 @@
 
 #include <ut/env/asioStub/udp/socket.hpp>
 
+namespace asio = eMU::ut::env::asioStub;
+
 #elif eMU_MT
 
 #include <mt/env/asioStub/ioService.hpp>
@@ -18,21 +20,11 @@
 
 #include <mt/env/asioStub/udp/socket.hpp>
 
-#else
-
-#include <boost/asio.hpp>
-
-#endif
-
-#ifdef eMU_UT
-
-namespace asio = eMU::ut::env::asioStub;
-
-#elif eMU_MT
-
 namespace asio = eMU::mt::env::asioStub;
 
 #else
+
+#include <boost/asio.hpp>
 
 namespace asio = boost::asio;
 

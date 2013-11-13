@@ -48,11 +48,11 @@ Connection& ConnectionsFactory::get(size_t hash)
     return *connections_[hash];
 }
 
-size_t ConnectionsFactory::getHash(Connection &connection) const
+size_t ConnectionsFactory::getHash(const Connection &connection) const
 {
     for(auto &it : connections_)
     {
-        if(it.second->getHash() == connection.getHash())
+        if(*(it.second) == connection)
         {
             return it.first;
         }

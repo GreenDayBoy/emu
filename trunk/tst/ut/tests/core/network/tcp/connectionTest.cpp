@@ -10,7 +10,6 @@ using ::testing::Ref;
 using ::testing::_;
 using ::testing::Throw;
 
-namespace asioStub = eMU::ut::env::asioStub;
 namespace networkEnv = eMU::ut::env::core::network;
 namespace tcpEnv = networkEnv::tcp;
 namespace network = eMU::core::network;
@@ -19,7 +18,7 @@ class TcpConnectionTest: public ::testing::Test
 {
 public:
     TcpConnectionTest():
-        socket_(new asioStub::ip::tcp::socket(ioService_)),
+        socket_(new asio::ip::tcp::socket(ioService_)),
         connection_(socket_),
         endpoint_(boost::asio::ip::tcp::v4(), 55962) {}
 
@@ -47,20 +46,20 @@ public:
         EXPECT_CALL(*socket_, async_connect(endpoint_, _)).WillOnce(SaveArg<1>(&connectHandler_));
     }
 
-    asioStub::io_service ioService_;
+    asio::io_service ioService_;
     network::tcp::Connection::SocketPointer socket_;
     network::tcp::Connection connection_;
     boost::asio::ip::tcp::endpoint endpoint_;
 
     tcpEnv::ConnectionEventsMock connectionEvents_;
 
-    asioStub::io_service::IoHandler receiveHandler_;
+    asio::io_service::IoHandler receiveHandler_;
     boost::asio::mutable_buffer receiveBuffer_;
 
-    asioStub::io_service::IoHandler sendHandler_;
+    asio::io_service::IoHandler sendHandler_;
     boost::asio::mutable_buffer sendBuffer_;
 
-    asioStub::ip::tcp::socket::ConnectHandler connectHandler_;
+    asio::ip::tcp::socket::ConnectHandler connectHandler_;
 
     networkEnv::SamplePayloads samplePayloads_;
 };
@@ -184,7 +183,7 @@ TEST_F(TcpConnectionTest, PendingBuffersShouldBeSendTogether)
     for(size_t i = 0; i < attempts; ++i)
     {
         boost::asio::mutable_buffer sendBuffer1;
-        asioStub::io_service::IoHandler sendHandler1;
+        asio::io_service::IoHandler sendHandler1;
         EXPECT_CALL(*socket_, async_send(_, _)).WillOnce(DoAll(SaveArg<0>(&sendBuffer1), SaveArg<1>(&sendHandler1)));
 
         connection_.send(samplePayloads_.payload1_);
@@ -196,7 +195,7 @@ TEST_F(TcpConnectionTest, PendingBuffersShouldBeSendTogether)
         connection_.send(samplePayloads_.halfFilledPayload_);
 
         boost::asio::mutable_buffer sendBuffer2;
-        eMU::ut::env::asioStub::io_service::IoHandler sendHandler2;
+        asio::io_service::IoHandler sendHandler2;
         EXPECT_CALL(*socket_, async_send(_, _)).WillOnce(DoAll(SaveArg<0>(&sendBuffer2), SaveArg<1>(&sendHandler2)));
 
         sendHandler1(boost::system::error_code(), samplePayloads_.payload1_.getSize());

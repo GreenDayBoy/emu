@@ -2,7 +2,6 @@
 
 #include <core/network/writeBuffer.hpp>
 #include <core/network/readBuffer.hpp>
-#include <core/common/hashableObject.hpp>
 #include <common/mockable.hpp>
 #include <common/asio.hpp>
 
@@ -18,7 +17,7 @@ namespace network
 namespace tcp
 {
 
-class Connection: boost::noncopyable, public common::HashableObject
+class Connection: boost::noncopyable
 {
 public:
     typedef std::function<void(Connection&)> EventCallback;
@@ -39,6 +38,8 @@ public:
     MOCKABLE void send(const Payload &payload);
     MOCKABLE void queueReceive();
     void connect(const boost::asio::ip::tcp::endpoint &endpoint);
+
+    bool operator==(const Connection &connection) const;
 
     friend std::ostream& operator<<(std::ostream &stream, const Connection &connection);
 
