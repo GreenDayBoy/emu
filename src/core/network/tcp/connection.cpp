@@ -17,9 +17,9 @@ Connection::Connection(SocketPointer socket):
 
 Connection::~Connection() {}
 
-ReadBuffer& Connection::readBuffer()
+Payload& Connection::getReadPayload()
 {
-    return readBuffer_;
+    return readPayload_;
 }
 
 void Connection::setConnectEventCallback(const EventCallback &callback)
@@ -72,16 +72,16 @@ void Connection::send(const Payload &payload)
         return;
     }
 
-    if(!writeBuffer_.pending_)
+    if(!writeBuffer_.isPending())
     {
-        writeBuffer_.pending_ = true;
+        writeBuffer_.setPendingState();
         this->queueSend();
     }
 }
 
 void Connection::queueReceive()
 {
-    socket_->async_receive(boost::asio::buffer(&readBuffer_.payload_[0], Payload::getMaxSize()),
+    socket_->async_receive(boost::asio::buffer(&readPayload_[0], Payload::getMaxSize()),
                            strand_.wrap(std::bind(&Connection::receiveHandler,
                                         this,
                                         std::placeholders::_1,
@@ -97,7 +97,7 @@ void Connection::connect(const boost::asio::ip::tcp::endpoint &endpoint)
 
 void Connection::queueSend()
 {
-    socket_->async_send(boost::asio::buffer(&writeBuffer_.payload_[0], writeBuffer_.payload_.getSize()),
+    socket_->async_send(boost::asio::buffer(&writeBuffer_.getPayload()[0], writeBuffer_.getPayload().getSize()),
                         strand_.wrap(std::bind(&Connection::sendHandler,
                                      this,
                                      std::placeholders::_1,
@@ -117,7 +117,7 @@ void Connection::receiveHandler(const boost::system::error_code &errorCode, size
         return;
     }
 
-    readBuffer_.payload_.setSize(bytesTransferred); // we should trust ASIO and belive that bytesTransfered never will be greater than maxSize
+    readPayload_.setSize(bytesTransferred); // we should trust ASIO and belive that bytesTransfered never will be greater than maxSize
     receiveEventCallback_(*this);
 
     if(!closeOngoing_)
@@ -134,7 +134,7 @@ void Connection::sendHandler(const boost::system::error_code& errorCode, size_t 
         return;
     }
 
-    if(writeBuffer_.secondPayload_.getSize() > 0)
+    if(writeBuffer_.getSecondPayload().getSize() > 0)
     {
         writeBuffer_.swap();
         this->queueSend();

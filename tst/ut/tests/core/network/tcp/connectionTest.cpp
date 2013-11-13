@@ -116,8 +116,8 @@ TEST_F(TcpConnectionTest, receive)
 
     receiveHandler_(boost::system::error_code(), samplePayloads_.payload1_.getSize());
 
-    ASSERT_EQ(samplePayloads_.payload1_.getSize(), connection_.readBuffer().payload_.getSize());
-    EXPECT_EQ(memcmp(&samplePayloads_.payload1_[0], &connection_.readBuffer().payload_[0], samplePayloads_.payload1_.getSize()), 0);
+    ASSERT_EQ(samplePayloads_.payload1_.getSize(), connection_.getReadPayload().getSize());
+    EXPECT_EQ(memcmp(&samplePayloads_.payload1_[0], &connection_.getReadPayload()[0], samplePayloads_.payload1_.getSize()), 0);
 }
 
 TEST_F(TcpConnectionTest, receiveErrorShouldTriggerCloseEvent)

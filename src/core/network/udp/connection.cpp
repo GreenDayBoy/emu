@@ -21,9 +21,9 @@ Connection::Connection(SocketPointer socket):
 
 Connection::~Connection() {}
 
-ReadBuffer& Connection::readBuffer()
+Payload& Connection::getReadPayload()
 {
-    return readBuffer_;
+    return readPayload_;
 }
 
 void Connection::setReceiveFromEventCallback(const ReceiveFromEventCallback &callback)
@@ -33,7 +33,7 @@ void Connection::setReceiveFromEventCallback(const ReceiveFromEventCallback &cal
 
 void Connection::queueReceiveFrom()
 {
-    socket_->async_receive_from(boost::asio::buffer(&readBuffer_.payload_[0], Payload::getMaxSize()),
+    socket_->async_receive_from(boost::asio::buffer(&readPayload_[0], Payload::getMaxSize()),
                                 senderEndpoint_,
                                 strand_.wrap(std::bind(&Connection::receiveFromHandler,
                                         this,
@@ -53,9 +53,9 @@ void Connection::sendTo(const boost::asio::ip::udp::endpoint &endpoint, const Pa
         return;
     }
 
-    if(!writeBuffer.pending_)
+    if(!writeBuffer.isPending())
     {
-        writeBuffer.pending_ = true;
+        writeBuffer.setPendingState();
         this->queueSendTo(endpoint, writeBuffer);
     }
 }
@@ -68,7 +68,7 @@ void Connection::receiveFromHandler(const boost::system::error_code &errorCode, 
     }
     else
     {
-        readBuffer_.payload_.setSize(bytesTransferred); // we should trust ASIO and belive that bytesTransfered never will be greater than maxSize
+        readPayload_.setSize(bytesTransferred); // we should trust ASIO and belive that bytesTransfered never will be greater than maxSize
         receiveFromEventCallback_(*this, senderEndpoint_);
     }
 
@@ -77,7 +77,7 @@ void Connection::receiveFromHandler(const boost::system::error_code &errorCode, 
 
 void Connection::queueSendTo(const boost::asio::ip::udp::endpoint &endpoint, WriteBuffer &writeBuffer)
 {
-    socket_->async_send_to(boost::asio::buffer(&writeBuffer.payload_[0], writeBuffer.payload_.getSize()),
+    socket_->async_send_to(boost::asio::buffer(&writeBuffer.getPayload()[0], writeBuffer.getPayload().getSize()),
                            endpoint,
                            strand_.wrap(std::bind(&Connection::sendToHandler,
                                         this,
@@ -95,7 +95,7 @@ void Connection::sendToHandler(const boost::asio::ip::udp::endpoint &endpoint, c
 
     WriteBuffer &writeBuffer = writeBufferFactory_.get(endpoint);
 
-    if(writeBuffer.secondPayload_.getSize() > 0)
+    if(writeBuffer.getSecondPayload().getSize() > 0)
     {
         writeBuffer.swap();
         this->queueSendTo(endpoint, writeBuffer);

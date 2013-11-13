@@ -12,31 +12,31 @@ protected:
 
 TEST_F(WriteBufferTest, construct)
 {
-    EXPECT_FALSE(writeBuffer_.pending_);
+    EXPECT_FALSE(writeBuffer_.isPending());
 }
 
 TEST_F(WriteBufferTest, clear)
 {
-    writeBuffer_.payload_.insert<uint8_t>(0x01);
-    writeBuffer_.secondPayload_.insert<uint8_t>(0x04);
-    writeBuffer_.pending_ = true;
+    writeBuffer_.getPayload().insert<uint8_t>(0x01);
+    writeBuffer_.getSecondPayload().insert<uint8_t>(0x04);
+    writeBuffer_.setPendingState();
 
     writeBuffer_.clear();
 
-    EXPECT_EQ(0, writeBuffer_.payload_.getSize());
-    EXPECT_EQ(0, writeBuffer_.secondPayload_.getSize());
+    EXPECT_EQ(0, writeBuffer_.getPayload().getSize());
+    EXPECT_EQ(0, writeBuffer_.getSecondPayload().getSize());
 
-    EXPECT_FALSE(writeBuffer_.pending_);
+    EXPECT_FALSE(writeBuffer_.isPending());
 }
 
 TEST_F(WriteBufferTest, swap)
 {
-    writeBuffer_.secondPayload_ = samplePayloads_.payload1_;
+    writeBuffer_.getSecondPayload() = samplePayloads_.payload1_;
 
     writeBuffer_.swap();
 
-    ASSERT_EQ(samplePayloads_.payload1_.getSize(), writeBuffer_.payload_.getSize());
-    ASSERT_EQ(memcmp(&samplePayloads_.payload1_[0], &writeBuffer_.payload_[0], samplePayloads_.payload1_.getSize()), 0);
+    ASSERT_EQ(samplePayloads_.payload1_.getSize(), writeBuffer_.getPayload().getSize());
+    ASSERT_EQ(memcmp(&samplePayloads_.payload1_[0], &writeBuffer_.getPayload()[0], samplePayloads_.payload1_.getSize()), 0);
 }
 
 TEST_F(WriteBufferTest, insert)
@@ -47,13 +47,13 @@ TEST_F(WriteBufferTest, insert)
     result = writeBuffer_.insert(samplePayloads_.halfFilledPayload_);
     ASSERT_TRUE(result);
 
-    ASSERT_EQ(samplePayloads_.fullFilledPayload_.getSize(), writeBuffer_.payload_.getSize());
-    ASSERT_EQ(memcmp(&samplePayloads_.fullFilledPayload_[0], &writeBuffer_.payload_[0], samplePayloads_.fullFilledPayload_.getSize()), 0);
+    ASSERT_EQ(samplePayloads_.fullFilledPayload_.getSize(), writeBuffer_.getPayload().getSize());
+    ASSERT_EQ(memcmp(&samplePayloads_.fullFilledPayload_[0], &writeBuffer_.getPayload()[0], samplePayloads_.fullFilledPayload_.getSize()), 0);
 }
 
 TEST_F(WriteBufferTest, insertBufferWhenPendingState)
 {
-    writeBuffer_.pending_ = true;
+    writeBuffer_.setPendingState();
 
     bool result = writeBuffer_.insert(samplePayloads_.halfFilledPayload_);
     ASSERT_TRUE(result);
@@ -61,13 +61,13 @@ TEST_F(WriteBufferTest, insertBufferWhenPendingState)
     result = writeBuffer_.insert(samplePayloads_.halfFilledPayload_);
     ASSERT_TRUE(result);
 
-    ASSERT_EQ(samplePayloads_.fullFilledPayload_.getSize(), writeBuffer_.secondPayload_.getSize());
-    ASSERT_EQ(memcmp(&samplePayloads_.fullFilledPayload_[0], &writeBuffer_.secondPayload_[0], samplePayloads_.fullFilledPayload_.getSize()), 0);
+    ASSERT_EQ(samplePayloads_.fullFilledPayload_.getSize(), writeBuffer_.getSecondPayload().getSize());
+    ASSERT_EQ(memcmp(&samplePayloads_.fullFilledPayload_[0], &writeBuffer_.getSecondPayload()[0], samplePayloads_.fullFilledPayload_.getSize()), 0);
 }
 
 TEST_F(WriteBufferTest, insertShouldReturnFalseWhenPrimaryBufferWillBeOverflow)
 {
-    writeBuffer_.pending_ = false;
+    writeBuffer_.clearPendingState();
 
     bool result = writeBuffer_.insert(samplePayloads_.fullFilledPayload_);
 
@@ -79,7 +79,7 @@ TEST_F(WriteBufferTest, insertShouldReturnFalseWhenPrimaryBufferWillBeOverflow)
 
 TEST_F(WriteBufferTest, insertShouldReturnFalseWhenSecondaryBufferWillBeOverflow)
 {
-    writeBuffer_.pending_ = true;
+    writeBuffer_.setPendingState();
 
     bool result = writeBuffer_.insert(samplePayloads_.fullFilledPayload_);
 
