@@ -23,7 +23,7 @@ public:
     std::string getErrorMessage();
 
     bool executeQuery(const std::string &query);
-    const QueryResult&& fetchQuery();
+    const QueryResult&& fetchQueryResult();
 
     void releaseQuery();
 

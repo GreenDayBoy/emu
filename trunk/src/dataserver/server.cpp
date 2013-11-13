@@ -11,8 +11,9 @@ namespace eMU
 namespace dataserver
 {
 
-Server::Server(asio::io_service &ioService, const Configuration &configuration):
-    core::network::Server<User>(ioService, configuration.port_, configuration.maxNumberOfUsers_) {}
+Server::Server(asio::io_service &ioService, database::SqlInterface &sqlInterface, const Configuration &configuration):
+    core::network::Server<User>(ioService, configuration.port_, configuration.maxNumberOfUsers_),
+    database_(sqlInterface) {}
 
 bool Server::onStartup()
 {

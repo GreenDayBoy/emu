@@ -25,7 +25,7 @@ public:
     void cleanup();
     void execute(std::string query);
 
-    const QueryResult&& fetchQuery();
+    const QueryResult&& fetchQueryResult();
 
 private:
     SqlInterface &sqlInterface_;

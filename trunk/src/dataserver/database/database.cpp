@@ -47,9 +47,9 @@ void Database::execute(std::string query)
     }
 }
 
-const QueryResult&& Database::fetchQuery()
+const QueryResult&& Database::fetchQueryResult()
 {
-    return sqlInterface_.fetchQuery();
+    return sqlInterface_.fetchQueryResult();
 }
 
 }
