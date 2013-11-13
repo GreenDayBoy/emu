@@ -4,6 +4,7 @@
 #include <core/network/server.hpp>
 #include <common/asio.hpp>
 #include <dataserver/user.hpp>
+#include <dataserver/database/database.hpp>
 
 namespace eMU
 {
@@ -19,7 +20,7 @@ public:
         size_t maxNumberOfUsers_;
     };
 
-    Server(asio::io_service &ioService, const Configuration &configuration);
+    Server(asio::io_service &ioService, database::SqlInterface &sqlInterface, const Configuration &configuration);
 
     bool onStartup();
     void onCleanup();
@@ -28,6 +29,8 @@ public:
 
 private:
     void handlePacket(size_t hash, const eMU::core::network::Payload &packet);
+
+    database::Database database_;
 };
 
 }

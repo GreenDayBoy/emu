@@ -25,7 +25,7 @@ public:
     virtual std::string getErrorMessage() = 0;
 
     virtual bool executeQuery(const std::string &query) = 0;
-    virtual const QueryResult&& fetchQuery() = 0;
+    virtual const QueryResult&& fetchQueryResult() = 0;
 };
 
 }

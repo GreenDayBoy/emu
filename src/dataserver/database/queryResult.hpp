@@ -22,11 +22,13 @@ public:
     template<typename T>
     T getFieldValue(const std::string &fieldName) const
     {
+        return T();
     }
 
     template<typename T>
     T getFieldValue(size_t index) const
     {
+        return T();
     }
 
     Fields& getFields();

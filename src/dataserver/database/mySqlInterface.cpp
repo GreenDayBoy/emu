@@ -61,7 +61,7 @@ std::string MySqlInterface::getErrorMessage()
     return mysql_error(&handle_);
 }
 
-const QueryResult&& MySqlInterface::fetchQuery()
+const QueryResult&& MySqlInterface::fetchQueryResult()
 {
     queryResult_ = mysql_store_result(&handle_);
 
