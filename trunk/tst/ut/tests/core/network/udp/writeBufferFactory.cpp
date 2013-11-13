@@ -6,11 +6,11 @@
 
 bool operator==(const eMU::core::network::WriteBuffer &left, const eMU::core::network::WriteBuffer &right)
 {
-    return left.payload_.getSize() == right.payload_.getSize() &&
-           memcmp(&left.payload_[0], &right.payload_[0], left.payload_.getSize()) == 0 &&
-           left.secondPayload_.getSize() == right.secondPayload_.getSize() &&
-           memcmp(&left.secondPayload_[0], &right.secondPayload_[0], left.secondPayload_.getSize()) == 0 &&
-           left.pending_ == right.pending_;
+    return left.getPayload().getSize() == right.getPayload().getSize() &&
+           memcmp(&left.getPayload()[0], &right.getPayload()[0], left.getPayload().getSize()) == 0 &&
+           left.getSecondPayload().getSize() == right.getSecondPayload().getSize() &&
+           memcmp(&left.getSecondPayload()[0], &right.getSecondPayload()[0], left.getSecondPayload().getSize()) == 0 &&
+           left.isPending() == right.isPending();
 }
 
 class WriteBufferFactoryTest: public ::testing::Test
@@ -26,7 +26,7 @@ TEST_F(WriteBufferFactoryTest, ShouldReturnSameBufferForSameEndpoint)
     eMU::core::network::WriteBuffer &writeBuffer = writeBufferFactory_.get(endpoint);
 
     writeBuffer.insert(samplePayloads_.payload1_);
-    writeBuffer.pending_ = true;
+    writeBuffer.setPendingState();
     writeBuffer.insert(samplePayloads_.payload2_);
 
     eMU::core::network::WriteBuffer &writeBuffer2 = writeBufferFactory_.get(endpoint);
@@ -40,7 +40,7 @@ TEST_F(WriteBufferFactoryTest, ShouldRemoveBufferForGivenEndpoint)
     eMU::core::network::WriteBuffer &writeBuffer = writeBufferFactory_.get(endpoint);
 
     writeBuffer.insert(samplePayloads_.payload1_);
-    writeBuffer.pending_ = true;
+    writeBuffer.setPendingState();
     writeBuffer.insert(samplePayloads_.payload2_);
 
     ASSERT_TRUE(writeBufferFactory_.erase(endpoint));

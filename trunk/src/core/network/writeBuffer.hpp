@@ -18,14 +18,24 @@ public:
     bool insert(const Payload& payload);
     void swap();
 
-    Payload payload_;
-    Payload secondPayload_;
+    bool isPending() const;
+    void setPendingState();
+    void clearPendingState();
 
-    bool pending_;
+    Payload& getPayload();
+    const Payload& getPayload() const;
+
+    Payload& getSecondPayload();
+    const Payload& getSecondPayload() const;
 
 private:
     void clearFirstPayload();
     void clearSecondPayload();
+
+    Payload payload_;
+    Payload secondPayload_;
+
+    bool pending_;
 };
 
 }

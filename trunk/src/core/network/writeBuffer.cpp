@@ -53,6 +53,41 @@ void WriteBuffer::swap()
     this->clearSecondPayload();
 }
 
+bool WriteBuffer::isPending() const
+{
+    return pending_;
+}
+
+void WriteBuffer::setPendingState()
+{
+    pending_ = true;
+}
+
+void WriteBuffer::clearPendingState()
+{
+    pending_ = false;
+}
+
+Payload& WriteBuffer::getPayload()
+{
+    return payload_;
+}
+
+const Payload& WriteBuffer::getPayload() const
+{
+    return payload_;
+}
+
+Payload& WriteBuffer::getSecondPayload()
+{
+    return secondPayload_;
+}
+
+const Payload& WriteBuffer::getSecondPayload() const
+{
+    return secondPayload_;
+}
+
 }
 }
 }

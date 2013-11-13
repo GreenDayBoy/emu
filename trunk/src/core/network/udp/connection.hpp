@@ -1,6 +1,5 @@
 #pragma once
 
-#include <core/network/readBuffer.hpp>
 #include <core/network/udp/writeBufferFactory.hpp>
 #include <common/asio.hpp>
 
@@ -26,7 +25,7 @@ public:
     explicit Connection(SocketPointer socket);
     virtual ~Connection();
 
-    ReadBuffer& readBuffer();
+    Payload& getReadPayload();
     void setReceiveFromEventCallback(const ReceiveFromEventCallback &callback);
     void queueReceiveFrom();
     void sendTo(const boost::asio::ip::udp::endpoint &endpoint, const Payload &payload);
@@ -42,7 +41,7 @@ private:
 
     SocketPointer socket_;
     asio::io_service::strand strand_;
-    ReadBuffer readBuffer_;
+    Payload readPayload_;
     WriteBufferFactory writeBufferFactory_;
     boost::asio::ip::udp::endpoint senderEndpoint_;
     ReceiveFromEventCallback receiveFromEventCallback_;

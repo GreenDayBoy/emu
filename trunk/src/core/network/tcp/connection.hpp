@@ -1,7 +1,6 @@
 #pragma once
 
 #include <core/network/writeBuffer.hpp>
-#include <core/network/readBuffer.hpp>
 #include <common/mockable.hpp>
 #include <common/asio.hpp>
 
@@ -27,7 +26,7 @@ public:
     Connection(SocketPointer socket);
     virtual ~Connection();
 
-    ReadBuffer& readBuffer();
+    Payload& getReadPayload();
 
     void setConnectEventCallback(const EventCallback &callback);
     MOCKABLE void setReceiveEventCallback(const EventCallback &callback);
@@ -55,7 +54,7 @@ private:
 
     SocketPointer socket_;
 
-    ReadBuffer readBuffer_;
+    Payload readPayload_;
     WriteBuffer writeBuffer_;
 
     asio::io_service::strand strand_;

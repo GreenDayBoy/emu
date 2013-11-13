@@ -109,7 +109,7 @@ void ConnectionsManager::receiveEvent(Connection &connection)
     {
         size_t hash = connectionsFactory_->getHash(connection);
 
-        receiveEventCallback_(hash, connection.readBuffer().payload_);
+        receiveEventCallback_(hash, connection.getReadPayload());
     }
     catch(const ConnectionsFactory::UnknownConnectionException&)
     {
