@@ -1,7 +1,10 @@
 #include <dataserver/server.hpp>
+#include <dataserver/transactions/checkAccountRequestTransaction.hpp>
 
 #include <core/protocol/packetsExtractor.hpp>
 #include <core/common/serviceThreading.hpp>
+
+#include <interface/messageIds.hpp>
 
 #include <glog/logging.h>
 #include <boost/lexical_cast.hpp>
@@ -33,7 +36,15 @@ void Server::onClose(size_t hash)
     usersFactory_.destroy(hash);
 }
 
-void Server::handlePacket(size_t hash, const core::network::Payload &packet) {}
+void Server::handlePacket(size_t hash, const core::network::Payload &packet)
+{
+    uint16_t messageId = packet.getValue<uint16_t>(4);
+
+    if(messageId == interface::DataServerMessageIds::CheckAccountRequest)
+    {
+        transactionsManager_.queue(new transactions::CheckAccountRequestTransaction(sqlInterface_));
+    }
+}
 
 }
 }
