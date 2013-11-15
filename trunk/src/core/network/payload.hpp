@@ -44,6 +44,8 @@ public:
         return *(reinterpret_cast<const T*>(&data_[offset]));
     }
 
+    std::string getString(size_t offset, size_t length) const;
+
     template<typename T>
     void insert(const T &value)
     {

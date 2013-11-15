@@ -64,28 +64,26 @@ void MySqlInterface::executeQuery(std::string query)
 
 std::string MySqlInterface::getErrorMessage()
 {
-    return mysql_error(&handle_);
+    return std::move(std::string(mysql_error(&handle_)));
 }
 
-const QueryResult&& MySqlInterface::fetchQueryResult()
+QueryResult MySqlInterface::fetchQueryResult()
 {
     queryResult_ = mysql_store_result(&handle_);
-
-    if(queryResult_ == nullptr)
-    {
-        return std::move(QueryResult());
-    }
-
     QueryResult queryResult;
-    queryResult.getFields() = this->fetchQueryFields();
-    queryResult.getRows() = this->fetchQueryRows();
 
-    mysql_free_result(queryResult_);
+    if(queryResult_ != nullptr)
+    {
+        queryResult.getFields() = this->fetchQueryFields();
+        queryResult.getRows() = this->fetchQueryRows();
+
+        mysql_free_result(queryResult_);
+    }
 
     return std::move(queryResult);
 }
 
-QueryResult::Fields&& MySqlInterface::fetchQueryFields()
+QueryResult::Fields MySqlInterface::fetchQueryFields()
 {
     MYSQL_FIELD *field = mysql_fetch_field(queryResult_);
     size_t i = 0;
@@ -101,7 +99,7 @@ QueryResult::Fields&& MySqlInterface::fetchQueryFields()
     return std::move(fields);
 }
 
-QueryResult::Rows&& MySqlInterface::fetchQueryRows()
+QueryResult::Rows MySqlInterface::fetchQueryRows()
 {
     MYSQL_ROW mysqlRow = mysql_fetch_row(queryResult_);
     size_t fieldsCount = mysql_num_fields(queryResult_);

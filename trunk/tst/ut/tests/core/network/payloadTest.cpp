@@ -103,6 +103,20 @@ TEST_F(PayloadTest, getValue)
     ASSERT_EQ(0x07, payload_.getValue<uint8_t>(6));
 }
 
+TEST_F(PayloadTest, getString)
+{
+    std::string sampleString = "testtesttest";
+
+    for(size_t i = 0; i < sampleString.length(); ++i)
+    {
+        payload_.insert<std::string::value_type>(sampleString[i]);
+    }
+
+    std::string value = payload_.getString(0, sampleString.length());
+
+    EXPECT_EQ(sampleString, value);
+}
+
 TEST_F(PayloadTest, throwExceptionWhenOffsetInGetValueIsOutOfBound)
 {
     bool exceptionThrown = false;
