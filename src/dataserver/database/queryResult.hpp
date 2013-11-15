@@ -3,6 +3,7 @@
 #include <boost/noncopyable.hpp>
 #include <map>
 #include <vector>
+#include <string>
 
 namespace eMU
 {
