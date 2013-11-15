@@ -42,7 +42,7 @@ void Server::handlePacket(size_t hash, const core::network::Payload &packet)
 
     if(messageId == interface::DataServerMessageIds::CheckAccountRequest)
     {
-        transactionsManager_.queue(new transactions::CheckAccountRequestTransaction(sqlInterface_));
+        transactionsManager_.queue(new transactions::CheckAccountRequestTransaction(packet, sqlInterface_));
     }
 }
 
