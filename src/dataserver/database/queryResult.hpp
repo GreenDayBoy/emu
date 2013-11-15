@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost/noncopyable.hpp>
 #include <map>
 #include <vector>
 #include <string>
@@ -12,7 +11,7 @@ namespace dataserver
 namespace database
 {
 
-class QueryResult: boost::noncopyable {
+class QueryResult {
 public:
     typedef std::map<std::string, size_t> Fields;
     typedef std::vector<std::string> Row;

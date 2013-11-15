@@ -53,6 +53,18 @@ const uint8_t& Payload::operator[](size_t offset) const
     return data_[offset];
 }
 
+std::string Payload::getString(size_t offset, size_t length) const
+{
+    std::string value;
+
+    for(size_t i = 0; i < length; ++i)
+    {
+        value.push_back(this->getValue<std::string::value_type>(offset + i));
+    }
+
+    return std::move(value);
+}
+
 }
 }
 }

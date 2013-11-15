@@ -23,13 +23,13 @@ public:
     std::string getErrorMessage();
 
     void executeQuery(std::string query);
-    const QueryResult&& fetchQueryResult();
+    QueryResult fetchQueryResult();
 
     void releaseQuery();
 
 private:
-    QueryResult::Fields&& fetchQueryFields();
-    QueryResult::Rows&& fetchQueryRows();
+    QueryResult::Fields fetchQueryFields();
+    QueryResult::Rows fetchQueryRows();
 
     MYSQL handle_;
     MYSQL_RES *queryResult_;
