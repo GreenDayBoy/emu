@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/transactions/transaction.hpp>
-#include <dataserver/database/database.hpp>
+#include <dataserver/database/sqlInterface.hpp>
 
 namespace eMU
 {
@@ -13,13 +13,13 @@ namespace transactions
 class CheckAccountRequestTransaction: public eMU::core::transactions::Transaction
 {
 public:
-    CheckAccountRequestTransaction(database::Database &database);
+    CheckAccountRequestTransaction(database::SqlInterface &sqlInterface);
 
     bool isValid() const;
     void handle();
 
 private:
-    database::Database &database_;
+    database::SqlInterface &sqlInterface_;
 };
 
 }

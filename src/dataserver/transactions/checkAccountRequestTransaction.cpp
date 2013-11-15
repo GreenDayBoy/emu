@@ -1,5 +1,7 @@
 #include <dataserver/transactions/checkAccountRequestTransaction.hpp>
 
+#include <sstream>
+
 namespace eMU
 {
 namespace dataserver
@@ -7,8 +9,8 @@ namespace dataserver
 namespace transactions
 {
 
-CheckAccountRequestTransaction::CheckAccountRequestTransaction(database::Database &database):
-    database_(database) {}
+CheckAccountRequestTransaction::CheckAccountRequestTransaction(database::SqlInterface &sqlInterface):
+    sqlInterface_(sqlInterface) {}
 
 bool CheckAccountRequestTransaction::isValid() const
 {
@@ -21,9 +23,9 @@ void CheckAccountRequestTransaction::handle()
     query << "SELECT"
           << " `eMU_AccountCheck`();";
 
-    database_.execute(query.str());
+    sqlInterface_.executeQuery(query.str());
 
-    const database::QueryResult&& queryResult = database_.fetchQueryResult();
+    const database::QueryResult&& queryResult = sqlInterface_.fetchQueryResult();
 
     if(queryResult.getRows().size() > 0)
     {

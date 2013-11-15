@@ -1,5 +1,8 @@
 #include <dataserver/database/mySqlInterface.hpp>
 
+#include <glog/logging.h>
+#include <boost/algorithm/string/replace.hpp>
+
 namespace eMU
 {
 namespace dataserver
@@ -44,15 +47,18 @@ void MySqlInterface::cleanup()
     mysql_close(&handle_);
 }
 
-bool MySqlInterface::executeQuery(const std::string &query)
+void MySqlInterface::executeQuery(std::string query)
 {
+    boost::algorithm::replace_all(query, "'", "\\'");
+    boost::algorithm::replace_all(query, "\\", "\\\\");
+
     if(mysql_real_query(&handle_, query.c_str(), query.size()) == 0)
     {
-        return true;
+        LOG(INFO) << "Executed query: " << query;
     }
     else
     {
-        return false;
+        LOG(ERROR) << "Execute query failed. Reason: " << this->getErrorMessage() << ", query: " << query;
     }
 }
 

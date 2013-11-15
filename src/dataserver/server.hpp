@@ -4,7 +4,7 @@
 #include <core/network/server.hpp>
 #include <common/asio.hpp>
 #include <dataserver/user.hpp>
-#include <dataserver/database/database.hpp>
+#include <dataserver/database/sqlInterface.hpp>
 
 namespace eMU
 {
@@ -30,7 +30,7 @@ public:
 private:
     void handlePacket(size_t hash, const eMU::core::network::Payload &packet);
 
-    database::Database database_;
+    database::SqlInterface &sqlInterface_;
 };
 
 }
