@@ -87,6 +87,21 @@ public:
             LOG(ERROR) << "hash: " << hash << ", received packet with invalid size!";
             connectionsManager_.disconnect(hash);
         }
+        catch(const core::network::Payload::GetOverflowException&)
+        {
+            LOG(ERROR) << "hash: " << hash << ", packet decode error!";
+            connectionsManager_.disconnect(hash);
+        }
+        catch(const core::network::Payload::InsertOverflowException&)
+        {
+            LOG(ERROR) << "hash: " << hash << ", packet construction error!";
+            connectionsManager_.disconnect(hash);
+        }
+        catch(const core::network::Payload::SizeOutOfBoundException&)
+        {
+            LOG(ERROR) << "hash: " << hash << ", set invalid packet size!";
+            connectionsManager_.disconnect(hash);
+        }
         catch(const UnknownMessageException&)
         {
             LOG(ERROR) << "hash: " << hash << ", received unknown message!";

@@ -9,7 +9,8 @@ namespace dataserver
 namespace transactions
 {
 
-CheckAccountRequestTransaction::CheckAccountRequestTransaction(database::SqlInterface &sqlInterface):
+CheckAccountRequestTransaction::CheckAccountRequestTransaction(const core::network::Payload &packet, database::SqlInterface &sqlInterface):
+    packet_(packet),
     sqlInterface_(sqlInterface) {}
 
 bool CheckAccountRequestTransaction::isValid() const
