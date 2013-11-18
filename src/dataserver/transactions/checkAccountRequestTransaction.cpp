@@ -9,7 +9,8 @@ namespace dataserver
 namespace transactions
 {
 
-CheckAccountRequestTransaction::CheckAccountRequestTransaction(const core::network::Payload &packet, database::SqlInterface &sqlInterface):
+CheckAccountRequestTransaction::CheckAccountRequestTransaction(MessageSender &messageSender, const core::network::Payload &packet, database::SqlInterface &sqlInterface):
+    MessageSender_(messageSender),
     packet_(packet),
     sqlInterface_(sqlInterface) {}
 
@@ -31,6 +32,7 @@ void CheckAccountRequestTransaction::handle()
     if(queryResult.getRows().size() > 0)
     {
         int32_t checkResult = queryResult.getFieldValue<int32_t>(0);
+        messageSender_.sendCheckAccountResponse(0, checkResult);
     }
 }
 
