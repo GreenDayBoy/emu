@@ -17,8 +17,8 @@ TEST_F(WriteBufferTest, construct)
 
 TEST_F(WriteBufferTest, clear)
 {
-    writeBuffer_.getPayload().insert<uint8_t>(0x01);
-    writeBuffer_.getSecondPayload().insert<uint8_t>(0x04);
+    writeBuffer_.getPayload()[0] = 0x01;
+    writeBuffer_.getSecondPayload()[0] = 0x04;
     writeBuffer_.setPendingState();
 
     writeBuffer_.clear();
