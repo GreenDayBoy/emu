@@ -6,7 +6,7 @@
 #include <core/common/usersFactory.hpp>
 #include <core/transactions/manager.hpp>
 #include <core/network/tcp/connectionsManager.hpp>
-#include <core/protocol/packetsExtractor.hpp>
+//#include <core/protocol/packetsExtractor.hpp>
 
 #include <common/asio.hpp>
 
@@ -56,47 +56,47 @@ public:
     {
         try
         {
-            core::protocol::PacketsExtractor packetsExtractor(payload);
-            packetsExtractor.extract();
+            //core::protocol::PacketsExtractor packetsExtractor(payload);
+            //packetsExtractor.extract();
 
-            const core::protocol::PacketsExtractor::PacketsContainer &packets = packetsExtractor.getPackets();
+            //core::protocol::PacketsExtractor::PacketsContainer &packets = packetsExtractor.getPackets();
 
-            for(const auto &packet : packets)
-            {
-                this->handlePacket(hash, packet);
+//            for(auto &packet : packets)
+//            {
+//                this->handlePacket(hash, packet);
 
-                if(!transactionsManager_.dequeueAll())
-                {
-                    LOG(ERROR) << "hash: " << hash << ", some transactions were invalid. Disconnected.";
-                    connectionsManager_.disconnect(hash);
-                }
-            }
+//                if(!transactionsManager_.dequeueAll())
+//                {
+//                    LOG(ERROR) << "hash: " << hash << ", some transactions were invalid. Disconnected.";
+//                    connectionsManager_.disconnect(hash);
+//                }
+//            }
         }
-        catch(const core::protocol::PacketsExtractor::EmptyPayloadException&)
-        {
-            LOG(ERROR) << "hash: " << hash << ", received empty payload!";
-            connectionsManager_.disconnect(hash);
-        }
-        catch(const core::protocol::PacketsExtractor::NullPacketSizeException&)
-        {
-            LOG(ERROR) << "hash: " << hash << ", received packet with null size!";
-            connectionsManager_.disconnect(hash);
-        }
-        catch(const core::protocol::PacketsExtractor::PacketSizeOutOfBoundException&)
-        {
-            LOG(ERROR) << "hash: " << hash << ", received packet with invalid size!";
-            connectionsManager_.disconnect(hash);
-        }
-        catch(const core::network::Payload::GetOverflowException&)
-        {
-            LOG(ERROR) << "hash: " << hash << ", packet decode error!";
-            connectionsManager_.disconnect(hash);
-        }
-        catch(const core::network::Payload::InsertOverflowException&)
-        {
-            LOG(ERROR) << "hash: " << hash << ", packet construction error!";
-            connectionsManager_.disconnect(hash);
-        }
+//        catch(const core::protocol::PacketsExtractor::EmptyPayloadException&)
+//        {
+//            LOG(ERROR) << "hash: " << hash << ", received empty payload!";
+//            connectionsManager_.disconnect(hash);
+//        }
+//        catch(const core::protocol::PacketsExtractor::NullPacketSizeException&)
+//        {
+//            LOG(ERROR) << "hash: " << hash << ", received packet with null size!";
+//            connectionsManager_.disconnect(hash);
+//        }
+//        catch(const core::protocol::PacketsExtractor::PacketSizeOutOfBoundException&)
+//        {
+//            LOG(ERROR) << "hash: " << hash << ", received packet with invalid size!";
+//            connectionsManager_.disconnect(hash);
+//        }
+//        catch(const core::network::Payload::GetOverflowException&)
+//        {
+//            LOG(ERROR) << "hash: " << hash << ", packet decode error!";
+//            connectionsManager_.disconnect(hash);
+//        }
+//        catch(const core::network::Payload::InsertOverflowException&)
+//        {
+//            LOG(ERROR) << "hash: " << hash << ", packet construction error!";
+//            connectionsManager_.disconnect(hash);
+//        }
         catch(const core::network::Payload::SizeOutOfBoundException&)
         {
             LOG(ERROR) << "hash: " << hash << ", set invalid packet size!";
@@ -125,7 +125,7 @@ protected:
         }
     }
 
-    virtual void handlePacket(size_t hash, const core::network::Payload &packet) = 0;
+    virtual void handlePacket(size_t hash, core::network::Payload &packet) = 0;
 
     core::network::tcp::ConnectionsManager connectionsManager_;
     core::common::UsersFactory<User> usersFactory_;

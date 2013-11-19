@@ -1,41 +1,44 @@
-#include <dataserver/transactions/checkAccountRequestTransaction.hpp>
+//#include <dataserver/transactions/checkAccountRequestTransaction.hpp>
 
-#include <sstream>
+//#include <sstream>
 
-namespace eMU
-{
-namespace dataserver
-{
-namespace transactions
-{
+//namespace eMU
+//{
+//namespace dataserver
+//{
+//namespace transactions
+//{
 
-CheckAccountRequestTransaction::CheckAccountRequestTransaction(MessageSender &messageSender, const core::network::Payload &packet, database::SqlInterface &sqlInterface):
-    MessageSender_(messageSender),
-    packet_(packet),
-    sqlInterface_(sqlInterface) {}
+//CheckAccountRequestTransaction::CheckAccountRequestTransaction(size_t hash, MessageSender &messageSender,
+//                                                               const interface::dataserver::decoders::CheckAccountRequest &request,
+//                                                               database::SqlInterface &sqlInterface):
+//    hash_(hash),
+//    messageSender_(messageSender),
+//    request_(request),
+//    sqlInterface_(sqlInterface) {}
 
-bool CheckAccountRequestTransaction::isValid() const
-{
-    return true;
-}
+//bool CheckAccountRequestTransaction::isValid() const
+//{
+//    return true;
+//}
 
-void CheckAccountRequestTransaction::handle()
-{
-    std::stringstream query;
-    query << "SELECT"
-          << " `eMU_AccountCheck`();";
+//void CheckAccountRequestTransaction::handle()
+//{
+//    std::stringstream query;
+//    query << "SELECT"
+//          << " `eMU_AccountCheck`();";
 
-    sqlInterface_.executeQuery(query.str());
+//    sqlInterface_.executeQuery(query.str());
 
-    const database::QueryResult&& queryResult = sqlInterface_.fetchQueryResult();
+//    const database::QueryResult&& queryResult = sqlInterface_.fetchQueryResult();
 
-    if(queryResult.getRows().size() > 0)
-    {
-        int32_t checkResult = queryResult.getFieldValue<int32_t>(0);
-        messageSender_.sendCheckAccountResponse(0, checkResult);
-    }
-}
+//    if(queryResult.getRows().size() > 0)
+//    {
+//        int32_t checkResult = queryResult.getFieldValue<int32_t>(0);
+//        messageSender_.sendCheckAccountResponse(0, checkResult);
+//    }
+//}
 
-}
-}
-}
+//}
+//}
+//}
