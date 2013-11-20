@@ -1,11 +1,6 @@
 #include <dataserver/server.hpp>
-#include <dataserver/transactions/checkAccountRequestTransaction.hpp>
 
-//#include <core/protocol/packetsExtractor.hpp>
 #include <core/common/serviceThreading.hpp>
-
-#include <protocol/dataserver/messageIds.hpp>
-#include <protocol/dataserver/decoders/checkAccountRequest.hpp>
 
 #include <glog/logging.h>
 #include <boost/lexical_cast.hpp>
@@ -31,23 +26,15 @@ void Server::onAccept(size_t hash)
 	LOG(INFO) << "hash: " << hash << ", user registered.";
 }
 
+void Server::onReceive(size_t hash, const core::network::Payload &payload)
+{
+
+}
+
 void Server::onClose(size_t hash)
 {
     LOG(INFO) << "hash: " << hash << ", user closed.";
     usersFactory_.destroy(hash);
-}
-
-void Server::handlePacket(size_t hash, core::network::Payload &packet)
-{
-//    uint16_t messageId = packet.read<uint16_t>();
-
-//    if(messageId == interface::dataserver::ids::CheckAccountRequest)
-//    {
-//        transactionsManager_.queue(new transactions::CheckAccountRequestTransaction(hash,
-//                                                                                    messageSender_,
-//                                                                                    interface::dataserver::decoders::CheckAccountRequest(packet),
-//                                                                                    sqlInterface_));
-//    }
 }
 
 }

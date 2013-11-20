@@ -5,7 +5,6 @@
 #include <common/asio.hpp>
 #include <dataserver/user.hpp>
 #include <dataserver/database/sqlInterface.hpp>
-#include <dataserver/messageSender.hpp>
 
 namespace eMU
 {
@@ -26,11 +25,10 @@ public:
     bool onStartup();
     void onCleanup();
     void onAccept(size_t hash);
+    void onReceive(size_t hash, const core::network::Payload &payload);
     void onClose(size_t hash);
 
 private:
-    void handlePacket(size_t hash, core::network::Payload &packet);
-
     database::SqlInterface &sqlInterface_;
 };
 

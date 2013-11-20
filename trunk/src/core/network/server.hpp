@@ -6,7 +6,6 @@
 #include <core/common/usersFactory.hpp>
 #include <core/transactions/manager.hpp>
 #include <core/network/tcp/connectionsManager.hpp>
-//#include <core/protocol/packetsExtractor.hpp>
 
 #include <common/asio.hpp>
 
@@ -52,62 +51,7 @@ public:
     virtual void onCleanup() = 0;
     virtual void onAccept(size_t hash) = 0;
 
-    void onReceive(size_t hash, const eMU::core::network::Payload &payload)
-    {
-        try
-        {
-            //core::protocol::PacketsExtractor packetsExtractor(payload);
-            //packetsExtractor.extract();
-
-            //core::protocol::PacketsExtractor::PacketsContainer &packets = packetsExtractor.getPackets();
-
-//            for(auto &packet : packets)
-//            {
-//                this->handlePacket(hash, packet);
-
-//                if(!transactionsManager_.dequeueAll())
-//                {
-//                    LOG(ERROR) << "hash: " << hash << ", some transactions were invalid. Disconnected.";
-//                    connectionsManager_.disconnect(hash);
-//                }
-//            }
-        }
-//        catch(const core::protocol::PacketsExtractor::EmptyPayloadException&)
-//        {
-//            LOG(ERROR) << "hash: " << hash << ", received empty payload!";
-//            connectionsManager_.disconnect(hash);
-//        }
-//        catch(const core::protocol::PacketsExtractor::NullPacketSizeException&)
-//        {
-//            LOG(ERROR) << "hash: " << hash << ", received packet with null size!";
-//            connectionsManager_.disconnect(hash);
-//        }
-//        catch(const core::protocol::PacketsExtractor::PacketSizeOutOfBoundException&)
-//        {
-//            LOG(ERROR) << "hash: " << hash << ", received packet with invalid size!";
-//            connectionsManager_.disconnect(hash);
-//        }
-//        catch(const core::network::Payload::GetOverflowException&)
-//        {
-//            LOG(ERROR) << "hash: " << hash << ", packet decode error!";
-//            connectionsManager_.disconnect(hash);
-//        }
-//        catch(const core::network::Payload::InsertOverflowException&)
-//        {
-//            LOG(ERROR) << "hash: " << hash << ", packet construction error!";
-//            connectionsManager_.disconnect(hash);
-//        }
-        catch(const core::network::Payload::SizeOutOfBoundException&)
-        {
-            LOG(ERROR) << "hash: " << hash << ", set invalid packet size!";
-            connectionsManager_.disconnect(hash);
-        }
-        catch(const UnknownMessageException&)
-        {
-            LOG(ERROR) << "hash: " << hash << ", received unknown message!";
-            connectionsManager_.disconnect(hash);
-        }
-    }
+    virtual void onReceive(size_t hash, const eMU::core::network::Payload &payload) = 0;
 
     virtual void onClose(size_t hash) = 0;
 
@@ -124,8 +68,6 @@ protected:
             return 0;
         }
     }
-
-    virtual void handlePacket(size_t hash, core::network::Payload &packet) = 0;
 
     core::network::tcp::ConnectionsManager connectionsManager_;
     core::common::UsersFactory<User> usersFactory_;
