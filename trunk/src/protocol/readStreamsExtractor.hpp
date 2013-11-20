@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/network/payload.hpp>
+#include <protocol/readStream.hpp>
 #include <core/common/exception.hpp>
 
 #include <stdint.h>
@@ -12,26 +12,27 @@ namespace protocol
 
 class ReadStreamsExtractor
 {
-//public:
-//    typedef std::vector<network::Payload> PacketsContainer;
+public:
+    typedef std::vector<ReadStream> StreamsContainer;
 
-//    class EmptyPayloadException: public common::Exception {};
-//    class PacketSizeOutOfBoundException: public common::Exception {};
-//    class NullPacketSizeException: public common::Exception {};
+    class EmptyPayloadException: public core::common::Exception {};
+    class EmptyStreamException: public core::common::Exception {};
+    class UnknownStreamFormatException: public core::common::Exception {};
 
-//    PacketsExtractor(const network::Payload &payload);
+    ReadStreamsExtractor(const core::network::Payload &payload);
 
-//    void extract();
-//    PacketsContainer &getPackets();
+    void extract();
+    StreamsContainer& getStreams();
 
-//private:
-//    PacketsExtractor();
+private:
+    ReadStreamsExtractor();
 
-//    size_t getPacketSize(size_t offset) const;
-//    size_t calculateDataOffset(size_t offset, size_t packetSize) const;
+    size_t calculateStreamSize(size_t currentOffset) const;
+    size_t calculateStreamOffset(size_t currentOffset) const;
+    bool validateStream(size_t currentOffset) const;
 
-//    const network::Payload &payload_;
-//    PacketsContainer packets_;
+    const core::network::Payload &payload_;
+    StreamsContainer streams_;
 };
 
 }
