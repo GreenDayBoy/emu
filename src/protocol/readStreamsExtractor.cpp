@@ -7,69 +7,71 @@ namespace eMU
 namespace protocol
 {
 
-//StreamsExtractor::StreamsExtractor(const network::Payload &payload):
-//    payload_(payload) {}
+ReadStreamsExtractor::ReadStreamsExtractor(const core::network::Payload &payload):
+    payload_(payload) {}
 
-//void PacketsExtractor::extract()
-//{
-//    if(payload_.empty())
-//    {
-//        throw EmptyPayloadException();
-//    }
+void ReadStreamsExtractor::extract()
+{
+    if(payload_.empty())
+    {
+        throw EmptyPayloadException();
+    }
 
-//    size_t totalSize = 0;
+    size_t currentOffset = 0;
 
-//    while(totalSize < payload_.getSize())
-//    {
-//        try
-//        {
-//            size_t packetSize = this->getPacketSize(totalSize);
-//            size_t dataOffset = this->calculateDataOffset(totalSize, packetSize);
+    while(currentOffset < payload_.getSize())
+    {
+        if(!this->validateStream(currentOffset))
+        {
+            throw UnknownStreamFormatException();
+        }
 
-//            // When I will be familiar with rvalue references then I will extract this code to separated method :D...
-//            network::Payload packet;
-//            memcpy(&packet[0], &payload_[dataOffset], packetSize);
-//            packet.setSize(packetSize);
+        size_t streamOffset = this->calculateStreamOffset(currentOffset);
+        size_t streamSize = this->calculateStreamSize(currentOffset);
 
-//            packets_.push_back(std::move(packet));
+        core::network::Payload payload;
+        payload.setSize(streamSize);
+        memcpy(&payload[0], &payload_[streamOffset], streamSize);
 
-//            totalSize += packetSize + sizeof(uint32_t);
-//        }
-//        catch(const network::Payload::GetOverflowException&)
-//        {
-//            throw PacketSizeOutOfBoundException();
-//        }
-//    }
-//}
+        streams_.push_back(std::move(ReadStream(payload)));
 
-//PacketsExtractor::PacketsContainer &PacketsExtractor::getPackets()
-//{
-//    return packets_;
-//}
+        currentOffset += streamSize + sizeof(uint32_t);
+    }
+}
 
-//size_t PacketsExtractor::getPacketSize(size_t offset) const
-//{
-//    size_t size = payload_.getValue<uint32_t>(offset);
+ReadStreamsExtractor::StreamsContainer &ReadStreamsExtractor::getStreams()
+{
+    return streams_;
+}
 
-//    if(size == 0)
-//    {
-//        throw NullPacketSizeException();
-//    }
+size_t ReadStreamsExtractor::calculateStreamSize(size_t currentOffset) const
+{
+    size_t size = reinterpret_cast<const uint32_t&>(payload_[currentOffset]);
 
-//    return size;
-//}
+    if(size == 0)
+    {
+        throw EmptyStreamException();
+    }
 
-//size_t PacketsExtractor::calculateDataOffset(size_t offset, size_t packetSize) const
-//{
-//    size_t dataOffset = (offset + sizeof(uint32_t));
+    return size;
+}
 
-//    if(dataOffset + packetSize > payload_.getSize())
-//    {
-//        throw PacketSizeOutOfBoundException();
-//    }
+size_t ReadStreamsExtractor::calculateStreamOffset(size_t currentOffset) const
+{
+    return currentOffset + sizeof(uint32_t);
+}
 
-//    return dataOffset;
-//}
+bool ReadStreamsExtractor::validateStream(size_t currentOffset) const
+{
+    size_t streamOffset = this->calculateStreamOffset(currentOffset);
+
+    if(streamOffset >= payload_.getSize())
+    {
+        return false;
+    }
+
+    return (streamOffset + this->calculateStreamSize(currentOffset) <= payload_.getSize());
+}
 
 }
 }
