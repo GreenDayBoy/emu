@@ -50,9 +50,7 @@ public:
     virtual bool onStartup() = 0;
     virtual void onCleanup() = 0;
     virtual void onAccept(size_t hash) = 0;
-
-    virtual void onReceive(size_t hash, const eMU::core::network::Payload &payload) = 0;
-
+    virtual void onReceive(size_t hash, const network::Payload &payload) = 0;
     virtual void onClose(size_t hash) = 0;
 
 protected:

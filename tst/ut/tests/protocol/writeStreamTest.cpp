@@ -39,3 +39,23 @@ TEST_F(WriteStreamTest, writeNext)
     int32_t result = memcmp(&payload[0], &writeStream.getPayload()[0], payload.getSize());
     ASSERT_EQ(0, result);
 }
+
+TEST_F(WriteStreamTest, writeNextShouldThrowExceptionWhenOffsetIsOutOfBound)
+{
+   protocol::WriteStream writeStream(0xFFFF);
+
+   bool exceptionThrown = false;
+
+   std::string value(eMU::core::network::Payload::getMaxSize(), 'A');
+
+   try
+   {
+       writeStream.writeNext(value);
+   }
+   catch(const protocol::WriteStream::OverflowException&)
+   {
+       exceptionThrown = true;
+   }
+
+   ASSERT_TRUE(exceptionThrown);
+}

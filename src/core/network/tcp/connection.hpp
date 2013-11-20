@@ -40,8 +40,6 @@ public:
 
     bool operator==(const Connection &connection) const;
 
-    friend std::ostream& operator<<(std::ostream &stream, const Connection &connection);
-
 private:
     Connection();
 
