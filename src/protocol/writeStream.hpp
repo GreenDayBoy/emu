@@ -20,7 +20,7 @@ public:
     const core::network::Payload& getPayload() const;
 
     template<typename T>
-    void write(const T &value)
+    void writeNext(const T &value)
     {
         size_t typeSize = sizeof(T);
 
@@ -34,10 +34,8 @@ public:
 
         currentOffset_ += typeSize;
         size_ += typeSize;
-        payload_.setSize(currentOffset_);
+        payload_.setSize(size_ + sizeof(uint32_t));
     }
-
-    size_t getSize() const;
 
 private:
     WriteStream();

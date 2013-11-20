@@ -11,12 +11,31 @@ public:
     WriteStreamTest() {}
 };
 
-TEST_F(WriteStreamTest, asd)
+TEST_F(WriteStreamTest, writeNext)
 {
-    protocol::WriteStream writeStream(0xAABB);
+    uint16_t id = 0xAABB;
+    std::string testString = "writeNextTest";
+    uint32_t testStringLength = testString.length();
+    size_t payloadSize = sizeof(id) + sizeof(testStringLength) + testString.length();
 
-    writeStream.write<uint16_t>(0xCCDD);
-    writeStream.write<uint32_t>(0xEEFFAABB);
+    eMU::core::network::Payload payload;
+    reinterpret_cast<uint32_t&>(payload[0]) = payloadSize;
+    reinterpret_cast<uint16_t&>(payload[4]) = id;
+    reinterpret_cast<uint32_t&>(payload[6]) = testStringLength;
 
-    ASSERT_EQ(writeStream.getSize(), 8);
+    payload.setSize((payloadSize + sizeof(uint32_t)));
+
+    for(size_t i = 0; i < testString.length(); ++i)
+    {
+        payload[10 + i] = testString[i];
+    }
+
+    protocol::WriteStream writeStream(id);
+    writeStream.writeNext<uint32_t>(testStringLength);
+    writeStream.writeNext(testString);
+
+    ASSERT_EQ(payload.getSize(), writeStream.getPayload().getSize());
+
+    int32_t result = memcmp(&payload[0], &writeStream.getPayload()[0], payload.getSize());
+    ASSERT_EQ(0, result);
 }
