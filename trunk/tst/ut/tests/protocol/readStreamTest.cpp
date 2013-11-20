@@ -36,6 +36,22 @@ public:
 //    ASSERT_EQ(string1, readStream_.readStringFromOffset(65, string1Length));
 //}
 
+TEST_F(ReadStreamTest, readNextStringShouldThrowExceptionWhenStringLengthIsOutOfBound)
+{
+   bool exceptionThrown = false;
+
+   try
+   {
+       readStream_.readNextString(samplePayloads_.fullFilledPayload_.getSize());
+   }
+   catch(const protocol::ReadStream::OverflowException&)
+   {
+       exceptionThrown = true;
+   }
+
+   ASSERT_TRUE(exceptionThrown);
+}
+
 TEST_F(ReadStreamTest, readNext)
 {
     uint32_t &value1 = reinterpret_cast<uint32_t&>(samplePayloads_.fullFilledPayload_[2]);

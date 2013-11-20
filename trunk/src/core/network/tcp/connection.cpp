@@ -174,13 +174,6 @@ bool Connection::operator==(const Connection &connection) const
     return reinterpret_cast<size_t>(this) == reinterpret_cast<size_t>(&connection);
 }
 
-std::ostream& operator<<(std::ostream &stream, const Connection &connection)
-{
-    stream << "address: " << connection.socket_->remote_endpoint().address().to_string();
-
-    return stream;
-}
-
 }
 }
 }
