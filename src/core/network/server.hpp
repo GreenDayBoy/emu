@@ -20,8 +20,6 @@ template<typename User>
 class Server: boost::noncopyable
 {
 public:
-    class UnknownMessageException: public core::common::Exception {};
-
     Server(asio::io_service& ioService,
            uint16_t port,
            size_t maxNumberOfUsers):

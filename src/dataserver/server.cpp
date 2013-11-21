@@ -1,4 +1,11 @@
 #include <dataserver/server.hpp>
+#include <dataserver/transactions/checkAccountRequestTransaction.hpp>
+
+#include <protocol/readStreamsExtractor.hpp>
+#include <protocol/writeStream.hpp>
+
+#include <protocol/dataserver/messageIds.hpp>
+#include <protocol/dataserver/decoders/checkAccountRequest.hpp>
 
 #include <core/common/serviceThreading.hpp>
 
@@ -28,13 +35,70 @@ void Server::onAccept(size_t hash)
 
 void Server::onReceive(size_t hash, const core::network::Payload &payload)
 {
+    try
+    {
+        protocol::ReadStreamsExtractor readStreamsExtractor(payload);
+        readStreamsExtractor.extract();
 
+        for(const auto& stream : readStreamsExtractor.getStreams())
+        {
+            this->handleReadStream(hash, stream);
+
+            if(!transactionsManager_.dequeueAll())
+            {
+                LOG(ERROR) << "hash: " << hash << ", some transactions were invalid. Disconnected.";
+                connectionsManager_.disconnect(hash);
+            }
+
+        }
+    }
+    catch(const protocol::ReadStreamsExtractor::EmptyPayloadException&)
+    {
+        LOG(ERROR) << "Received empty payload! hash: " << hash;
+        connectionsManager_.disconnect(hash);
+    }
+    catch(const protocol::ReadStreamsExtractor::EmptyStreamException&)
+    {
+        LOG(ERROR) << "Received empty stream! hash: " << hash;
+        connectionsManager_.disconnect(hash);
+    }
+    catch(const protocol::ReadStreamsExtractor::UnknownStreamFormatException&)
+    {
+        LOG(ERROR) << "Received stream with unknown format! hash: " << hash;
+        connectionsManager_.disconnect(hash);
+    }
+    catch(const protocol::ReadStream::OverflowException&)
+    {
+        LOG(ERROR) << "Overflow during stream read! hash: " << hash;
+        connectionsManager_.disconnect(hash);
+    }
+    catch(const protocol::WriteStream::OverflowException&)
+    {
+        LOG(ERROR) << "Overflow during stream creation! hash: " << hash;
+        connectionsManager_.disconnect(hash);
+    }
+    catch(const core::network::Payload::SizeOutOfBoundException&)
+    {
+        LOG(ERROR) << "Set size for payload is out of bound! hash: " << hash;
+        connectionsManager_.disconnect(hash);
+    }
 }
 
 void Server::onClose(size_t hash)
 {
     LOG(INFO) << "hash: " << hash << ", user closed.";
     usersFactory_.destroy(hash);
+}
+
+void Server::handleReadStream(size_t hash, const protocol::ReadStream &stream)
+{
+    uint16_t messageId = stream.getId();
+
+    if(messageId == protocol::dataserver::MessageIds::kCheckAccountRequest)
+    {
+        protocol::dataserver::decoders::CheckAccountRequest request(stream);
+        transactionsManager_.queue(new transactions::CheckAccountRequestTransaction(hash, sqlInterface_, request));
+    }
 }
 
 }
