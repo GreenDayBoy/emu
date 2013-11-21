@@ -1,4 +1,6 @@
 #include <dataserver/transactions/checkAccountRequestTransaction.hpp>
+#include <protocol/dataserver/encoders/checkAccountResponse.hpp>
+#include <protocol/dataserver/CheckAccountResult.hpp>
 
 #include <sstream>
 
@@ -9,10 +11,13 @@ namespace dataserver
 namespace transactions
 {
 
-CheckAccountRequestTransaction::CheckAccountRequestTransaction(size_t hash, database::SqlInterface &sqlInterface,
+CheckAccountRequestTransaction::CheckAccountRequestTransaction(size_t hash,
+                                                               database::SqlInterface &sqlInterface,
+                                                               core::network::tcp::ConnectionsManager &connectionsManager,
                                                                const protocol::dataserver::decoders::CheckAccountRequest &request):
     hash_(hash),
     sqlInterface_(sqlInterface),
+    connectionsManager_(connectionsManager),
     request_(request) {}
 
 bool CheckAccountRequestTransaction::isValid() const
@@ -24,7 +29,10 @@ void CheckAccountRequestTransaction::handle()
 {
     std::stringstream query;
     query << "SELECT"
-          << " `eMU_AccountCheck`();";
+          << " `eMU_AccountCheck`(" << request_.getAccountId()
+                                    << ", "
+                                    << request_.getPassword()
+                                    << ");";
 
     sqlInterface_.executeQuery(query.str());
 
@@ -32,7 +40,12 @@ void CheckAccountRequestTransaction::handle()
 
     if(queryResult.getRows().size() > 0)
     {
-        int32_t checkResult = queryResult.getFieldValue<int32_t>(0);
+         protocol::dataserver::CheckAccountResult result =
+                 static_cast<protocol::dataserver::CheckAccountResult>(queryResult.getFieldValue<int32_t>(0));
+
+         protocol::dataserver::encoders::CheckAccountResponse response(request_.getClientHash(), result);
+
+         connectionsManager_.send(hash_, response.getWriteStream().getPayload());
     }
 }
 

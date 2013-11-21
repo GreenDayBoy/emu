@@ -21,6 +21,12 @@ CheckAccountRequest::CheckAccountRequest(const ReadStream &readStream):
     password_ = readStream_.readNextString(passwordLength);
 }
 
+CheckAccountRequest::CheckAccountRequest(size_t clientHash, const std::string &accountId, const std::string &password):
+    readStream_(core::network::Payload()),
+    clientHash_(clientHash),
+    accountId_(accountId),
+    password_(password) {}
+
 size_t CheckAccountRequest::getClientHash() const
 {
     return clientHash_;

@@ -3,6 +3,7 @@
 #include <core/network/writeBuffer.hpp>
 #include <core/network/tcp/connectionsFactory.hpp>
 #include <common/asio.hpp>
+#include <common/mockable.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <functional>
@@ -28,6 +29,7 @@ public:
 
     ConnectionsManager(asio::io_service &ioService, int16_t port);
     ConnectionsManager(ConnectionsFactory::Pointer connectionsFactory, asio::io_service &ioService, AcceptorPointer acceptor);
+    virtual ~ConnectionsManager();
 
     void queueAccept();
 
@@ -36,7 +38,7 @@ public:
     void setReceiveEventCallback(const ReceiveEventCallback &callback);
     void setCloseEventCallback(const CloseEventCallback &callback);
 
-    void send(size_t hash, const Payload &payload);
+    MOCKABLE void send(size_t hash, const Payload &payload);
     void disconnect(size_t hash);
 
 private:

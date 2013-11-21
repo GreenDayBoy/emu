@@ -20,6 +20,8 @@ ConnectionsManager::ConnectionsManager(ConnectionsFactory::Pointer connectionsFa
     ioService_(ioService),
     acceptor_(acceptor) {}
 
+ConnectionsManager::~ConnectionsManager() {}
+
 void ConnectionsManager::queueAccept()
 {
     Connection::SocketPointer socket(new asio::ip::tcp::socket(ioService_));

@@ -97,7 +97,10 @@ void Server::handleReadStream(size_t hash, const protocol::ReadStream &stream)
     if(messageId == protocol::dataserver::MessageIds::kCheckAccountRequest)
     {
         protocol::dataserver::decoders::CheckAccountRequest request(stream);
-        transactionsManager_.queue(new transactions::CheckAccountRequestTransaction(hash, sqlInterface_, request));
+        transactionsManager_.queue(new transactions::CheckAccountRequestTransaction(hash,
+                                                                                    sqlInterface_,
+                                                                                    connectionsManager_,
+                                                                                    request));
     }
 }
 
