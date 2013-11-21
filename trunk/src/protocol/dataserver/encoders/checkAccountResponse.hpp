@@ -1,6 +1,7 @@
 #pragma once
 
 #include <protocol/writeStream.hpp>
+#include <protocol/dataserver/CheckAccountResult.hpp>
 
 #include <string>
 
@@ -16,13 +17,6 @@ namespace encoders
 class CheckAccountResponse
 {
 public:
-    enum class CheckAccountResult
-    {
-        Succeed = 0,
-        Failed,
-        AcoountInUse
-    };
-
     CheckAccountResponse(size_t clientHash, CheckAccountResult result);
 
     const WriteStream& getWriteStream() const;

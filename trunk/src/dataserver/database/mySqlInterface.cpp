@@ -26,7 +26,7 @@ bool MySqlInterface::initialize()
 }
 
 bool MySqlInterface::connect(const std::string &hostname, uint16_t port,
-                         const std::string &userName, const std::string &password, const std::string &databaseName)
+                             const std::string &userName, const std::string &password, const std::string &databaseName)
 {
     if(mysql_real_connect(&handle_, hostname.c_str(), userName.c_str(), password.c_str(),
                           databaseName.c_str(), port, 0, CLIENT_MULTI_RESULTS | CLIENT_MULTI_STATEMENTS) != nullptr)

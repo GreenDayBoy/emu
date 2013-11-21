@@ -17,6 +17,7 @@ class CheckAccountRequest
 {
 public:
     CheckAccountRequest(const ReadStream &readStream);
+    CheckAccountRequest(size_t clientHash, const std::string &accountId, const std::string &password);
 
     size_t getClientHash() const;
     const std::string& getAccountId() const;

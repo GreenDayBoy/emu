@@ -1,17 +1,18 @@
 #include <protocol/dataserver/encoders/checkAccountResponse.hpp>
+#include <protocol/dataserver/CheckAccountResult.hpp>
 #include <protocol/dataserver/messageIds.hpp>
 #include <protocol/readStream.hpp>
 
 #include <gtest/gtest.h>
 #include <stdint.h>
 
-namespace dataserverEncoders = eMU::protocol::dataserver::encoders;
+namespace protocol = eMU::protocol;
 
 TEST(CheckAccountResponseEncoderTest, encode)
 {   
     size_t clientHash = 0x4567;
-    dataserverEncoders::CheckAccountResponse::CheckAccountResult result = dataserverEncoders::CheckAccountResponse::CheckAccountResult::Succeed;
-    dataserverEncoders::CheckAccountResponse response(clientHash, result);
+    protocol::dataserver::CheckAccountResult result = protocol::dataserver::CheckAccountResult::Succeed;
+    protocol::dataserver::encoders::CheckAccountResponse response(clientHash, result);
 
     eMU::protocol::ReadStream readStream(response.getWriteStream().getPayload());
 
