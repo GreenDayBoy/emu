@@ -26,16 +26,15 @@ void ReadStreamsExtractor::extract()
             throw UnknownStreamFormatException();
         }
 
-        size_t streamOffset = this->calculateStreamOffset(currentOffset);
-        size_t streamSize = this->calculateStreamSize(currentOffset);
+        size_t payloadSize = this->calculateStreamSize(currentOffset) + sizeof(uint32_t);
 
         core::network::Payload payload;
-        payload.setSize(streamSize);
-        memcpy(&payload[0], &payload_[streamOffset], streamSize);
+        payload.setSize(payloadSize);
+        memcpy(&payload[0], &payload_[currentOffset], payloadSize);
 
         streams_.push_back(std::move(ReadStream(payload)));
 
-        currentOffset += streamSize + sizeof(uint32_t);
+        currentOffset += payloadSize;
     }
 }
 
