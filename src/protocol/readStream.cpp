@@ -9,13 +9,13 @@ namespace protocol
 
 ReadStream::ReadStream(const core::network::Payload &payload):
     payload_(payload),
-    currentOffset_(2)
+    currentOffset_(6)
 {
 }
 
 uint16_t ReadStream::getId() const
 {
-    return this->readFromOffset<uint16_t>(0);
+    return this->readFromOffset<uint16_t>(4);
 }
 
 std::string ReadStream::readStringFromOffset(size_t offset, size_t length) const
