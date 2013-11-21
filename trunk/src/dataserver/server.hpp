@@ -2,6 +2,7 @@
 
 #include <core/network/tcp/connectionsManager.hpp>
 #include <core/network/server.hpp>
+#include <protocol/readStream.hpp>
 #include <common/asio.hpp>
 #include <dataserver/user.hpp>
 #include <dataserver/database/sqlInterface.hpp>
@@ -29,6 +30,8 @@ public:
     void onClose(size_t hash);
 
 private:
+    void handleReadStream(size_t hash, const protocol::ReadStream &stream);
+
     database::SqlInterface &sqlInterface_;
 };
 

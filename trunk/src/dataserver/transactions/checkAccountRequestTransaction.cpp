@@ -1,0 +1,41 @@
+#include <dataserver/transactions/checkAccountRequestTransaction.hpp>
+
+#include <sstream>
+
+namespace eMU
+{
+namespace dataserver
+{
+namespace transactions
+{
+
+CheckAccountRequestTransaction::CheckAccountRequestTransaction(size_t hash, database::SqlInterface &sqlInterface,
+                                                               const protocol::dataserver::decoders::CheckAccountRequest &request):
+    hash_(hash),
+    sqlInterface_(sqlInterface),
+    request_(request) {}
+
+bool CheckAccountRequestTransaction::isValid() const
+{
+    return true;
+}
+
+void CheckAccountRequestTransaction::handle()
+{
+    std::stringstream query;
+    query << "SELECT"
+          << " `eMU_AccountCheck`();";
+
+    sqlInterface_.executeQuery(query.str());
+
+    const database::QueryResult&& queryResult = sqlInterface_.fetchQueryResult();
+
+    if(queryResult.getRows().size() > 0)
+    {
+        int32_t checkResult = queryResult.getFieldValue<int32_t>(0);
+    }
+}
+
+}
+}
+}
