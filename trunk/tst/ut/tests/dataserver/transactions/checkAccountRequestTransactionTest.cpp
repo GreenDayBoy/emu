@@ -53,7 +53,7 @@ TEST_F(CheckAccountRequestTransactionTest, handle)
     ASSERT_EQ(result, readStream.readNext<uint8_t>());
 }
 
-TEST_F(CheckAccountRequestTransactionTest, isValidShoutAlawayReturnTrue)
+TEST_F(CheckAccountRequestTransactionTest, isValidShouldAlawayReturnTrue)
 {
     eMU::dataserver::transactions::CheckAccountRequestTransaction transaction(hash_, sqlInterface_, connectionsManager_, request_);
 
