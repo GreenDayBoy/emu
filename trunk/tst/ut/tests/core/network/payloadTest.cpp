@@ -2,7 +2,7 @@
 
 #include <core/network/payload.hpp>
 
-namespace network = eMU::core::network;
+using eMU::core::network::Payload;
 
 class PayloadTest: public ::testing::Test
 {
@@ -10,12 +10,12 @@ public:
     PayloadTest() {}
 
 protected:
-    network::Payload payload_;
+    Payload payload_;
 };
 
 TEST_F(PayloadTest, checkMaxSize)
 {
-    ASSERT_EQ(4096, network::Payload::getMaxSize());
+    ASSERT_EQ(4096, Payload::getMaxSize());
 }
 
 TEST_F(PayloadTest, empty)
@@ -32,9 +32,9 @@ TEST_F(PayloadTest, setSizeShouldThrowExceptionWhenValueIsOutOfBound)
 
     try
     {
-        payload_.setSize(network::Payload::getMaxSize() + 1);
+        payload_.setSize(Payload::getMaxSize() + 1);
     }
-    catch(const network::Payload::SizeOutOfBoundException&)
+    catch(const Payload::SizeOutOfBoundException&)
     {
         exceptionThrown = true;
     }

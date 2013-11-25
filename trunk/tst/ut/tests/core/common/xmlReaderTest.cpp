@@ -2,7 +2,7 @@
 
 #include <core/common/xmlReader.hpp>
 
-namespace common = eMU::core::common;
+using eMU::core::common::XmlReader;
 
 class XmlReaderTest: public ::testing::Test
 {
@@ -23,7 +23,7 @@ protected:
         EXPECT_EQ(port, xmlReader_.get<uint16_t>("server", "port"));
     }
 
-    common::XmlReader xmlReader_;
+    XmlReader xmlReader_;
     std::string content_;
 };
 
@@ -56,7 +56,7 @@ TEST_F(XmlReaderTest, exceptionShouldBeThrownWhenContentIsEmpty)
     {
         xmlReader_.parse(content_, "servers");
     }
-    catch(const common::XmlReader::EmptyXmlContentException&)
+    catch(const XmlReader::EmptyXmlContentException&)
     {
         exceptionThrown = true;
     }
@@ -74,7 +74,7 @@ TEST_F(XmlReaderTest, exceptionShouldBeThrownWhenFirstNodeDoesNotMatch)
     {
         xmlReader_.parse(content_, "ssservverrs");
     }
-    catch(const common::XmlReader::NotMatchedXmlNodeException&)
+    catch(const XmlReader::NotMatchedXmlNodeException&)
     {
         exceptionThrown = true;
     }

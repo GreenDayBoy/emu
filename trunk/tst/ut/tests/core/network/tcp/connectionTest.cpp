@@ -10,23 +10,27 @@ using ::testing::Ref;
 using ::testing::_;
 using ::testing::Throw;
 
-namespace networkEnv = eMU::ut::env::core::network;
-namespace tcpEnv = networkEnv::tcp;
-namespace network = eMU::core::network;
+using eMU::ut::env::core::network::tcp::ConnectionEventsMock;
+using eMU::ut::env::core::network::SamplePayloads;
+
+using eMU::core::network::tcp::Connection;
+using eMU::core::network::Payload;
+
+namespace asioStub = eMU::ut::env::asioStub;
 
 class TcpConnectionTest: public ::testing::Test
 {
 public:
     TcpConnectionTest():
-        socket_(new asio::ip::tcp::socket(ioService_)),
+        socket_(new asioStub::ip::tcp::socket(ioService_)),
         connection_(socket_),
         endpoint_(boost::asio::ip::tcp::v4(), 55962) {}
 
     void SetUp()
     {
-        connection_.setConnectEventCallback(std::bind(&tcpEnv::ConnectionEventsMock::connectEvent, &connectionEvents_, std::placeholders::_1));
-        connection_.setReceiveEventCallback(std::bind(&tcpEnv::ConnectionEventsMock::receiveEvent, &connectionEvents_, std::placeholders::_1));
-        connection_.setCloseEventCallback(std::bind(&tcpEnv::ConnectionEventsMock::closeEvent, &connectionEvents_, std::placeholders::_1));
+        connection_.setConnectEventCallback(std::bind(&ConnectionEventsMock::connectEvent, &connectionEvents_, std::placeholders::_1));
+        connection_.setReceiveEventCallback(std::bind(&ConnectionEventsMock::receiveEvent, &connectionEvents_, std::placeholders::_1));
+        connection_.setCloseEventCallback(std::bind(&ConnectionEventsMock::closeEvent, &connectionEvents_, std::placeholders::_1));
     }
 
     void TearDown() {}
@@ -46,22 +50,22 @@ public:
         EXPECT_CALL(*socket_, async_connect(endpoint_, _)).WillOnce(SaveArg<1>(&connectHandler_));
     }
 
-    asio::io_service ioService_;
-    network::tcp::Connection::SocketPointer socket_;
-    network::tcp::Connection connection_;
+    asioStub::io_service ioService_;
+    Connection::SocketPointer socket_;
+    Connection connection_;
     boost::asio::ip::tcp::endpoint endpoint_;
 
-    tcpEnv::ConnectionEventsMock connectionEvents_;
+    ConnectionEventsMock connectionEvents_;
 
-    asio::io_service::IoHandler receiveHandler_;
+    asioStub::io_service::IoHandler receiveHandler_;
     boost::asio::mutable_buffer receiveBuffer_;
 
-    asio::io_service::IoHandler sendHandler_;
+    asioStub::io_service::IoHandler sendHandler_;
     boost::asio::mutable_buffer sendBuffer_;
 
-    asio::ip::tcp::socket::ConnectHandler connectHandler_;
+    asioStub::ip::tcp::socket::ConnectHandler connectHandler_;
 
-    networkEnv::SamplePayloads samplePayloads_;
+    SamplePayloads samplePayloads_;
 };
 
 TEST_F(TcpConnectionTest, close)
@@ -107,7 +111,7 @@ TEST_F(TcpConnectionTest, receive)
     connection_.queueReceive();
 
     ASSERT_TRUE(boost::asio::buffer_cast<const uint8_t*>(receiveBuffer_) != nullptr);
-    ASSERT_EQ(network::Payload::getMaxSize(), boost::asio::buffer_size(receiveBuffer_));
+    ASSERT_EQ(Payload::getMaxSize(), boost::asio::buffer_size(receiveBuffer_));
 
     memcpy(boost::asio::buffer_cast<uint8_t*>(receiveBuffer_), &samplePayloads_.payload1_[0], samplePayloads_.payload1_.getSize());
 
@@ -235,7 +239,7 @@ TEST_F(TcpConnectionTest, overflowSecondarySendBufferShouldTriggerCloseEvent)
 {
     EXPECT_CALL(*socket_, async_send(_, _));
 
-    network::Payload payload1(samplePayloads_.payload1_);
+    Payload payload1(samplePayloads_.payload1_);
     connection_.send(payload1);
 
     EXPECT_CALL(*socket_, is_open()).WillOnce(Return(true));

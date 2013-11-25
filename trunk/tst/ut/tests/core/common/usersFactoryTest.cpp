@@ -3,7 +3,8 @@
 #include <core/common/usersFactory.hpp>
 #include <core/common/hashableObject.hpp>
 
-namespace common = eMU::core::common;
+using eMU::core::common::UsersFactory;
+using eMU::core::common::HashableObject;
 
 class UsersFactoryTest: public ::testing::Test
 {
@@ -12,7 +13,7 @@ protected:
         maxNumberOfUsers_(2),
         usersFactory_(maxNumberOfUsers_) {}
 
-    class FakeUser: public common::HashableObject
+    class FakeUser: public HashableObject
     {
 
     };
@@ -22,7 +23,7 @@ protected:
     }
 
     size_t maxNumberOfUsers_;
-    common::UsersFactory<FakeUser> usersFactory_;
+    UsersFactory<FakeUser> usersFactory_;
 };
 
 TEST_F(UsersFactoryTest, WhenMaxNumberOfUsersReachedShouldThrowException)
@@ -35,7 +36,7 @@ TEST_F(UsersFactoryTest, WhenMaxNumberOfUsersReachedShouldThrowException)
     {
         usersFactory_.create();
     }
-    catch(const common::UsersFactory<FakeUser>::MaxNumberOfUsersReachedException&)
+    catch(const UsersFactory<FakeUser>::MaxNumberOfUsersReachedException&)
     {
         exceptionThrown = true;
     }
@@ -65,7 +66,7 @@ TEST_F(UsersFactoryTest, WhenInvalidHashWasGivenThenFindShouldThrowException)
     {
         usersFactory_.find(12345);
     }
-    catch(const common::UsersFactory<FakeUser>::UnknownUserException&)
+    catch(const UsersFactory<FakeUser>::UnknownUserException&)
     {
         exceptionThrown = true;
     }

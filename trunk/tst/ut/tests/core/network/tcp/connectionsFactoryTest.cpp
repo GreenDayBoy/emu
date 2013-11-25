@@ -2,22 +2,30 @@
 #include <gmock/gmock.h>
 #include <core/network/tcp/connectionsFactory.hpp>
 
-namespace network = eMU::core::network;
+using eMU::core::network::tcp::ConnectionsFactory;
+using eMU::core::network::tcp::Connection;
+namespace asioStub = eMU::ut::env::asioStub;
+using asioStub::io_service;
+
 
 class TcpConnectionsFactoryTest: public ::testing::Test
 {
 public:
-    asio::io_service ioService_;
-    network::tcp::ConnectionsFactory connectionsFactory_;
+    TcpConnectionsFactoryTest():
+        socket_(new asioStub::ip::tcp::socket(ioService_)) {}
+
+    io_service ioService_;
+    ConnectionsFactory connectionsFactory_;
+    Connection::SocketPointer socket_;
 };
 
 TEST_F(TcpConnectionsFactoryTest, createConnectionWithSameHashTwiceShouldThrowException)
 {
     size_t hash = 1234;
-    network::tcp::Connection::SocketPointer socket1(new asio::ip::tcp::socket(ioService_));
+    Connection::SocketPointer socket1(new asioStub::ip::tcp::socket(ioService_));
     connectionsFactory_.create(hash, socket1);
 
-    network::tcp::Connection::SocketPointer socket2(new asio::ip::tcp::socket(ioService_));
+    Connection::SocketPointer socket2(new asioStub::ip::tcp::socket(ioService_));
 
     bool exceptionThrown = false;
 
@@ -25,7 +33,7 @@ TEST_F(TcpConnectionsFactoryTest, createConnectionWithSameHashTwiceShouldThrowEx
     {
         connectionsFactory_.create(hash, socket2);
     }
-    catch(const network::tcp::ConnectionsFactory::AlreadyExistingConnectionException&)
+    catch(const ConnectionsFactory::AlreadyExistingConnectionException&)
     {
         exceptionThrown = true;
     }
@@ -36,8 +44,7 @@ TEST_F(TcpConnectionsFactoryTest, createConnectionWithSameHashTwiceShouldThrowEx
 TEST_F(TcpConnectionsFactoryTest, create)
 {
     size_t hash = 1234;
-    network::tcp::Connection::SocketPointer socket(new asio::ip::tcp::socket(ioService_));
-    network::tcp::Connection &connection = connectionsFactory_.create(hash, socket);
+    Connection &connection = connectionsFactory_.create(hash, socket_);
 
     EXPECT_EQ(hash, connectionsFactory_.getHash(connection));
 }
@@ -45,12 +52,11 @@ TEST_F(TcpConnectionsFactoryTest, create)
 TEST_F(TcpConnectionsFactoryTest, destroy)
 {
     size_t hash = 1234;
-    network::tcp::Connection::SocketPointer socket(new asio::ip::tcp::socket(ioService_));
-    connectionsFactory_.create(hash, socket);
+    connectionsFactory_.create(hash, socket_);
 
     connectionsFactory_.destroy(hash);
 
-    connectionsFactory_.create(hash, socket);
+    connectionsFactory_.create(hash, socket_);
 }
 
 TEST_F(TcpConnectionsFactoryTest, destroyNotExistingConnectionShouldThrowException)
@@ -61,7 +67,7 @@ TEST_F(TcpConnectionsFactoryTest, destroyNotExistingConnectionShouldThrowExcepti
     {
         connectionsFactory_.destroy(4321);
     }
-    catch(const network::tcp::ConnectionsFactory::UnknownConnectionException&)
+    catch(const ConnectionsFactory::UnknownConnectionException&)
     {
         exceptionThrown = true;
     }
@@ -72,10 +78,9 @@ TEST_F(TcpConnectionsFactoryTest, destroyNotExistingConnectionShouldThrowExcepti
 TEST_F(TcpConnectionsFactoryTest, get)
 {
     size_t hash = 1234;
-    network::tcp::Connection::SocketPointer socket(new asio::ip::tcp::socket(ioService_));
-    network::tcp::Connection &connection = connectionsFactory_.create(hash, socket);
+    Connection &connection = connectionsFactory_.create(hash, socket_);
 
-    network::tcp::Connection &gotConnection = connectionsFactory_.get(hash);
+    Connection &gotConnection = connectionsFactory_.get(hash);
 
     ASSERT_EQ(connection, gotConnection);
 }
@@ -88,7 +93,7 @@ TEST_F(TcpConnectionsFactoryTest, getNotExisitngConnectionShouldThrowException)
     {
         connectionsFactory_.get(4321);
     }
-    catch(const network::tcp::ConnectionsFactory::UnknownConnectionException&)
+    catch(const ConnectionsFactory::UnknownConnectionException&)
     {
         exceptionThrown = true;
     }
@@ -98,8 +103,7 @@ TEST_F(TcpConnectionsFactoryTest, getNotExisitngConnectionShouldThrowException)
 
 TEST_F(TcpConnectionsFactoryTest, getHashForNotExistingConnectionShouldThrowException)
 {
-    network::tcp::Connection::SocketPointer socket(new asio::ip::tcp::socket(ioService_));
-    network::tcp::Connection connection(socket);
+    Connection connection(socket_);
 
     bool exceptionThrown = false;
 
@@ -107,7 +111,7 @@ TEST_F(TcpConnectionsFactoryTest, getHashForNotExistingConnectionShouldThrowExce
     {
         connectionsFactory_.getHash(connection);
     }
-    catch(const network::tcp::ConnectionsFactory::UnknownConnectionException&)
+    catch(const ConnectionsFactory::UnknownConnectionException&)
     {
         exceptionThrown = true;
     }

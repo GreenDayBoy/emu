@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-namespace network = eMU::core::network;
-namespace protocol = eMU::protocol;
+using eMU::core::network::Payload;
+using eMU::protocol::ReadStreamsExtractor;
 
 class ReadStreamsExtractorTest: public ::testing::Test
 {
@@ -12,8 +12,8 @@ public:
         extractor_(payload_) {}
 
 protected:
-    network::Payload payload_;
-    protocol::ReadStreamsExtractor extractor_;
+    Payload payload_;
+    ReadStreamsExtractor extractor_;
 };
 
 TEST_F(ReadStreamsExtractorTest, extract)
@@ -38,7 +38,7 @@ TEST_F(ReadStreamsExtractorTest, extract)
 
     extractor_.extract();
 
-    protocol::ReadStreamsExtractor::StreamsContainer streams = extractor_.getStreams();
+    ReadStreamsExtractor::StreamsContainer streams = extractor_.getStreams();
     ASSERT_EQ(3, streams.size());
 
     ASSERT_EQ(0xFFFF, streams[0].getId());
@@ -60,7 +60,7 @@ TEST_F(ReadStreamsExtractorTest, EmptyPayloadShouldThrowException)
     {
         extractor_.extract();
     }
-    catch(const protocol::ReadStreamsExtractor::EmptyPayloadException&)
+    catch(const ReadStreamsExtractor::EmptyPayloadException&)
     {
         exceptionThrown = true;
     }
@@ -79,7 +79,7 @@ TEST_F(ReadStreamsExtractorTest, StreamWithTooLargeSizeShouldThrowException)
     {
         extractor_.extract();
     }
-    catch(const protocol::ReadStreamsExtractor::UnknownStreamFormatException&)
+    catch(const ReadStreamsExtractor::UnknownStreamFormatException&)
     {
         exceptionThrown = true;
     }
@@ -99,7 +99,7 @@ TEST_F(ReadStreamsExtractorTest, StreamWithZeroSizeShouldThrowException)
         extractor_.extract();
 
     }
-    catch(const protocol::ReadStreamsExtractor::EmptyStreamException&)
+    catch(const ReadStreamsExtractor::EmptyStreamException&)
     {
         exceptionThrown = true;
     }

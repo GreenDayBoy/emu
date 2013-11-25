@@ -3,7 +3,8 @@
 
 #include <gtest/gtest.h>
 
-namespace protocol = eMU::protocol;
+using eMU::protocol::WriteStream;
+using eMU::core::network::Payload;
 
 class WriteStreamTest: public ::testing::Test
 {
@@ -18,7 +19,7 @@ TEST_F(WriteStreamTest, writeNext)
     uint32_t testStringLength = testString.length();
     size_t payloadSize = sizeof(id) + sizeof(testStringLength) + testString.length();
 
-    eMU::core::network::Payload payload;
+    Payload payload;
     reinterpret_cast<uint32_t&>(payload[0]) = payloadSize;
     reinterpret_cast<uint16_t&>(payload[4]) = id;
     reinterpret_cast<uint32_t&>(payload[6]) = testStringLength;
@@ -30,7 +31,7 @@ TEST_F(WriteStreamTest, writeNext)
         payload[10 + i] = testString[i];
     }
 
-    protocol::WriteStream writeStream(id);
+    WriteStream writeStream(id);
     writeStream.writeNext<uint32_t>(testStringLength);
     writeStream.writeNext(testString);
 
@@ -42,17 +43,17 @@ TEST_F(WriteStreamTest, writeNext)
 
 TEST_F(WriteStreamTest, writeNextShouldThrowExceptionWhenOffsetIsOutOfBound)
 {
-   protocol::WriteStream writeStream(0xFFFF);
+   WriteStream writeStream(0xFFFF);
 
    bool exceptionThrown = false;
 
-   std::string value(eMU::core::network::Payload::getMaxSize(), 'A');
+   std::string value(Payload::getMaxSize(), 'A');
 
    try
    {
        writeStream.writeNext(value);
    }
-   catch(const protocol::WriteStream::OverflowException&)
+   catch(const WriteStream::OverflowException&)
    {
        exceptionThrown = true;
    }
