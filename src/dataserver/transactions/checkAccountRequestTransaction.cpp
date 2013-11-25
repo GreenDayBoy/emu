@@ -36,16 +36,14 @@ void CheckAccountRequestTransaction::handle()
 
     sqlInterface_.executeQuery(query.str());
 
-    const database::QueryResult&& queryResult = sqlInterface_.fetchQueryResult();
+    const database::QueryResult &queryResult = sqlInterface_.fetchQueryResult();
 
     if(queryResult.getRows().size() > 0)
     {
-         protocol::dataserver::CheckAccountResult result =
-                 static_cast<protocol::dataserver::CheckAccountResult>(queryResult.getFieldValue<int32_t>(0));
+        protocol::dataserver::CheckAccountResult result = static_cast<protocol::dataserver::CheckAccountResult>(queryResult.getRows()[0].getValue<uint32_t>(0));
+        protocol::dataserver::encoders::CheckAccountResponse response(request_.getClientHash(), result);
 
-         protocol::dataserver::encoders::CheckAccountResponse response(request_.getClientHash(), result);
-
-         connectionsManager_.send(hash_, response.getWriteStream().getPayload());
+        connectionsManager_.send(hash_, response.getWriteStream().getPayload());
     }
 }
 

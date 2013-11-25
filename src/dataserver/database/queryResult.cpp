@@ -7,26 +7,16 @@ namespace dataserver
 namespace database
 {
 
-QueryResult::~QueryResult() {}
-
-QueryResult::Fields& QueryResult::getFields()
-{
-    return fields_;
-}
-
-const QueryResult::Fields& QueryResult::getFields() const
-{
-    return fields_;
-}
-
-QueryResult::Rows& QueryResult::getRows()
+const Rows& QueryResult::getRows() const
 {
     return rows_;
 }
 
-const QueryResult::Rows& QueryResult::getRows() const
+Row& QueryResult::createRow(const Row::Fields &fields)
 {
-    return rows_;
+    rows_.push_back(Row(fields));
+
+    return rows_.back();
 }
 
 }

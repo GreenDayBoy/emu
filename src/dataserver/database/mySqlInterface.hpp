@@ -28,8 +28,8 @@ public:
     void releaseQuery();
 
 private:
-    QueryResult::Fields fetchQueryFields();
-    QueryResult::Rows fetchQueryRows();
+    Row::Fields fetchFields();
+    void fetchRows(QueryResult &queryResult);
 
     MYSQL handle_;
     MYSQL_RES *queryResult_;
