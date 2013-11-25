@@ -29,8 +29,12 @@ using eMU::dataserver::transactions::CheckAccountRequestTransaction;
 using eMU::protocol::ReadStream;
 using eMU::protocol::dataserver::CheckAccountResult;
 namespace MessageIds = eMU::protocol::dataserver::MessageIds;
-using eMU::protocol::dataserver::decoders::CheckAccountResponse;
-using eMU::protocol::dataserver::decoders::FaultIndication;
+
+namespace decoders = eMU::protocol::dataserver::decoders;
+using decoders::CheckAccountResponse;
+using decoders::FaultIndication;
+
+namespace encoders = eMU::protocol::dataserver::encoders;
 
 using eMU::core::network::Payload;
 
@@ -40,9 +44,9 @@ public:
     CheckAccountRequestTransactionTest():
         clientHash_(0x12345),
         hash_(0x54321),
-        request_(ReadStream(eMU::protocol::dataserver::encoders::CheckAccountRequest(clientHash_,
-                                                                                     "testAccount",
-                                                                                     "testPassword").getWriteStream().getPayload())) {}
+        request_(ReadStream(encoders::CheckAccountRequest(clientHash_,
+                                                          "testAccount",
+                                                          "testPassword").getWriteStream().getPayload())) {}
 
     ConnectionsManagerMock connectionsManager_;
     SqlInterfaceMock sqlInterface_;
@@ -51,7 +55,7 @@ public:
 
     size_t clientHash_;
     size_t hash_;
-    eMU::protocol::dataserver::decoders::CheckAccountRequest request_;
+    decoders::CheckAccountRequest request_;
 };
 
 TEST_F(CheckAccountRequestTransactionTest, handle)
