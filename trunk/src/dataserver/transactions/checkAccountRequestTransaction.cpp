@@ -4,6 +4,7 @@
 #include <protocol/dataserver/checkAccountResult.hpp>
 
 #include <sstream>
+#include <glog/logging.h>
 
 namespace eMU
 {
@@ -48,7 +49,9 @@ void CheckAccountRequestTransaction::handle()
         }
         else
         {
-            protocol::dataserver::encoders::FaultIndication indication(request_.getClientHash(), "Empty check account result");
+            LOG(ERROR) << "Empty query results for accountId: " << request_.getAccountId();
+
+            protocol::dataserver::encoders::FaultIndication indication(request_.getClientHash(), "Check account query result is empty");
             connectionsManager_.send(hash_, indication.getWriteStream().getPayload());
         }
     }
