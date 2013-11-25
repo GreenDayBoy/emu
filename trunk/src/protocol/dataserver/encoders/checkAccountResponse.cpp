@@ -14,7 +14,7 @@ CheckAccountResponse::CheckAccountResponse(size_t clientHash, CheckAccountResult
     writeStream_(MessageIds::kCheckAccountResponse)
 {
     writeStream_.writeNext<size_t>(clientHash);
-    writeStream_.writeNext<uint8_t>(static_cast<uint8_t>(result));
+    writeStream_.writeNext<CheckAccountResult>(result);
 }
 
 const WriteStream& CheckAccountResponse::getWriteStream() const

@@ -1,4 +1,5 @@
 #include <dataserver/transactions/checkAccountRequestTransaction.hpp>
+
 #include <protocol/readStream.hpp>
 #include <protocol/dataserver/messageIds.hpp>
 #include <protocol/dataserver/CheckAccountResult.hpp>
@@ -10,12 +11,23 @@
 #include <gtest/gtest.h>
 #include <boost/lexical_cast.hpp>
 
-namespace dataserverEnv = eMU::ut::env::dataserver;
-namespace networkEnv = eMU::ut::env::core::network;
-
 using ::testing::_;
 using ::testing::Return;
 using ::testing::SaveArg;
+
+using eMU::ut::env::core::network::tcp::ConnectionsManagerMock;
+using eMU::ut::env::dataserver::database::SqlInterfaceMock;
+
+using eMU::dataserver::database::QueryResult;
+using eMU::dataserver::database::Row;
+using eMU::dataserver::transactions::CheckAccountRequestTransaction;
+
+namespace MessageIds = eMU::protocol::dataserver::MessageIds;
+using eMU::protocol::dataserver::CheckAccountResult;
+using eMU::protocol::dataserver::decoders::CheckAccountRequest;
+using eMU::protocol::ReadStream;
+
+using eMU::core::network::Payload;
 
 class CheckAccountRequestTransactionTest: public ::testing::Test
 {
@@ -25,37 +37,37 @@ public:
         hash_(0x54321),
         request_(clientHash_, "testAccount", "testPassword") {}
 
-    networkEnv::tcp::ConnectionsManagerMock connectionsManager_;
-    dataserverEnv::database::SqlInterfaceMock sqlInterface_;
-    eMU::dataserver::database::QueryResult queryResult_;
-    eMU::core::network::Payload payload_;
+    ConnectionsManagerMock connectionsManager_;
+    SqlInterfaceMock sqlInterface_;
+    QueryResult queryResult_;
+    Payload payload_;
 
     size_t clientHash_;
     size_t hash_;
-    eMU::protocol::dataserver::decoders::CheckAccountRequest request_;
+    CheckAccountRequest request_;
 };
 
 TEST_F(CheckAccountRequestTransactionTest, handle)
 {
-    uint8_t result = static_cast<uint8_t>(eMU::protocol::dataserver::CheckAccountResult::Succeed);
-    queryResult_.getRows().push_back({boost::lexical_cast<std::string>(result)});
-    EXPECT_CALL(sqlInterface_, fetchQueryResult()).WillOnce(Return((queryResult_)));
+    Row &row = queryResult_.createRow(Row::Fields());
+    CheckAccountResult result = CheckAccountResult::AcoountInUse;
+    row.insert(boost::lexical_cast<Row::Value>(static_cast<uint32_t>(result)));
 
+    EXPECT_CALL(sqlInterface_, fetchQueryResult()).WillOnce(Return((queryResult_)));
     EXPECT_CALL(sqlInterface_, executeQuery(_));
     EXPECT_CALL(connectionsManager_, send(hash_, _)).WillOnce(SaveArg<1>(&payload_));
 
+    CheckAccountRequestTransaction(hash_, sqlInterface_, connectionsManager_, request_).handle();
 
-    eMU::dataserver::transactions::CheckAccountRequestTransaction(hash_, sqlInterface_, connectionsManager_, request_).handle();
-
-    eMU::protocol::ReadStream readStream(payload_);
-    ASSERT_EQ(eMU::protocol::dataserver::MessageIds::kCheckAccountResponse, readStream.getId());
+    ReadStream readStream(payload_);
+    ASSERT_EQ(MessageIds::kCheckAccountResponse, readStream.getId());
     ASSERT_EQ(clientHash_, readStream.readNext<size_t>());
-    ASSERT_EQ(result, readStream.readNext<uint8_t>());
+    ASSERT_EQ(result, readStream.readNext<CheckAccountResult>());
 }
 
 TEST_F(CheckAccountRequestTransactionTest, isValidShouldAlawayReturnTrue)
 {
-    eMU::dataserver::transactions::CheckAccountRequestTransaction transaction(hash_, sqlInterface_, connectionsManager_, request_);
+    CheckAccountRequestTransaction transaction(hash_, sqlInterface_, connectionsManager_, request_);
 
     ASSERT_TRUE(transaction.isValid());
 }

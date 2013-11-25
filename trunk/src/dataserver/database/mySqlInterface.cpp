@@ -69,13 +69,12 @@ std::string MySqlInterface::getErrorMessage()
 
 QueryResult MySqlInterface::fetchQueryResult()
 {
-    queryResult_ = mysql_store_result(&handle_);
     QueryResult queryResult;
+    queryResult_ = mysql_store_result(&handle_);
 
     if(queryResult_ != nullptr)
     {
-        queryResult.getFields() = this->fetchQueryFields();
-        queryResult.getRows() = this->fetchQueryRows();
+        this->fetchRows(queryResult);
 
         mysql_free_result(queryResult_);
     }
@@ -83,12 +82,12 @@ QueryResult MySqlInterface::fetchQueryResult()
     return std::move(queryResult);
 }
 
-QueryResult::Fields MySqlInterface::fetchQueryFields()
+Row::Fields MySqlInterface::fetchFields()
 {
     MYSQL_FIELD *field = mysql_fetch_field(queryResult_);
     size_t i = 0;
 
-    QueryResult::Fields fields;
+    Row::Fields fields;
 
     while(field != nullptr)
     {
@@ -96,31 +95,26 @@ QueryResult::Fields MySqlInterface::fetchQueryFields()
         field = mysql_fetch_field(queryResult_);
     }
 
-    return std::move(fields);
+    return fields;
 }
 
-QueryResult::Rows MySqlInterface::fetchQueryRows()
+void MySqlInterface::fetchRows(QueryResult &queryResult)
 {
     MYSQL_ROW mysqlRow = mysql_fetch_row(queryResult_);
-    size_t fieldsCount = mysql_num_fields(queryResult_);
 
-    QueryResult::Rows rows;
+    const Row::Fields &fields = this->fetchFields();
 
     while(mysqlRow != nullptr)
     {
-        QueryResult::Row row;
+        Row &row = queryResult.createRow(fields);
 
-        for(size_t i = 0; i < fieldsCount; ++i)
+        for(size_t i = 0; i < fields.size(); ++i)
         {
-            row.push_back(mysqlRow[i]);
+            row.insert(mysqlRow[i]);
         }
 
         mysqlRow = mysql_fetch_row(queryResult_);
-
-        rows.push_back(row);
     }
-
-    return std::move(rows);
 }
 
 }
