@@ -23,7 +23,7 @@ public:
                                const std::string &password, const std::string &databaseName));
     MOCK_METHOD0(cleanup, void());
     MOCK_METHOD0(getErrorMessage, std::string());
-    MOCK_METHOD1(executeQuery, void(std::string query));
+    MOCK_METHOD1(executeQuery, bool(std::string query));
     MOCK_METHOD0(fetchQueryResult, eMU::dataserver::database::QueryResult());
 };
 
