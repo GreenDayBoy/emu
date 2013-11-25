@@ -13,9 +13,13 @@ using ::testing::NotNull;
 using ::testing::ActionInterface;
 
 namespace asioStub = eMU::ut::env::asioStub;
-namespace networkEnv = eMU::ut::env::core::network;
-namespace udpEnv = networkEnv::udp;
-namespace network = eMU::core::network;
+using asioStub::io_service;
+
+using eMU::ut::env::core::network::udp::ConnectionEventsMock;
+using eMU::ut::env::core::network::SamplePayloads;
+
+using eMU::core::network::udp::Connection;
+using eMU::core::network::Payload;
 
 ACTION_TEMPLATE(SaveArgToPointer,
                 HAS_1_TEMPLATE_PARAMS(int, k),
@@ -34,7 +38,7 @@ public:
 
     void SetUp()
     {
-        connection_.setReceiveFromEventCallback(std::bind(&udpEnv::ConnectionEventsMock::receiveFromEvent,
+        connection_.setReceiveFromEventCallback(std::bind(&ConnectionEventsMock::receiveFromEvent,
                                                 &connectionEvents_,
                                                 std::placeholders::_1,
                                                 std::placeholders::_2));
@@ -56,19 +60,19 @@ public:
     }
 
     uint16_t port_;
-    network::udp::Connection::SocketPointer socket_;
-    network::udp::Connection connection_;
+    Connection::SocketPointer socket_;
+    Connection connection_;
     asioStub::io_service ioService_;
-    udpEnv::ConnectionEventsMock connectionEvents_;
+    ConnectionEventsMock connectionEvents_;
 
     boost::asio::mutable_buffer receiveBuffer_;
-    asioStub::io_service::IoHandler receiveFromHandler_;
+    io_service::IoHandler receiveFromHandler_;
     boost::asio::ip::udp::endpoint* senderEndpoint_;
 
     boost::asio::mutable_buffer sendBuffer_;
     asioStub::io_service::IoHandler sendToHandler_;
 
-    networkEnv::SamplePayloads samplePayloads_;
+    SamplePayloads samplePayloads_;
 };
 
 TEST_F(UdpConnectionTest, receiveFrom)
@@ -78,7 +82,7 @@ TEST_F(UdpConnectionTest, receiveFrom)
     connection_.queueReceiveFrom();
 
     ASSERT_THAT(boost::asio::buffer_cast<const uint8_t*>(receiveBuffer_), NotNull());
-    ASSERT_EQ(boost::asio::buffer_size(receiveBuffer_), network::Payload::getMaxSize());
+    ASSERT_EQ(boost::asio::buffer_size(receiveBuffer_), Payload::getMaxSize());
 
     memcpy(boost::asio::buffer_cast<uint8_t*>(receiveBuffer_), &samplePayloads_.payload1_[0], samplePayloads_.payload1_.getSize());
 
@@ -220,5 +224,5 @@ TEST_F(UdpConnectionTest, sendTo_overflow_buffer)
 
 TEST_F(UdpConnectionTest, CheckConstructor)
 {
-    network::udp::Connection connection(ioService_, port_);
+    Connection connection(ioService_, port_);
 }

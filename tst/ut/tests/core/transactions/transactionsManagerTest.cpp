@@ -3,23 +3,24 @@
 #include <core/transactions/manager.hpp>
 #include <ut/env/core/transactions/transactionMock.hpp>
 
-namespace transactions = eMU::core::transactions;
-namespace transactionsEnv = eMU::ut::env::core::transactions;
-
 using ::testing::_;
 using ::testing::Return;
 
+using eMU::core::transactions::Transaction;
+using eMU::core::transactions::Manager;
+
+using eMU::ut::env::core::transactions::TransactionMock;
 
 class TransactionsManagerTest: public ::testing::Test
 {
 public:
-    transactions::Manager transactionsManager_;
+    Manager transactionsManager_;
 
     bool scenario(const std::vector<bool> &transactionsValidationResult)
     {
         for(bool validationResult : transactionsValidationResult)
         {
-            transactionsEnv::TransactionMock *transaction = new transactionsEnv::TransactionMock();
+            TransactionMock *transaction = new TransactionMock();
             EXPECT_CALL(*transaction, isValid()).WillOnce(Return(validationResult));
 
             if(validationResult)

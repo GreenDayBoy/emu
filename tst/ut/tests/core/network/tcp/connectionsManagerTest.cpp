@@ -24,35 +24,45 @@ ACTION_TEMPLATE(SaveArgToPointer,
     *pointer = &(::std::tr1::get<k>(args));
 }
 
+using eMU::ut::env::asioStub::io_service;
+using eMU::ut::env::asioStub::ip::tcp::acceptor;
+
+using eMU::ut::env::core::network::tcp::ConnectionsManagerEventsMock;
+using eMU::ut::env::core::network::tcp::ConnectionsFactoryMock;
+using eMU::ut::env::core::network::tcp::ConnectionMock;
+using eMU::ut::env::core::network::SamplePayloads;
+
+using eMU::core::network::tcp::ConnectionsManager;
+using eMU::core::network::tcp::ConnectionsFactory;
+using eMU::core::network::tcp::Connection;
+using eMU::core::network::Payload;
+
 namespace asioStub = eMU::ut::env::asioStub;
-namespace networkEnv = eMU::ut::env::core::network;
-namespace tcpEnv = networkEnv::tcp;
-namespace network = eMU::core::network;
 
 class ConnectionsManagerTest: public ::testing::Test
 {
 public:
     ConnectionsManagerTest():
         port_(55962),
-        acceptor_(new asioStub::ip::tcp::acceptor(ioService_, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port_))),
-        connectionsFactory_(new tcpEnv::ConnectionsFactoryMock()),
+        acceptor_(new acceptor(ioService_, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port_))),
+        connectionsFactory_(new ConnectionsFactoryMock()),
         connectionsManager_(connectionsFactory_, ioService_, acceptor_),
-        connection_(tcpEnv::ConnectionMock::SocketPointer(new asioStub::ip::tcp::socket(ioService_))),
+        connection_(ConnectionMock::SocketPointer(new asioStub::ip::tcp::socket(ioService_))),
         connectionHash_(1234)
     {
-        connectionsManager_.setGenerateConnectionHashCallback(std::bind(&tcpEnv::ConnectionsManagerEventsMock::generateConnectionHash,
+        connectionsManager_.setGenerateConnectionHashCallback(std::bind(&ConnectionsManagerEventsMock::generateConnectionHash,
                 &connectionsManagerEventsMock_));
 
-        connectionsManager_.setAcceptEventCallback(std::bind(&tcpEnv::ConnectionsManagerEventsMock::acceptEvent,
+        connectionsManager_.setAcceptEventCallback(std::bind(&ConnectionsManagerEventsMock::acceptEvent,
                 &connectionsManagerEventsMock_,
                 std::placeholders::_1));
 
-        connectionsManager_.setReceiveEventCallback(std::bind(&tcpEnv::ConnectionsManagerEventsMock::receiveEvent,
+        connectionsManager_.setReceiveEventCallback(std::bind(&ConnectionsManagerEventsMock::receiveEvent,
                 &connectionsManagerEventsMock_,
                 std::placeholders::_1,
                 std::placeholders::_2));
 
-        connectionsManager_.setCloseEventCallback(std::bind(&tcpEnv::ConnectionsManagerEventsMock::closeEvent,
+        connectionsManager_.setCloseEventCallback(std::bind(&ConnectionsManagerEventsMock::closeEvent,
                 &connectionsManagerEventsMock_,
                 std::placeholders::_1));
     }
@@ -80,21 +90,21 @@ public:
         acceptHandler_(boost::system::error_code());
     }
 
-    asioStub::io_service ioService_;
+    io_service ioService_;
     uint16_t port_;
-    network::tcp::ConnectionsManager::AcceptorPointer acceptor_;
-    std::shared_ptr<tcpEnv::ConnectionsFactoryMock> connectionsFactory_;
+    ConnectionsManager::AcceptorPointer acceptor_;
+    std::shared_ptr<ConnectionsFactoryMock> connectionsFactory_;
 
-    asioStub::ip::tcp::acceptor::AcceptHandler acceptHandler_;
-    tcpEnv::ConnectionsManagerEventsMock connectionsManagerEventsMock_;
-    network::tcp::ConnectionsManager connectionsManager_;
-    tcpEnv::ConnectionMock connection_;
+    acceptor::AcceptHandler acceptHandler_;
+    ConnectionsManagerEventsMock connectionsManagerEventsMock_;
+    ConnectionsManager connectionsManager_;
+    ConnectionMock connection_;
     size_t connectionHash_;
 
-    network::tcp::Connection::EventCallback receiveCallback_;
-    network::tcp::Connection::EventCallback closeCallback_;
+    Connection::EventCallback receiveCallback_;
+    Connection::EventCallback closeCallback_;
 
-    networkEnv::SamplePayloads samplePayloads_;
+    SamplePayloads samplePayloads_;
 };
 
 TEST_F(ConnectionsManagerTest, accept)
@@ -106,7 +116,7 @@ TEST_F(ConnectionsManagerTest, send)
 {
     acceptScenario();
 
-    network::Payload sentPayload;
+    Payload sentPayload;
     EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&sentPayload));
     EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(ReturnRef(connection_));
 
@@ -120,7 +130,7 @@ TEST_F(ConnectionsManagerTest, getThrowExceptionDuringSend)
 {
     acceptScenario();
 
-    EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(network::tcp::ConnectionsFactory::UnknownConnectionException()));
+    EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(ConnectionsFactory::UnknownConnectionException()));
 
     connectionsManager_.send(connectionHash_, samplePayloads_.payload1_);
 }
@@ -146,7 +156,7 @@ TEST_F(ConnectionsManagerTest, getThrowExceptionDuringDisconnect)
 {
     acceptScenario();
 
-    EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(network::tcp::ConnectionsFactory::UnknownConnectionException()));
+    EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(Throw(ConnectionsFactory::UnknownConnectionException()));
 
     connectionsManager_.disconnect(connectionHash_);
 }
@@ -159,7 +169,7 @@ TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringCloseEvent)
     EXPECT_CALL(*connectionsFactory_, get(connectionHash_)).WillOnce(ReturnRef(connection_));
     connectionsManager_.disconnect(connectionHash_);
 
-    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Throw(network::tcp::ConnectionsFactory::UnknownConnectionException()));
+    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Throw(ConnectionsFactory::UnknownConnectionException()));
     closeCallback_(connection_);
 }
 
@@ -197,12 +207,12 @@ TEST_F(ConnectionsManagerTest, getHashThrowExceptionDuringReceive)
 {
     acceptScenario();
 
-    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Throw(network::tcp::ConnectionsFactory::UnknownConnectionException()));
+    EXPECT_CALL(*connectionsFactory_, getHash(Ref(connection_))).WillOnce(Throw(ConnectionsFactory::UnknownConnectionException()));
 
     receiveCallback_(connection_);
 }
 
 TEST_F(ConnectionsManagerTest, CheckConstructor)
 {
-    network::tcp::ConnectionsManager ConnectionsManager(ioService_, port_);
+    ConnectionsManager ConnectionsManager(ioService_, port_);
 }

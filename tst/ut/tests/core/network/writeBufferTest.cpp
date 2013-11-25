@@ -3,11 +3,14 @@
 #include <core/network/writeBuffer.hpp>
 #include <ut/env/core/network/samplePayloads.hpp>
 
+using eMU::ut::env::core::network::SamplePayloads;
+using eMU::core::network::WriteBuffer;
+
 class WriteBufferTest: public ::testing::Test
 {
 protected:
-    eMU::ut::env::core::network::SamplePayloads samplePayloads_;
-    eMU::core::network::WriteBuffer writeBuffer_;
+    SamplePayloads samplePayloads_;
+    WriteBuffer writeBuffer_;
 };
 
 TEST_F(WriteBufferTest, construct)

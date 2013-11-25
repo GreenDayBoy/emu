@@ -3,8 +3,8 @@
 
 #include <gtest/gtest.h>
 
-namespace protocol = eMU::protocol;
-namespace networkEnv = eMU::ut::env::core::network;
+using eMU::protocol::ReadStream;
+using eMU::ut::env::core::network::SamplePayloads;
 
 class ReadStreamTest: public ::testing::Test
 {
@@ -12,8 +12,8 @@ public:
     ReadStreamTest():
         readStream_(samplePayloads_.fullFilledPayload_) {}
 
-    networkEnv::SamplePayloads samplePayloads_;
-    eMU::protocol::ReadStream readStream_;
+    SamplePayloads samplePayloads_;
+    ReadStream readStream_;
 };
 
 //TEST_F(ReadStreamTest, readFromOffset)
@@ -44,7 +44,7 @@ TEST_F(ReadStreamTest, readNextStringShouldThrowExceptionWhenStringLengthIsOutOf
    {
        readStream_.readNextString(samplePayloads_.fullFilledPayload_.getSize());
    }
-   catch(const protocol::ReadStream::OverflowException&)
+   catch(const ReadStream::OverflowException&)
    {
        exceptionThrown = true;
    }
