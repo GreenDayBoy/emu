@@ -24,7 +24,7 @@ public:
     virtual void cleanup() = 0;
     virtual std::string getErrorMessage() = 0;
 
-    virtual void executeQuery(std::string query) = 0;
+    virtual bool executeQuery(std::string query) = 0;
     virtual QueryResult fetchQueryResult() = 0;
 };
 

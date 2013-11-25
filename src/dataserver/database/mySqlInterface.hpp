@@ -22,7 +22,7 @@ public:
     void cleanup();
     std::string getErrorMessage();
 
-    void executeQuery(std::string query);
+    bool executeQuery(std::string query);
     QueryResult fetchQueryResult();
 
     void releaseQuery();

@@ -14,10 +14,10 @@ namespace dataserver
 namespace encoders
 {
 
-class CheckAccountResponse
+class CheckAccountRequest
 {
 public:
-    CheckAccountResponse(size_t clientHash, CheckAccountResult result);
+    CheckAccountRequest(size_t clientHash, const std::string &accountId, const std::string password);
 
     const WriteStream& getWriteStream() const;
 

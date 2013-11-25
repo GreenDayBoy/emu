@@ -13,21 +13,19 @@ namespace dataserver
 namespace decoders
 {
 
-class CheckAccountRequest
+class FaultIndication
 {
 public:
-    CheckAccountRequest(const ReadStream &readStream);
+    FaultIndication(const ReadStream &readStream);
 
     size_t getClientHash() const;
-    const std::string& getAccountId() const;
-    const std::string& getPassword() const;
+    const std::string& getMessage() const;
 
 private:
     ReadStream readStream_;
 
     size_t clientHash_;
-    std::string accountId_;
-    std::string password_;
+    std::string message_;
 };
 
 }

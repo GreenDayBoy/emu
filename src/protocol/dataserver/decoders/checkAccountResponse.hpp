@@ -1,6 +1,7 @@
 #pragma once
 
 #include <protocol/readStream.hpp>
+#include <protocol/dataserver/checkAccountResult.hpp>
 
 #include <string>
 
@@ -13,21 +14,19 @@ namespace dataserver
 namespace decoders
 {
 
-class CheckAccountRequest
+class CheckAccountResponse
 {
 public:
-    CheckAccountRequest(const ReadStream &readStream);
+    CheckAccountResponse(const ReadStream &readStream);
 
     size_t getClientHash() const;
-    const std::string& getAccountId() const;
-    const std::string& getPassword() const;
+    CheckAccountResult getResult() const;
 
 private:
     ReadStream readStream_;
 
     size_t clientHash_;
-    std::string accountId_;
-    std::string password_;
+    CheckAccountResult result_;
 };
 
 }

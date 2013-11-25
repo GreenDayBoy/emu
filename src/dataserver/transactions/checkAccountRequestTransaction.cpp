@@ -1,6 +1,7 @@
 #include <dataserver/transactions/checkAccountRequestTransaction.hpp>
 #include <protocol/dataserver/encoders/checkAccountResponse.hpp>
-#include <protocol/dataserver/CheckAccountResult.hpp>
+#include <protocol/dataserver/encoders/faultIndication.hpp>
+#include <protocol/dataserver/checkAccountResult.hpp>
 
 #include <sstream>
 
@@ -34,16 +35,27 @@ void CheckAccountRequestTransaction::handle()
                                     << request_.getPassword()
                                     << ");";
 
-    sqlInterface_.executeQuery(query.str());
-
-    const database::QueryResult &queryResult = sqlInterface_.fetchQueryResult();
-
-    if(queryResult.getRows().size() > 0)
+    if(sqlInterface_.executeQuery(query.str()))
     {
-        protocol::dataserver::CheckAccountResult result = static_cast<protocol::dataserver::CheckAccountResult>(queryResult.getRows()[0].getValue<uint32_t>(0));
-        protocol::dataserver::encoders::CheckAccountResponse response(request_.getClientHash(), result);
+        const database::QueryResult &queryResult = sqlInterface_.fetchQueryResult();
 
-        connectionsManager_.send(hash_, response.getWriteStream().getPayload());
+        if(queryResult.getRows().size() > 0)
+        {
+            protocol::dataserver::CheckAccountResult result = static_cast<protocol::dataserver::CheckAccountResult>(queryResult.getRows()[0].getValue<uint32_t>(0));
+            protocol::dataserver::encoders::CheckAccountResponse response(request_.getClientHash(), result);
+
+            connectionsManager_.send(hash_, response.getWriteStream().getPayload());
+        }
+        else
+        {
+            protocol::dataserver::encoders::FaultIndication indication(request_.getClientHash(), "Empty check account result");
+            connectionsManager_.send(hash_, indication.getWriteStream().getPayload());
+        }
+    }
+    else
+    {
+        protocol::dataserver::encoders::FaultIndication indication(request_.getClientHash(), sqlInterface_.getErrorMessage());
+        connectionsManager_.send(hash_, indication.getWriteStream().getPayload());
     }
 }
 

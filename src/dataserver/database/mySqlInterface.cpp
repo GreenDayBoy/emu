@@ -47,7 +47,7 @@ void MySqlInterface::cleanup()
     mysql_close(&handle_);
 }
 
-void MySqlInterface::executeQuery(std::string query)
+bool MySqlInterface::executeQuery(std::string query)
 {
     boost::algorithm::replace_all(query, "'", "\\'");
     boost::algorithm::replace_all(query, "\\", "\\\\");
@@ -55,10 +55,12 @@ void MySqlInterface::executeQuery(std::string query)
     if(mysql_real_query(&handle_, query.c_str(), query.size()) == 0)
     {
         LOG(INFO) << "Executed query: " << query;
+        return true;
     }
     else
     {
         LOG(ERROR) << "Execute query failed. Reason: " << this->getErrorMessage() << ", query: " << query;
+        return false;
     }
 }
 

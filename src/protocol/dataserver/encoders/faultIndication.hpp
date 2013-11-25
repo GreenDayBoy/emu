@@ -1,7 +1,6 @@
 #pragma once
 
 #include <protocol/writeStream.hpp>
-#include <protocol/dataserver/checkAccountResult.hpp>
 
 #include <string>
 
@@ -14,10 +13,10 @@ namespace dataserver
 namespace encoders
 {
 
-class CheckAccountResponse
+class FaultIndication
 {
 public:
-    CheckAccountResponse(size_t clientHash, CheckAccountResult result);
+    FaultIndication(size_t clientHash, const std::string &message);
 
     const WriteStream& getWriteStream() const;
 

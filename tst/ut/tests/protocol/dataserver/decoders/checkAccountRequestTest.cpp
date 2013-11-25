@@ -5,11 +5,14 @@
 #include <gtest/gtest.h>
 #include <stdint.h>
 
-namespace protocol = eMU::protocol;
+namespace MessageIds = eMU::protocol::dataserver::MessageIds;
+using eMU::protocol::WriteStream;
+using eMU::protocol::ReadStream;
+using eMU::protocol::dataserver::decoders::CheckAccountRequest;
 
-TEST(CheckAccountRequestDecoderTest, decode)
+TEST(CheckAccountRequestTest, decode)
 {   
-    protocol::WriteStream writeStream(protocol::dataserver::MessageIds::kCheckAccountRequest);
+    WriteStream writeStream(MessageIds::kCheckAccountRequest);
 
     size_t clientHash = 0x123456;
     writeStream.writeNext<size_t>(clientHash);
@@ -22,8 +25,9 @@ TEST(CheckAccountRequestDecoderTest, decode)
     writeStream.writeNext<uint32_t>(password.length());
     writeStream.writeNext(password);
 
-    protocol::ReadStream readStream(writeStream.getPayload());
-    protocol::dataserver::decoders::CheckAccountRequest request(readStream);
+    // -----------------------------------------------------------------------------
+
+    CheckAccountRequest request(ReadStream(writeStream.getPayload()));
 
     ASSERT_EQ(clientHash, request.getClientHash());
     ASSERT_EQ(accountId, request.getAccountId());
