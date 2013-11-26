@@ -26,7 +26,10 @@ bool Server::onStartup()
     return true;
 }
 
-void Server::onCleanup() {}
+void Server::onCleanup()
+{
+    sqlInterface_.cleanup();
+}
 
 void Server::onAccept(size_t hash)
 {
@@ -49,7 +52,6 @@ void Server::onReceive(size_t hash, const core::network::Payload &payload)
                 LOG(ERROR) << "hash: " << hash << ", some transactions were invalid. Disconnected.";
                 connectionsManager_.disconnect(hash);
             }
-
         }
     }
     catch(const protocol::ReadStreamsExtractor::EmptyPayloadException&)

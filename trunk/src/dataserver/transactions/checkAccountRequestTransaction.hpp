@@ -31,7 +31,7 @@ private:
     size_t hash_;
     database::SqlInterface &sqlInterface_;
     core::network::tcp::ConnectionsManager &connectionsManager_;
-    const protocol::dataserver::decoders::CheckAccountRequest &request_;
+    protocol::dataserver::decoders::CheckAccountRequest request_;
 };
 
 }

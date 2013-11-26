@@ -41,7 +41,7 @@ namespace asioStub = eMU::ut::env::asioStub;
 
 class ConnectionsManagerTest: public ::testing::Test
 {
-public:
+protected:
     ConnectionsManagerTest():
         port_(55962),
         acceptor_(new acceptor(ioService_, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port_))),

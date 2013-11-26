@@ -8,7 +8,7 @@ using eMU::ut::env::core::network::SamplePayloads;
 
 class ReadStreamTest: public ::testing::Test
 {
-public:
+protected:
     ReadStreamTest():
         readStream_(samplePayloads_.fullFilledPayload_) {}
 
@@ -38,18 +38,7 @@ public:
 
 TEST_F(ReadStreamTest, readNextStringShouldThrowExceptionWhenStringLengthIsOutOfBound)
 {
-   bool exceptionThrown = false;
-
-   try
-   {
-       readStream_.readNextString(samplePayloads_.fullFilledPayload_.getSize());
-   }
-   catch(const ReadStream::OverflowException&)
-   {
-       exceptionThrown = true;
-   }
-
-   ASSERT_TRUE(exceptionThrown);
+    ASSERT_THROW(readStream_.readNextString(samplePayloads_.fullFilledPayload_.getSize()), ReadStream::OverflowException);
 }
 
 TEST_F(ReadStreamTest, readNext)

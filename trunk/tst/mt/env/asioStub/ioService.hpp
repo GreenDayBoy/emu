@@ -1,9 +1,14 @@
 #pragma once
 
+#include <mt/env/asioStub/types.hpp>
+#include <mt/env/asioStub/tcp/socket.hpp>
+#include <mt/env/asioStub/udp/socket.hpp>
+
+#include <protocol/readStream.hpp>
+#include <protocol/writeStream.hpp>
+
 #include <vector>
 #include <boost/system/error_code.hpp>
-#include <mt/env/asioStub/types.hpp>
-#include <core/network/buffer.hpp>
 
 namespace eMU
 {
@@ -13,18 +18,6 @@ namespace env
 {
 namespace asioStub
 {
-
-namespace ip
-{
-namespace tcp
-{
-class socket;
-}
-namespace udp
-{
-class socket;
-}
-}
 
 class io_service
 {
@@ -38,12 +31,14 @@ public:
         CompletionHandler wrap(const CompletionHandler &handler) { return handler; }
     };
 
-    class UnknownSocketException{};
-    class NotCreatedUdpSocketException{};
+    class AcceptingNotStartedException {};
+    class NonExistentTcpSocketException {};
+    class NonExistentUdpSocketException {};
 
-    typedef std::vector<ip::tcp::socket*> SocketsContainer;
+    typedef std::vector<ip::tcp::socket*> TcpSocketsContainer;
 
     io_service();
+    ~io_service();
 
     template<typename CompletionHandler>
     void post(const CompletionHandler &handler) { handler(); }
@@ -51,33 +46,29 @@ public:
     size_t run();
     void stop();
 
+    void estabilishUdpConnection(ip::udp::socket *socket);
+    void sendTo(const protocol::WriteStream &writeStream);
+    protocol::ReadStream receiveFrom();
+
+    size_t estabilishTcpConnection();
+    void closeTcpConnection(size_t hash);
+    void closeTcpConnection(ip::tcp::socket *socket);
+    bool tcpConnectionEstabilished(size_t hash) const;
+
     void queueAccept(ip::tcp::socket &socket, const AcceptHandler &handler);
-    size_t createConnection();
-
-    void send(size_t hash, const core::network::Payload &payload);
-    core::network::Payload receive(size_t hash);
-
-    void close(size_t hash);
-    void close(ip::tcp::socket *socket);
-
-    void registerUdpSocket(ip::udp::socket *socket);
-
-    void sendTo(const core::network::Payload &payload);
-    core::network::Payload receiveFrom();
-
-    bool exists(size_t hash) const;
-
+    void send(size_t hash, const protocol::WriteStream &writeStream);
+    protocol::ReadStream receive(size_t hash);
     void disconnect(size_t hash);
 
 private:
-    SocketsContainer::iterator find(size_t hash);
+    TcpSocketsContainer::iterator find(size_t hash);
+    void closeAllTcpConnections();
 
-    ip::tcp::socket *incomingSocket_;
+    TcpSocketsContainer tcpSockets_;
+    ip::tcp::socket *tcpSocket_;
     AcceptHandler acceptHandler_;
 
     ip::udp::socket *udpSocket_;
-
-    SocketsContainer sockets_;
 };
 
 }

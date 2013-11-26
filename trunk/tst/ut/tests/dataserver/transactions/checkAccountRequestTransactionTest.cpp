@@ -40,7 +40,7 @@ using eMU::core::network::Payload;
 
 class CheckAccountRequestTransactionTest: public ::testing::Test
 {
-public:
+protected:
     CheckAccountRequestTransactionTest():
         clientHash_(0x12345),
         hash_(0x54321),

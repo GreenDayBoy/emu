@@ -31,17 +31,7 @@ TEST_F(UsersFactoryTest, WhenMaxNumberOfUsersReachedShouldThrowException)
     size_t user1 = usersFactory_.create();
     size_t user2 = usersFactory_.create();
 
-    bool exceptionThrown = false;
-    try
-    {
-        usersFactory_.create();
-    }
-    catch(const UsersFactory<FakeUser>::MaxNumberOfUsersReachedException&)
-    {
-        exceptionThrown = true;
-    }
-
-    ASSERT_TRUE(exceptionThrown);
+    ASSERT_THROW(usersFactory_.create(), UsersFactory<FakeUser>::MaxNumberOfUsersReachedException);
 
     usersFactory_.destroy(user1);
     usersFactory_.destroy(user2);
@@ -61,17 +51,7 @@ TEST_F(UsersFactoryTest, WhenInvalidHashWasGivenThenFindShouldThrowException)
     size_t user1 = usersFactory_.create();
     size_t user2 = usersFactory_.create();
 
-    bool exceptionThrown = false;
-    try
-    {
-        usersFactory_.find(12345);
-    }
-    catch(const UsersFactory<FakeUser>::UnknownUserException&)
-    {
-        exceptionThrown = true;
-    }
-
-    ASSERT_TRUE(exceptionThrown);
+    ASSERT_THROW(usersFactory_.find(12345), UsersFactory<FakeUser>::UnknownUserException);
 
     usersFactory_.destroy(user1);
     usersFactory_.destroy(user2);

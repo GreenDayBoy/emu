@@ -8,7 +8,7 @@ using eMU::core::network::Payload;
 
 class WriteStreamTest: public ::testing::Test
 {
-public:
+protected:
     WriteStreamTest() {}
 };
 
@@ -45,18 +45,7 @@ TEST_F(WriteStreamTest, writeNextShouldThrowExceptionWhenOffsetIsOutOfBound)
 {
    WriteStream writeStream(0xFFFF);
 
-   bool exceptionThrown = false;
-
    std::string value(Payload::getMaxSize(), 'A');
 
-   try
-   {
-       writeStream.writeNext(value);
-   }
-   catch(const WriteStream::OverflowException&)
-   {
-       exceptionThrown = true;
-   }
-
-   ASSERT_TRUE(exceptionThrown);
+   ASSERT_THROW(writeStream.writeNext(value), WriteStream::OverflowException);
 }

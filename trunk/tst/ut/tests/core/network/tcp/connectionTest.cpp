@@ -20,7 +20,7 @@ namespace asioStub = eMU::ut::env::asioStub;
 
 class TcpConnectionTest: public ::testing::Test
 {
-public:
+protected:
     TcpConnectionTest():
         socket_(new asioStub::ip::tcp::socket(ioService_)),
         connection_(socket_),

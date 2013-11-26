@@ -7,11 +7,10 @@ using eMU::protocol::ReadStreamsExtractor;
 
 class ReadStreamsExtractorTest: public ::testing::Test
 {
-public:
+protected:
     ReadStreamsExtractorTest():
         extractor_(payload_) {}
 
-protected:
     Payload payload_;
     ReadStreamsExtractor extractor_;
 };
@@ -52,57 +51,23 @@ TEST_F(ReadStreamsExtractorTest, extract)
     ASSERT_EQ(0xFFFFFFFF, streams[2].readNext<uint32_t>());
 }
 
-TEST_F(ReadStreamsExtractorTest, EmptyPayloadShouldThrowException)
+TEST_F(ReadStreamsExtractorTest, ExceptionShouldBeThrownWhenEmptyPayloadWasProvided)
 {
-    bool exceptionThrown = false;
-
-    try
-    {
-        extractor_.extract();
-    }
-    catch(const ReadStreamsExtractor::EmptyPayloadException&)
-    {
-        exceptionThrown = true;
-    }
-
-    ASSERT_TRUE(exceptionThrown);
+    ASSERT_THROW(extractor_.extract(), ReadStreamsExtractor::EmptyPayloadException);
 }
 
-TEST_F(ReadStreamsExtractorTest, StreamWithTooLargeSizeShouldThrowException)
+TEST_F(ReadStreamsExtractorTest, ExceptionShouldBeThrownWhenStreamWithTooLargeSizeWasProvided)
 {
     reinterpret_cast<uint32_t&>(payload_[0]) = 5;
     payload_.setSize(4);
 
-    bool exceptionThrown = false;
-
-    try
-    {
-        extractor_.extract();
-    }
-    catch(const ReadStreamsExtractor::UnknownStreamFormatException&)
-    {
-        exceptionThrown = true;
-    }
-
-    ASSERT_TRUE(exceptionThrown);
+    ASSERT_THROW(extractor_.extract(), ReadStreamsExtractor::UnknownStreamFormatException);
 }
 
-TEST_F(ReadStreamsExtractorTest, StreamWithZeroSizeShouldThrowException)
+TEST_F(ReadStreamsExtractorTest, ExceptionShouldBeThrownWhenStreamWithZeroSizeWasProvided)
 {
     reinterpret_cast<uint32_t&>(payload_[0]) = 0;
     payload_.setSize(20);
 
-    bool exceptionThrown = false;
-
-    try
-    {
-        extractor_.extract();
-
-    }
-    catch(const ReadStreamsExtractor::EmptyStreamException&)
-    {
-        exceptionThrown = true;
-    }
-
-    ASSERT_TRUE(exceptionThrown);
+    ASSERT_THROW(extractor_.extract(), ReadStreamsExtractor::EmptyStreamException);
 }

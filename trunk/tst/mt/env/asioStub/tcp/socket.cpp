@@ -20,7 +20,7 @@ socket::socket(io_service &ioService):
 
 void socket::close()
 {
-    ioService_.close(this);
+    ioService_.closeTcpConnection(this);
 }
 
 bool socket::is_open() const

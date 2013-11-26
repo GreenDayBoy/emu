@@ -1,19 +1,47 @@
 #pragma once
 
-#define TEST_EXCEPTIONS_CATCH \
-    catch(asioStub::BaseSocket::NullBufferException&) \
-    { \
-        ASSERT_TRUE(false) << "async operation was not queued."; \
+#define IO_SERVICE_EXCEPTIONS_CATCH \
+catch(const eMU::mt::env::asioStub::io_service::AcceptingNotStartedException&) \
+{ \
+    ASSERT_TRUE(false) << "accept not queued."; \
+} \
+catch(const eMU::mt::env::asioStub::io_service::NonExistentTcpSocketException&) \
+{ \
+    ASSERT_TRUE(false) << "tcp socket does not exists."; \
+} \
+catch(const eMU::mt::env::asioStub::io_service::NonExistentUdpSocketException&) \
+{ \
+    ASSERT_TRUE(false) << "udp socket does not exists."; \
+}
+
+#define SOCKET_EXCEPTIONS_CATCH \
+catch(const eMU::mt::env::asioStub::BaseSocket::ReceiveNotStartedException&) \
+{ \
+    ASSERT_TRUE(false) << "receive operation was not queued."; \
+} \
+catch(const eMU::mt::env::asioStub::BaseSocket::SendNotStartedException&) \
+{ \
+    ASSERT_TRUE(false) << "send operation was not queued."; \
+} \
+catch(const eMU::mt::env::asioStub::BaseSocket::PayloadSizeOutOfBoundException&) \
+{ \
+    ASSERT_TRUE(false) << "payload size out of bound."; \
+} \
+
+#define SQL_EXCEPTIONS_CATCH \
+catch(const eMU::mt::env::dataserver::database::SqlInterfaceStub::UnexpectedQueryExecutionException&) \
+{ \
+    ASSERT_TRUE(false) << "unexpected sql query execution."; \
+} \
+catch(const eMU::mt::env::dataserver::database::SqlInterfaceStub::UnexpectedFetchResultExecutionException&) \
+{ \
+    ASSERT_TRUE(false) << "unexpected fetch of sql result."; \
+} \
+
+#define IO_CHECK(statement) \
+    try { \
+        statement; \
     } \
-    catch(asioStub::BaseSocket::TooBigPayloadException&) \
-    { \
-        ASSERT_TRUE(false) << "trying to insert too big payload to tested object."; \
-    } \
-    catch(asioStub::io_service::UnknownSocketException&) \
-    { \
-        ASSERT_TRUE(false) << "socket does not exists."; \
-    } \
-    catch(asioStub::io_service::NotCreatedUdpSocketException&) \
-    { \
-        ASSERT_TRUE(false) << "udp socket not created."; \
-    }
+    IO_SERVICE_EXCEPTIONS_CATCH \
+    SOCKET_EXCEPTIONS_CATCH \
+    SQL_EXCEPTIONS_CATCH \

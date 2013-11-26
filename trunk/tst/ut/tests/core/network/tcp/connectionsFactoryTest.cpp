@@ -10,7 +10,7 @@ using asioStub::io_service;
 
 class TcpConnectionsFactoryTest: public ::testing::Test
 {
-public:
+protected:
     TcpConnectionsFactoryTest():
         socket_(new asioStub::ip::tcp::socket(ioService_)) {}
 
@@ -27,18 +27,7 @@ TEST_F(TcpConnectionsFactoryTest, createConnectionWithSameHashTwiceShouldThrowEx
 
     Connection::SocketPointer socket2(new asioStub::ip::tcp::socket(ioService_));
 
-    bool exceptionThrown = false;
-
-    try
-    {
-        connectionsFactory_.create(hash, socket2);
-    }
-    catch(const ConnectionsFactory::AlreadyExistingConnectionException&)
-    {
-        exceptionThrown = true;
-    }
-
-    ASSERT_TRUE(exceptionThrown);
+    ASSERT_THROW(connectionsFactory_.create(hash, socket2), ConnectionsFactory::AlreadyExistingConnectionException);
 }
 
 TEST_F(TcpConnectionsFactoryTest, create)
@@ -61,18 +50,7 @@ TEST_F(TcpConnectionsFactoryTest, destroy)
 
 TEST_F(TcpConnectionsFactoryTest, destroyNotExistingConnectionShouldThrowException)
 {
-    bool exceptionThrown = false;
-
-    try
-    {
-        connectionsFactory_.destroy(4321);
-    }
-    catch(const ConnectionsFactory::UnknownConnectionException&)
-    {
-        exceptionThrown = true;
-    }
-
-    ASSERT_TRUE(exceptionThrown);
+    ASSERT_THROW(connectionsFactory_.destroy(4321), ConnectionsFactory::UnknownConnectionException);
 }
 
 TEST_F(TcpConnectionsFactoryTest, get)
@@ -87,34 +65,11 @@ TEST_F(TcpConnectionsFactoryTest, get)
 
 TEST_F(TcpConnectionsFactoryTest, getNotExisitngConnectionShouldThrowException)
 {
-    bool exceptionThrown = false;
-
-    try
-    {
-        connectionsFactory_.get(4321);
-    }
-    catch(const ConnectionsFactory::UnknownConnectionException&)
-    {
-        exceptionThrown = true;
-    }
-
-    ASSERT_TRUE(exceptionThrown);
+    ASSERT_THROW(connectionsFactory_.get(4321), ConnectionsFactory::UnknownConnectionException);
 }
 
 TEST_F(TcpConnectionsFactoryTest, getHashForNotExistingConnectionShouldThrowException)
 {
     Connection connection(socket_);
-
-    bool exceptionThrown = false;
-
-    try
-    {
-        connectionsFactory_.getHash(connection);
-    }
-    catch(const ConnectionsFactory::UnknownConnectionException&)
-    {
-        exceptionThrown = true;
-    }
-
-    ASSERT_TRUE(exceptionThrown);
+    ASSERT_THROW(connectionsFactory_.getHash(connection), ConnectionsFactory::UnknownConnectionException);
 }

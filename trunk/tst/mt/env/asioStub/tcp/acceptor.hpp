@@ -1,8 +1,10 @@
 #pragma once
 
+#include <mt/env/asioStub/types.hpp>
+#include <mt/env/asioStub/ioService.hpp>
+
 #include <boost/asio.hpp>
 #include <gmock/gmock.h>
-#include <mt/env/asioStub/types.hpp>
 
 namespace eMU
 {
@@ -12,9 +14,6 @@ namespace env
 {
 namespace asioStub
 {
-
-class io_service;
-
 namespace ip
 {
 namespace tcp

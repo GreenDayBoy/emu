@@ -13,7 +13,7 @@ using eMU::ut::env::core::transactions::TransactionMock;
 
 class TransactionsManagerTest: public ::testing::Test
 {
-public:
+protected:
     Manager transactionsManager_;
 
     bool scenario(const std::vector<bool> &transactionsValidationResult)
