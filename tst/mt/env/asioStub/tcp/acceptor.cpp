@@ -1,5 +1,4 @@
 #include <mt/env/asioStub/tcp/acceptor.hpp>
-#include <mt/env/asioStub/ioService.hpp>
 
 namespace eMU
 {

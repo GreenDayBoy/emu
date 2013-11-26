@@ -6,10 +6,9 @@ using eMU::core::network::Payload;
 
 class PayloadTest: public ::testing::Test
 {
-public:
+protected:
     PayloadTest() {}
 
-protected:
     Payload payload_;
 };
 
@@ -28,18 +27,7 @@ TEST_F(PayloadTest, empty)
 
 TEST_F(PayloadTest, setSizeShouldThrowExceptionWhenValueIsOutOfBound)
 {
-    bool exceptionThrown = false;
-
-    try
-    {
-        payload_.setSize(Payload::getMaxSize() + 1);
-    }
-    catch(const Payload::SizeOutOfBoundException&)
-    {
-        exceptionThrown = true;
-    }
-
-    ASSERT_TRUE(exceptionThrown);
+    ASSERT_THROW(payload_.setSize(Payload::getMaxSize() + 1), Payload::SizeOutOfBoundException);
 }
 
 TEST_F(PayloadTest, construct)

@@ -50,36 +50,14 @@ TEST_F(XmlReaderTest, parseCorrectContent)
 
 TEST_F(XmlReaderTest, exceptionShouldBeThrownWhenContentIsEmpty)
 {
-    bool exceptionThrown = false;
-
-    try
-    {
-        xmlReader_.parse(content_, "servers");
-    }
-    catch(const XmlReader::EmptyXmlContentException&)
-    {
-        exceptionThrown = true;
-    }
-
-    ASSERT_TRUE(exceptionThrown);
+    ASSERT_THROW(xmlReader_.parse(content_, "servers"), XmlReader::EmptyXmlContentException);
 }
 
 TEST_F(XmlReaderTest, exceptionShouldBeThrownWhenFirstNodeDoesNotMatch)
 {
     prepareContent();
 
-    bool exceptionThrown = false;
-
-    try
-    {
-        xmlReader_.parse(content_, "ssservverrs");
-    }
-    catch(const XmlReader::NotMatchedXmlNodeException&)
-    {
-        exceptionThrown = true;
-    }
-
-    ASSERT_TRUE(exceptionThrown);
+    ASSERT_THROW(xmlReader_.parse(content_, "ssservverrs"), XmlReader::NotMatchedXmlNodeException);
 }
 
 TEST_F(XmlReaderTest, parseContentWithoutRecords)

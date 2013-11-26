@@ -1,6 +1,5 @@
 #include <mt/env/asioStub/ioService.hpp>
-#include <mt/env/asioStub/tcp/socket.hpp>
-#include <mt/env/asioStub/udp/socket.hpp>
+
 #include <algorithm>
 #include <gtest/gtest.h>
 
@@ -13,121 +12,141 @@ namespace env
 namespace asioStub
 {
 
+using protocol::ReadStream;
+using protocol::WriteStream;
+
 io_service::strand::strand(io_service& service) {}
 
 io_service::io_service():
-    incomingSocket_(nullptr),
+    tcpSocket_(nullptr),
     udpSocket_(nullptr) {}
 
-size_t io_service::run()
+io_service::~io_service()
 {
-    return 0;
+    this->closeAllTcpConnections();
 }
 
+size_t io_service::run() { return 0; }
 void io_service::stop() {}
 
-void io_service::queueAccept(ip::tcp::socket &socket, const AcceptHandler &handler)
-{
-    incomingSocket_ = &socket;
-    acceptHandler_ = handler;
-}
-
-size_t io_service::createConnection()
-{
-    sockets_.push_back(incomingSocket_);
-    acceptHandler_(boost::system::error_code());
-
-    return reinterpret_cast<size_t>(sockets_.back());
-}
-
-void io_service::send(size_t hash, const core::network::Payload &payload)
-{
-    auto it = this->find(hash);
-
-    if(it == sockets_.end())
-    {
-        throw UnknownSocketException();
-    }
-
-    (*it)->insertPayload(payload);
-}
-
-core::network::Payload io_service::receive(size_t hash)
-{
-    auto it = this->find(hash);
-
-    if(it == sockets_.end())
-    {
-        throw UnknownSocketException();
-    }
-
-    return (*it)->getPayload();
-}
-
-io_service::SocketsContainer::iterator io_service::find(size_t hash)
-{
-    return std::find_if(sockets_.begin(), sockets_.end(),
-                        [hash](ip::tcp::socket *socket) { return hash == reinterpret_cast<size_t>(socket); });
-}
-
-void io_service::close(size_t hash)
-{
-    auto it = this->find(hash);
-
-    if(it == sockets_.end())
-    {
-        throw UnknownSocketException();
-    }
-
-    sockets_.erase(it);
-}
-
-void io_service::close(ip::tcp::socket *socket)
-{
-    this->close(reinterpret_cast<size_t>(socket));
-}
-
-void io_service::registerUdpSocket(ip::udp::socket *socket)
+void io_service::estabilishUdpConnection(ip::udp::socket *socket)
 {
     udpSocket_ = socket;
 }
 
-void io_service::sendTo(const core::network::Payload &payload)
+void io_service::sendTo(const protocol::WriteStream &writeStream)
 {
     if(udpSocket_ == nullptr)
     {
-        throw NotCreatedUdpSocketException();
+        throw NonExistentUdpSocketException();
     }
 
-    udpSocket_->insertPayload(payload);
+    udpSocket_->insertPayload(writeStream.getPayload());
 }
 
-core::network::Payload io_service::receiveFrom()
+protocol::ReadStream io_service::receiveFrom()
 {
     if(udpSocket_ == nullptr)
     {
-        throw NotCreatedUdpSocketException();
+        throw NonExistentUdpSocketException();
     }
 
-    return udpSocket_->getPayload();
+    return protocol::ReadStream(udpSocket_->getPayload());
 }
 
-bool io_service::exists(size_t hash) const
+size_t io_service::estabilishTcpConnection()
 {
-    return const_cast<io_service*>(this)->find(hash) != sockets_.end();
+    if(tcpSocket_ == nullptr)
+    {
+        throw AcceptingNotStartedException();
+    }
+
+    tcpSockets_.push_back(tcpSocket_);
+    acceptHandler_(boost::system::error_code());
+
+    return reinterpret_cast<size_t>(tcpSockets_.back());
+}
+
+void io_service::closeTcpConnection(size_t hash)
+{
+    auto it = this->find(hash);
+
+    if(it == tcpSockets_.end())
+    {
+        throw NonExistentTcpSocketException();
+    }
+
+    ASSERT_FALSE((*it)->hasUnreadPayload());
+    tcpSockets_.erase(it);
+}
+
+void io_service::closeTcpConnection(ip::tcp::socket *socket)
+{
+    this->closeTcpConnection(reinterpret_cast<size_t>(socket));
+}
+
+bool io_service::tcpConnectionEstabilished(size_t hash) const
+{
+    return const_cast<io_service*>(this)->find(hash) != tcpSockets_.end();
+}
+
+void io_service::queueAccept(ip::tcp::socket &socket, const AcceptHandler &handler)
+{
+    tcpSocket_ = &socket;
+    acceptHandler_ = handler;
+}
+
+void io_service::send(size_t hash, const protocol::WriteStream &writeStream)
+{
+    auto it = this->find(hash);
+
+    if(it == tcpSockets_.end())
+    {
+        throw NonExistentTcpSocketException();
+    }
+
+    (*it)->insertPayload(writeStream.getPayload());
+}
+
+protocol::ReadStream io_service::receive(size_t hash)
+{
+    auto it = this->find(hash);
+
+    if(it == tcpSockets_.end())
+    {
+        throw NonExistentTcpSocketException();
+    }
+
+    return protocol::ReadStream((*it)->getPayload());
 }
 
 void io_service::disconnect(size_t hash)
 {
     auto it = this->find(hash);
 
-    if(it == sockets_.end())
+    if(it == tcpSockets_.end())
     {
-        throw UnknownSocketException();
+        throw NonExistentTcpSocketException();
     }
 
     (*it)->disconnect();
 }
+
+void io_service::closeAllTcpConnections()
+{
+    for(auto tcpSocket : tcpSockets_)
+    {
+        this->closeTcpConnection(tcpSocket);
+    }
+}
+
+io_service::TcpSocketsContainer::iterator io_service::find(size_t hash)
+{
+    return std::find_if(tcpSockets_.begin(), tcpSockets_.end(),
+                        [hash](ip::tcp::socket *socket) { return hash == reinterpret_cast<size_t>(socket); });
+}
+
+
 
 }
 }
