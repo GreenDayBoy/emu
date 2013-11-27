@@ -46,14 +46,14 @@ public:
     size_t run();
     void stop();
 
-    void estabilishUdpConnection(ip::udp::socket *socket);
+    void establishUdpConnection(ip::udp::socket *socket);
     void sendTo(const protocol::WriteStream &writeStream);
     protocol::ReadStream receiveFrom();
 
-    size_t estabilishTcpConnection();
+    size_t establishTcpConnection();
     void closeTcpConnection(size_t hash);
     void closeTcpConnection(ip::tcp::socket *socket);
-    bool tcpConnectionEstabilished(size_t hash) const;
+    bool tcpConnectionEstablished(size_t hash) const;
 
     void queueAccept(ip::tcp::socket &socket, const AcceptHandler &handler);
     void send(size_t hash, const protocol::WriteStream &writeStream);

@@ -47,7 +47,7 @@ TEST_F(DataserverTest, CheckAccountShoulBeSuccesful)
     Server server(ioService_, sqlInterface_, configuration_);
     server.startup();
 
-    size_t connectionHash = ioService_.estabilishTcpConnection();
+    size_t connectionHash = ioService_.establishTcpConnection();
 
     size_t clientHash = 0x1234;
     CheckAccountResult checkAccountResult = CheckAccountResult::AcoountInUse;
@@ -77,7 +77,7 @@ TEST_F(DataserverTest, WhenQueryExecutionWasFailedThenFaultIndicationShouldBeRec
     Server server(ioService_, sqlInterface_, configuration_);
     server.startup();
 
-    size_t connectionHash = ioService_.estabilishTcpConnection();
+    size_t connectionHash = ioService_.establishTcpConnection();
 
     size_t clientHash = 0x1234;
     sqlInterface_.pushQueryStatus(false);
@@ -99,7 +99,7 @@ TEST_F(DataserverTest, WhenQueryResultIsEmptyThenFaultIndicationShouldBeReceived
     Server server(ioService_, sqlInterface_, configuration_);
     server.startup();
 
-    size_t connectionHash = ioService_.estabilishTcpConnection();
+    size_t connectionHash = ioService_.establishTcpConnection();
 
     size_t clientHash = 0x1234;
     sqlInterface_.pushQueryStatus(true);

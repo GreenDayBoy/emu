@@ -44,4 +44,4 @@ catch(const eMU::mt::env::dataserver::database::SqlInterfaceStub::UnexpectedFetc
     } \
     IO_SERVICE_EXCEPTIONS_CATCH \
     SOCKET_EXCEPTIONS_CATCH \
-    SQL_EXCEPTIONS_CATCH \
+    SQL_EXCEPTIONS_CATCH

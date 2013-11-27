@@ -26,8 +26,6 @@ public:
     void handle();
 
 private:
-    void decode();
-
     size_t hash_;
     database::SqlInterface &sqlInterface_;
     core::network::tcp::ConnectionsManager &connectionsManager_;

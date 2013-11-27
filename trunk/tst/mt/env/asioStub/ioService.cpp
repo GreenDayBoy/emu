@@ -29,7 +29,7 @@ io_service::~io_service()
 size_t io_service::run() { return 0; }
 void io_service::stop() {}
 
-void io_service::estabilishUdpConnection(ip::udp::socket *socket)
+void io_service::establishUdpConnection(ip::udp::socket *socket)
 {
     udpSocket_ = socket;
 }
@@ -54,7 +54,7 @@ protocol::ReadStream io_service::receiveFrom()
     return protocol::ReadStream(udpSocket_->getPayload());
 }
 
-size_t io_service::estabilishTcpConnection()
+size_t io_service::establishTcpConnection()
 {
     if(tcpSocket_ == nullptr)
     {
@@ -85,7 +85,7 @@ void io_service::closeTcpConnection(ip::tcp::socket *socket)
     this->closeTcpConnection(reinterpret_cast<size_t>(socket));
 }
 
-bool io_service::tcpConnectionEstabilished(size_t hash) const
+bool io_service::tcpConnectionEstablished(size_t hash) const
 {
     return const_cast<io_service*>(this)->find(hash) != tcpSockets_.end();
 }

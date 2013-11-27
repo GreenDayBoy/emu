@@ -23,6 +23,7 @@ public:
     typedef std::shared_ptr<Connection> Pointer;
     typedef std::shared_ptr<asio::ip::tcp::socket> SocketPointer;
 
+    Connection(asio::io_service &ioService);
     Connection(SocketPointer socket);
     virtual ~Connection();
 
@@ -37,6 +38,7 @@ public:
     MOCKABLE void send(const Payload &payload);
     MOCKABLE void queueReceive();
     void connect(const boost::asio::ip::tcp::endpoint &endpoint);
+    MOCKABLE bool isOpen() const;
 
     bool operator==(const Connection &connection) const;
 
