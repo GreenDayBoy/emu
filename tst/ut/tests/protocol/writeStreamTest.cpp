@@ -49,3 +49,17 @@ TEST_F(WriteStreamTest, writeNextShouldThrowExceptionWhenOffsetIsOutOfBound)
 
    ASSERT_THROW(writeStream.writeNext(value), WriteStream::OverflowException);
 }
+
+TEST_F(WriteStreamTest, writeNextWideString)
+{
+   WriteStream writeStream(0xFFFF);
+
+   std::wstring expectedValue = L"Another perfect wide string";
+   writeStream.writeNext(expectedValue);
+
+   size_t dataOffset = 6; // sizeof(uint32) -> size + sizeof(uint16_t) -> id
+   std::wstring value(reinterpret_cast<const wchar_t*>(&writeStream.getPayload()[dataOffset]), expectedValue.length());
+
+   ASSERT_EQ(expectedValue, value);
+}
+

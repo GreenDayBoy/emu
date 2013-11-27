@@ -10,6 +10,9 @@ namespace network
 namespace tcp
 {
 
+Connection::Connection(asio::io_service &ioService):
+    Connection(SocketPointer(new asio::ip::tcp::socket(ioService))) {}
+
 Connection::Connection(SocketPointer socket):
     socket_(socket),
     strand_(socket_->get_io_service()),
@@ -39,7 +42,7 @@ void Connection::setCloseEventCallback(const EventCallback &callback)
 
 void Connection::disconnect()
 {
-    if(socket_->is_open())
+    if(isOpen())
     {
         closeOngoing_ = true;
 
@@ -167,6 +170,11 @@ void Connection::connectHandler(const boost::system::error_code &errorCode)
     }
 
     connectEventCallback_(*this);
+}
+
+bool Connection::isOpen() const
+{
+    return socket_->is_open();
 }
 
 bool Connection::operator==(const Connection &connection) const

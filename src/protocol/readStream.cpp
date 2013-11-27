@@ -18,24 +18,28 @@ uint16_t ReadStream::getId() const
     return this->readFromOffset<uint16_t>(4);
 }
 
-std::string ReadStream::readStringFromOffset(size_t offset, size_t length) const
+std::string ReadStream::readNextString(size_t length)
 {
     std::string value;
 
     for(size_t i = 0; i < length; ++i)
     {
-        value.push_back(this->readFromOffset<std::string::value_type>(offset + i));
+        value.push_back(this->readNext<std::string::value_type>());
     }
 
     return std::move(value);
 }
 
-std::string ReadStream::readNextString(size_t length)
+std::wstring ReadStream::readNextWideString(size_t length)
 {
-    size_t offset = currentOffset_;
-    currentOffset_ += length;
+    std::wstring value;
 
-    return std::move(this->readStringFromOffset(offset, length));
+    for(size_t i = 0; i < length; ++i)
+    {
+        value.push_back(this->readNext<std::wstring::value_type>());
+    }
+
+    return std::move(value);
 }
 
 }

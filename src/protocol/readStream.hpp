@@ -29,6 +29,7 @@ public:
     }
 
     std::string readNextString(size_t length);
+    std::wstring readNextWideString(size_t length);
 
 private:
     ReadStream();
@@ -43,8 +44,6 @@ private:
 
         return *(reinterpret_cast<const T*>(&payload_[offset]));
     }
-
-    std::string readStringFromOffset(size_t offset, size_t length) const;
 
     core::network::Payload payload_;
     size_t currentOffset_;

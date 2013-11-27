@@ -19,7 +19,7 @@ namespace tcp
 class ConnectionMock: public eMU::core::network::tcp::Connection
 {
 public:
-    ConnectionMock(Connection::SocketPointer socket);
+    ConnectionMock();
 
     MOCK_METHOD0(queueReceive, void());
     MOCK_METHOD1(setReceiveEventCallback, void(const EventCallback &callback));
@@ -27,6 +27,10 @@ public:
     MOCK_METHOD1(send, void(const eMU::core::network::Payload &payload));
     MOCK_METHOD0(disconnect, void());
     MOCK_METHOD0(close, void());
+    MOCK_CONST_METHOD0(isOpen, bool());
+
+private:
+    asioStub::io_service ioService_;
 };
 
 }

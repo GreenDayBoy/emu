@@ -8,6 +8,7 @@ set(eMU_src_DIR ${eMU_base_DIR}/src)
 set(eMU_core_DIR ${eMU_src_DIR}/core)
 set(eMU_protocol_DIR ${eMU_src_DIR}/protocol)
 set(eMU_dataserver_DIR ${eMU_src_DIR}/dataserver)
+set(eMU_loginserver_DIR ${eMU_src_DIR}/loginserver)
 
 set(eMU_tst_DIR ${eMU_base_DIR}/tst)
 set(eMU_ut_DIR ${eMU_tst_DIR}/ut)
@@ -39,20 +40,27 @@ target_link_libraries(core glog boost_system boost_thread)
 # protocol setup -----------------
 file(GLOB_RECURSE protocol_SOURCES "${eMU_protocol_DIR}/*.cpp")
 add_library(protocol SHARED ${protocol_SOURCES})
-#target_link_libraries(core glog boost_system boost_thread)
+add_dependencies(protocol core)
 # -------------------------------
 
 # dataserver setup ----------------
 file(GLOB_RECURSE dataserver_SOURCES "${eMU_dataserver_DIR}/*.cpp")
 add_executable(dataserver ${dataserver_SOURCES})
-target_link_libraries(dataserver core mysqlclient)
-add_dependencies(dataserver core)
+target_link_libraries(dataserver core protocol mysqlclient)
+add_dependencies(dataserver core protocol)
+# ------------------------------------
+
+# loginserver setup ----------------
+file(GLOB_RECURSE loginserver_SOURCES "${eMU_loginserver_DIR}/*.cpp")
+add_executable(loginserver ${loginserver_SOURCES})
+target_link_libraries(loginserver core protocol)
+add_dependencies(loginserver core protocol)
 # ------------------------------------
 
 # mt/ut tests setup ----------------
 # ut -------
 file(GLOB_RECURSE ut_SOURCES "${eMU_ut_DIR}/*.cpp")
-add_executable(ut EXCLUDE_FROM_ALL ${ut_SOURCES} ${core_SOURCES} ${dataserver_SOURCES} ${protocol_SOURCES})
+add_executable(ut EXCLUDE_FROM_ALL ${ut_SOURCES} ${core_SOURCES} ${dataserver_SOURCES} ${protocol_SOURCES} ${loginserver_SOURCES})
 target_link_libraries(ut gmock gtest pthread glog boost_system boost_thread mysqlclient)
 
 # mt -------

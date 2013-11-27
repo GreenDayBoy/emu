@@ -13,8 +13,8 @@ namespace network
 namespace tcp
 {
 
-ConnectionMock::ConnectionMock(Connection::SocketPointer socket):
-    Connection(socket) {}
+ConnectionMock::ConnectionMock():
+    Connection((ioService_)) {}
 
 }
 }

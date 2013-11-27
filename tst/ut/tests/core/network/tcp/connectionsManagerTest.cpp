@@ -47,7 +47,7 @@ protected:
         acceptor_(new acceptor(ioService_, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port_))),
         connectionsFactory_(new ConnectionsFactoryMock()),
         connectionsManager_(connectionsFactory_, ioService_, acceptor_),
-        connection_(ConnectionMock::SocketPointer(new asioStub::ip::tcp::socket(ioService_))),
+        connection_(),
         connectionHash_(1234)
     {
         connectionsManager_.setGenerateConnectionHashCallback(std::bind(&ConnectionsManagerEventsMock::generateConnectionHash,
