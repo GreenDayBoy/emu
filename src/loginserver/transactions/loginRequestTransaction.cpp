@@ -10,35 +10,36 @@ namespace loginserver
 namespace transactions
 {
 
-LoginRequestTransaction::LoginRequestTransaction(size_t hash,
+LoginRequestTransaction::LoginRequestTransaction(User &user,
                                                  core::network::tcp::ConnectionsManager &connectionsManager,
                                                  core::network::tcp::Connection &dataserverConnection,
                                                  const protocol::loginserver::decoders::LoginRequest &request):
-    hash_(hash),
+    user_(user),
     connectionsManager_(connectionsManager),
     dataserverConnection_(dataserverConnection),
     request_(request) {}
 
 bool LoginRequestTransaction::isValid() const
 {
-    if(!dataserverConnection_.isOpen())
-    {
-        LOG(ERROR) << "hash: " << hash_ << ", Connection to dataserver not established!";
-        return false;
-    }
-
-    return true;
+    return dataserverConnection_.isOpen();
 }
 
 void LoginRequestTransaction::handleValid()
 {
-    protocol::dataserver::encoders::CheckAccountRequest checkAccountRequest(hash_, request_.getAccountId(), request_.getPassword());
+    user_.setAccountId(request_.getAccountId());
+
+    LOG(INFO) << "hash: " << user_.getHash() << ", accountId: " << user_.getAccountId() << ", sending request for account check.";
+
+    protocol::dataserver::encoders::CheckAccountRequest checkAccountRequest(user_.getHash(), request_.getAccountId(), request_.getPassword());
     dataserverConnection_.send(checkAccountRequest.getWriteStream().getPayload());
 }
 
 void LoginRequestTransaction::handleInvalid()
 {
-    connectionsManager_.disconnect(hash_);
+    LOG(ERROR) << "hash: " << user_.getHash() << ", accountId: " << request_.getAccountId()
+               << ", connection to dataserver not established! Disconnected.";
+
+    connectionsManager_.disconnect(user_.getHash());
 }
 
 }

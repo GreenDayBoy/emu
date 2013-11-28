@@ -18,6 +18,8 @@ public:
     {
         uint16_t port_;
         size_t maxNumberOfUsers_;
+        std::string dataserverAddress_;
+        uint16_t dataserverPort_;
     };
 
     Server(asio::io_service &ioService, const Configuration &configuration);

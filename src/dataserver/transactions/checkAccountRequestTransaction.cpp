@@ -24,15 +24,7 @@ CheckAccountRequestTransaction::CheckAccountRequestTransaction(size_t hash,
 
 bool CheckAccountRequestTransaction::isValid() const
 {
-    if(sqlInterface_.isAlive())
-    {
-        return true;
-    }
-    else
-    {
-        LOG(ERROR) << "hash: " << hash_ << ", Connection to database is died!";
-        return false;
-    }
+    return sqlInterface_.isAlive();
 }
 
 void CheckAccountRequestTransaction::handleValid()
@@ -69,6 +61,8 @@ void CheckAccountRequestTransaction::handleValid()
 
 void CheckAccountRequestTransaction::handleInvalid()
 {
+    LOG(ERROR) << "hash: " << hash_ << ", Connection to database is died!";
+
     this->sendFaultIndication("Connection to database is died");
 }
 
