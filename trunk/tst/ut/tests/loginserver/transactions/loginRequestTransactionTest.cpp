@@ -6,6 +6,7 @@
 #include <protocol/loginserver/encoders/loginRequest.hpp>
 
 #include <ut/env/core/network/tcp/connectionMock.hpp>
+#include <ut/env/core/network/tcp/connectionsManagerMock.hpp>
 
 #include <gtest/gtest.h>
 #include <boost/locale.hpp>
@@ -15,6 +16,7 @@ using ::testing::Return;
 using ::testing::SaveArg;
 
 using eMU::ut::env::core::network::tcp::ConnectionMock;
+using eMU::ut::env::core::network::tcp::ConnectionsManagerMock;
 using eMU::core::network::Payload;
 using eMU::protocol::ReadStream;
 namespace encoders = eMU::protocol::loginserver::encoders;
@@ -38,6 +40,7 @@ protected:
     std::wstring password_;
     decoders::LoginRequest request_;
     ConnectionMock dataserverConnection_;
+    ConnectionsManagerMock connectionsManager_;
 };
 
 TEST_F(LoginRequestTransactionTest, handle)
@@ -45,10 +48,9 @@ TEST_F(LoginRequestTransactionTest, handle)
     Payload payload;
     EXPECT_CALL(dataserverConnection_, send(_)).WillOnce(SaveArg<0>(&payload));
 
-    bool connectionStatus = true;
-    EXPECT_CALL(dataserverConnection_, isOpen()).WillOnce((Return(connectionStatus)));
+    EXPECT_CALL(dataserverConnection_, isOpen()).WillOnce((Return(true)));
 
-    LoginRequestTransaction(hash_, dataserverConnection_, request_).handle();
+    LoginRequestTransaction(hash_, connectionsManager_, dataserverConnection_, request_).handle();
 
     ReadStream readStream(payload);
     ASSERT_EQ(MessageIds::kCheckAccountRequest, readStream.getId());
@@ -57,4 +59,12 @@ TEST_F(LoginRequestTransactionTest, handle)
     ASSERT_EQ(hash_, checkAccountRequest.getClientHash());
     ASSERT_EQ(boost::locale::conv::utf_to_utf<std::string::value_type>(accountId_), checkAccountRequest.getAccountId());
     ASSERT_EQ(boost::locale::conv::utf_to_utf<std::string::value_type>(password_), checkAccountRequest.getPassword());
+}
+
+TEST_F(LoginRequestTransactionTest, WhenConnectionToDataserverIsNotOpenThenClientShouldBeDisconnected)
+{
+    EXPECT_CALL(dataserverConnection_, isOpen()).WillOnce((Return(false)));
+    EXPECT_CALL(connectionsManager_, disconnect(hash_));
+
+    LoginRequestTransaction(hash_, connectionsManager_, dataserverConnection_, request_).handle();
 }

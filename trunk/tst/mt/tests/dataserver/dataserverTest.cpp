@@ -47,18 +47,17 @@ TEST_F(DataserverTest, CheckAccountShoulBeSuccesful)
     Server server(ioService_, sqlInterface_, configuration_);
     server.startup();
 
-    size_t connectionHash = ioService_.establishTcpConnection();
-
-    size_t clientHash = 0x1234;
-    CheckAccountResult checkAccountResult = CheckAccountResult::AcoountInUse;
-
     QueryResult queryResult;
     Row &row = queryResult.createRow(Row::Fields());
+    CheckAccountResult checkAccountResult = CheckAccountResult::AcoountInUse;
     row.insert(boost::lexical_cast<Row::Value>(static_cast<uint32_t>(checkAccountResult)));
 
     sqlInterface_.pushQueryResult(queryResult);
     sqlInterface_.pushQueryStatus(true);
 
+    size_t connectionHash = ioService_.establishTcpConnection();
+
+    size_t clientHash = 0x1234;
     CheckAccountRequest request(clientHash, "Account", "Password");   
     IO_CHECK(ioService_.send(connectionHash, request.getWriteStream()));
 
@@ -77,11 +76,11 @@ TEST_F(DataserverTest, WhenQueryExecutionWasFailedThenFaultIndicationShouldBeRec
     Server server(ioService_, sqlInterface_, configuration_);
     server.startup();
 
+    sqlInterface_.pushQueryStatus(false);
+
     size_t connectionHash = ioService_.establishTcpConnection();
 
     size_t clientHash = 0x1234;
-    sqlInterface_.pushQueryStatus(false);
-
     CheckAccountRequest request(clientHash, "Account", "Password");
     IO_CHECK(ioService_.send(connectionHash, request.getWriteStream()));
 
@@ -99,12 +98,34 @@ TEST_F(DataserverTest, WhenQueryResultIsEmptyThenFaultIndicationShouldBeReceived
     Server server(ioService_, sqlInterface_, configuration_);
     server.startup();
 
-    size_t connectionHash = ioService_.establishTcpConnection();
-
-    size_t clientHash = 0x1234;
     sqlInterface_.pushQueryStatus(true);
     sqlInterface_.pushQueryResult(QueryResult());
 
+    size_t connectionHash = ioService_.establishTcpConnection();
+
+    size_t clientHash = 0x1234;
+    CheckAccountRequest request(clientHash, "Account", "Password");
+    IO_CHECK(ioService_.send(connectionHash, request.getWriteStream()));
+
+    const ReadStream &readStream = ioService_.receive(connectionHash);
+    ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());
+
+    FaultIndication indication(readStream);
+    ASSERT_EQ(clientHash, indication.getClientHash());
+
+    IO_CHECK(ioService_.disconnect(connectionHash));
+}
+
+TEST_F(DataserverTest, WhenConnectionToDatabaseIsDiedThenFaultIndicationShouldBeSent)
+{
+    Server server(ioService_, sqlInterface_, configuration_);
+    server.startup();
+
+    sqlInterface_.setDied();
+
+    size_t connectionHash = ioService_.establishTcpConnection();
+
+    size_t clientHash = 0x1234;
     CheckAccountRequest request(clientHash, "Account", "Password");
     IO_CHECK(ioService_.send(connectionHash, request.getWriteStream()));
 

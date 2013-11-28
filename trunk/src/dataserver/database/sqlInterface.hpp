@@ -26,6 +26,8 @@ public:
 
     virtual bool executeQuery(std::string query) = 0;
     virtual QueryResult fetchQueryResult() = 0;
+
+    virtual bool isAlive() = 0;
 };
 
 }

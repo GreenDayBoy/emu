@@ -24,6 +24,7 @@ public:
     ConnectionsManagerMock();
 
     MOCK_METHOD2(send, void(size_t hash, const eMU::core::network::Payload &payload));
+    MOCK_METHOD1(disconnect, void(size_t hash));
 
 private:
     asio::io_service service_;

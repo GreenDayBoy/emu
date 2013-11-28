@@ -11,6 +11,9 @@ namespace dataserver
 namespace database
 {
 
+SqlInterfaceStub::SqlInterfaceStub():
+    isAlive_(true) {}
+
 bool SqlInterfaceStub::initialize() { return true; }
 
 bool SqlInterfaceStub::connect(const std::string &hostname, uint16_t port, const std::string &userName,
@@ -43,6 +46,21 @@ eMU::dataserver::database::QueryResult SqlInterfaceStub::fetchQueryResult()
     queriesResult_.pop();
 
     return result;
+}
+
+bool SqlInterfaceStub::isAlive()
+{
+    return isAlive_;
+}
+
+void SqlInterfaceStub::setAlive()
+{
+    isAlive_ = true;
+}
+
+void SqlInterfaceStub::setDied()
+{
+    isAlive_ = false;
 }
 
 void SqlInterfaceStub::pushQueryStatus(bool status)

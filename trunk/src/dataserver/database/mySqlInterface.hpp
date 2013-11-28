@@ -26,6 +26,7 @@ public:
     QueryResult fetchQueryResult();
 
     void releaseQuery();
+    bool isAlive();
 
 private:
     Row::Fields fetchFields();
