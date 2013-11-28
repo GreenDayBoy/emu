@@ -52,11 +52,7 @@ void Server::onReceive(size_t hash, const core::network::Payload &payload)
         {
             this->handleReadStream(hash, stream);
 
-            if(!transactionsManager_.dequeueAll())
-            {
-                LOG(ERROR) << "hash: " << hash << ", some transactions were invalid. Disconnected.";
-                connectionsManager_.disconnect(hash);
-            }
+            transactionsManager_.dequeueAll();
         }
     }
     catch(const protocol::ReadStreamsExtractor::EmptyPayloadException&)
@@ -126,10 +122,7 @@ void Server::onDataserverReceive(core::network::tcp::Connection &connection)
         {
             this->handleDataserverReadStream(stream);
 
-            if(!transactionsManager_.dequeueAll())
-            {
-                LOG(ERROR) << "Dataserver, some transactions were invalid.";
-            }
+            transactionsManager_.dequeueAll();
         }
     }
     catch(const protocol::ReadStreamsExtractor::EmptyPayloadException&)

@@ -28,7 +28,7 @@ bool LoginRequestTransaction::isValid() const
     return true;
 }
 
-void LoginRequestTransaction::handle()
+void LoginRequestTransaction::handleValid()
 {
     protocol::dataserver::encoders::CheckAccountRequest checkAccountRequest(hash_, request_.getAccountId(), request_.getPassword());
     dataserverConnection_.send(checkAccountRequest.getWriteStream().getPayload());

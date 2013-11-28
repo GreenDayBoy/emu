@@ -19,10 +19,10 @@ public:
                             core::network::tcp::Connection &dataserverConnection,
                             const protocol::loginserver::decoders::LoginRequest &request);
 
-    bool isValid() const;
-    void handle();
-
 private:
+    bool isValid() const;
+    void handleValid();
+
     size_t hash_;
     core::network::tcp::Connection &dataserverConnection_;
     protocol::loginserver::decoders::LoginRequest request_;

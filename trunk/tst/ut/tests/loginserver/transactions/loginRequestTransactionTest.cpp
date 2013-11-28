@@ -45,6 +45,9 @@ TEST_F(LoginRequestTransactionTest, handle)
     Payload payload;
     EXPECT_CALL(dataserverConnection_, send(_)).WillOnce(SaveArg<0>(&payload));
 
+    bool connectionStatus = true;
+    EXPECT_CALL(dataserverConnection_, isOpen()).WillOnce((Return(connectionStatus)));
+
     LoginRequestTransaction(hash_, dataserverConnection_, request_).handle();
 
     ReadStream readStream(payload);
@@ -54,16 +57,4 @@ TEST_F(LoginRequestTransactionTest, handle)
     ASSERT_EQ(hash_, checkAccountRequest.getClientHash());
     ASSERT_EQ(boost::locale::conv::utf_to_utf<std::string::value_type>(accountId_), checkAccountRequest.getAccountId());
     ASSERT_EQ(boost::locale::conv::utf_to_utf<std::string::value_type>(password_), checkAccountRequest.getPassword());
-}
-
-TEST_F(LoginRequestTransactionTest, isValidShouldReturnValueDependentOnTheConnectionStatus)
-{
-    bool connectionStatus = true;
-    EXPECT_CALL(dataserverConnection_, isOpen()).WillOnce((Return(connectionStatus)));
-
-    EXPECT_EQ(connectionStatus, LoginRequestTransaction(hash_, dataserverConnection_, request_).isValid());
-
-    connectionStatus = false;
-    EXPECT_CALL(dataserverConnection_, isOpen()).WillOnce((Return(connectionStatus)));
-    EXPECT_EQ(connectionStatus, LoginRequestTransaction(hash_, dataserverConnection_, request_).isValid());
 }

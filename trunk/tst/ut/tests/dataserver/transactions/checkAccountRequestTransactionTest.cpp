@@ -78,13 +78,6 @@ TEST_F(CheckAccountRequestTransactionTest, handle)
     ASSERT_EQ(result, response.getResult());
 }
 
-TEST_F(CheckAccountRequestTransactionTest, isValidShouldAlawayReturnTrue)
-{
-    CheckAccountRequestTransaction transaction(hash_, sqlInterface_, connectionsManager_, request_);
-
-    ASSERT_TRUE(transaction.isValid());
-}
-
 TEST_F(CheckAccountRequestTransactionTest, whenExecutionOfQueryIsFailedThenFaultIndicationShouldBeSend)
 {
     EXPECT_CALL(sqlInterface_, executeQuery(_)).WillOnce(Return(false));
