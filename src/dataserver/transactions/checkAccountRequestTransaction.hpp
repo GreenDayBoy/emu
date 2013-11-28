@@ -22,10 +22,10 @@ public:
                                    core::network::tcp::ConnectionsManager &connectionsManager,
                                    const protocol::dataserver::decoders::CheckAccountRequest &request);
 
-    bool isValid() const;
-    void handle();
-
 private:
+    bool isValid() const;
+    void handleValid();
+
     size_t hash_;
     database::SqlInterface &sqlInterface_;
     core::network::tcp::ConnectionsManager &connectionsManager_;

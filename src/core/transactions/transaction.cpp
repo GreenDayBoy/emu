@@ -12,6 +12,20 @@ Transaction::~Transaction()
 
 }
 
+void Transaction::handle()
+{
+    if(this->isValid())
+    {
+        this->handleValid();
+    }
+    else
+    {
+        this->handleInvalid();
+    }
+}
+
+void Transaction::handleInvalid() {}
+
 }
 }
 }

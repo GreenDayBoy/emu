@@ -27,7 +27,7 @@ bool CheckAccountRequestTransaction::isValid() const
     return true;
 }
 
-void CheckAccountRequestTransaction::handle()
+void CheckAccountRequestTransaction::handleValid()
 {
     std::stringstream query;
     query << "SELECT"

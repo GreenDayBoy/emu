@@ -1,49 +1,47 @@
+#include <core/transactions/manager.hpp>
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include <core/transactions/manager.hpp>
-#include <ut/env/core/transactions/transactionMock.hpp>
-
-using ::testing::_;
-using ::testing::Return;
 
 using eMU::core::transactions::Transaction;
 using eMU::core::transactions::Manager;
 
-using eMU::ut::env::core::transactions::TransactionMock;
-
 class TransactionsManagerTest: public ::testing::Test
 {
 protected:
-    Manager transactionsManager_;
-
-    bool scenario(const std::vector<bool> &transactionsValidationResult)
+    class SimpleTransaction: public Transaction
     {
-        for(bool validationResult : transactionsValidationResult)
+    public:
+        SimpleTransaction(size_t &count):
+            count_(count) {}
+
+    private:
+        bool isValid() const
         {
-            TransactionMock *transaction = new TransactionMock();
-            EXPECT_CALL(*transaction, isValid()).WillOnce(Return(validationResult));
-
-            if(validationResult)
-            {
-                EXPECT_CALL(*transaction, handle());
-            }
-
-            transactionsManager_.queue(transaction);
+            return true;
         }
 
-        return transactionsManager_.dequeueAll();
-    }
+        void handleValid()
+        {
+            ++count_;
+        }
+
+        size_t &count_;
+    };
+
+    Manager transactionsManager_;
 };
 
-TEST_F(TransactionsManagerTest, whenAllTransactionsWereValidThenDequeueAllShouldReturnTrue)
+TEST_F(TransactionsManagerTest, AllTransactionsShouldBeHandled)
 {
+    size_t count = 0;
+    SimpleTransaction *transaction1 = new SimpleTransaction(count);
+    transactionsManager_.queue(transaction1);
 
-    ASSERT_TRUE(scenario({true, true, true, true}));
+    SimpleTransaction *transaction2 = new SimpleTransaction(count);
+    transactionsManager_.queue(transaction2);
+
+    transactionsManager_.dequeueAll();
+
+    ASSERT_EQ(2, count);
 }
-
-TEST_F(TransactionsManagerTest, whenAnyOfTransactionWasNotValidThenDequeueAllShouldReturnFalse)
-{
-    ASSERT_FALSE(scenario({true, false, true, true}));
-    ASSERT_FALSE(scenario({false, false, false, false}));
-}
-

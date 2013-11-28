@@ -12,26 +12,15 @@ void Manager::queue(Transaction *transaction)
     transactions_.push(transaction);
 }
 
-bool Manager::dequeueAll()
+void Manager::dequeueAll()
 {
-    bool succeed = true;
-
     while(!transactions_.empty())
     {
-        if(transactions_.front()->isValid())
-        {
-            transactions_.front()->handle();
-        }
-        else
-        {
-            succeed = false;
-        }
+        transactions_.front()->handle();
 
         delete transactions_.front();
         transactions_.pop();
     }
-
-    return succeed;
 }
 
 }

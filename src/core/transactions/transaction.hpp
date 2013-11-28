@@ -12,8 +12,13 @@ class Transaction
 public:
     virtual ~Transaction();
 
-    virtual void handle() = 0;
+    void handle();
+
+protected:
     virtual bool isValid() const = 0;
+
+    virtual void handleValid() = 0;
+    virtual void handleInvalid();
 };
 
 }
