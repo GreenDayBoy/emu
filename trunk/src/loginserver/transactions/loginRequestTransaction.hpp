@@ -4,6 +4,7 @@
 #include <core/network/tcp/connection.hpp>
 #include <core/network/tcp/connectionsManager.hpp>
 
+#include <loginserver/user.hpp>
 #include <protocol/loginserver/decoders/loginRequest.hpp>
 
 namespace eMU
@@ -13,10 +14,10 @@ namespace loginserver
 namespace transactions
 {
 
-class LoginRequestTransaction: public eMU::core::transactions::Transaction
+class LoginRequestTransaction: public core::transactions::Transaction
 {
 public:
-    LoginRequestTransaction(size_t hash,
+    LoginRequestTransaction(User &user,
                             core::network::tcp::ConnectionsManager &connectionsManager,
                             core::network::tcp::Connection &dataserverConnection,
                             const protocol::loginserver::decoders::LoginRequest &request);
@@ -26,7 +27,7 @@ private:
     void handleValid();
     void handleInvalid();
 
-    size_t hash_;
+    User &user_;
     core::network::tcp::ConnectionsManager &connectionsManager_;
     core::network::tcp::Connection &dataserverConnection_;
     protocol::loginserver::decoders::LoginRequest request_;

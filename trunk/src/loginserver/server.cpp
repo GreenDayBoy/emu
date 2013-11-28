@@ -1,5 +1,6 @@
 #include <loginserver/server.hpp>
 #include <loginserver/transactions/loginRequestTransaction.hpp>
+#include <loginserver/transactions/checkAccountResponseTransaction.hpp>
 
 #include <protocol/readStreamsExtractor.hpp>
 #include <protocol/writeStream.hpp>
@@ -7,6 +8,7 @@
 #include <protocol/loginserver/messageIds.hpp>
 #include <protocol/loginserver/decoders/loginRequest.hpp>
 #include <protocol/dataserver/messageIds.hpp>
+#include <protocol/dataserver/decoders/checkAccountResponse.hpp>
 
 #include <core/common/serviceThreading.hpp>
 
@@ -99,8 +101,10 @@ void Server::handleReadStream(size_t hash, const protocol::ReadStream &stream)
 
     if(messageId == protocol::loginserver::MessageIds::kLoginRequest)
     {
+        User &user = usersFactory_.find(hash);
+
         protocol::loginserver::decoders::LoginRequest request(stream);
-        transactionsManager_.queue(new transactions::LoginRequestTransaction(hash,
+        transactionsManager_.queue(new transactions::LoginRequestTransaction(user,
                                                                              connectionsManager_,
                                                                              dataserverConnection_,
                                                                              request));
@@ -163,7 +167,8 @@ void Server::handleDataserverReadStream(const protocol::ReadStream &stream)
 
     if(messageId == protocol::dataserver::MessageIds::kCheckAccountResponse)
     {
-
+        protocol::dataserver::decoders::CheckAccountResponse response(stream);
+        transactionsManager_.queue(new transactions::CheckAccountResponseTransaction(connectionsManager_, usersFactory_, response));
     }
 }
 

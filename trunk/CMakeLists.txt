@@ -65,7 +65,7 @@ target_link_libraries(ut gmock gtest pthread glog boost_system boost_thread mysq
 
 # mt -------
 file(GLOB_RECURSE mt_SOURCES "${eMU_mt_DIR}/*.cpp")
-add_executable(mt EXCLUDE_FROM_ALL ${mt_SOURCES} ${core_SOURCES} ${dataserver_SOURCES} ${protocol_SOURCES})
+add_executable(mt EXCLUDE_FROM_ALL ${mt_SOURCES} ${core_SOURCES} ${dataserver_SOURCES} ${protocol_SOURCES} ${loginserver_SOURCES})
 target_link_libraries(mt gtest pthread glog boost_system boost_thread mysqlclient)
 # -------------------------------
 

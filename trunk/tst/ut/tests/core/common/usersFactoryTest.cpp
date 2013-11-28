@@ -71,3 +71,11 @@ TEST_F(UsersFactoryTest, find)
     usersFactory_.destroy(user1);
     usersFactory_.destroy(user2);
 }
+
+TEST_F(UsersFactoryTest, exists)
+{
+    size_t user1 = usersFactory_.create();
+
+    ASSERT_TRUE(usersFactory_.exists(user1));
+    ASSERT_FALSE(usersFactory_.exists(0x12643));
+}

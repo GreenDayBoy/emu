@@ -60,10 +60,7 @@ public:
         typename UsersContainer::iterator it;
         it = std::find_if(users_.begin(),
                           users_.end(),
-                          [hash](const User *userFromVector)
-        {
-            return hash == userFromVector->getHash();
-        });
+                          [hash](const User *userFromVector) { return hash == userFromVector->getHash(); });
 
         if(it == users_.end())
         {
@@ -76,6 +73,15 @@ public:
     UsersContainer& users()
     {
         return users_;
+    }
+
+    bool exists(size_t hash) const
+    {
+        size_t count = std::count_if(users_.begin(),
+                                     users_.end(),
+                                     [hash](const User *userFromVector) { return hash == userFromVector->getHash(); });
+
+        return count > 0;
     }
 
 private:

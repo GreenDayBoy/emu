@@ -14,7 +14,7 @@ namespace dataserver
 namespace transactions
 {
 
-class CheckAccountRequestTransaction: public eMU::core::transactions::Transaction
+class CheckAccountRequestTransaction: public core::transactions::Transaction
 {
 public:
     CheckAccountRequestTransaction(size_t hash,
