@@ -25,6 +25,7 @@ public:
     MOCK_METHOD0(getErrorMessage, std::string());
     MOCK_METHOD1(executeQuery, bool(std::string query));
     MOCK_METHOD0(fetchQueryResult, eMU::dataserver::database::QueryResult());
+    MOCK_METHOD0(isAlive, bool());
 };
 
 }

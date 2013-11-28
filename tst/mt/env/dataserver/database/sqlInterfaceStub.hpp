@@ -28,6 +28,8 @@ public:
     class UnexpectedQueryExecutionException {};
     class UnexpectedFetchResultExecutionException {};
 
+    SqlInterfaceStub();
+
     typedef std::queue<bool> QueryStatusContainer;
     typedef std::queue<eMU::dataserver::database::QueryResult> QueryResultContainer;
 
@@ -40,13 +42,18 @@ public:
 
     bool executeQuery(std::string query);
     eMU::dataserver::database::QueryResult fetchQueryResult();
+    bool isAlive();
 
     void pushQueryStatus(bool status);
     void pushQueryResult(const eMU::dataserver::database::QueryResult &queryResult);
 
+    void setAlive();
+    void setDied();
+
 private:
     QueryStatusContainer queriesStatus_;
     QueryResultContainer queriesResult_;
+    bool isAlive_;
 };
 
 }

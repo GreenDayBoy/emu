@@ -119,6 +119,19 @@ void MySqlInterface::fetchRows(QueryResult &queryResult)
     }
 }
 
+bool MySqlInterface::isAlive()
+{
+    if(mysql_ping(&handle_) == 0)
+    {
+        return true;
+    }
+    else
+    {
+        LOG(ERROR) << "Ping failed. Reason: " << this->getErrorMessage();
+        return false;
+    }
+}
+
 }
 }
 }

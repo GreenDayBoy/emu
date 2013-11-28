@@ -39,7 +39,7 @@ public:
     void setCloseEventCallback(const CloseEventCallback &callback);
 
     MOCKABLE void send(size_t hash, const Payload &payload);
-    void disconnect(size_t hash);
+    MOCKABLE void disconnect(size_t hash);
 
 private:
     void acceptHandler(Connection::SocketPointer socket, const boost::system::error_code &errorCode);

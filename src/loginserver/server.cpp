@@ -101,6 +101,7 @@ void Server::handleReadStream(size_t hash, const protocol::ReadStream &stream)
     {
         protocol::loginserver::decoders::LoginRequest request(stream);
         transactionsManager_.queue(new transactions::LoginRequestTransaction(hash,
+                                                                             connectionsManager_,
                                                                              dataserverConnection_,
                                                                              request));
     }

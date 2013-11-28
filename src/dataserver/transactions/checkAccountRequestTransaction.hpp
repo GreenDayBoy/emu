@@ -25,6 +25,9 @@ public:
 private:
     bool isValid() const;
     void handleValid();
+    void handleInvalid();
+
+    void sendFaultIndication(const std::string &message);
 
     size_t hash_;
     database::SqlInterface &sqlInterface_;

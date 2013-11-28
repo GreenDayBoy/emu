@@ -24,7 +24,15 @@ CheckAccountRequestTransaction::CheckAccountRequestTransaction(size_t hash,
 
 bool CheckAccountRequestTransaction::isValid() const
 {
-    return true;
+    if(sqlInterface_.isAlive())
+    {
+        return true;
+    }
+    else
+    {
+        LOG(ERROR) << "hash: " << hash_ << ", Connection to database is died!";
+        return false;
+    }
 }
 
 void CheckAccountRequestTransaction::handleValid()
@@ -50,16 +58,24 @@ void CheckAccountRequestTransaction::handleValid()
         else
         {
             LOG(ERROR) << "Empty query results for accountId: " << request_.getAccountId();
-
-            protocol::dataserver::encoders::FaultIndication indication(request_.getClientHash(), "Check account query result is empty");
-            connectionsManager_.send(hash_, indication.getWriteStream().getPayload());
+            this->sendFaultIndication("Check account query result is empty");
         }
     }
     else
     {
-        protocol::dataserver::encoders::FaultIndication indication(request_.getClientHash(), sqlInterface_.getErrorMessage());
-        connectionsManager_.send(hash_, indication.getWriteStream().getPayload());
+        this->sendFaultIndication(sqlInterface_.getErrorMessage());
     }
+}
+
+void CheckAccountRequestTransaction::handleInvalid()
+{
+    this->sendFaultIndication("Connection to database is died");
+}
+
+void CheckAccountRequestTransaction::sendFaultIndication(const std::string &message)
+{
+    protocol::dataserver::encoders::FaultIndication indication(request_.getClientHash(), message);
+    connectionsManager_.send(hash_, indication.getWriteStream().getPayload());
 }
 
 }

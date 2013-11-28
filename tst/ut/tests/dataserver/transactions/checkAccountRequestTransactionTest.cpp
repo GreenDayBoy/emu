@@ -64,6 +64,7 @@ TEST_F(CheckAccountRequestTransactionTest, handle)
     CheckAccountResult result = CheckAccountResult::AcoountInUse;
     row.insert(boost::lexical_cast<Row::Value>(static_cast<uint32_t>(result)));
 
+    EXPECT_CALL(sqlInterface_, isAlive()).WillOnce(Return(true));
     EXPECT_CALL(sqlInterface_, fetchQueryResult()).WillOnce(Return((queryResult_)));
     EXPECT_CALL(sqlInterface_, executeQuery(_)).WillOnce(Return(true));
     EXPECT_CALL(connectionsManager_, send(hash_, _)).WillOnce(SaveArg<1>(&payload_));
@@ -78,8 +79,9 @@ TEST_F(CheckAccountRequestTransactionTest, handle)
     ASSERT_EQ(result, response.getResult());
 }
 
-TEST_F(CheckAccountRequestTransactionTest, whenExecutionOfQueryIsFailedThenFaultIndicationShouldBeSend)
+TEST_F(CheckAccountRequestTransactionTest, WhenExecutionOfQueryIsFailedThenFaultIndicationShouldBeSent)
 {
+    EXPECT_CALL(sqlInterface_, isAlive()).WillOnce(Return(true));
     EXPECT_CALL(sqlInterface_, executeQuery(_)).WillOnce(Return(false));
 
     std::string errorMessage = "database error";
@@ -97,10 +99,25 @@ TEST_F(CheckAccountRequestTransactionTest, whenExecutionOfQueryIsFailedThenFault
     ASSERT_EQ(errorMessage, indication.getMessage());
 }
 
-TEST_F(CheckAccountRequestTransactionTest, whenQueryResultIsEmptyThenFaultIndicationShouldBeSend)
+TEST_F(CheckAccountRequestTransactionTest, WhenQueryResultIsEmptyThenFaultIndicationShouldBeSent)
 {
+    EXPECT_CALL(sqlInterface_, isAlive()).WillOnce(Return(true));
     EXPECT_CALL(sqlInterface_, fetchQueryResult()).WillOnce(Return((queryResult_)));
     EXPECT_CALL(sqlInterface_, executeQuery(_)).WillOnce(Return(true));
+    EXPECT_CALL(connectionsManager_, send(hash_, _)).WillOnce(SaveArg<1>(&payload_));
+
+    CheckAccountRequestTransaction(hash_, sqlInterface_, connectionsManager_, request_).handle();
+
+    ReadStream readStream(payload_);
+    ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());
+    FaultIndication indication(readStream);
+
+    ASSERT_EQ(clientHash_, indication.getClientHash());
+}
+
+TEST_F(CheckAccountRequestTransactionTest, WhenConnectionToDatabaseIsDiedThenFaultIndicationShouldBeSent)
+{
+    EXPECT_CALL(sqlInterface_, isAlive()).WillOnce(Return(false));
     EXPECT_CALL(connectionsManager_, send(hash_, _)).WillOnce(SaveArg<1>(&payload_));
 
     CheckAccountRequestTransaction(hash_, sqlInterface_, connectionsManager_, request_).handle();
