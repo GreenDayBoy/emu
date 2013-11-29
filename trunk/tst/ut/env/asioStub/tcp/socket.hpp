@@ -30,7 +30,7 @@ public:
     MOCK_METHOD1(shutdown, void(boost::asio::ip::tcp::socket::shutdown_type type));
     MOCK_METHOD2(async_receive, void(const boost::asio::mutable_buffers_1 &buffer, const io_service::IoHandler &handler));
     MOCK_METHOD2(async_send, void(const boost::asio::mutable_buffers_1 &buffer, const io_service::IoHandler &handler));
-    MOCK_METHOD2(async_connect, void(const boost::asio::ip::tcp::endpoint &endpoint, const ConnectHandler &handler));
+    MOCK_METHOD2(connect, void(const boost::asio::ip::tcp::endpoint &endpoint, boost::system::error_code &errorCode));
 
     io_service& get_io_service();
     io_service& service_;

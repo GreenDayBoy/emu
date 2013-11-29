@@ -29,7 +29,6 @@ public:
 
     Payload& getReadPayload();
 
-    void setConnectEventCallback(const EventCallback &callback);
     MOCKABLE void setReceiveEventCallback(const EventCallback &callback);
     MOCKABLE void setCloseEventCallback(const EventCallback &callback);
 
@@ -37,7 +36,7 @@ public:
     MOCKABLE void close();
     MOCKABLE void send(const Payload &payload);
     MOCKABLE void queueReceive();
-    void connect(const boost::asio::ip::tcp::endpoint &endpoint);
+    bool connect(const boost::asio::ip::tcp::endpoint &endpoint);
     MOCKABLE bool isOpen() const;
 
     bool operator==(const Connection &connection) const;
@@ -50,7 +49,6 @@ private:
     void receiveHandler(const boost::system::error_code &errorCode, size_t bytesTransferred);
     void sendHandler(const boost::system::error_code &errorCode, size_t bytesTransferred);
     void errorHandler(const boost::system::error_code &errorCode, const std::string &operationName);
-    void connectHandler(const boost::system::error_code &errorCode);
 
     SocketPointer socket_;
 
@@ -60,7 +58,6 @@ private:
     asio::io_service::strand strand_;
     bool closeOngoing_;
 
-    EventCallback connectEventCallback_;
     EventCallback receiveEventCallback_;
     EventCallback closeEventCallback_;
 };

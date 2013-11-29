@@ -25,11 +25,6 @@ Payload& Connection::getReadPayload()
     return readPayload_;
 }
 
-void Connection::setConnectEventCallback(const EventCallback &callback)
-{
-    connectEventCallback_ = callback;
-}
-
 void Connection::setReceiveEventCallback(const EventCallback &callback)
 {
     receiveEventCallback_ = callback;
@@ -91,11 +86,25 @@ void Connection::queueReceive()
                                         std::placeholders::_2)));
 }
 
-void Connection::connect(const boost::asio::ip::tcp::endpoint &endpoint)
+bool Connection::connect(const boost::asio::ip::tcp::endpoint &endpoint)
 {
-    socket_->async_connect(endpoint, std::bind(&Connection::connectHandler,
-                           this,
-                           std::placeholders::_1));
+    boost::system::error_code errorCode;
+    socket_->connect(endpoint, errorCode);
+
+    if(errorCode)
+    {
+        LOG(ERROR) << "Error during connect, address: " << endpoint.address().to_string() << ", port: " <<  endpoint.port()
+                   << ", error: " << errorCode.message() << ", code: " << errorCode.value();
+
+        if(socket_->is_open())
+        {
+            this->close();
+        }
+
+        return false;
+    }
+
+    return true;
 }
 
 void Connection::queueSend()
@@ -159,17 +168,6 @@ void Connection::errorHandler(const boost::system::error_code &errorCode, const 
                << ", code: " << errorCode.value();
 
     this->disconnect();
-}
-
-void Connection::connectHandler(const boost::system::error_code &errorCode)
-{
-    if(errorCode)
-    {
-        this->errorHandler(errorCode, "connect");
-        return;
-    }
-
-    connectEventCallback_(*this);
 }
 
 bool Connection::isOpen() const
