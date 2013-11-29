@@ -13,7 +13,18 @@
 #include <core/common/serviceThreading.hpp>
 
 #include <glog/logging.h>
+#include <gflags/gflags.h>
 #include <boost/lexical_cast.hpp>
+
+#ifdef eMU_TARGET
+DEFINE_string(dataserver1_host, "127.0.0.1", "Master dataserver address");
+DEFINE_int32(dataserver1_port, 55960, "Master dataserver port");
+DEFINE_string(dataserver2_host, "127.0.0.1", "Slave dataserver address");
+DEFINE_int32(dataserver2_port, 55962, "Slave dataserver port");
+DEFINE_int32(max_users, 5, "Max number of users to connect");
+DEFINE_int32(port, 55557, "server listen port");
+DEFINE_int32(max_threads, 2, "max number of concurrent threads");
+#endif
 
 namespace eMU
 {
@@ -22,16 +33,16 @@ namespace loginserver
 
 Server::Server(asio::io_service &ioService, const Configuration &configuration):
     core::network::Server<User>(ioService, configuration.port_, configuration.maxNumberOfUsers_),
-    dataserverConnection_(ioService)
+    dataserverConnection_(ioService),
+    configuration_(configuration)
 {
-    dataserverConnection_.setConnectEventCallback(std::bind(&Server::onDataserverConnect, this, std::placeholders::_1));
     dataserverConnection_.setReceiveEventCallback(std::bind(&Server::onDataserverReceive, this, std::placeholders::_1));
     dataserverConnection_.setCloseEventCallback(std::bind(&Server::onDataserverClose, this, std::placeholders::_1));
 }
 
 bool Server::onStartup()
 {
-    return true;
+    return initializeDataserverConnection();
 }
 
 void Server::onCleanup()
@@ -111,11 +122,6 @@ void Server::handleReadStream(size_t hash, const protocol::ReadStream &stream)
     }
 }
 
-void Server::onDataserverConnect(core::network::tcp::Connection &connection)
-{
-
-}
-
 void Server::onDataserverReceive(core::network::tcp::Connection &connection)
 {
     try
@@ -172,29 +178,45 @@ void Server::handleDataserverReadStream(const protocol::ReadStream &stream)
     }
 }
 
+bool Server::initializeDataserverConnection()
+{
+    if(dataserverConnection_.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(configuration_.dataserver1Address_),
+                                                                     configuration_.dataserver1Port_)))
+    {
+        LOG(ERROR) << "Connected to dataserver address: " << configuration_.dataserver1Address_ << ", port: " << configuration_.dataserver1Port_;
+        return true;
+    }
+    else if(dataserverConnection_.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(configuration_.dataserver2Address_),
+                                                                         configuration_.dataserver2Port_)))
+    {
+        LOG(ERROR) << "Connected to dataserver address: " << configuration_.dataserver2Address_ << ", port: " << configuration_.dataserver2Port_;
+        return true;
+    }
+
+    return false;
+}
+
 }
 }
 
 #ifdef eMU_TARGET
 int main(int argsCount, char *args[])
 {
-    if(argsCount < 4)
-    {
-        LOG(ERROR) << "Invalid command line to start GameServer instance.";
-        return 1;
-    }
-
+    FLAGS_logtostderr = true;
+    google::ParseCommandLineFlags(&argsCount, &args, true);
     google::InitGoogleLogging(args[0]);
 
-    eMU::dataserver::Server::Configuration configuration = {0};
-    configuration.maxNumberOfUsers_ = boost::lexical_cast<size_t>(args[1]);
-    configuration.port_ = boost::lexical_cast<uint16_t>(args[2]);
-
-    size_t maxNumberOfThreads = boost::lexical_cast<size_t>(args[3]);
+    eMU::loginserver::Server::Configuration configuration = {0};
+    configuration.dataserver1Address_ = FLAGS_dataserver1_host;
+    configuration.dataserver1Port_ = FLAGS_dataserver1_port;
+    configuration.dataserver2Address_ = FLAGS_dataserver2_host;
+    configuration.dataserver2Port_ = FLAGS_dataserver2_port;
+    configuration.maxNumberOfUsers_ = FLAGS_max_users;
+    configuration.port_ = FLAGS_port;
 
     boost::asio::io_service service;
-    eMU::dataserver::Server server(service, configuration);
-    eMU::core::common::ServiceThreading<eMU::dataserver::User> serviceThreading(maxNumberOfThreads, service, server);
+    eMU::loginserver::Server server(service, configuration);
+    eMU::core::common::ServiceThreading<eMU::loginserver::User> serviceThreading(FLAGS_max_threads, service, server);
     serviceThreading.start();
 
     return 0;

@@ -5,6 +5,7 @@
 #include <ut/env/core/network/samplePayloads.hpp>
 
 using ::testing::SaveArg;
+using ::testing::SetArgReferee;
 using ::testing::Return;
 using ::testing::Ref;
 using ::testing::_;
@@ -28,7 +29,6 @@ protected:
 
     void SetUp()
     {
-        connection_.setConnectEventCallback(std::bind(&ConnectionEventsMock::connectEvent, &connectionEvents_, std::placeholders::_1));
         connection_.setReceiveEventCallback(std::bind(&ConnectionEventsMock::receiveEvent, &connectionEvents_, std::placeholders::_1));
         connection_.setCloseEventCallback(std::bind(&ConnectionEventsMock::closeEvent, &connectionEvents_, std::placeholders::_1));
     }
@@ -45,11 +45,6 @@ protected:
         EXPECT_CALL(*socket_, async_send(_, _)).WillOnce(DoAll(SaveArg<0>(&sendBuffer_), SaveArg<1>(&sendHandler_)));
     }
 
-    void expectAsyncConnectCallAndSaveArguments()
-    {
-        EXPECT_CALL(*socket_, async_connect(endpoint_, _)).WillOnce(SaveArg<1>(&connectHandler_));
-    }
-
     asioStub::io_service ioService_;
     Connection::SocketPointer socket_;
     Connection connection_;
@@ -62,8 +57,6 @@ protected:
 
     asioStub::io_service::IoHandler sendHandler_;
     boost::asio::mutable_buffer sendBuffer_;
-
-    asioStub::ip::tcp::socket::ConnectHandler connectHandler_;
 
     SamplePayloads samplePayloads_;
 };
@@ -260,38 +253,30 @@ TEST_F(TcpConnectionTest, sendWithOperationAbortedErrorShouldNotTriggerCloseEven
     sendHandler_(boost::asio::error::operation_aborted, 0);
 }
 
-TEST_F(TcpConnectionTest, connect)
+TEST_F(TcpConnectionTest, connectShouldReturnFalseWhenErrorOccuredAndCloseSocketIfOpened)
 {
-    expectAsyncConnectCallAndSaveArguments();
-
-    connection_.connect(endpoint_);
-
-    EXPECT_CALL(connectionEvents_, connectEvent(Ref(connection_)));
-    connectHandler_(boost::system::error_code());
-}
-
-TEST_F(TcpConnectionTest, connectErrorShouldTriggerCloseEvent)
-{
-    expectAsyncConnectCallAndSaveArguments();
-
-    connection_.connect(endpoint_);
+    EXPECT_CALL(*socket_, connect(endpoint_, _)).WillOnce(SetArgReferee<1>(boost::asio::error::access_denied));
 
     EXPECT_CALL(*socket_, is_open()).WillOnce(Return(true));
-    EXPECT_CALL(connectionEvents_, closeEvent(Ref(connection_)));
+    EXPECT_CALL(*socket_, close());
+    EXPECT_CALL(*socket_, shutdown(boost::asio::ip::tcp::socket::shutdown_both));
 
-    connectHandler_(boost::asio::error::access_denied);
+    ASSERT_FALSE(connection_.connect(endpoint_));
 }
 
-TEST_F(TcpConnectionTest, connectErrorShouldNotTriggerCloseEventWhenSocketIsNotOpen)
+TEST_F(TcpConnectionTest, connectShouldReturnFalseWhenErrorOccuredAndDoNotCloseSocketIfNotOpened)
 {
-    expectAsyncConnectCallAndSaveArguments();
-
-    connection_.connect(endpoint_);
+    EXPECT_CALL(*socket_, connect(endpoint_, _)).WillOnce(SetArgReferee<1>(boost::asio::error::access_denied));
 
     EXPECT_CALL(*socket_, is_open()).WillOnce(Return(false));
-    EXPECT_CALL(connectionEvents_, closeEvent(_)).Times(0);
 
-    connectHandler_(boost::asio::error::access_denied);
+    ASSERT_FALSE(connection_.connect(endpoint_));
+}
+
+TEST_F(TcpConnectionTest, connectShouldReturnTrueWhenNoErrorOccured)
+{
+    EXPECT_CALL(*socket_, connect(endpoint_, _)).WillOnce(SetArgReferee<1>(boost::system::error_code()));
+    ASSERT_TRUE(connection_.connect(endpoint_));
 }
 
 TEST_F(TcpConnectionTest, thrownExceptionFromShutdownDuringCloseOperationShouldBeCaught)

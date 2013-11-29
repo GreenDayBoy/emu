@@ -1,4 +1,5 @@
 #include <dataserver/server.hpp>
+#include <dataserver/database/mySqlInterface.hpp>
 #include <dataserver/transactions/checkAccountRequestTransaction.hpp>
 
 #include <protocol/readStreamsExtractor.hpp>
@@ -10,7 +11,19 @@
 #include <core/common/serviceThreading.hpp>
 
 #include <glog/logging.h>
+#include <gflags/gflags.h>
 #include <boost/lexical_cast.hpp>
+
+#ifdef eMU_TARGET
+DEFINE_string(db_host, "127.0.0.1", "Database engine address");
+DEFINE_int32(db_port, 3306, "Database engine listen port");
+DEFINE_string(db_name, "mu2", "Database name");
+DEFINE_string(db_user, "root", "Database engine user name");
+DEFINE_string(db_password, "root", "Database engine user password");
+DEFINE_int32(max_users, 5, "Max number of users to connect");
+DEFINE_int32(port, 44405, "server listen port");
+DEFINE_int32(max_threads, 2, "max number of concurrent threads");
+#endif
 
 namespace eMU
 {
@@ -28,7 +41,6 @@ bool Server::onStartup()
 
 void Server::onCleanup()
 {
-    sqlInterface_.cleanup();
 }
 
 void Server::onAccept(size_t hash)
@@ -108,24 +120,33 @@ void Server::handleReadStream(size_t hash, const protocol::ReadStream &stream)
 #ifdef eMU_TARGET
 int main(int argsCount, char *args[])
 {
-    if(argsCount < 4)
+    FLAGS_logtostderr = true;
+    google::ParseCommandLineFlags(&argsCount, &args, true);
+    google::InitGoogleLogging(args[0]);
+
+    eMU::dataserver::database::MySqlInterface mysqlInterface;
+    if(!mysqlInterface.initialize())
     {
-        LOG(ERROR) << "Invalid command line to start GameServer instance.";
+        LOG(ERROR) << "Initialization of database engine failed.";
         return 1;
     }
 
-    google::InitGoogleLogging(args[0]);
+    if(!mysqlInterface.connect(FLAGS_db_host, FLAGS_db_port, FLAGS_db_user, FLAGS_db_password, FLAGS_db_name))
+    {
+        LOG(ERROR) << "Connect to database engine failed.";
+        return 1;
+    }
 
     eMU::dataserver::Server::Configuration configuration = {0};
-    configuration.maxNumberOfUsers_ = boost::lexical_cast<size_t>(args[1]);
-    configuration.port_ = boost::lexical_cast<uint16_t>(args[2]);
-
-    size_t maxNumberOfThreads = boost::lexical_cast<size_t>(args[3]);
+    configuration.maxNumberOfUsers_ = FLAGS_max_users;
+    configuration.port_ = FLAGS_port;
 
     boost::asio::io_service service;
-    eMU::dataserver::Server server(service, configuration);
-    eMU::core::common::ServiceThreading<eMU::dataserver::User> serviceThreading(maxNumberOfThreads, service, server);
+    eMU::dataserver::Server server(service, mysqlInterface, configuration);
+    eMU::core::common::ServiceThreading<eMU::dataserver::User> serviceThreading(FLAGS_max_threads, service, server);
     serviceThreading.start();
+
+    mysqlInterface.cleanup();
 
     return 0;
 }

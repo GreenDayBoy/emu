@@ -18,8 +18,10 @@ public:
     {
         uint16_t port_;
         size_t maxNumberOfUsers_;
-        std::string dataserverAddress_;
-        uint16_t dataserverPort_;
+        std::string dataserver1Address_;
+        uint16_t dataserver1Port_;
+        std::string dataserver2Address_;
+        uint16_t dataserver2Port_;
     };
 
     Server(asio::io_service &ioService, const Configuration &configuration);
@@ -31,14 +33,15 @@ public:
     void onClose(size_t hash);
 
 private:
+    bool initializeDataserverConnection();
     void handleReadStream(size_t hash, const protocol::ReadStream &stream);
 
-    void onDataserverConnect(core::network::tcp::Connection &connection);
     void onDataserverReceive(core::network::tcp::Connection &connection);
     void onDataserverClose(core::network::tcp::Connection &connection);
     void handleDataserverReadStream(const protocol::ReadStream &stream);
 
     core::network::tcp::Connection dataserverConnection_;
+    Configuration configuration_;
 };
 
 }
