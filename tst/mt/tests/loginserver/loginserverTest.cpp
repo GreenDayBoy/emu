@@ -37,7 +37,7 @@ protected:
         configuration_.maxNumberOfUsers_ = 5;
         configuration_.port_ = 55557;
         configuration_.dataserver1Address_ = "127.0.0.1";
-        configuration_.port_ = 55960;
+        configuration_.dataserver1Port_ = 55960;
         configuration_.dataserver2Address_ = "127.0.0.1";
         configuration_.dataserver2Port_ = 55962;
     }
@@ -135,8 +135,7 @@ TEST_F(LoginserverTest, WhenConnectToDataserverFailedThenClientShouldBeDisconnec
     server.startup();
 
     size_t connectionHash = ioService_.establishTcpConnection();
-    LoginRequest loginRequest(L"accountTest", L"passwordTest");
-    IO_CHECK(ioService_.send(connectionHash, loginRequest.getWriteStream()));
+    IO_CHECK(ioService_.send(connectionHash, LoginRequest(L"accountTest", L"passwordTest").getWriteStream()));
 
     ASSERT_FALSE(ioService_.tcpConnectionEstablished(connectionHash));
 }
