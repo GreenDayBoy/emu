@@ -29,7 +29,7 @@ io_service::~io_service()
 
     if(clientTcpSocket_ != nullptr)
     {
-        ASSERT_FALSE(clientTcpSocket_->hasUnreadPayload());
+        EXPECT_FALSE(clientTcpSocket_->hasUnreadPayload());
     }
 }
 
@@ -164,6 +164,7 @@ io_service::TcpSocketsContainer::iterator io_service::find(size_t hash)
 bool io_service::establishClientTcpSocket(ip::tcp::socket &socket)
 {
     clientTcpSocket_ = &socket;
+    clientTcpSocket_->setOpenState(connectResult_);
 
     return connectResult_;
 }
