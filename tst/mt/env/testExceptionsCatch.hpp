@@ -1,7 +1,9 @@
 #pragma once
 
+#include <mt/env/dataserver/database/sqlInterfaceStub.hpp>
+
 #define IO_SERVICE_EXCEPTIONS_CATCH \
-catch(const eMU::mt::env::asioStub::io_service::AcceptingNotStartedException&) \
+catch(const eMU::mt::env::asioStub::io_service::AcceptNotStartedException&) \
 { \
     ASSERT_TRUE(false) << "accept not queued."; \
 } \
@@ -12,6 +14,10 @@ catch(const eMU::mt::env::asioStub::io_service::NonExistentTcpSocketException&) 
 catch(const eMU::mt::env::asioStub::io_service::NonExistentUdpSocketException&) \
 { \
     ASSERT_TRUE(false) << "udp socket does not exists."; \
+} \
+catch(const eMU::mt::env::asioStub::io_service::ClientSocketNotConnectedException&) \
+{ \
+    ASSERT_TRUE(false) << "payload size out of bound."; \
 }
 
 #define SOCKET_EXCEPTIONS_CATCH \
@@ -26,7 +32,7 @@ catch(const eMU::mt::env::asioStub::BaseSocket::SendNotStartedException&) \
 catch(const eMU::mt::env::asioStub::BaseSocket::PayloadSizeOutOfBoundException&) \
 { \
     ASSERT_TRUE(false) << "payload size out of bound."; \
-} \
+}
 
 #define SQL_EXCEPTIONS_CATCH \
 catch(const eMU::mt::env::dataserver::database::SqlInterfaceStub::UnexpectedQueryExecutionException&) \
@@ -36,7 +42,7 @@ catch(const eMU::mt::env::dataserver::database::SqlInterfaceStub::UnexpectedQuer
 catch(const eMU::mt::env::dataserver::database::SqlInterfaceStub::UnexpectedFetchResultExecutionException&) \
 { \
     ASSERT_TRUE(false) << "unexpected fetch of sql result."; \
-} \
+}
 
 #define IO_CHECK(statement) \
     try { \

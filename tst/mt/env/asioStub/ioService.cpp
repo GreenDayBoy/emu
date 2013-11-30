@@ -19,11 +19,18 @@ io_service::strand::strand(io_service& service) {}
 
 io_service::io_service():
     tcpSocket_(nullptr),
-    udpSocket_(nullptr) {}
+    udpSocket_(nullptr),
+    clientTcpSocket_(nullptr),
+    connectResult_(true) {}
 
 io_service::~io_service()
 {
     this->closeAllTcpConnections();
+
+    if(clientTcpSocket_ != nullptr)
+    {
+        ASSERT_FALSE(clientTcpSocket_->hasUnreadPayload());
+    }
 }
 
 size_t io_service::run() { return 0; }
@@ -58,7 +65,7 @@ size_t io_service::establishTcpConnection()
 {
     if(tcpSocket_ == nullptr)
     {
-        throw AcceptingNotStartedException();
+        throw AcceptNotStartedException();
     }
 
     tcpSockets_.push_back(tcpSocket_);
@@ -82,7 +89,15 @@ void io_service::closeTcpConnection(size_t hash)
 
 void io_service::closeTcpConnection(ip::tcp::socket *socket)
 {
-    this->closeTcpConnection(reinterpret_cast<size_t>(socket));
+    if(socket == clientTcpSocket_)
+    {
+        ASSERT_FALSE(clientTcpSocket_->hasUnreadPayload());
+        clientTcpSocket_ = nullptr;
+    }
+    else
+    {
+        this->closeTcpConnection(reinterpret_cast<size_t>(socket));
+    }
 }
 
 bool io_service::tcpConnectionEstablished(size_t hash) const
@@ -146,7 +161,37 @@ io_service::TcpSocketsContainer::iterator io_service::find(size_t hash)
                         [hash](ip::tcp::socket *socket) { return hash == reinterpret_cast<size_t>(socket); });
 }
 
+bool io_service::establishClientTcpSocket(ip::tcp::socket &socket)
+{
+    clientTcpSocket_ = &socket;
 
+    return connectResult_;
+}
+
+void io_service::sendToClientTcpSocket(const protocol::WriteStream &writeStream)
+{
+    if(clientTcpSocket_ == nullptr)
+    {
+        throw ClientSocketNotConnectedException();
+    }
+
+    clientTcpSocket_->insertPayload(writeStream.getPayload());
+}
+
+protocol::ReadStream io_service::receiveFromClientTcpSocket()
+{
+    if(clientTcpSocket_ == nullptr)
+    {
+        throw ClientSocketNotConnectedException();
+    }
+
+    return protocol::ReadStream(clientTcpSocket_->getPayload());
+}
+
+void io_service::setConnectResult(bool result)
+{
+    connectResult_ = result;
+}
 
 }
 }

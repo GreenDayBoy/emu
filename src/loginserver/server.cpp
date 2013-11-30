@@ -1,6 +1,7 @@
 #include <loginserver/server.hpp>
 #include <loginserver/transactions/loginRequestTransaction.hpp>
 #include <loginserver/transactions/checkAccountResponseTransaction.hpp>
+#include <loginserver/transactions/faultIndicationTransaction.hpp>
 
 #include <protocol/readStreamsExtractor.hpp>
 #include <protocol/writeStream.hpp>
@@ -9,6 +10,7 @@
 #include <protocol/loginserver/decoders/loginRequest.hpp>
 #include <protocol/dataserver/messageIds.hpp>
 #include <protocol/dataserver/decoders/checkAccountResponse.hpp>
+#include <protocol/dataserver/decoders/faultIndication.hpp>
 
 #include <core/common/serviceThreading.hpp>
 
@@ -34,7 +36,9 @@ namespace loginserver
 Server::Server(asio::io_service &ioService, const Configuration &configuration):
     core::network::Server<User>(ioService, configuration.port_, configuration.maxNumberOfUsers_),
     dataserverConnection_(ioService),
-    configuration_(configuration)
+    configuration_(configuration),
+    dataserverConnector_(dataserverConnection_, {{configuration_.dataserver1Address_, configuration_.dataserver1Port_},
+                                                 {configuration_.dataserver2Address_, configuration_.dataserver2Port_}})
 {
     dataserverConnection_.setReceiveEventCallback(std::bind(&Server::onDataserverReceive, this, std::placeholders::_1));
     dataserverConnection_.setCloseEventCallback(std::bind(&Server::onDataserverClose, this, std::placeholders::_1));
@@ -42,7 +46,7 @@ Server::Server(asio::io_service &ioService, const Configuration &configuration):
 
 bool Server::onStartup()
 {
-    return initializeDataserverConnection();
+    return dataserverConnector_.connect();
 }
 
 void Server::onCleanup()
@@ -176,24 +180,11 @@ void Server::handleDataserverReadStream(const protocol::ReadStream &stream)
         protocol::dataserver::decoders::CheckAccountResponse response(stream);
         transactionsManager_.queue(new transactions::CheckAccountResponseTransaction(connectionsManager_, usersFactory_, response));
     }
-}
-
-bool Server::initializeDataserverConnection()
-{
-    if(dataserverConnection_.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(configuration_.dataserver1Address_),
-                                                                     configuration_.dataserver1Port_)))
+    if(messageId == protocol::dataserver::MessageIds::kFaultIndication)
     {
-        LOG(ERROR) << "Connected to dataserver address: " << configuration_.dataserver1Address_ << ", port: " << configuration_.dataserver1Port_;
-        return true;
+        protocol::dataserver::decoders::FaultIndication indication(stream);
+        transactionsManager_.queue(new transactions::FaultIndicationTransaction(connectionsManager_, usersFactory_, indication));
     }
-    else if(dataserverConnection_.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(configuration_.dataserver2Address_),
-                                                                         configuration_.dataserver2Port_)))
-    {
-        LOG(ERROR) << "Connected to dataserver address: " << configuration_.dataserver2Address_ << ", port: " << configuration_.dataserver2Port_;
-        return true;
-    }
-
-    return false;
 }
 
 }

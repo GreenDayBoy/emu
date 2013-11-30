@@ -31,9 +31,10 @@ public:
         CompletionHandler wrap(const CompletionHandler &handler) { return handler; }
     };
 
-    class AcceptingNotStartedException {};
+    class AcceptNotStartedException {};
     class NonExistentTcpSocketException {};
     class NonExistentUdpSocketException {};
+    class ClientSocketNotConnectedException {};
 
     typedef std::vector<ip::tcp::socket*> TcpSocketsContainer;
 
@@ -60,6 +61,11 @@ public:
     protocol::ReadStream receive(size_t hash);
     void disconnect(size_t hash);
 
+    bool establishClientTcpSocket(ip::tcp::socket &socket);
+    void sendToClientTcpSocket(const protocol::WriteStream &writeStream);
+    protocol::ReadStream receiveFromClientTcpSocket();
+    void setConnectResult(bool results);
+
 private:
     TcpSocketsContainer::iterator find(size_t hash);
     void closeAllTcpConnections();
@@ -69,6 +75,9 @@ private:
     AcceptHandler acceptHandler_;
 
     ip::udp::socket *udpSocket_;
+
+    ip::tcp::socket *clientTcpSocket_;
+    bool connectResult_;
 };
 
 }

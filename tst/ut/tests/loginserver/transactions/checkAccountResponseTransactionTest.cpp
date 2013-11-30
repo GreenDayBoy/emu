@@ -28,16 +28,14 @@ class CheckAccountResponseTransactionTest: public ::testing::Test
 {
 protected:
     CheckAccountResponseTransactionTest():
-        usersFactory_(1) {}
+        usersFactory_(1),
+        checkAccountResult_(CheckAccountResult::Succeed),
+        expectedLoginResult_(LoginResult::Succeed) {}
 
-    UsersFactory<User> usersFactory_;
-    ConnectionsManagerMock connectionsManager_;
-    Payload payload_;
-
-    void handle(CheckAccountResult checkAccountResult, LoginResult expectedLoginResult)
+    void scenario()
     {
         size_t hash = usersFactory_.create();
-        decoders::CheckAccountResponse checkAccountResponse(encoders::CheckAccountResponse(hash, checkAccountResult).getWriteStream().getPayload());
+        decoders::CheckAccountResponse checkAccountResponse(encoders::CheckAccountResponse(hash, checkAccountResult_).getWriteStream().getPayload());
 
         EXPECT_CALL(connectionsManager_, send(hash, _)).WillOnce(SaveArg<1>(&payload_));
         CheckAccountResponseTransaction(connectionsManager_, usersFactory_, checkAccountResponse).handle();
@@ -46,23 +44,33 @@ protected:
         ASSERT_EQ(MessageIds::kLoginResponse, readStream.getId());
 
         LoginResponse loginResponse(readStream);
-        ASSERT_EQ(expectedLoginResult, loginResponse.getResult());
+        ASSERT_EQ(expectedLoginResult_, loginResponse.getResult());
     }
+
+    UsersFactory<User> usersFactory_;
+    ConnectionsManagerMock connectionsManager_;
+    Payload payload_;
+    CheckAccountResult checkAccountResult_;
+    LoginResult expectedLoginResult_;
 };
 
 TEST_F(CheckAccountResponseTransactionTest, WhenDataServerReturnSucceedThenLoginResponseShouldBeSucceed)
 {
-    handle(CheckAccountResult::Succeed, LoginResult::Succeed);
+    scenario();
 }
 
 TEST_F(CheckAccountResponseTransactionTest, WhenDataServerReturnFailedThenLoginResponseShouldBeFailed)
 {
-    handle(CheckAccountResult::Failed, LoginResult::Failed);
+    checkAccountResult_ = CheckAccountResult::Failed;
+    expectedLoginResult_ = LoginResult::Failed;
+    scenario();
 }
 
 TEST_F(CheckAccountResponseTransactionTest, WhenDataServerReturnAccountInUseThenLoginResponseShouldBeFailed)
 {
-    handle(CheckAccountResult::AcoountInUse, LoginResult::Failed);
+    checkAccountResult_ = CheckAccountResult::AcoountInUse;
+    expectedLoginResult_ = LoginResult::Failed;
+    scenario();
 }
 
 TEST_F(CheckAccountResponseTransactionTest, WhenHashGivenFromDataServerIsInvalidThenNothingShouldHappen)

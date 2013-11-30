@@ -25,7 +25,7 @@ public:
     void shutdown(boost::asio::ip::tcp::socket::shutdown_type type);
     void async_receive(const boost::asio::mutable_buffers_1 &buffer, const IoHandler &handler);
     void async_send(const boost::asio::mutable_buffers_1 &buffer, const IoHandler &handler);
-    void async_connect(const boost::asio::ip::tcp::endpoint &endpoint, const ConnectHandler &handler);
+    void connect(const boost::asio::ip::tcp::endpoint &endpoint, boost::system::error_code& errorCode);
     void disconnect();
 
     boost::asio::ip::tcp::endpoint remote_endpoint() const;

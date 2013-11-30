@@ -1,5 +1,6 @@
 #pragma once
 
+#include <loginserver/dataserverConnector.hpp>
 #include <core/network/tcp/connectionsManager.hpp>
 #include <core/network/server.hpp>
 #include <protocol/readStream.hpp>
@@ -33,7 +34,6 @@ public:
     void onClose(size_t hash);
 
 private:
-    bool initializeDataserverConnection();
     void handleReadStream(size_t hash, const protocol::ReadStream &stream);
 
     void onDataserverReceive(core::network::tcp::Connection &connection);
@@ -42,6 +42,7 @@ private:
 
     core::network::tcp::Connection dataserverConnection_;
     Configuration configuration_;
+    DataserverConnector dataserverConnector_;
 };
 
 }
