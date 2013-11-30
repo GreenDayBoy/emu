@@ -16,7 +16,8 @@ namespace tcp
 {
 
 socket::socket(io_service &ioService):
-    BaseSocket(ioService) {}
+    BaseSocket(ioService),
+    openState_(true) {}
 
 void socket::close()
 {
@@ -25,7 +26,7 @@ void socket::close()
 
 bool socket::is_open() const
 {
-    return true;
+    return openState_;
 }
 
 void socket::shutdown(boost::asio::ip::tcp::socket::shutdown_type type) {}
@@ -58,6 +59,11 @@ boost::asio::ip::tcp::endpoint socket::remote_endpoint() const
 void socket::disconnect()
 {
     receiveHandler_(boost::asio::error::eof, 0);
+}
+
+void socket::setOpenState(bool state)
+{
+    openState_ = state;
 }
 
 }

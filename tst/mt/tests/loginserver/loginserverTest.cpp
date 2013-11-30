@@ -127,3 +127,16 @@ TEST_F(LoginserverTest, WhenConnectToDataserverFailedThenStartupShouldBeFailed)
     Server server(ioService_, configuration_);
     ASSERT_FALSE(server.startup());
 }
+
+TEST_F(LoginserverTest, WhenConnectToDataserverFailedThenClientShouldBeDisconnected)
+{
+    ioService_.setConnectResult(false);
+    Server server(ioService_, configuration_);
+    server.startup();
+
+    size_t connectionHash = ioService_.establishTcpConnection();
+    LoginRequest loginRequest(L"accountTest", L"passwordTest");
+    IO_CHECK(ioService_.send(connectionHash, loginRequest.getWriteStream()));
+
+    ASSERT_FALSE(ioService_.tcpConnectionEstablished(connectionHash));
+}

@@ -28,7 +28,10 @@ public:
     void connect(const boost::asio::ip::tcp::endpoint &endpoint, boost::system::error_code& errorCode);
     void disconnect();
 
+    void setOpenState(bool state);
+
     boost::asio::ip::tcp::endpoint remote_endpoint() const;
+    bool openState_;
 };
 
 }
