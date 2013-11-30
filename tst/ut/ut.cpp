@@ -4,6 +4,7 @@
 
 int main(int count, char *args[])
 {
+    FLAGS_logtostderr = true;
     google::InitGoogleLogging(args[0]);
     testing::InitGoogleTest(&count, args);
 

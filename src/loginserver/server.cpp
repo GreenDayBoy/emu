@@ -114,6 +114,8 @@ void Server::handleReadStream(size_t hash, const protocol::ReadStream &stream)
 {
     uint16_t messageId = stream.getId();
 
+    LOG(INFO) << "hash: " << hash << ", received stream, id: " << messageId;
+
     if(messageId == protocol::loginserver::MessageIds::kLoginRequest)
     {
         User &user = usersFactory_.find(hash);
@@ -174,6 +176,8 @@ void Server::onDataserverClose(core::network::tcp::Connection &connection)
 void Server::handleDataserverReadStream(const protocol::ReadStream &stream)
 {
     uint16_t messageId = stream.getId();
+
+    LOG(INFO) << "Dataserver, received stream, id: " << messageId;
 
     if(messageId == protocol::dataserver::MessageIds::kCheckAccountResponse)
     {
