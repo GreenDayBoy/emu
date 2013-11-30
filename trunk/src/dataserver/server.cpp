@@ -104,6 +104,8 @@ void Server::handleReadStream(size_t hash, const protocol::ReadStream &stream)
 {
     uint16_t messageId = stream.getId();
 
+    LOG(INFO) << "hash: " << hash << ", received stream, id: " << messageId;
+
     if(messageId == protocol::dataserver::MessageIds::kCheckAccountRequest)
     {
         protocol::dataserver::decoders::CheckAccountRequest request(stream);

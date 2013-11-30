@@ -29,6 +29,8 @@ bool CheckAccountRequestTransaction::isValid() const
 
 void CheckAccountRequestTransaction::handleValid()
 {
+    LOG(INFO) << "hash: " << hash_ << ", clientHash: " << request_.getClientHash() << ", checking account: " << request_.getAccountId();
+
     std::stringstream query;
     query << "SELECT"
           << " `eMU_AccountCheck`(" << request_.getAccountId()
