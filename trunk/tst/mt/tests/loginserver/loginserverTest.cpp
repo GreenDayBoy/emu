@@ -1,139 +1,129 @@
-//#include <dataserver/server.hpp>
-//#include <mt/env/dataserver/database/sqlInterfaceStub.hpp>
-//#include <mt/env/testExceptionsCatch.hpp>
+#include <loginserver/server.hpp>
+#include <mt/env/asioStub/ioService.hpp>
+#include <mt/env/testExceptionsCatch.hpp>
 
-//#include <protocol/dataserver/messageIds.hpp>
-//#include <protocol/dataserver/encoders/checkAccountRequest.hpp>
-//#include <protocol/dataserver/decoders/checkAccountResponse.hpp>
-//#include <protocol/dataserver/decoders/faultIndication.hpp>
+#include <protocol/loginserver/encoders/loginRequest.hpp>
+#include <protocol/loginserver/decoders/loginResponse.hpp>
+#include <protocol/loginserver/messageIds.hpp>
 
-//#include <gtest/gtest.h>
+#include <protocol/dataserver/messageIds.hpp>
+#include <protocol/dataserver/decoders/checkAccountRequest.hpp>
+#include <protocol/dataserver/encoders/checkAccountResponse.hpp>
+#include <protocol/dataserver/encoders/faultIndication.hpp>
 
-//using eMU::dataserver::Server;
-//using eMU::dataserver::database::QueryResult;
-//using eMU::dataserver::database::Row;
+using eMU::loginserver::Server;
+using eMU::mt::env::asioStub::io_service;
+using eMU::protocol::ReadStream;
+using eMU::protocol::loginserver::encoders::LoginRequest;
+using eMU::protocol::loginserver::decoders::LoginResponse;
+using eMU::protocol::loginserver::LoginResult;
+namespace MessageIds = eMU::protocol::loginserver::MessageIds;
+using eMU::protocol::dataserver::CheckAccountResult;
+using eMU::protocol::dataserver::decoders::CheckAccountRequest;
+using eMU::protocol::dataserver::encoders::CheckAccountResponse;
+using eMU::protocol::dataserver::encoders::FaultIndication;
 
-//using eMU::mt::env::asioStub::io_service;
-//using eMU::mt::env::dataserver::database::SqlInterfaceStub;
+class LoginserverTest: public ::testing::Test
+{
+protected:
+    LoginserverTest():
+        server_(ioService_, configuration_)
+    {
+        prepareConfiguration();
+    }
 
-//using eMU::protocol::ReadStream;
-//using eMU::protocol::dataserver::CheckAccountResult;
-//using eMU::protocol::dataserver::encoders::CheckAccountRequest;
-//using eMU::protocol::dataserver::decoders::CheckAccountResponse;
-//using eMU::protocol::dataserver::decoders::FaultIndication;
-//namespace MessageIds = eMU::protocol::dataserver::MessageIds;
+    void prepareConfiguration()
+    {
+        configuration_.maxNumberOfUsers_ = 5;
+        configuration_.port_ = 55557;
+        configuration_.dataserver1Address_ = "127.0.0.1";
+        configuration_.port_ = 55960;
+        configuration_.dataserver2Address_ = "127.0.0.1";
+        configuration_.dataserver2Port_ = 55962;
+    }
 
-//class LoginserverTest: public ::testing::Test
-//{
-//protected:
-//    LoginserverTest()
-//    {
-//        prepareConfiguration();
-//    }
+    void faultIndicationScenario(bool clientHashExists)
+    {
+        Server server(ioService_, configuration_);
+        server.startup();
 
-//    void prepareConfiguration()
-//    {
-//        configuration_.maxNumberOfUsers_ = 5;
-//        configuration_.port_ = 55960;
-//    }
+        size_t connectionHash = ioService_.establishTcpConnection();
+        LoginRequest loginRequest(L"accountTest", L"passwordTest");
+        IO_CHECK(ioService_.send(connectionHash, loginRequest.getWriteStream()));
 
-//    io_service ioService_;
-//    SqlInterfaceStub sqlInterface_;
-//    Server::Configuration configuration_;
-//};
+        const ReadStream &checkAccountRequestStream = ioService_.receiveFromClientTcpSocket();
+        ASSERT_EQ(eMU::protocol::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
+        eMU::protocol::dataserver::decoders::CheckAccountRequest checkAccountRequest(checkAccountRequestStream);
 
-//TEST_F(DataserverTest, CheckAccountShoulBeSuccesful)
-//{
-//    Server server(ioService_, sqlInterface_, configuration_);
-//    server.startup();
+        size_t clientHash = clientHashExists ? checkAccountRequest.getClientHash() : 0x1234;
+        IO_CHECK(ioService_.sendToClientTcpSocket(FaultIndication(clientHash, "test message").getWriteStream()));
 
-//    QueryResult queryResult;
-//    Row &row = queryResult.createRow(Row::Fields());
-//    CheckAccountResult checkAccountResult = CheckAccountResult::AcoountInUse;
-//    row.insert(boost::lexical_cast<Row::Value>(static_cast<uint32_t>(checkAccountResult)));
+        bool connectionShouldExists = clientHashExists ? false : true;
+        ASSERT_EQ(connectionShouldExists, ioService_.tcpConnectionEstablished(connectionHash));
+    }
 
-//    sqlInterface_.pushQueryResult(queryResult);
-//    sqlInterface_.pushQueryStatus(true);
+    io_service ioService_;
+    Server::Configuration configuration_;
+    Server server_;
+};
 
-//    size_t connectionHash = ioService_.establishTcpConnection();
+TEST_F(LoginserverTest, Login)
+{
+    Server server(ioService_, configuration_);
+    server.startup();
 
-//    size_t clientHash = 0x1234;
-//    CheckAccountRequest request(clientHash, "Account", "Password");
-//    IO_CHECK(ioService_.send(connectionHash, request.getWriteStream()));
+    size_t connectionHash = ioService_.establishTcpConnection();
+    LoginRequest loginRequest(L"accountTest", L"passwordTest");
+    IO_CHECK(ioService_.send(connectionHash, loginRequest.getWriteStream()));
 
-//    const ReadStream &readStream = ioService_.receive(connectionHash);
-//    ASSERT_EQ(MessageIds::kCheckAccountResponse, readStream.getId());
+    const ReadStream &checkAccountRequestStream = ioService_.receiveFromClientTcpSocket();
+    ASSERT_EQ(eMU::protocol::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
 
-//    CheckAccountResponse response(readStream);
-//    ASSERT_EQ(clientHash, response.getClientHash());
-//    ASSERT_EQ(checkAccountResult, response.getResult());
+    CheckAccountRequest checkAccountRequest(checkAccountRequestStream);
+    ASSERT_EQ("accountTest", checkAccountRequest.getAccountId());
+    ASSERT_EQ("passwordTest", checkAccountRequest.getPassword());
 
-//    IO_CHECK(ioService_.disconnect(connectionHash));
-//}
+    IO_CHECK(ioService_.sendToClientTcpSocket(CheckAccountResponse(checkAccountRequest.getClientHash(), CheckAccountResult::Succeed).getWriteStream()));
 
-//TEST_F(DataserverTest, WhenQueryExecutionWasFailedThenFaultIndicationShouldBeReceived)
-//{
-//    Server server(ioService_, sqlInterface_, configuration_);
-//    server.startup();
+    const ReadStream &loginResponseStream = ioService_.receive(connectionHash);
+    ASSERT_EQ(MessageIds::kLoginResponse, loginResponseStream.getId());
 
-//    sqlInterface_.pushQueryStatus(false);
+    LoginResponse loginResponse(loginResponseStream);
+    ASSERT_EQ(LoginResult::Succeed, loginResponse.getResult());
+}
 
-//    size_t connectionHash = ioService_.establishTcpConnection();
+TEST_F(LoginserverTest, WhenCheckAccountWithInvalidClientHashReceivedThenNothingHappens)
+{
+    Server server(ioService_, configuration_);
+    server.startup();
 
-//    size_t clientHash = 0x1234;
-//    CheckAccountRequest request(clientHash, "Account", "Password");
-//    IO_CHECK(ioService_.send(connectionHash, request.getWriteStream()));
+    size_t connectionHash = ioService_.establishTcpConnection();
+    LoginRequest loginRequest(L"accountTest", L"passwordTest");
+    IO_CHECK(ioService_.send(connectionHash, loginRequest.getWriteStream()));
 
-//    const ReadStream &readStream = ioService_.receive(connectionHash);
-//    ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());
+    const ReadStream &checkAccountRequestStream = ioService_.receiveFromClientTcpSocket();
+    ASSERT_EQ(eMU::protocol::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
 
-//    FaultIndication indication(readStream);
-//    ASSERT_EQ(clientHash, indication.getClientHash());
+    IO_CHECK(ioService_.sendToClientTcpSocket(CheckAccountResponse(0x1234, CheckAccountResult::Succeed).getWriteStream()));
+    ASSERT_TRUE(ioService_.tcpConnectionEstablished(connectionHash));
+}
 
-//    IO_CHECK(ioService_.disconnect(connectionHash));
-//}
+TEST_F(LoginserverTest, WhenFaultIndicationReceivedThenClientShouldBeDisconnected)
+{
+    bool clientHashExists = true;
+    faultIndicationScenario(clientHashExists);
+}
 
-//TEST_F(DataserverTest, WhenQueryResultIsEmptyThenFaultIndicationShouldBeReceived)
-//{
-//    Server server(ioService_, sqlInterface_, configuration_);
-//    server.startup();
+TEST_F(LoginserverTest, WhenFaultIndicationWithInvalidClientHashReceivedThenNothingHappens)
+{
+    bool clientHashExists = false;
+    faultIndicationScenario(clientHashExists);
+}
 
-//    sqlInterface_.pushQueryStatus(true);
-//    sqlInterface_.pushQueryResult(QueryResult());
+TEST_F(LoginserverTest, WhenConnectToDataserverFailedThenStartupShouldBeFailed)
+{
+    ioService_.setConnectResult(false);
 
-//    size_t connectionHash = ioService_.establishTcpConnection();
-
-//    size_t clientHash = 0x1234;
-//    CheckAccountRequest request(clientHash, "Account", "Password");
-//    IO_CHECK(ioService_.send(connectionHash, request.getWriteStream()));
-
-//    const ReadStream &readStream = ioService_.receive(connectionHash);
-//    ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());
-
-//    FaultIndication indication(readStream);
-//    ASSERT_EQ(clientHash, indication.getClientHash());
-
-//    IO_CHECK(ioService_.disconnect(connectionHash));
-//}
-
-//TEST_F(DataserverTest, WhenConnectionToDatabaseIsDiedThenFaultIndicationShouldBeSent)
-//{
-//    Server server(ioService_, sqlInterface_, configuration_);
-//    server.startup();
-
-//    sqlInterface_.setDied();
-
-//    size_t connectionHash = ioService_.establishTcpConnection();
-
-//    size_t clientHash = 0x1234;
-//    CheckAccountRequest request(clientHash, "Account", "Password");
-//    IO_CHECK(ioService_.send(connectionHash, request.getWriteStream()));
-
-//    const ReadStream &readStream = ioService_.receive(connectionHash);
-//    ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());
-
-//    FaultIndication indication(readStream);
-//    ASSERT_EQ(clientHash, indication.getClientHash());
-
-//    IO_CHECK(ioService_.disconnect(connectionHash));
-//}
+    Server server(ioService_, configuration_);
+    ASSERT_FALSE(server.startup());
+}

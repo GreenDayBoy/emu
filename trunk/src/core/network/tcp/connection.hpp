@@ -36,7 +36,7 @@ public:
     MOCKABLE void close();
     MOCKABLE void send(const Payload &payload);
     MOCKABLE void queueReceive();
-    bool connect(const boost::asio::ip::tcp::endpoint &endpoint);
+    MOCKABLE bool connect(const boost::asio::ip::tcp::endpoint &endpoint);
     MOCKABLE bool isOpen() const;
 
     bool operator==(const Connection &connection) const;

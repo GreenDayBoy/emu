@@ -42,7 +42,13 @@ void socket::async_send(const boost::asio::mutable_buffers_1 &buffer, const IoHa
     sendHandler_ = handler;
 }
 
-void socket::async_connect(const boost::asio::ip::tcp::endpoint &endpoint, const ConnectHandler &handler) {}
+void socket::connect(const boost::asio::ip::tcp::endpoint &endpoint, boost::system::error_code& errorCode)
+{
+    if(!ioService_.establishClientTcpSocket(*this))
+    {
+        errorCode = boost::asio::error::access_denied;
+    }
+}
 
 boost::asio::ip::tcp::endpoint socket::remote_endpoint() const
 {

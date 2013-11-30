@@ -28,6 +28,7 @@ public:
     MOCK_METHOD0(disconnect, void());
     MOCK_METHOD0(close, void());
     MOCK_CONST_METHOD0(isOpen, bool());
+    MOCK_METHOD1(connect, bool(const boost::asio::ip::tcp::endpoint &endpoint));
 
 private:
     asioStub::io_service ioService_;

@@ -58,8 +58,7 @@ TEST_F(DataserverTest, CheckAccountShoulBeSuccesful)
     size_t connectionHash = ioService_.establishTcpConnection();
 
     size_t clientHash = 0x1234;
-    CheckAccountRequest request(clientHash, "Account", "Password");   
-    IO_CHECK(ioService_.send(connectionHash, request.getWriteStream()));
+    IO_CHECK(ioService_.send(connectionHash, CheckAccountRequest(clientHash, "Account", "Password").getWriteStream()));
 
     const ReadStream &readStream = ioService_.receive(connectionHash);
     ASSERT_EQ(MessageIds::kCheckAccountResponse, readStream.getId());
@@ -81,8 +80,7 @@ TEST_F(DataserverTest, WhenQueryExecutionWasFailedThenFaultIndicationShouldBeRec
     size_t connectionHash = ioService_.establishTcpConnection();
 
     size_t clientHash = 0x1234;
-    CheckAccountRequest request(clientHash, "Account", "Password");
-    IO_CHECK(ioService_.send(connectionHash, request.getWriteStream()));
+    IO_CHECK(ioService_.send(connectionHash, CheckAccountRequest(clientHash, "Account", "Password").getWriteStream()));
 
     const ReadStream &readStream = ioService_.receive(connectionHash);
     ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());
@@ -104,8 +102,7 @@ TEST_F(DataserverTest, WhenQueryResultIsEmptyThenFaultIndicationShouldBeReceived
     size_t connectionHash = ioService_.establishTcpConnection();
 
     size_t clientHash = 0x1234;
-    CheckAccountRequest request(clientHash, "Account", "Password");
-    IO_CHECK(ioService_.send(connectionHash, request.getWriteStream()));
+    IO_CHECK(ioService_.send(connectionHash, CheckAccountRequest(clientHash, "Account", "Password").getWriteStream()));
 
     const ReadStream &readStream = ioService_.receive(connectionHash);
     ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());
@@ -126,8 +123,7 @@ TEST_F(DataserverTest, WhenConnectionToDatabaseIsDiedThenFaultIndicationShouldBe
     size_t connectionHash = ioService_.establishTcpConnection();
 
     size_t clientHash = 0x1234;
-    CheckAccountRequest request(clientHash, "Account", "Password");
-    IO_CHECK(ioService_.send(connectionHash, request.getWriteStream()));
+    IO_CHECK(ioService_.send(connectionHash, CheckAccountRequest(clientHash, "Account", "Password").getWriteStream()));
 
     const ReadStream &readStream = ioService_.receive(connectionHash);
     ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());

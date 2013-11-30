@@ -104,6 +104,7 @@ bool Connection::connect(const boost::asio::ip::tcp::endpoint &endpoint)
         return false;
     }
 
+    this->queueReceive();
     return true;
 }
 
