@@ -33,7 +33,7 @@ void WriteStream::writeNext(const std::wstring &value)
 {
     for(size_t i = 0; i < value.length(); ++i)
     {
-        this->writeNext<std::wstring::value_type>(value[i]);
+        this->writeNext<int16_t>(value[i]);
     }
 }
 

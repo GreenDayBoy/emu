@@ -18,7 +18,7 @@ bool DataserverConnector::connect()
         if(connection_.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(connectInfo.address_),
                                                               connectInfo.port_)))
         {
-            LOG(ERROR) << "Connected to dataserver address: " << connectInfo.address_ << ", port: " << connectInfo.port_;
+            LOG(INFO) << "Connected to dataserver address: " << connectInfo.address_ << ", port: " << connectInfo.port_;
             return true;
         }
     }

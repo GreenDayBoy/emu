@@ -36,7 +36,7 @@ std::wstring ReadStream::readNextWideString(size_t length)
 
     for(size_t i = 0; i < length; ++i)
     {
-        value.push_back(this->readNext<std::wstring::value_type>());
+        value.push_back(this->readNext<int16_t>());
     }
 
     return std::move(value);

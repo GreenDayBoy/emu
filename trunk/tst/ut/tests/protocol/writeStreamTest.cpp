@@ -58,7 +58,13 @@ TEST_F(WriteStreamTest, writeNextWideString)
    writeStream.writeNext(expectedValue);
 
    size_t dataOffset = 6; // sizeof(uint32) -> size + sizeof(uint16_t) -> id
-   std::wstring value(reinterpret_cast<const wchar_t*>(&writeStream.getPayload()[dataOffset]), expectedValue.length());
+
+   std::wstring value;
+   for(size_t i = 0; i < expectedValue.length(); ++i)
+   {
+       size_t offset = i * sizeof(int16_t);
+       value.push_back(reinterpret_cast<const int16_t&>(writeStream.getPayload()[dataOffset + offset]));
+   }
 
    ASSERT_EQ(expectedValue, value);
 }

@@ -49,8 +49,8 @@ void MySqlInterface::cleanup()
 
 bool MySqlInterface::executeQuery(std::string query)
 {
-    boost::algorithm::replace_all(query, "'", "\\'");
-    boost::algorithm::replace_all(query, "\\", "\\\\");
+    //boost::algorithm::replace_all(query, "'", "\\'");
+    //boost::algorithm::replace_all(query, "\\", "\\\\");
 
     if(mysql_real_query(&handle_, query.c_str(), query.size()) == 0)
     {

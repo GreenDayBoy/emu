@@ -15,6 +15,9 @@ namespace encoders
 LoginRequest::LoginRequest(const std::wstring &accountId, const std::wstring &password):
     writeStream_(MessageIds::kLoginRequest)
 {
+    writeStream_.writeNext<uint32_t>(0); // dummy1
+    writeStream_.writeNext<uint32_t>(0); // dummy2
+
     writeStream_.writeNext<uint32_t>(accountId.length());
     writeStream_.writeNext(accountId);
 

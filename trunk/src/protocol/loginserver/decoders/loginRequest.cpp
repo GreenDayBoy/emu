@@ -14,6 +14,9 @@ namespace decoders
 LoginRequest::LoginRequest(const ReadStream &readStream):
     readStream_(readStream)
 {
+    readStream_.readNext<uint32_t>(); // dummy1;
+    readStream_.readNext<uint32_t>(); // dummy2;
+
     uint32_t accountIdLength = readStream_.readNext<uint32_t>();
     std::wstring accountId = readStream_.readNextWideString(accountIdLength);
     accountId_ = boost::locale::conv::utf_to_utf<std::string::value_type>(accountId);
