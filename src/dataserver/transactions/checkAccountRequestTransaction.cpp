@@ -33,10 +33,10 @@ void CheckAccountRequestTransaction::handleValid()
 
     std::stringstream query;
     query << "SELECT"
-          << " `eMU_AccountCheck`(" << request_.getAccountId()
-                                    << ", "
-                                    << request_.getPassword()
-                                    << ");";
+          << " `eMU_AccountCheck`("
+          << "'" << request_.getAccountId() << "'"
+          << ", '" << request_.getPassword() << "'"
+          << ", '" << "127.0.0.1" << "');";
 
     if(sqlInterface_.executeQuery(query.str()))
     {

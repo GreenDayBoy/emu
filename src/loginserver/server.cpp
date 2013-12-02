@@ -126,6 +126,9 @@ void Server::handleReadStream(size_t hash, const protocol::ReadStream &stream)
                                                                              dataserverConnection_,
                                                                              request));
     }
+    else if(messageId == protocol::loginserver::MessageIds::kGameServersListRequest)
+    {
+    }
 }
 
 void Server::onDataserverReceive(core::network::tcp::Connection &connection)

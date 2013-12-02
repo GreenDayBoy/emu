@@ -48,17 +48,29 @@ TEST_F(ReadStreamTest, readNextString)
 
 TEST_F(ReadStreamTest, readNextWideString)
 {
+    std::wstring string1;
     size_t string1Length = 10;
-    std::wstring string1(reinterpret_cast<const wchar_t*>(&samplePayloads_.fullFilledPayload_[6]), string1Length);
+    for(size_t i = 0; i < string1Length; ++i)
+    {
+        size_t offset = i * sizeof(int16_t);
+        string1.push_back(reinterpret_cast<int16_t&>(samplePayloads_.fullFilledPayload_[6 + offset]));
+    }
+
     ASSERT_EQ(string1, readStream_.readNextWideString(string1Length));
 
+    std::wstring string2;
     size_t string2Length = 20;
-    std::wstring string2(reinterpret_cast<const wchar_t*>(&samplePayloads_.fullFilledPayload_[46]), string2Length);
+    for(size_t i = 0; i < string2Length; ++i)
+    {
+        size_t offset = i * sizeof(int16_t);
+        string2.push_back(reinterpret_cast<const int16_t&>(samplePayloads_.fullFilledPayload_[26 + offset]));
+    }
+
     ASSERT_EQ(string2, readStream_.readNextWideString(string2Length));
 }
 
 TEST_F(ReadStreamTest, getId)
 {
-    uint16_t &id = reinterpret_cast<uint16_t&>(samplePayloads_.fullFilledPayload_[4]);
+    const uint16_t &id = reinterpret_cast<const uint16_t&>(samplePayloads_.fullFilledPayload_[4]);
     ASSERT_EQ(id, readStream_.getId());
 }

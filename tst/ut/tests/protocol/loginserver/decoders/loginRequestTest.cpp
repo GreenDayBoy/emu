@@ -14,6 +14,9 @@ TEST(LoginRequestTest, decode)
 {   
     WriteStream writeStream(MessageIds::kLoginRequest);
 
+    writeStream.writeNext<uint32_t>(0); // dummy1;
+    writeStream.writeNext<uint32_t>(0); // dummy1;
+
     std::wstring accountId = L"mu2emulator";
     writeStream.writeNext<uint32_t>(accountId.length());
     writeStream.writeNext(accountId);
