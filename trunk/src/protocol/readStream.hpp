@@ -16,6 +16,7 @@ public:
     class OverflowException: public core::common::Exception {};
 
     ReadStream(const core::network::Payload &payload);
+    ReadStream();
 
     uint16_t getId() const;
 
@@ -32,8 +33,6 @@ public:
     std::wstring readNextWideString(size_t length);
 
 private:
-    ReadStream();
-
     template<typename T>
     T readFromOffset(size_t offset) const
     {

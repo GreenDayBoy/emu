@@ -2,16 +2,14 @@
 #include <loginserver/user.hpp>
 #include <core/common/usersFactory.hpp>
 #include <ut/env/core/network/tcp/connectionsManagerMock.hpp>
-#include <protocol/dataserver/encoders/faultIndication.hpp>
-#include <protocol/dataserver/decoders/faultIndication.hpp>
+#include <protocol/dataserver/faultIndication.hpp>
 
 using eMU::loginserver::User;
 using eMU::loginserver::transactions::FaultIndicationTransaction;
 using eMU::core::common::UsersFactory;
 using eMU::ut::env::core::network::tcp::ConnectionsManagerMock;
 using eMU::protocol::ReadStream;
-namespace encoders = eMU::protocol::dataserver::encoders;
-namespace decoders = eMU::protocol::dataserver::decoders;
+using eMU::protocol::dataserver::FaultIndication;
 
 class FaultIndicationTransactionTest: public ::testing::Test
 {
@@ -30,7 +28,7 @@ protected:
             EXPECT_CALL(connectionsManager_, disconnect(hash));
         }
 
-        encoders::FaultIndication indication(hash, "testMessage");
+        FaultIndication indication(hash, "testMessage");
         FaultIndicationTransaction(connectionsManager_, usersFactory_, ReadStream(indication.getWriteStream().getPayload())).handle();
     }
 

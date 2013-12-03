@@ -5,7 +5,7 @@
 #include <core/network/tcp/connectionsManager.hpp>
 
 #include <loginserver/user.hpp>
-#include <protocol/loginserver/decoders/loginRequest.hpp>
+#include <protocol/loginserver/loginRequest.hpp>
 
 namespace eMU
 {
@@ -20,7 +20,7 @@ public:
     LoginRequestTransaction(User &user,
                             core::network::tcp::ConnectionsManager &connectionsManager,
                             core::network::tcp::Connection &dataserverConnection,
-                            const protocol::loginserver::decoders::LoginRequest &request);
+                            const protocol::loginserver::LoginRequest &request);
 
 private:
     bool isValid() const;
@@ -30,7 +30,7 @@ private:
     User &user_;
     core::network::tcp::ConnectionsManager &connectionsManager_;
     core::network::tcp::Connection &dataserverConnection_;
-    protocol::loginserver::decoders::LoginRequest request_;
+    protocol::loginserver::LoginRequest request_;
 };
 
 }

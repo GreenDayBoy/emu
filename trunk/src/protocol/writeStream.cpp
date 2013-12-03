@@ -14,6 +14,9 @@ WriteStream::WriteStream(uint16_t id):
     this->writeNext<uint16_t>(id);
 }
 
+WriteStream::WriteStream():
+    WriteStream(0) {}
+
 const core::network::Payload& WriteStream::getPayload() const
 {
     return payload_;

@@ -13,6 +13,9 @@ ReadStream::ReadStream(const core::network::Payload &payload):
 {
 }
 
+ReadStream::ReadStream():
+    currentOffset_(0) {}
+
 uint16_t ReadStream::getId() const
 {
     return this->readFromOffset<uint16_t>(4);

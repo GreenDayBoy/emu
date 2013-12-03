@@ -1,5 +1,7 @@
 #include <core/common/xmlReader.hpp>
 
+#include <fstream>
+
 namespace eMU
 {
 namespace core
@@ -44,6 +46,22 @@ void XmlReader::next()
 void XmlReader::clear()
 {
     document_.clear();
+}
+
+std::string XmlReader::getXmlFileContent(const std::string &filePath)
+{
+    std::ifstream file(filePath);
+
+    if(file.is_open())
+    {
+        std::stringstream content;
+        content << file.rdbuf();
+        file.close();
+
+        return content.str();
+    }
+
+    return "";
 }
 
 }

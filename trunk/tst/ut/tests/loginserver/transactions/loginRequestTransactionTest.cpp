@@ -2,9 +2,9 @@
 #include <loginserver/user.hpp>
 
 #include <protocol/readStream.hpp>
-#include <protocol/dataserver/decoders/checkAccountRequest.hpp>
+#include <protocol/dataserver/checkAccountRequest.hpp>
 #include <protocol/dataserver/messageIds.hpp>
-#include <protocol/loginserver/encoders/loginRequest.hpp>
+#include <protocol/loginserver/loginRequest.hpp>
 
 #include <ut/env/core/network/tcp/connectionMock.hpp>
 #include <ut/env/core/network/tcp/connectionsManagerMock.hpp>
@@ -20,11 +20,10 @@ using eMU::ut::env::core::network::tcp::ConnectionMock;
 using eMU::ut::env::core::network::tcp::ConnectionsManagerMock;
 using eMU::core::network::Payload;
 using eMU::protocol::ReadStream;
-namespace encoders = eMU::protocol::loginserver::encoders;
-namespace decoders = eMU::protocol::loginserver::decoders;
+using eMU::protocol::loginserver::LoginRequest;
 using eMU::loginserver::transactions::LoginRequestTransaction;
 using eMU::loginserver::User;
-using eMU::protocol::dataserver::decoders::CheckAccountRequest;
+using eMU::protocol::dataserver::CheckAccountRequest;
 namespace MessageIds = eMU::protocol::dataserver::MessageIds;
 
 class LoginRequestTransactionTest: public ::testing::Test
@@ -33,12 +32,11 @@ protected:
     LoginRequestTransactionTest():
         accountId_(L"testAccount"),
         password_(L"testPassword"),
-        request_(ReadStream(encoders::LoginRequest(accountId_,
-                                                   password_).getWriteStream().getPayload())) {}
+        request_(ReadStream(LoginRequest(accountId_, password_).getWriteStream().getPayload())) {}
 
     std::wstring accountId_;
     std::wstring password_;
-    decoders::LoginRequest request_;
+    LoginRequest request_;
     ConnectionMock dataserverConnection_;
     ConnectionsManagerMock connectionsManager_;
     User user_;

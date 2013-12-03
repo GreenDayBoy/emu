@@ -1,8 +1,7 @@
 #pragma once
 
 #include <protocol/writeStream.hpp>
-
-#include <string>
+#include <protocol/loginserver/gameserverInfo.hpp>
 
 namespace eMU
 {
@@ -10,13 +9,11 @@ namespace protocol
 {
 namespace loginserver
 {
-namespace encoders
-{
 
-class LoginRequest
+class GameserversListResponse
 {
 public:
-    LoginRequest(const std::wstring &accountId, const std::wstring &password);
+    GameserversListResponse(const GameserversInfoContainer &servers);
 
     const WriteStream& getWriteStream() const;
 
@@ -24,7 +21,6 @@ private:
     WriteStream writeStream_;
 };
 
-}
 }
 }
 }

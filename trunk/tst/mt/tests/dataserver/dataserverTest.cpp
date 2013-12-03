@@ -3,9 +3,9 @@
 #include <mt/env/testExceptionsCatch.hpp>
 
 #include <protocol/dataserver/messageIds.hpp>
-#include <protocol/dataserver/encoders/checkAccountRequest.hpp>
-#include <protocol/dataserver/decoders/checkAccountResponse.hpp>
-#include <protocol/dataserver/decoders/faultIndication.hpp>
+#include <protocol/dataserver/checkAccountRequest.hpp>
+#include <protocol/dataserver/checkAccountResponse.hpp>
+#include <protocol/dataserver/faultIndication.hpp>
 
 #include <gtest/gtest.h>
 
@@ -18,9 +18,9 @@ using eMU::mt::env::dataserver::database::SqlInterfaceStub;
 
 using eMU::protocol::ReadStream;
 using eMU::protocol::dataserver::CheckAccountResult;
-using eMU::protocol::dataserver::encoders::CheckAccountRequest;
-using eMU::protocol::dataserver::decoders::CheckAccountResponse;
-using eMU::protocol::dataserver::decoders::FaultIndication;
+using eMU::protocol::dataserver::CheckAccountRequest;
+using eMU::protocol::dataserver::CheckAccountResponse;
+using eMU::protocol::dataserver::FaultIndication;
 namespace MessageIds = eMU::protocol::dataserver::MessageIds;
 
 class DataserverTest: public ::testing::Test

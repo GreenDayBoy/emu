@@ -11,7 +11,7 @@ namespace transactions
 
 FaultIndicationTransaction::FaultIndicationTransaction(core::network::tcp::ConnectionsManager &connectionsManager,
                                                        core::common::UsersFactory<User> &usersFactory,
-                                                       const protocol::dataserver::decoders::FaultIndication &indication):
+                                                       const protocol::dataserver::FaultIndication &indication):
     connectionsManager_(connectionsManager),
     usersFactory_(usersFactory),
     indication_(indication) {}

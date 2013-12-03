@@ -16,6 +16,7 @@ public:
     class OverflowException: public core::common::Exception {};
 
     WriteStream(uint16_t id);
+    WriteStream();
 
     const core::network::Payload& getPayload() const;
 
@@ -38,8 +39,6 @@ public:
     }
 
 private:
-    WriteStream();
-
     core::network::Payload payload_;
     uint32_t currentOffset_;
     uint32_t &size_;

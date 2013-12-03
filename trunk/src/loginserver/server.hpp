@@ -1,6 +1,7 @@
 #pragma once
 
 #include <loginserver/dataserverConnector.hpp>
+#include <loginserver/gameserversList.hpp>
 #include <core/network/tcp/connectionsManager.hpp>
 #include <core/network/server.hpp>
 #include <protocol/readStream.hpp>
@@ -23,6 +24,7 @@ public:
         uint16_t dataserver1Port_;
         std::string dataserver2Address_;
         uint16_t dataserver2Port_;
+        std::string gameserversListFileContent_;
     };
 
     Server(asio::io_service &ioService, const Configuration &configuration);
@@ -43,6 +45,7 @@ private:
     core::network::tcp::Connection dataserverConnection_;
     Configuration configuration_;
     DataserverConnector dataserverConnector_;
+    GameserversList gameserversList_;
 };
 
 }

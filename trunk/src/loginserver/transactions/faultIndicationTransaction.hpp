@@ -6,7 +6,7 @@
 
 #include <loginserver/user.hpp>
 
-#include <protocol/dataserver/decoders/faultIndication.hpp>
+#include <protocol/dataserver/faultIndication.hpp>
 
 namespace eMU
 {
@@ -20,7 +20,7 @@ class FaultIndicationTransaction: public core::transactions::Transaction
 public:
     FaultIndicationTransaction(core::network::tcp::ConnectionsManager &connectionsManager,
                                core::common::UsersFactory<User> &usersFactory,
-                               const protocol::dataserver::decoders::FaultIndication &indication);
+                               const protocol::dataserver::FaultIndication &indication);
 
 private:
     bool isValid() const;
@@ -29,7 +29,7 @@ private:
 
     core::network::tcp::ConnectionsManager &connectionsManager_;
     core::common::UsersFactory<User> &usersFactory_;
-    protocol::dataserver::decoders::FaultIndication indication_;
+    protocol::dataserver::FaultIndication indication_;
 };
 
 }

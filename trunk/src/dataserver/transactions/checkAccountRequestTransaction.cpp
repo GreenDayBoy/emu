@@ -1,6 +1,6 @@
 #include <dataserver/transactions/checkAccountRequestTransaction.hpp>
-#include <protocol/dataserver/encoders/checkAccountResponse.hpp>
-#include <protocol/dataserver/encoders/faultIndication.hpp>
+#include <protocol/dataserver/checkAccountResponse.hpp>
+#include <protocol/dataserver/faultIndication.hpp>
 #include <protocol/dataserver/checkAccountResult.hpp>
 
 #include <sstream>
@@ -16,7 +16,7 @@ namespace transactions
 CheckAccountRequestTransaction::CheckAccountRequestTransaction(size_t hash,
                                                                database::SqlInterface &sqlInterface,
                                                                core::network::tcp::ConnectionsManager &connectionsManager,
-                                                               const protocol::dataserver::decoders::CheckAccountRequest &request):
+                                                               const protocol::dataserver::CheckAccountRequest &request):
     hash_(hash),
     sqlInterface_(sqlInterface),
     connectionsManager_(connectionsManager),
@@ -45,7 +45,7 @@ void CheckAccountRequestTransaction::handleValid()
         if(queryResult.getRows().size() > 0)
         {
             protocol::dataserver::CheckAccountResult result = static_cast<protocol::dataserver::CheckAccountResult>(queryResult.getRows()[0].getValue<uint32_t>(0));
-            protocol::dataserver::encoders::CheckAccountResponse response(request_.getClientHash(), result);
+            protocol::dataserver::CheckAccountResponse response(request_.getClientHash(), result);
 
             connectionsManager_.send(hash_, response.getWriteStream().getPayload());
         }
@@ -70,7 +70,7 @@ void CheckAccountRequestTransaction::handleInvalid()
 
 void CheckAccountRequestTransaction::sendFaultIndication(const std::string &message)
 {
-    protocol::dataserver::encoders::FaultIndication indication(request_.getClientHash(), message);
+    protocol::dataserver::FaultIndication indication(request_.getClientHash(), message);
     connectionsManager_.send(hash_, indication.getWriteStream().getPayload());
 }
 

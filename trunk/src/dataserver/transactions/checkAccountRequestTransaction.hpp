@@ -5,7 +5,7 @@
 
 #include <dataserver/database/sqlInterface.hpp>
 
-#include <protocol/dataserver/decoders/checkAccountRequest.hpp>
+#include <protocol/dataserver/checkAccountRequest.hpp>
 
 namespace eMU
 {
@@ -20,7 +20,7 @@ public:
     CheckAccountRequestTransaction(size_t hash,
                                    database::SqlInterface &sqlInterface,
                                    core::network::tcp::ConnectionsManager &connectionsManager,
-                                   const protocol::dataserver::decoders::CheckAccountRequest &request);
+                                   const protocol::dataserver::CheckAccountRequest &request);
 
 private:
     bool isValid() const;
@@ -32,7 +32,7 @@ private:
     size_t hash_;
     database::SqlInterface &sqlInterface_;
     core::network::tcp::ConnectionsManager &connectionsManager_;
-    protocol::dataserver::decoders::CheckAccountRequest request_;
+    protocol::dataserver::CheckAccountRequest request_;
 };
 
 }
