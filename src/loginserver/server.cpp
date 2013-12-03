@@ -2,15 +2,18 @@
 #include <loginserver/transactions/loginRequestTransaction.hpp>
 #include <loginserver/transactions/checkAccountResponseTransaction.hpp>
 #include <loginserver/transactions/faultIndicationTransaction.hpp>
+#include <loginserver/transactions/gameserversListRequestTransaction.hpp>
 
 #include <protocol/readStreamsExtractor.hpp>
 #include <protocol/writeStream.hpp>
 
 #include <protocol/loginserver/messageIds.hpp>
-#include <protocol/loginserver/decoders/loginRequest.hpp>
+#include <protocol/loginserver/loginRequest.hpp>
+#include <protocol/loginserver/gameserversListRequest.hpp>
+
 #include <protocol/dataserver/messageIds.hpp>
-#include <protocol/dataserver/decoders/checkAccountResponse.hpp>
-#include <protocol/dataserver/decoders/faultIndication.hpp>
+#include <protocol/dataserver/checkAccountResponse.hpp>
+#include <protocol/dataserver/faultIndication.hpp>
 
 #include <core/common/serviceThreading.hpp>
 
@@ -46,7 +49,26 @@ Server::Server(asio::io_service &ioService, const Configuration &configuration):
 
 bool Server::onStartup()
 {
-    return dataserverConnector_.connect();
+    bool succeed = false;
+
+    try
+    {
+        core::common::XmlReader xmlReader;
+        xmlReader.parse(configuration_.gameserversListFileContent_, "servers");
+        gameserversList_.initialize(xmlReader);
+
+        succeed = dataserverConnector_.connect();
+    }
+    catch(core::common::XmlReader::EmptyXmlContentException&)
+    {
+        LOG(ERROR) << "Got empty xml servers list file!";
+    }
+    catch(core::common::XmlReader::NotMatchedXmlNodeException&)
+    {
+        LOG(ERROR) << "Got corrupted xml servers list file!";
+    }
+
+    return succeed;
 }
 
 void Server::onCleanup()
@@ -120,14 +142,19 @@ void Server::handleReadStream(size_t hash, const protocol::ReadStream &stream)
     {
         User &user = usersFactory_.find(hash);
 
-        protocol::loginserver::decoders::LoginRequest request(stream);
+        protocol::loginserver::LoginRequest request(stream);
         transactionsManager_.queue(new transactions::LoginRequestTransaction(user,
                                                                              connectionsManager_,
                                                                              dataserverConnection_,
                                                                              request));
     }
-    else if(messageId == protocol::loginserver::MessageIds::kGameServersListRequest)
+    else if(messageId == protocol::loginserver::MessageIds::kGameserversListRequest)
     {
+        protocol::loginserver::GameserversListRequest request(stream);
+        transactionsManager_.queue((new transactions::GameserversListRequestTransaction(hash,
+                                                                                        connectionsManager_,
+                                                                                        gameserversList_,
+                                                                                        request)));
     }
 }
 
@@ -184,12 +211,12 @@ void Server::handleDataserverReadStream(const protocol::ReadStream &stream)
 
     if(messageId == protocol::dataserver::MessageIds::kCheckAccountResponse)
     {
-        protocol::dataserver::decoders::CheckAccountResponse response(stream);
+        protocol::dataserver::CheckAccountResponse response(stream);
         transactionsManager_.queue(new transactions::CheckAccountResponseTransaction(connectionsManager_, usersFactory_, response));
     }
     if(messageId == protocol::dataserver::MessageIds::kFaultIndication)
     {
-        protocol::dataserver::decoders::FaultIndication indication(stream);
+        protocol::dataserver::FaultIndication indication(stream);
         transactionsManager_.queue(new transactions::FaultIndicationTransaction(connectionsManager_, usersFactory_, indication));
     }
 }
@@ -211,6 +238,7 @@ int main(int argsCount, char *args[])
     configuration.dataserver2Port_ = FLAGS_dataserver2_port;
     configuration.maxNumberOfUsers_ = FLAGS_max_users;
     configuration.port_ = FLAGS_port;
+    configuration.gameserversListFileContent_ = eMU::core::common::XmlReader::getXmlFileContent("./data/gameserversList.xml");
 
     boost::asio::io_service service;
     eMU::loginserver::Server server(service, configuration);

@@ -50,6 +50,8 @@ public:
         return defaultValue;
     }
 
+    static std::string getXmlFileContent(const std::string &filePath);
+
 private:
     rapidxml::xml_document<> document_;
     rapidxml::xml_node<> *currentNode_;

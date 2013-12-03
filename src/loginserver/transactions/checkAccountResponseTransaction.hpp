@@ -6,7 +6,7 @@
 
 #include <loginserver/user.hpp>
 
-#include <protocol/dataserver/decoders/checkAccountResponse.hpp>
+#include <protocol/dataserver/checkAccountResponse.hpp>
 
 namespace eMU
 {
@@ -20,7 +20,7 @@ class CheckAccountResponseTransaction: public core::transactions::Transaction
 public:
     CheckAccountResponseTransaction(core::network::tcp::ConnectionsManager &connectionsManager,
                                     core::common::UsersFactory<User> &usersFactory,
-                                    const protocol::dataserver::decoders::CheckAccountResponse &response);
+                                    const protocol::dataserver::CheckAccountResponse &response);
 
 private:
     bool isValid() const;
@@ -29,7 +29,7 @@ private:
 
     core::network::tcp::ConnectionsManager &connectionsManager_;
     core::common::UsersFactory<User> &usersFactory_;
-    protocol::dataserver::decoders::CheckAccountResponse response_;
+    protocol::dataserver::CheckAccountResponse response_;
 };
 
 }

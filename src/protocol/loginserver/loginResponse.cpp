@@ -1,7 +1,5 @@
-#include <protocol/loginserver/encoders/loginResponse.hpp>
+#include <protocol/loginserver/loginResponse.hpp>
 #include <protocol/loginserver/messageIds.hpp>
-
-#include <boost/locale.hpp>
 
 namespace eMU
 {
@@ -9,8 +7,12 @@ namespace protocol
 {
 namespace loginserver
 {
-namespace encoders
+
+LoginResponse::LoginResponse(const ReadStream &readStream):
+    readStream_(readStream)
 {
+    result_ = readStream_.readNext<LoginResult>();
+}
 
 LoginResponse::LoginResponse(LoginResult result):
     writeStream_(MessageIds::kLoginResponse)
@@ -23,7 +25,11 @@ const WriteStream& LoginResponse::getWriteStream() const
     return writeStream_;
 }
 
+LoginResult LoginResponse::getResult() const
+{
+    return result_;
 }
+
 }
 }
 }

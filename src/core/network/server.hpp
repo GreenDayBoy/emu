@@ -36,8 +36,13 @@ public:
 
     bool startup()
     {
-        connectionsManager_.queueAccept();
-        return this->onStartup();
+        if(this->onStartup())
+        {
+            connectionsManager_.queueAccept();
+            return true;
+        }
+
+        return false;
     }
 
     void cleanup()

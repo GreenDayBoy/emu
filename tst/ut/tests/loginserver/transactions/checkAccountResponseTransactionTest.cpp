@@ -2,10 +2,9 @@
 #include <loginserver/user.hpp>
 #include <core/common/usersFactory.hpp>
 #include <ut/env/core/network/tcp/connectionsManagerMock.hpp>
-#include <protocol/dataserver/decoders/checkAccountResponse.hpp>
-#include <protocol/dataserver/encoders/checkAccountResponse.hpp>
+#include <protocol/dataserver/checkAccountResponse.hpp>
 #include <protocol/loginserver/messageIds.hpp>
-#include <protocol/loginserver/decoders/loginResponse.hpp>
+#include <protocol/loginserver/loginResponse.hpp>
 
 using ::testing::_;
 using ::testing::SaveArg;
@@ -16,12 +15,11 @@ using eMU::core::common::UsersFactory;
 using eMU::core::network::Payload;
 using eMU::ut::env::core::network::tcp::ConnectionsManagerMock;
 
-namespace encoders = eMU::protocol::dataserver::encoders;
-namespace decoders = eMU::protocol::dataserver::decoders;
+using eMU::protocol::dataserver::CheckAccountResponse;
 using eMU::protocol::dataserver::CheckAccountResult;
 using eMU::protocol::ReadStream;
 namespace MessageIds = eMU::protocol::loginserver::MessageIds;
-using eMU::protocol::loginserver::decoders::LoginResponse;
+using eMU::protocol::loginserver::LoginResponse;
 using eMU::protocol::loginserver::LoginResult;
 
 class CheckAccountResponseTransactionTest: public ::testing::Test
@@ -35,7 +33,7 @@ protected:
     void scenario()
     {
         size_t hash = usersFactory_.create();
-        decoders::CheckAccountResponse checkAccountResponse(encoders::CheckAccountResponse(hash, checkAccountResult_).getWriteStream().getPayload());
+        CheckAccountResponse checkAccountResponse(CheckAccountResponse(hash, checkAccountResult_).getWriteStream().getPayload());
 
         EXPECT_CALL(connectionsManager_, send(hash, _)).WillOnce(SaveArg<1>(&payload_));
         CheckAccountResponseTransaction(connectionsManager_, usersFactory_, checkAccountResponse).handle();
@@ -75,7 +73,7 @@ TEST_F(CheckAccountResponseTransactionTest, WhenDataServerReturnAccountInUseThen
 
 TEST_F(CheckAccountResponseTransactionTest, WhenHashGivenFromDataServerIsInvalidThenNothingShouldHappen)
 {
-    decoders::CheckAccountResponse checkAccountResponse(encoders::CheckAccountResponse(0x12345, CheckAccountResult::Succeed).getWriteStream().getPayload());
+    CheckAccountResponse checkAccountResponse(CheckAccountResponse(0x12345, CheckAccountResult::Succeed).getWriteStream().getPayload());
 
     CheckAccountResponseTransaction(connectionsManager_, usersFactory_, checkAccountResponse).handle();
 }

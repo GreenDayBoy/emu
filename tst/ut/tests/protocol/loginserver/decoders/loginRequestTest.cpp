@@ -1,4 +1,4 @@
-#include <protocol/loginserver/decoders/loginRequest.hpp>
+#include <protocol/loginserver/loginRequest.hpp>
 #include <protocol/loginserver/messageIds.hpp>
 #include <protocol/writeStream.hpp>
 
@@ -8,7 +8,7 @@
 namespace MessageIds = eMU::protocol::loginserver::MessageIds;
 using eMU::protocol::WriteStream;
 using eMU::protocol::ReadStream;
-using eMU::protocol::loginserver::decoders::LoginRequest;
+using eMU::protocol::loginserver::LoginRequest;
 
 TEST(LoginRequestTest, decode)
 {   

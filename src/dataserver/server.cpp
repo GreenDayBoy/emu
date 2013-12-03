@@ -6,7 +6,7 @@
 #include <protocol/writeStream.hpp>
 
 #include <protocol/dataserver/messageIds.hpp>
-#include <protocol/dataserver/decoders/checkAccountRequest.hpp>
+#include <protocol/dataserver/checkAccountRequest.hpp>
 
 #include <core/common/serviceThreading.hpp>
 
@@ -108,7 +108,7 @@ void Server::handleReadStream(size_t hash, const protocol::ReadStream &stream)
 
     if(messageId == protocol::dataserver::MessageIds::kCheckAccountRequest)
     {
-        protocol::dataserver::decoders::CheckAccountRequest request(stream);
+        protocol::dataserver::CheckAccountRequest request(stream);
         transactionsManager_.queue(new transactions::CheckAccountRequestTransaction(hash,
                                                                                     sqlInterface_,
                                                                                     connectionsManager_,

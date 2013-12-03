@@ -3,11 +3,9 @@
 #include <protocol/readStream.hpp>
 #include <protocol/dataserver/messageIds.hpp>
 #include <protocol/dataserver/checkAccountResult.hpp>
-#include <protocol/dataserver/decoders/checkAccountRequest.hpp>
-#include <protocol/dataserver/decoders/checkAccountResponse.hpp>
-#include <protocol/dataserver/decoders/faultIndication.hpp>
-
-#include <protocol/dataserver/encoders/checkAccountRequest.hpp>
+#include <protocol/dataserver/checkAccountRequest.hpp>
+#include <protocol/dataserver/checkAccountResponse.hpp>
+#include <protocol/dataserver/faultIndication.hpp>
 
 #include <ut/env/core/network/tcp/connectionsManagerMock.hpp>
 #include <ut/env/dataserver/database/sqlInterfaceMock.hpp>
@@ -30,11 +28,9 @@ using eMU::protocol::ReadStream;
 using eMU::protocol::dataserver::CheckAccountResult;
 namespace MessageIds = eMU::protocol::dataserver::MessageIds;
 
-namespace decoders = eMU::protocol::dataserver::decoders;
-using decoders::CheckAccountResponse;
-using decoders::FaultIndication;
-
-namespace encoders = eMU::protocol::dataserver::encoders;
+using eMU::protocol::dataserver::CheckAccountRequest;
+using eMU::protocol::dataserver::CheckAccountResponse;
+using eMU::protocol::dataserver::FaultIndication;
 
 using eMU::core::network::Payload;
 
@@ -44,9 +40,9 @@ protected:
     CheckAccountRequestTransactionTest():
         clientHash_(0x12345),
         hash_(0x54321),
-        request_(ReadStream(encoders::CheckAccountRequest(clientHash_,
-                                                          "testAccount",
-                                                          "testPassword").getWriteStream().getPayload())) {}
+        request_(ReadStream(CheckAccountRequest(clientHash_,
+                                                "testAccount",
+                                                "testPassword").getWriteStream().getPayload())) {}
 
     ConnectionsManagerMock connectionsManager_;
     SqlInterfaceMock sqlInterface_;
@@ -55,7 +51,7 @@ protected:
 
     size_t clientHash_;
     size_t hash_;
-    decoders::CheckAccountRequest request_;
+    CheckAccountRequest request_;
 };
 
 TEST_F(CheckAccountRequestTransactionTest, handle)

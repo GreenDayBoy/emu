@@ -2,26 +2,26 @@
 #include <mt/env/asioStub/ioService.hpp>
 #include <mt/env/testExceptionsCatch.hpp>
 
-#include <protocol/loginserver/encoders/loginRequest.hpp>
-#include <protocol/loginserver/decoders/loginResponse.hpp>
+#include <protocol/loginserver/loginRequest.hpp>
+#include <protocol/loginserver/loginResponse.hpp>
 #include <protocol/loginserver/messageIds.hpp>
 
 #include <protocol/dataserver/messageIds.hpp>
-#include <protocol/dataserver/decoders/checkAccountRequest.hpp>
-#include <protocol/dataserver/encoders/checkAccountResponse.hpp>
-#include <protocol/dataserver/encoders/faultIndication.hpp>
+#include <protocol/dataserver/checkAccountRequest.hpp>
+#include <protocol/dataserver/checkAccountResponse.hpp>
+#include <protocol/dataserver/faultIndication.hpp>
 
 using eMU::loginserver::Server;
 using eMU::mt::env::asioStub::io_service;
 using eMU::protocol::ReadStream;
-using eMU::protocol::loginserver::encoders::LoginRequest;
-using eMU::protocol::loginserver::decoders::LoginResponse;
+using eMU::protocol::loginserver::LoginRequest;
+using eMU::protocol::loginserver::LoginResponse;
 using eMU::protocol::loginserver::LoginResult;
 namespace MessageIds = eMU::protocol::loginserver::MessageIds;
 using eMU::protocol::dataserver::CheckAccountResult;
-using eMU::protocol::dataserver::decoders::CheckAccountRequest;
-using eMU::protocol::dataserver::encoders::CheckAccountResponse;
-using eMU::protocol::dataserver::encoders::FaultIndication;
+using eMU::protocol::dataserver::CheckAccountRequest;
+using eMU::protocol::dataserver::CheckAccountResponse;
+using eMU::protocol::dataserver::FaultIndication;
 
 class LoginserverTest: public ::testing::Test
 {
@@ -53,7 +53,7 @@ protected:
 
         const ReadStream &checkAccountRequestStream = ioService_.receiveFromClientTcpSocket();
         ASSERT_EQ(eMU::protocol::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
-        eMU::protocol::dataserver::decoders::CheckAccountRequest checkAccountRequest(checkAccountRequestStream);
+        CheckAccountRequest checkAccountRequest(checkAccountRequestStream);
 
         size_t clientHash = clientHashExists ? checkAccountRequest.getClientHash() : 0x1234;
         IO_CHECK(ioService_.sendToClientTcpSocket(FaultIndication(clientHash, "test message").getWriteStream()));

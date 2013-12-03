@@ -1,6 +1,6 @@
 #include <loginserver/transactions/checkAccountResponseTransaction.hpp>
 #include <protocol/dataserver/checkAccountResult.hpp>
-#include <protocol/loginserver/encoders/loginResponse.hpp>
+#include <protocol/loginserver/loginResponse.hpp>
 #include <protocol/loginserver/loginResult.hpp>
 
 #include <glog/logging.h>
@@ -14,7 +14,7 @@ namespace transactions
 
 CheckAccountResponseTransaction::CheckAccountResponseTransaction(core::network::tcp::ConnectionsManager &connectionsManager,
                                                                  core::common::UsersFactory<User> &usersFactory,
-                                                                 const protocol::dataserver::decoders::CheckAccountResponse &response):
+                                                                 const protocol::dataserver::CheckAccountResponse &response):
     connectionsManager_(connectionsManager),
     usersFactory_(usersFactory),
     response_(response) {}
@@ -37,7 +37,7 @@ void CheckAccountResponseTransaction::handleValid()
         result = protocol::loginserver::LoginResult::Succeed;
     }
 
-    protocol::loginserver::encoders::LoginResponse response(result);
+    protocol::loginserver::LoginResponse response(result);
     connectionsManager_.send(user.getHash(), response.getWriteStream().getPayload());
 }
 
