@@ -40,6 +40,10 @@ protected:
         configuration_.dataserver1Port_ = 55960;
         configuration_.dataserver2Address_ = "127.0.0.1";
         configuration_.dataserver2Port_ = 55962;
+        configuration_.gameserversListFileContent_ =         "<servers> \
+                <server code=\"0\" name=\"eMU_Test\" address=\"localhost\" port=\"55901\" /> \
+                <server code=\"20\" name=\"eMU_Test2\" address=\"127.0.0.1\" port=\"55902\" /> \
+            </servers>";
     }
 
     void faultIndicationScenario(bool clientHashExists)

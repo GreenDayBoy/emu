@@ -32,3 +32,25 @@ TEST(LoginRequestTest, decode)
     ASSERT_EQ("mu2emulator", request.getAccountId());
     ASSERT_EQ("asdasdasd", request.getPassword());
 }
+
+TEST(LoginRequestTest, encode)
+{
+    std::wstring accountId = L"account";
+    std::wstring password = L"password";
+    LoginRequest request(accountId, password);
+
+    // -----------------------------------------------------------------------------
+
+    ReadStream readStream(request.getWriteStream().getPayload());
+
+    ASSERT_EQ(MessageIds::kLoginRequest, readStream.getId());
+
+    ASSERT_EQ(0, readStream.readNext<uint32_t>());
+    ASSERT_EQ(0, readStream.readNext<uint32_t>());
+
+    ASSERT_EQ(accountId.length(), readStream.readNext<uint32_t>());
+    ASSERT_EQ(accountId, readStream.readNextWideString(accountId.length()));
+
+    ASSERT_EQ(password.length(), readStream.readNext<uint32_t>());
+    ASSERT_EQ(password, readStream.readNextWideString(password.length()));
+}
