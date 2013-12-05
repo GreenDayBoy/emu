@@ -49,7 +49,7 @@ TEST_F(DataserverTest, CheckAccountShoulBeSuccesful)
 
     QueryResult queryResult;
     Row &row = queryResult.createRow(Row::Fields());
-    CheckAccountResult checkAccountResult = CheckAccountResult::AcoountInUse;
+    CheckAccountResult checkAccountResult = CheckAccountResult::AccountInUse;
     row.insert(boost::lexical_cast<Row::Value>(static_cast<uint32_t>(checkAccountResult)));
 
     sqlInterface_.pushQueryResult(queryResult);
