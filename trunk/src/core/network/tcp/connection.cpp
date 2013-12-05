@@ -159,7 +159,9 @@ void Connection::sendHandler(const boost::system::error_code& errorCode, size_t 
 void Connection::errorHandler(const boost::system::error_code &errorCode, const std::string &operationName)
 {
     if(boost::asio::error::operation_aborted == errorCode ||
-       boost::asio::error::connection_reset == errorCode)
+
+
+            boost::asio::error::connection_reset == errorCode)
     {
         return;
     }
