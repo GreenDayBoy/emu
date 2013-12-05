@@ -17,7 +17,6 @@ struct GameserverInfo
     std::string name_;
     std::string address_;
     uint16_t port_;
-    uint32_t load_;
 };
 
 typedef std::vector<GameserverInfo> GameserversInfoContainer;

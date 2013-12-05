@@ -57,7 +57,7 @@ protected:
 TEST_F(CheckAccountRequestTransactionTest, handle)
 {
     Row &row = queryResult_.createRow(Row::Fields());
-    CheckAccountResult result = CheckAccountResult::AcoountInUse;
+    CheckAccountResult result = CheckAccountResult::AccountInUse;
     row.insert(boost::lexical_cast<Row::Value>(static_cast<uint32_t>(result)));
 
     EXPECT_CALL(sqlInterface_, isAlive()).WillOnce(Return(true));

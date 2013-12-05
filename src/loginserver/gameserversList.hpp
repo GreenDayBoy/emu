@@ -18,8 +18,7 @@ public:
 
     virtual ~GameserversList();
     void initialize(eMU::core::common::XmlReader &xmlReader);
-    const protocol::loginserver::GameserversInfoContainer& getServers() const;
-    MOCKABLE void updateGameserverLoad(uint16_t code, uint32_t load);
+    MOCKABLE const protocol::loginserver::GameserversInfoContainer& getServers() const;
     MOCKABLE bool hasGameserver(uint16_t code) const;
     MOCKABLE const protocol::loginserver::GameserverInfo& getGameserverInfo(uint16_t code) const;
 

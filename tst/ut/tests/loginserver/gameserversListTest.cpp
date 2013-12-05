@@ -27,14 +27,12 @@ protected:
 
         info.address_ = "localhost";
         info.code_ = 0;
-        info.load_ = 0;
         info.name_ = "eMU_Test";
         info.port_ = 55901;
         sampleServers_.push_back(info);
 
         info.address_ = "127.0.0.1";
         info.code_ = 20;
-        info.load_ = 0;
         info.name_ = "eMU_Test2";
         info.port_ = 55902;
         sampleServers_.push_back(info);
@@ -45,7 +43,6 @@ protected:
     {
         EXPECT_EQ(left.address_, right.address_);
         EXPECT_EQ(left.code_, right.code_);
-        EXPECT_EQ(left.load_, right.load_);
         EXPECT_EQ(left.name_, right.name_);
         EXPECT_EQ(left.port_, right.port_);
     }
@@ -76,27 +73,6 @@ TEST_F(GameserversListTest, initialize)
     {
         compareGameserverInfo(sampleServers_[i], gameserversList_.getServers()[i]);
     }
-}
-
-TEST_F(GameserversListTest, updateLoad)
-{
-    initialize();
-
-    gameserversList_.updateGameserverLoad(0, 95);
-    gameserversList_.updateGameserverLoad(20, 35);
-
-    EXPECT_EQ(95, gameserversList_.getServers()[0].load_);
-    EXPECT_EQ(35, gameserversList_.getServers()[1].load_);
-}
-
-TEST_F(GameserversListTest, updateLoadWithInvalidCodeShouldDoNothing)
-{
-    initialize();
-
-    gameserversList_.updateGameserverLoad(1, 30);
-
-    EXPECT_EQ(0, gameserversList_.getServers()[0].load_);
-    EXPECT_EQ(0, gameserversList_.getServers()[1].load_);
 }
 
 TEST_F(GameserversListTest, hasGameserver)

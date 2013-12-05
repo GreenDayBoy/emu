@@ -57,17 +57,24 @@ TEST_F(CheckAccountResponseTransactionTest, WhenDataServerReturnSucceedThenLogin
     scenario();
 }
 
-TEST_F(CheckAccountResponseTransactionTest, WhenDataServerReturnFailedThenLoginResponseShouldBeFailed)
+TEST_F(CheckAccountResponseTransactionTest, CheckInvalidAccountId)
 {
-    checkAccountResult_ = CheckAccountResult::Failed;
-    expectedLoginResult_ = LoginResult::Failed;
+    checkAccountResult_ = CheckAccountResult::InvalidAccountId;
+    expectedLoginResult_ = LoginResult::InvalidAccountId;
     scenario();
 }
 
-TEST_F(CheckAccountResponseTransactionTest, WhenDataServerReturnAccountInUseThenLoginResponseShouldBeFailed)
+TEST_F(CheckAccountResponseTransactionTest, CheckAccountInUse)
 {
-    checkAccountResult_ = CheckAccountResult::AcoountInUse;
-    expectedLoginResult_ = LoginResult::Failed;
+    checkAccountResult_ = CheckAccountResult::AccountInUse;
+    expectedLoginResult_ = LoginResult::AccountInUse;
+    scenario();
+}
+
+TEST_F(CheckAccountResponseTransactionTest, CheckInvalidPassword)
+{
+    checkAccountResult_ = CheckAccountResult::InvalidPassword;
+    expectedLoginResult_ = LoginResult::InvalidPassword;
     scenario();
 }
 

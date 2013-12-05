@@ -28,14 +28,24 @@ void CheckAccountResponseTransaction::handleValid()
 {
     User &user = usersFactory_.find(response_.getClientHash());
 
-    LOG(INFO) << "hash: " << user.getHash() << ", accountId: " << user.getAccountId() << ", check account result: " << static_cast<uint32_t>(response_.getResult());
+    protocol::loginserver::LoginResult result = protocol::loginserver::LoginResult::Succeed;
 
-    protocol::loginserver::LoginResult result = protocol::loginserver::LoginResult::Failed;
-
-    if(response_.getResult() == protocol::dataserver::CheckAccountResult::Succeed)
+    if(response_.getResult() == protocol::dataserver::CheckAccountResult::AccountInUse)
     {
-        result = protocol::loginserver::LoginResult::Succeed;
+        result = protocol::loginserver::LoginResult::AccountInUse;
     }
+    else if(response_.getResult() == protocol::dataserver::CheckAccountResult::InvalidAccountId)
+    {
+        result = protocol::loginserver::LoginResult::InvalidAccountId;
+    }
+    else if(response_.getResult() == protocol::dataserver::CheckAccountResult::InvalidPassword)
+    {
+        result = protocol::loginserver::LoginResult::InvalidPassword;
+    }
+
+    LOG(INFO) << "hash: " << user.getHash() << ", accountId: " << user.getAccountId()
+              << ", check account result: " << static_cast<uint32_t>(response_.getResult())
+              << ", login result: " << static_cast<uint32_t>(result);
 
     protocol::loginserver::LoginResponse response(result);
     connectionsManager_.send(user.getHash(), response.getWriteStream().getPayload());
