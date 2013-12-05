@@ -4,6 +4,8 @@
 
 #include <protocol/loginserver/loginRequest.hpp>
 #include <protocol/loginserver/loginResponse.hpp>
+#include <protocol/loginserver/gameserversListRequest.hpp>
+#include <protocol/loginserver/gameserversListResponse.hpp>
 #include <protocol/loginserver/messageIds.hpp>
 
 #include <protocol/dataserver/messageIds.hpp>
@@ -16,6 +18,8 @@ using eMU::mt::env::asioStub::io_service;
 using eMU::protocol::ReadStream;
 using eMU::protocol::loginserver::LoginRequest;
 using eMU::protocol::loginserver::LoginResponse;
+using eMU::protocol::loginserver::GameserversListRequest;
+using eMU::protocol::loginserver::GameserversListResponse;
 using eMU::protocol::loginserver::LoginResult;
 namespace MessageIds = eMU::protocol::loginserver::MessageIds;
 using eMU::protocol::dataserver::CheckAccountResult;
@@ -40,10 +44,11 @@ protected:
         configuration_.dataserver1Port_ = 55960;
         configuration_.dataserver2Address_ = "127.0.0.1";
         configuration_.dataserver2Port_ = 55962;
-        configuration_.gameserversListFileContent_ =         "<servers> \
-                <server code=\"0\" name=\"eMU_Test\" address=\"localhost\" port=\"55901\" /> \
-                <server code=\"20\" name=\"eMU_Test2\" address=\"127.0.0.1\" port=\"55902\" /> \
-            </servers>";
+
+        configuration_.gameserversListFileContent_ = "<servers> \
+                                                      <server code=\"0\" name=\"eMU_TEST1\" address=\"localhost\" port=\"55901\" /> \
+                                                      <server code=\"1\" name=\"eMU_TEST2\" address=\"127.0.0.1\" port=\"55902\" /> \
+                                                      </servers>";
     }
 
     void faultIndicationScenario(bool clientHashExists)
@@ -132,14 +137,26 @@ TEST_F(LoginserverTest, WhenConnectToDataserverFailedThenStartupShouldBeFailed)
     ASSERT_FALSE(server.startup());
 }
 
-TEST_F(LoginserverTest, WhenConnectToDataserverFailedThenClientShouldBeDisconnected)
+TEST_F(LoginserverTest, checkGameserversListRequest)
 {
-    ioService_.setConnectResult(false);
     Server server(ioService_, configuration_);
     server.startup();
 
     size_t connectionHash = ioService_.establishTcpConnection();
-    IO_CHECK(ioService_.send(connectionHash, LoginRequest(L"accountTest", L"passwordTest").getWriteStream()));
 
-    ASSERT_FALSE(ioService_.tcpConnectionEstablished(connectionHash));
+    GameserversListRequest request;
+    IO_CHECK(ioService_.send(connectionHash, request.getWriteStream()));
+
+    const ReadStream &responseStream = ioService_.receive(connectionHash);
+    ASSERT_EQ(eMU::protocol::loginserver::MessageIds::kGameserversListResponse, responseStream.getId());
+
+    GameserversListResponse response(responseStream);
+
+    ASSERT_EQ(2, response.getServers().size());
+
+    ASSERT_EQ(0, response.getServers()[0].code_);
+    ASSERT_EQ("eMU_TEST1", response.getServers()[0].name_);
+
+    ASSERT_EQ(1, response.getServers()[1].code_);
+    ASSERT_EQ("eMU_TEST2", response.getServers()[1].name_);
 }
