@@ -1,5 +1,4 @@
 #include <core/network/udp/connection.hpp>
-#include <ut/env/core/network/udp/connectionEventsMock.hpp>
 #include <ut/env/asioStub/udp/socket.hpp>
 #include <ut/env/core/network/samplePayloads.hpp>
 
@@ -15,7 +14,6 @@ using ::testing::ActionInterface;
 namespace asioStub = eMU::ut::env::asioStub;
 using asioStub::io_service;
 
-using eMU::ut::env::core::network::udp::ConnectionEventsMock;
 using eMU::ut::env::core::network::SamplePayloads;
 
 using eMU::core::network::udp::Connection;
@@ -38,10 +36,10 @@ public:
 
     void SetUp()
     {
-        connection_.setReceiveFromEventCallback(std::bind(&ConnectionEventsMock::receiveFromEvent,
-                                                &connectionEvents_,
-                                                std::placeholders::_1,
-                                                std::placeholders::_2));
+        connection_.setReceiveFromEventCallback(std::bind(&UdpConnectionTest::receiveFromEvent,
+                                                          this,
+                                                          std::placeholders::_1,
+                                                          std::placeholders::_2));
     }
 
     void TearDown() {}
@@ -59,11 +57,12 @@ public:
                 SaveArg<2>(&sendToHandler_)));
     }
 
+    MOCK_METHOD2(receiveFromEvent, void(Connection&, const boost::asio::ip::udp::endpoint&));
+
     uint16_t port_;
     Connection::SocketPointer socket_;
     Connection connection_;
     asioStub::io_service ioService_;
-    ConnectionEventsMock connectionEvents_;
 
     boost::asio::mutable_buffer receiveBuffer_;
     io_service::IoHandler receiveFromHandler_;
@@ -91,7 +90,7 @@ TEST_F(UdpConnectionTest, receiveFrom)
     *senderEndpoint_ = senderEndpoint;
 
     EXPECT_CALL(*socket_, async_receive_from(_, _, _));
-    EXPECT_CALL(connectionEvents_, receiveFromEvent(::testing::Ref(connection_), senderEndpoint));
+    EXPECT_CALL(*this, receiveFromEvent(::testing::Ref(connection_), senderEndpoint));
 
     receiveFromHandler_(boost::system::error_code(), samplePayloads_.payload1_.getSize());
 
