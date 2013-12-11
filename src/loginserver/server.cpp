@@ -77,92 +77,86 @@ void Server::onCleanup()
 {
 }
 
-void Server::onAccept(size_t hash)
+void Server::onAccept(User &user)
 {
-	LOG(INFO) << "hash: " << hash << ", user registered.";
+    LOG(INFO) << "hash: " << user.getHash() << ", user registered.";
 }
 
-void Server::onReceive(size_t hash, const core::network::Payload &payload)
+void Server::onReceive(User &user)
 {
     try
     {
-        protocol::ReadStreamsExtractor readStreamsExtractor(payload);
+        protocol::ReadStreamsExtractor readStreamsExtractor(user.getConnection().getReadPayload());
         readStreamsExtractor.extract();
 
         for(const auto& stream : readStreamsExtractor.getStreams())
         {
-            this->handleReadStream(hash, stream);
+            this->handleReadStream(user, stream);
 
             transactionsManager_.dequeueAll();
         }
     }
     catch(const protocol::ReadStreamsExtractor::EmptyPayloadException&)
     {
-        LOG(ERROR) << "Received empty payload! hash: " << hash;
-        connectionsManager_.disconnect(hash);
+        LOG(ERROR) << "Received empty payload! hash: " << user.getHash();
+        user.getConnection().disconnect();
     }
     catch(const protocol::ReadStreamsExtractor::EmptyStreamException&)
     {
-        LOG(ERROR) << "Received empty stream! hash: " << hash;
-        connectionsManager_.disconnect(hash);
+        LOG(ERROR) << "Received empty stream! hash: " << user.getHash();
+        user.getConnection().disconnect();
     }
     catch(const protocol::ReadStreamsExtractor::UnknownStreamFormatException&)
     {
-        LOG(ERROR) << "Received stream with unknown format! hash: " << hash;
-        connectionsManager_.disconnect(hash);
+        LOG(ERROR) << "Received stream with unknown format! hash: " << user.getHash();
+        user.getConnection().disconnect();
     }
     catch(const protocol::ReadStream::OverflowException&)
     {
-        LOG(ERROR) << "Overflow during stream read! hash: " << hash;
-        connectionsManager_.disconnect(hash);
+        LOG(ERROR) << "Overflow during stream read! hash: " << user.getHash();
+        user.getConnection().disconnect();
     }
     catch(const protocol::WriteStream::OverflowException&)
     {
-        LOG(ERROR) << "Overflow during stream creation! hash: " << hash;
-        connectionsManager_.disconnect(hash);
+        LOG(ERROR) << "Overflow during stream creation! hash: " << user.getHash();
+        user.getConnection().disconnect();
     }
     catch(const core::network::Payload::SizeOutOfBoundException&)
     {
-        LOG(ERROR) << "Set size for payload is out of bound! hash: " << hash;
-        connectionsManager_.disconnect(hash);
+        LOG(ERROR) << "Set size for payload is out of bound! hash: " << user.getHash();
+        user.getConnection().disconnect();
     }
 }
 
-void Server::onClose(size_t hash)
+void Server::onClose(User &user)
 {
-    LOG(INFO) << "hash: " << hash << ", user closed.";
-    usersFactory_.destroy(hash);
+    LOG(INFO) << "hash: " << user.getHash() << ", user closed.";
 }
 
-void Server::handleReadStream(size_t hash, const protocol::ReadStream &stream)
+void Server::handleReadStream(User &user, const protocol::ReadStream &stream)
 {
     uint16_t messageId = stream.getId();
 
-    LOG(INFO) << "hash: " << hash << ", received stream, id: " << messageId;
+    LOG(INFO) << "hash: " << user.getHash() << ", received stream, id: " << messageId;
 
     if(messageId == protocol::loginserver::MessageIds::kLoginRequest)
     {
-        User &user = usersFactory_.find(hash);
-
         protocol::loginserver::LoginRequest request(stream);
         transactionsManager_.queue(new transactions::LoginRequestTransaction(user,
-                                                                             connectionsManager_,
                                                                              dataserverConnection_,
                                                                              request));
     }
     else if(messageId == protocol::loginserver::MessageIds::kGameserversListRequest)
     {
         protocol::loginserver::GameserversListRequest request(stream);
-        transactionsManager_.queue((new transactions::GameserversListRequestTransaction(hash,
-                                                                                        connectionsManager_,
+        transactionsManager_.queue((new transactions::GameserversListRequestTransaction(user,
                                                                                         gameserversList_,
                                                                                         request)));
     }
     else if(messageId == protocol::loginserver::MessageIds::kGameserverDetailsRequest)
     {
         protocol::loginserver::GameserverDetailsRequest request(stream);
-        transactionsManager_.queue((new transactions::GameserverDetailsRequestTransaction(hash,
-                                                                                          connectionsManager_,
+        transactionsManager_.queue((new transactions::GameserverDetailsRequestTransaction(user,
                                                                                           gameserversList_,
                                                                                           request)));
     }
@@ -222,12 +216,12 @@ void Server::handleDataserverReadStream(const protocol::ReadStream &stream)
     if(messageId == protocol::dataserver::MessageIds::kCheckAccountResponse)
     {
         protocol::dataserver::CheckAccountResponse response(stream);
-        transactionsManager_.queue(new transactions::CheckAccountResponseTransaction(connectionsManager_, usersFactory_, response));
+        transactionsManager_.queue(new transactions::CheckAccountResponseTransaction(usersFactory_, response));
     }
     if(messageId == protocol::dataserver::MessageIds::kFaultIndication)
     {
         protocol::dataserver::FaultIndication indication(stream);
-        transactionsManager_.queue(new transactions::FaultIndicationTransaction(connectionsManager_, usersFactory_, indication));
+        transactionsManager_.queue(new transactions::FaultIndicationTransaction(usersFactory_, indication));
     }
 }
 

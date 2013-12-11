@@ -27,6 +27,9 @@ public:
     acceptor(io_service &ioService, const boost::asio::ip::tcp::endpoint &endpoint);
     void async_accept(socket &socket, const AcceptHandler &handler);
 
+    io_service& get_io_service();
+
+private:
     io_service& ioService_;
 };
 

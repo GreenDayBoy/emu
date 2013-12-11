@@ -1,19 +1,20 @@
 #include <loginserver/transactions/checkAccountResponseTransaction.hpp>
 #include <loginserver/user.hpp>
-#include <core/common/usersFactory.hpp>
-#include <ut/env/core/network/tcp/connectionsManagerMock.hpp>
 #include <protocol/dataserver/checkAccountResponse.hpp>
 #include <protocol/loginserver/messageIds.hpp>
 #include <protocol/loginserver/loginResponse.hpp>
+#include <ut/env/core/network/tcp/connectionMock.hpp>
+
+#include <gtest/gtest.h>
 
 using ::testing::_;
 using ::testing::SaveArg;
 
 using eMU::loginserver::User;
 using eMU::loginserver::transactions::CheckAccountResponseTransaction;
-using eMU::core::common::UsersFactory;
+using eMU::core::common::Factory;
 using eMU::core::network::Payload;
-using eMU::ut::env::core::network::tcp::ConnectionsManagerMock;
+using eMU::ut::env::core::network::tcp::ConnectionMock;
 
 using eMU::protocol::dataserver::CheckAccountResponse;
 using eMU::protocol::dataserver::CheckAccountResult;
@@ -21,22 +22,22 @@ using eMU::protocol::ReadStream;
 namespace MessageIds = eMU::protocol::loginserver::MessageIds;
 using eMU::protocol::loginserver::LoginResponse;
 using eMU::protocol::loginserver::LoginResult;
+using eMU::ut::env::core::network::tcp::ConnectionMock;
 
 class CheckAccountResponseTransactionTest: public ::testing::Test
 {
 protected:
     CheckAccountResponseTransactionTest():
-        usersFactory_(1),
         checkAccountResult_(CheckAccountResult::Succeed),
         expectedLoginResult_(LoginResult::Succeed) {}
 
     void scenario()
     {
-        size_t hash = usersFactory_.create();
-        CheckAccountResponse checkAccountResponse(CheckAccountResponse(hash, checkAccountResult_).getWriteStream().getPayload());
+        User &user = usersFactory_.create(connection_);
+        CheckAccountResponse checkAccountResponse(CheckAccountResponse(user.getHash(), checkAccountResult_).getWriteStream().getPayload());
 
-        EXPECT_CALL(connectionsManager_, send(hash, _)).WillOnce(SaveArg<1>(&payload_));
-        CheckAccountResponseTransaction(connectionsManager_, usersFactory_, checkAccountResponse).handle();
+        EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
+        CheckAccountResponseTransaction(usersFactory_, checkAccountResponse).handle();
 
         ReadStream readStream(payload_);
         ASSERT_EQ(MessageIds::kLoginResponse, readStream.getId());
@@ -45,11 +46,11 @@ protected:
         ASSERT_EQ(expectedLoginResult_, loginResponse.getResult());
     }
 
-    UsersFactory<User> usersFactory_;
-    ConnectionsManagerMock connectionsManager_;
+    Factory<User> usersFactory_;
     Payload payload_;
     CheckAccountResult checkAccountResult_;
     LoginResult expectedLoginResult_;
+    ConnectionMock connection_;
 };
 
 TEST_F(CheckAccountResponseTransactionTest, WhenDataServerReturnSucceedThenLoginResponseShouldBeSucceed)
@@ -80,7 +81,9 @@ TEST_F(CheckAccountResponseTransactionTest, CheckInvalidPassword)
 
 TEST_F(CheckAccountResponseTransactionTest, WhenHashGivenFromDataServerIsInvalidThenNothingShouldHappen)
 {
-    CheckAccountResponse checkAccountResponse(CheckAccountResponse(0x12345, CheckAccountResult::Succeed).getWriteStream().getPayload());
+    usersFactory_.create(connection_);
 
-    CheckAccountResponseTransaction(connectionsManager_, usersFactory_, checkAccountResponse).handle();
+    CheckAccountResponse checkAccountResponse(CheckAccountResponse(User::Hash(0x12345), CheckAccountResult::Succeed).getWriteStream().getPayload());
+
+    CheckAccountResponseTransaction(usersFactory_, checkAccountResponse).handle();
 }

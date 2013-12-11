@@ -5,6 +5,9 @@ namespace eMU
 namespace loginserver
 {
 
+User::User(core::network::tcp::Connection &connection):
+    NetworkUser(connection) {}
+
 void User::setAccountId(const std::string &accountId)
 {
     accountId_ = accountId;

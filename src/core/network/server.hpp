@@ -1,13 +1,10 @@
 #pragma once
 
+#include <core/transactions/manager.hpp>
+#include <core/network/tcp/connectionsAcceptor.hpp>
+
 #include <boost/noncopyable.hpp>
 #include <glog/logging.h>
-
-#include <core/common/usersFactory.hpp>
-#include <core/transactions/manager.hpp>
-#include <core/network/tcp/connectionsManager.hpp>
-
-#include <common/asio.hpp>
 
 namespace eMU
 {
@@ -20,16 +17,12 @@ template<typename User>
 class Server: boost::noncopyable
 {
 public:
-    Server(asio::io_service& ioService,
-           uint16_t port,
-           size_t maxNumberOfUsers):
-        connectionsManager_(ioService, port),
-        usersFactory_(maxNumberOfUsers)
+    Server(asio::io_service& ioService, uint16_t port, size_t maxNumberOfUsers):
+        connectionsAcceptor_(connectionsFactory_,
+                             tcp::ConnectionsAcceptor::AcceptorPointer(new asio::ip::tcp::acceptor(ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)))),
+        maxNumberOfUsers_(maxNumberOfUsers)
     {
-           connectionsManager_.setAcceptEventCallback(std::bind(&Server::onAccept, this, std::placeholders::_1));
-           connectionsManager_.setReceiveEventCallback(std::bind(&Server::onReceive, this, std::placeholders::_1, std::placeholders::_2));
-           connectionsManager_.setCloseEventCallback(std::bind(&Server::onClose, this, std::placeholders::_1));
-           connectionsManager_.setGenerateConnectionHashCallback(std::bind(&Server::generateConnectionHash, this));
+           connectionsAcceptor_.setAcceptEventCallback(std::bind(&Server::acceptEvent, this, std::placeholders::_1));
     }
 
     virtual ~Server() {}
@@ -38,7 +31,7 @@ public:
     {
         if(this->onStartup())
         {
-            connectionsManager_.queueAccept();
+            connectionsAcceptor_.queueAccept();
             return true;
         }
 
@@ -52,27 +45,72 @@ public:
 
     virtual bool onStartup() = 0;
     virtual void onCleanup() = 0;
-    virtual void onAccept(size_t hash) = 0;
-    virtual void onReceive(size_t hash, const network::Payload &payload) = 0;
-    virtual void onClose(size_t hash) = 0;
+    virtual void onAccept(User &user) = 0;
+    virtual void onReceive(User &user) = 0;
+    virtual void onClose(User &user) = 0;
 
 protected:
-    size_t generateConnectionHash()
+    void acceptEvent(tcp::Connection &connection)
     {
-        try
+        if(usersFactory_.getObjects().size() > maxNumberOfUsers_)
         {
-            return usersFactory_.create();
+            LOG(WARNING) << "Max number of users reached!";
+
+            connection.close();
+            connectionsFactory_.destroy(connection);
         }
-        catch(const typename core::common::UsersFactory<User>::MaxNumberOfUsersReachedException&)
+        else
         {
-            LOG(WARNING) << "Max number of users reached.";
-            return 0;
+            User &user = usersFactory_.create(connection);
+
+            connection.setReceiveEventCallback(std::bind(&Server<User>::receiveEvent, this, std::placeholders::_1));
+            connection.setCloseEventCallback(std::bind(&Server<User>::closeEvent, this, std::placeholders::_1));
+            connection.queueReceive();
+
+            this->onAccept(user);
         }
     }
 
-    core::network::tcp::ConnectionsManager connectionsManager_;
-    core::common::UsersFactory<User> usersFactory_;
+    void receiveEvent(tcp::Connection &connection)
+    {
+        try
+        {
+            User &user = usersFactory_.find(connection);
+            this->onReceive(user);
+        }
+        catch(const typename core::common::Factory<User>::ObjectNotFoundException&)
+        {
+            connection.close();
+            connectionsFactory_.destroy(connection);
+        }
+    }
+
+    void closeEvent(tcp::Connection &connection)
+    {
+        try
+        {
+            User &user = usersFactory_.find(connection);
+            this->onClose(user);
+
+            usersFactory_.destroy(user);
+
+            connection.close();
+            connectionsFactory_.destroy(connection);
+        }
+        catch(const typename core::common::Factory<User>::ObjectNotFoundException&)
+        {
+            LOG(ERROR) << "user not found!";
+
+            connection.close();
+            connectionsFactory_.destroy(connection);
+        }
+    }
+
+    core::common::Factory<tcp::Connection> connectionsFactory_;
+    core::network::tcp::ConnectionsAcceptor connectionsAcceptor_;
+    core::common::Factory<User> usersFactory_;
     core::transactions::Manager transactionsManager_;
+    size_t maxNumberOfUsers_;
 };
 
 }

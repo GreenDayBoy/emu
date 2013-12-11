@@ -1,17 +1,19 @@
 #pragma once
 
-#include <core/common/hashableObject.hpp>
+#include <core/network/tcp/networkUser.hpp>
 
 namespace eMU
 {
 namespace dataserver
 {
 
-class User: public eMU::core::common::HashableObject
+class User: public core::network::tcp::NetworkUser
 {
 public:
+    User(core::network::tcp::Connection &connection);
 
 private:
+    User();
 };
 
 }

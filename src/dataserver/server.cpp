@@ -43,75 +43,73 @@ void Server::onCleanup()
 {
 }
 
-void Server::onAccept(size_t hash)
+void Server::onAccept(User &user)
 {
-	LOG(INFO) << "hash: " << hash << ", user registered.";
+    LOG(INFO) << "hash: " << user.getHash() <<  ", user registered.";
 }
 
-void Server::onReceive(size_t hash, const core::network::Payload &payload)
+void Server::onReceive(User &user)
 {
     try
     {
-        protocol::ReadStreamsExtractor readStreamsExtractor(payload);
+        protocol::ReadStreamsExtractor readStreamsExtractor(user.getConnection().getReadPayload());
         readStreamsExtractor.extract();
 
         for(const auto& stream : readStreamsExtractor.getStreams())
         {
-            this->handleReadStream(hash, stream);
+            this->handleReadStream(user, stream);
 
             transactionsManager_.dequeueAll();
         }
     }
     catch(const protocol::ReadStreamsExtractor::EmptyPayloadException&)
     {
-        LOG(ERROR) << "Received empty payload! hash: " << hash;
-        connectionsManager_.disconnect(hash);
+        LOG(ERROR) << "Received empty payload! hash: " << user.getHash();
+        user.getConnection().disconnect();
     }
     catch(const protocol::ReadStreamsExtractor::EmptyStreamException&)
     {
-        LOG(ERROR) << "Received empty stream! hash: " << hash;
-        connectionsManager_.disconnect(hash);
+        LOG(ERROR) << "Received empty stream! hash: " << user.getHash();
+        user.getConnection().disconnect();
     }
     catch(const protocol::ReadStreamsExtractor::UnknownStreamFormatException&)
     {
-        LOG(ERROR) << "Received stream with unknown format! hash: " << hash;
-        connectionsManager_.disconnect(hash);
+        LOG(ERROR) << "Received stream with unknown format! hash: " << user.getHash();
+        user.getConnection().disconnect();
     }
     catch(const protocol::ReadStream::OverflowException&)
     {
-        LOG(ERROR) << "Overflow during stream read! hash: " << hash;
-        connectionsManager_.disconnect(hash);
+        LOG(ERROR) << "Overflow during stream read! hash: " << user.getHash();
+        user.getConnection().disconnect();
     }
     catch(const protocol::WriteStream::OverflowException&)
     {
-        LOG(ERROR) << "Overflow during stream creation! hash: " << hash;
-        connectionsManager_.disconnect(hash);
+        LOG(ERROR) << "Overflow during stream creation! hash: " << user.getHash();
+        user.getConnection().disconnect();
     }
     catch(const core::network::Payload::SizeOutOfBoundException&)
     {
-        LOG(ERROR) << "Set size for payload is out of bound! hash: " << hash;
-        connectionsManager_.disconnect(hash);
+        LOG(ERROR) << "Set size for payload is out of bound! hash: " << user.getHash();
+        user.getConnection().disconnect();
     }
 }
 
-void Server::onClose(size_t hash)
+void Server::onClose(User &user)
 {
-    LOG(INFO) << "hash: " << hash << ", user closed.";
-    usersFactory_.destroy(hash);
+    LOG(INFO) << "hash: " << user.getHash() << " closed.";
 }
 
-void Server::handleReadStream(size_t hash, const protocol::ReadStream &stream)
+void Server::handleReadStream(User &user, const protocol::ReadStream &stream)
 {
     uint16_t messageId = stream.getId();
 
-    LOG(INFO) << "hash: " << hash << ", received stream, id: " << messageId;
+    LOG(INFO) << "hash: " << user.getHash() << ", received stream, id: " << messageId;
 
     if(messageId == protocol::dataserver::MessageIds::kCheckAccountRequest)
     {
         protocol::dataserver::CheckAccountRequest request(stream);
-        transactionsManager_.queue(new transactions::CheckAccountRequestTransaction(hash,
+        transactionsManager_.queue(new transactions::CheckAccountRequestTransaction(user,
                                                                                     sqlInterface_,
-                                                                                    connectionsManager_,
                                                                                     request));
     }
 }

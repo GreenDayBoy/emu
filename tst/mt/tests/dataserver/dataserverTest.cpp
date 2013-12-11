@@ -7,6 +7,8 @@
 #include <protocol/dataserver/checkAccountResponse.hpp>
 #include <protocol/dataserver/faultIndication.hpp>
 
+#include <core/network/tcp/networkUser.hpp>
+
 #include <gtest/gtest.h>
 
 using eMU::dataserver::Server;
@@ -22,6 +24,8 @@ using eMU::protocol::dataserver::CheckAccountRequest;
 using eMU::protocol::dataserver::CheckAccountResponse;
 using eMU::protocol::dataserver::FaultIndication;
 namespace MessageIds = eMU::protocol::dataserver::MessageIds;
+
+using eMU::core::network::tcp::NetworkUser;
 
 class DataserverTest: public ::testing::Test
 {
@@ -57,7 +61,7 @@ TEST_F(DataserverTest, CheckAccountShoulBeSuccesful)
 
     size_t connectionHash = ioService_.establishTcpConnection();
 
-    size_t clientHash = 0x1234;
+    NetworkUser::Hash clientHash(0x1234);
     IO_CHECK(ioService_.send(connectionHash, CheckAccountRequest(clientHash, "Account", "Password").getWriteStream()));
 
     const ReadStream &readStream = ioService_.receive(connectionHash);
@@ -79,7 +83,7 @@ TEST_F(DataserverTest, WhenQueryExecutionWasFailedThenFaultIndicationShouldBeRec
 
     size_t connectionHash = ioService_.establishTcpConnection();
 
-    size_t clientHash = 0x1234;
+    NetworkUser::Hash clientHash(0x1234);
     IO_CHECK(ioService_.send(connectionHash, CheckAccountRequest(clientHash, "Account", "Password").getWriteStream()));
 
     const ReadStream &readStream = ioService_.receive(connectionHash);
@@ -101,7 +105,7 @@ TEST_F(DataserverTest, WhenQueryResultIsEmptyThenFaultIndicationShouldBeReceived
 
     size_t connectionHash = ioService_.establishTcpConnection();
 
-    size_t clientHash = 0x1234;
+    NetworkUser::Hash clientHash(0x1234);
     IO_CHECK(ioService_.send(connectionHash, CheckAccountRequest(clientHash, "Account", "Password").getWriteStream()));
 
     const ReadStream &readStream = ioService_.receive(connectionHash);
@@ -122,7 +126,7 @@ TEST_F(DataserverTest, WhenConnectionToDatabaseIsDiedThenFaultIndicationShouldBe
 
     size_t connectionHash = ioService_.establishTcpConnection();
 
-    size_t clientHash = 0x1234;
+    NetworkUser::Hash clientHash(0x1234);
     IO_CHECK(ioService_.send(connectionHash, CheckAccountRequest(clientHash, "Account", "Password").getWriteStream()));
 
     const ReadStream &readStream = ioService_.receive(connectionHash);

@@ -7,7 +7,6 @@
 #include <protocol/loginserver/loginRequest.hpp>
 
 #include <ut/env/core/network/tcp/connectionMock.hpp>
-#include <ut/env/core/network/tcp/connectionsManagerMock.hpp>
 
 #include <gtest/gtest.h>
 #include <boost/locale.hpp>
@@ -17,7 +16,6 @@ using ::testing::Return;
 using ::testing::SaveArg;
 
 using eMU::ut::env::core::network::tcp::ConnectionMock;
-using eMU::ut::env::core::network::tcp::ConnectionsManagerMock;
 using eMU::core::network::Payload;
 using eMU::protocol::ReadStream;
 using eMU::protocol::loginserver::LoginRequest;
@@ -32,13 +30,14 @@ protected:
     LoginRequestTransactionTest():
         accountId_(L"testAccount"),
         password_(L"testPassword"),
-        request_(ReadStream(LoginRequest(accountId_, password_).getWriteStream().getPayload())) {}
+        request_(ReadStream(LoginRequest(accountId_, password_).getWriteStream().getPayload())),
+        user_(connection_) {}
 
     std::wstring accountId_;
     std::wstring password_;
     LoginRequest request_;
     ConnectionMock dataserverConnection_;
-    ConnectionsManagerMock connectionsManager_;
+    ConnectionMock connection_;
     User user_;
 };
 
@@ -46,10 +45,9 @@ TEST_F(LoginRequestTransactionTest, handle)
 {
     Payload payload;
     EXPECT_CALL(dataserverConnection_, send(_)).WillOnce(SaveArg<0>(&payload));
-
     EXPECT_CALL(dataserverConnection_, isOpen()).WillOnce((Return(true)));
 
-    LoginRequestTransaction(user_, connectionsManager_, dataserverConnection_, request_).handle();
+    LoginRequestTransaction(user_, dataserverConnection_, request_).handle();
 
     ReadStream readStream(payload);
     ASSERT_EQ(MessageIds::kCheckAccountRequest, readStream.getId());
@@ -64,7 +62,7 @@ TEST_F(LoginRequestTransactionTest, handle)
 TEST_F(LoginRequestTransactionTest, WhenConnectionToDataserverIsNotOpenThenClientShouldBeDisconnected)
 {
     EXPECT_CALL(dataserverConnection_, isOpen()).WillOnce((Return(false)));
-    EXPECT_CALL(connectionsManager_, disconnect(user_.getHash()));
+    EXPECT_CALL(connection_, disconnect());
 
-    LoginRequestTransaction(user_, connectionsManager_, dataserverConnection_, request_).handle();
+    LoginRequestTransaction(user_, dataserverConnection_, request_).handle();
 }

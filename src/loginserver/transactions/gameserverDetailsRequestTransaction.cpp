@@ -10,12 +10,10 @@ namespace loginserver
 namespace transactions
 {
 
-GameserverDetailsRequestTransaction::GameserverDetailsRequestTransaction(size_t hash,
-                                                                         core::network::tcp::ConnectionsManager &connectionsManager,
+GameserverDetailsRequestTransaction::GameserverDetailsRequestTransaction(User &user,
                                                                          const GameserversList &gameserversList,
                                                                          const protocol::loginserver::GameserverDetailsRequest &request):
-    hash_(hash),
-    connectionsManager_(connectionsManager),
+    user_(user),
     gameserversList_(gameserversList),
     request_(request) {}
 
@@ -26,17 +24,17 @@ bool GameserverDetailsRequestTransaction::isValid() const
 
 void GameserverDetailsRequestTransaction::handleValid()
 {
-    LOG(INFO) << "hash: " << hash_ << ", requested gameserver details, gameserverCode: " << request_.getGameserverCode();
+    LOG(INFO) << "hash: " << user_.getHash() << ", requested gameserver details, gameserverCode: " << request_.getGameserverCode();
     protocol::loginserver::GameserverDetailsResponse response;
 
-    connectionsManager_.send(hash_, response.getWriteStream().getPayload());
+    user_.getConnection().send(response.getWriteStream().getPayload());
 }
 
 void GameserverDetailsRequestTransaction::handleInvalid()
 {
-    LOG(ERROR) << "hash: " << hash_ << ", requested gameserver does not exists! gameserverCode: " << request_.getGameserverCode();
+    LOG(ERROR) << "hash: " << user_.getHash() << ", requested gameserver does not exists! gameserverCode: " << request_.getGameserverCode();
 
-    connectionsManager_.disconnect(hash_);
+    user_.getConnection().disconnect();
 }
 
 }

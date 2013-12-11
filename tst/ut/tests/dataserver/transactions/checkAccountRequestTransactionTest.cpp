@@ -1,4 +1,6 @@
 #include <dataserver/transactions/checkAccountRequestTransaction.hpp>
+#include <dataserver/user.hpp>
+#include <core/network/tcp/networkUser.hpp>
 
 #include <protocol/readStream.hpp>
 #include <protocol/dataserver/messageIds.hpp>
@@ -7,8 +9,8 @@
 #include <protocol/dataserver/checkAccountResponse.hpp>
 #include <protocol/dataserver/faultIndication.hpp>
 
-#include <ut/env/core/network/tcp/connectionsManagerMock.hpp>
 #include <ut/env/dataserver/database/sqlInterfaceMock.hpp>
+#include <ut/env/core/network/tcp/connectionMock.hpp>
 
 #include <gtest/gtest.h>
 #include <boost/lexical_cast.hpp>
@@ -17,9 +19,10 @@ using ::testing::_;
 using ::testing::Return;
 using ::testing::SaveArg;
 
-using eMU::ut::env::core::network::tcp::ConnectionsManagerMock;
+using eMU::ut::env::core::network::tcp::ConnectionMock;
 using eMU::ut::env::dataserver::database::SqlInterfaceMock;
 
+using eMU::dataserver::User;
 using eMU::dataserver::database::QueryResult;
 using eMU::dataserver::database::Row;
 using eMU::dataserver::transactions::CheckAccountRequestTransaction;
@@ -33,24 +36,25 @@ using eMU::protocol::dataserver::CheckAccountResponse;
 using eMU::protocol::dataserver::FaultIndication;
 
 using eMU::core::network::Payload;
+using eMU::core::network::tcp::NetworkUser;
 
 class CheckAccountRequestTransactionTest: public ::testing::Test
 {
 protected:
     CheckAccountRequestTransactionTest():
         clientHash_(0x12345),
-        hash_(0x54321),
+        user_(connection_),
         request_(ReadStream(CheckAccountRequest(clientHash_,
                                                 "testAccount",
                                                 "testPassword").getWriteStream().getPayload())) {}
 
-    ConnectionsManagerMock connectionsManager_;
     SqlInterfaceMock sqlInterface_;
     QueryResult queryResult_;
     Payload payload_;
 
-    size_t clientHash_;
-    size_t hash_;
+    NetworkUser::Hash clientHash_;
+    ConnectionMock connection_;
+    User user_;
     CheckAccountRequest request_;
 };
 
@@ -63,9 +67,9 @@ TEST_F(CheckAccountRequestTransactionTest, handle)
     EXPECT_CALL(sqlInterface_, isAlive()).WillOnce(Return(true));
     EXPECT_CALL(sqlInterface_, fetchQueryResult()).WillOnce(Return((queryResult_)));
     EXPECT_CALL(sqlInterface_, executeQuery(_)).WillOnce(Return(true));
-    EXPECT_CALL(connectionsManager_, send(hash_, _)).WillOnce(SaveArg<1>(&payload_));
+    EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
 
-    CheckAccountRequestTransaction(hash_, sqlInterface_, connectionsManager_, request_).handle();
+    CheckAccountRequestTransaction(user_, sqlInterface_, request_).handle();
 
     ReadStream readStream(payload_);
     ASSERT_EQ(MessageIds::kCheckAccountResponse, readStream.getId());
@@ -83,9 +87,9 @@ TEST_F(CheckAccountRequestTransactionTest, WhenExecutionOfQueryIsFailedThenFault
     std::string errorMessage = "database error";
     EXPECT_CALL(sqlInterface_, getErrorMessage()).WillOnce(Return(errorMessage));
 
-    EXPECT_CALL(connectionsManager_, send(hash_, _)).WillOnce(SaveArg<1>(&payload_));
+    EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
 
-    CheckAccountRequestTransaction(hash_, sqlInterface_, connectionsManager_, request_).handle();
+    CheckAccountRequestTransaction(user_, sqlInterface_, request_).handle();
 
     ReadStream readStream(payload_);
     ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());
@@ -100,9 +104,9 @@ TEST_F(CheckAccountRequestTransactionTest, WhenQueryResultIsEmptyThenFaultIndica
     EXPECT_CALL(sqlInterface_, isAlive()).WillOnce(Return(true));
     EXPECT_CALL(sqlInterface_, fetchQueryResult()).WillOnce(Return((queryResult_)));
     EXPECT_CALL(sqlInterface_, executeQuery(_)).WillOnce(Return(true));
-    EXPECT_CALL(connectionsManager_, send(hash_, _)).WillOnce(SaveArg<1>(&payload_));
+    EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
 
-    CheckAccountRequestTransaction(hash_, sqlInterface_, connectionsManager_, request_).handle();
+    CheckAccountRequestTransaction(user_, sqlInterface_, request_).handle();
 
     ReadStream readStream(payload_);
     ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());
@@ -114,9 +118,9 @@ TEST_F(CheckAccountRequestTransactionTest, WhenQueryResultIsEmptyThenFaultIndica
 TEST_F(CheckAccountRequestTransactionTest, WhenConnectionToDatabaseIsDiedThenFaultIndicationShouldBeSent)
 {
     EXPECT_CALL(sqlInterface_, isAlive()).WillOnce(Return(false));
-    EXPECT_CALL(connectionsManager_, send(hash_, _)).WillOnce(SaveArg<1>(&payload_));
+    EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
 
-    CheckAccountRequestTransaction(hash_, sqlInterface_, connectionsManager_, request_).handle();
+    CheckAccountRequestTransaction(user_, sqlInterface_, request_).handle();
 
     ReadStream readStream(payload_);
     ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());

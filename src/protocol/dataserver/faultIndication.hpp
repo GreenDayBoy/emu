@@ -2,6 +2,7 @@
 
 #include <protocol/readStream.hpp>
 #include <protocol/writeStream.hpp>
+#include <core/network/tcp/networkUser.hpp>
 
 #include <string>
 
@@ -16,17 +17,17 @@ class FaultIndication
 {
 public:
     FaultIndication(const ReadStream &readStream);
-    FaultIndication(size_t clientHash, const std::string &message);
+    FaultIndication(core::network::tcp::NetworkUser::Hash clientHash, const std::string &message);
 
     const WriteStream& getWriteStream() const;
-    size_t getClientHash() const;
+    core::network::tcp::NetworkUser::Hash getClientHash() const;
     const std::string& getMessage() const;
 
 private:
     ReadStream readStream_;
     WriteStream writeStream_;
 
-    size_t clientHash_;
+    core::network::tcp::NetworkUser::Hash clientHash_;
     std::string message_;
 };
 

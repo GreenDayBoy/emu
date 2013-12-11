@@ -21,6 +21,11 @@ void acceptor::async_accept(socket &socket, const AcceptHandler &handler)
     ioService_.queueAccept(socket, handler);
 }
 
+io_service& acceptor::get_io_service()
+{
+    return ioService_;
+}
+
 }
 }
 }

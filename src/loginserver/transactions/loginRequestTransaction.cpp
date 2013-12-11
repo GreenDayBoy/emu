@@ -11,11 +11,9 @@ namespace transactions
 {
 
 LoginRequestTransaction::LoginRequestTransaction(User &user,
-                                                 core::network::tcp::ConnectionsManager &connectionsManager,
                                                  core::network::tcp::Connection &dataserverConnection,
                                                  const protocol::loginserver::LoginRequest &request):
     user_(user),
-    connectionsManager_(connectionsManager),
     dataserverConnection_(dataserverConnection),
     request_(request) {}
 
@@ -39,7 +37,7 @@ void LoginRequestTransaction::handleInvalid()
     LOG(ERROR) << "hash: " << user_.getHash() << ", accountId: " << request_.getAccountId()
                << ", connection to dataserver not established! Disconnected.";
 
-    connectionsManager_.disconnect(user_.getHash());
+    user_.getConnection().disconnect();
 }
 
 }

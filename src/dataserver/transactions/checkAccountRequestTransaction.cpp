@@ -13,13 +13,11 @@ namespace dataserver
 namespace transactions
 {
 
-CheckAccountRequestTransaction::CheckAccountRequestTransaction(size_t hash,
+CheckAccountRequestTransaction::CheckAccountRequestTransaction(User &user,
                                                                database::SqlInterface &sqlInterface,
-                                                               core::network::tcp::ConnectionsManager &connectionsManager,
                                                                const protocol::dataserver::CheckAccountRequest &request):
-    hash_(hash),
+    user_(user),
     sqlInterface_(sqlInterface),
-    connectionsManager_(connectionsManager),
     request_(request) {}
 
 bool CheckAccountRequestTransaction::isValid() const
@@ -29,7 +27,7 @@ bool CheckAccountRequestTransaction::isValid() const
 
 void CheckAccountRequestTransaction::handleValid()
 {
-    LOG(INFO) << "hash: " << hash_ << ", clientHash: " << request_.getClientHash() << ", checking account: " << request_.getAccountId();
+    LOG(INFO) << "hash: " << user_.getHash() << ", clientHash: " << request_.getClientHash() << ", checking account: " << request_.getAccountId();
 
     std::stringstream query;
     query << "SELECT"
@@ -47,7 +45,7 @@ void CheckAccountRequestTransaction::handleValid()
             protocol::dataserver::CheckAccountResult result = static_cast<protocol::dataserver::CheckAccountResult>(queryResult.getRows()[0].getValue<uint32_t>(0));
             protocol::dataserver::CheckAccountResponse response(request_.getClientHash(), result);
 
-            connectionsManager_.send(hash_, response.getWriteStream().getPayload());
+            user_.getConnection().send(response.getWriteStream().getPayload());
         }
         else
         {
@@ -63,7 +61,7 @@ void CheckAccountRequestTransaction::handleValid()
 
 void CheckAccountRequestTransaction::handleInvalid()
 {
-    LOG(ERROR) << "hash: " << hash_ << ", Connection to database is died!";
+    LOG(ERROR) << "hash: " << user_.getHash() << ", Connection to database is died!";
 
     this->sendFaultIndication("Connection to database is died");
 }
@@ -71,7 +69,7 @@ void CheckAccountRequestTransaction::handleInvalid()
 void CheckAccountRequestTransaction::sendFaultIndication(const std::string &message)
 {
     protocol::dataserver::FaultIndication indication(request_.getClientHash(), message);
-    connectionsManager_.send(hash_, indication.getWriteStream().getPayload());
+    user_.getConnection().send(indication.getWriteStream().getPayload());
 }
 
 }

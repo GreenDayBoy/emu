@@ -11,14 +11,14 @@ namespace dataserver
 CheckAccountResponse::CheckAccountResponse(const ReadStream &readStream):
     readStream_(readStream)
 {
-    clientHash_ = readStream_.readNext<size_t>();
+    clientHash_ = readStream_.readNext<core::network::tcp::NetworkUser::Hash>();
     result_ = readStream_.readNext<CheckAccountResult>();
 }
 
-CheckAccountResponse::CheckAccountResponse(size_t clientHash, CheckAccountResult result):
+CheckAccountResponse::CheckAccountResponse(core::network::tcp::NetworkUser::Hash clientHash, CheckAccountResult result):
     writeStream_(MessageIds::kCheckAccountResponse)
 {
-    writeStream_.writeNext<size_t>(clientHash);
+    writeStream_.writeNext<core::network::tcp::NetworkUser::Hash>(clientHash);
     writeStream_.writeNext<CheckAccountResult>(result);
 }
 
@@ -27,7 +27,7 @@ const WriteStream& CheckAccountResponse::getWriteStream() const
     return writeStream_;
 }
 
-size_t CheckAccountResponse::getClientHash() const
+core::network::tcp::NetworkUser::Hash CheckAccountResponse::getClientHash() const
 {
     return clientHash_;
 }
