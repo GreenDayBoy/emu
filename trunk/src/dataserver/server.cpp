@@ -122,6 +122,7 @@ void Server::handleReadStream(size_t hash, const protocol::ReadStream &stream)
 #ifdef eMU_TARGET
 int main(int argsCount, char *args[])
 {
+    FLAGS_colorlogtostderr = true;
     FLAGS_logtostderr = true;
     google::ParseCommandLineFlags(&argsCount, &args, true);
     google::InitGoogleLogging(args[0]);

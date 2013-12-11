@@ -46,14 +46,14 @@ add_dependencies(protocol core)
 # dataserver setup ----------------
 file(GLOB_RECURSE dataserver_SOURCES "${eMU_dataserver_DIR}/*.cpp")
 add_executable(dataserver ${dataserver_SOURCES})
-target_link_libraries(dataserver core protocol mysqlclient gflags)
+target_link_libraries(dataserver pthread core protocol mysqlclient gflags)
 add_dependencies(dataserver core protocol)
 # ------------------------------------
 
 # loginserver setup ----------------
 file(GLOB_RECURSE loginserver_SOURCES "${eMU_loginserver_DIR}/*.cpp")
 add_executable(loginserver ${loginserver_SOURCES})
-target_link_libraries(loginserver core protocol gflags)
+target_link_libraries(loginserver pthread core protocol gflags)
 add_dependencies(loginserver core protocol)
 # ------------------------------------
 

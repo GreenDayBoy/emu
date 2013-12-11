@@ -10,7 +10,7 @@ namespace network
 namespace tcp
 {
 
-ConnectionsManager::ConnectionsManager(asio::io_service &ioService, int16_t port):
+ConnectionsManager::ConnectionsManager(asio::io_service &ioService, uint16_t port):
     ConnectionsManager(ConnectionsFactory::Pointer(new ConnectionsFactory),
                        ioService,
                        AcceptorPointer(new asio::ip::tcp::acceptor(ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)))) {}
