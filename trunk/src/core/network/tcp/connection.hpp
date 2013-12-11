@@ -20,7 +20,6 @@ class Connection: boost::noncopyable
 {
 public:
     typedef std::function<void(Connection&)> EventCallback;
-    typedef std::shared_ptr<Connection> Pointer;
     typedef std::shared_ptr<asio::ip::tcp::socket> SocketPointer;
 
     Connection(asio::io_service &ioService);

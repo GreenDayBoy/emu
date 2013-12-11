@@ -1,10 +1,8 @@
 #pragma once
 
+#include <dataserver/user.hpp>
 #include <core/transactions/transaction.hpp>
-#include <core/network/tcp/connectionsManager.hpp>
-
 #include <dataserver/database/sqlInterface.hpp>
-
 #include <protocol/dataserver/checkAccountRequest.hpp>
 
 namespace eMU
@@ -17,9 +15,8 @@ namespace transactions
 class CheckAccountRequestTransaction: public core::transactions::Transaction
 {
 public:
-    CheckAccountRequestTransaction(size_t hash,
+    CheckAccountRequestTransaction(User &user,
                                    database::SqlInterface &sqlInterface,
-                                   core::network::tcp::ConnectionsManager &connectionsManager,
                                    const protocol::dataserver::CheckAccountRequest &request);
 
 private:
@@ -29,9 +26,8 @@ private:
 
     void sendFaultIndication(const std::string &message);
 
-    size_t hash_;
+    User &user_;
     database::SqlInterface &sqlInterface_;
-    core::network::tcp::ConnectionsManager &connectionsManager_;
     protocol::dataserver::CheckAccountRequest request_;
 };
 

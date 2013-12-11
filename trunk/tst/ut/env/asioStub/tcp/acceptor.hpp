@@ -27,6 +27,9 @@ public:
     acceptor(io_service &ioService, const boost::asio::ip::tcp::endpoint &endpoint);
     MOCK_METHOD2(async_accept, void(socket &socket, const AcceptHandler &handler));
 
+    io_service& get_io_service();
+
+private:
     io_service& ioService_;
 };
 

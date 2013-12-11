@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/common/hashableObject.hpp>
+#include <core/network/tcp/networkUser.hpp>
 #include <string>
 
 namespace eMU
@@ -8,13 +8,17 @@ namespace eMU
 namespace loginserver
 {
 
-class User: public eMU::core::common::HashableObject
+class User: public core::network::tcp::NetworkUser
 {
 public:
+    User(core::network::tcp::Connection &connection);
+
     void setAccountId(const std::string &accountId);
     const std::string& getAccountId() const;
 
 private:
+    User();
+
     std::string accountId_;
 };
 

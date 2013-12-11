@@ -2,7 +2,6 @@
 
 #include <loginserver/dataserverConnector.hpp>
 #include <loginserver/gameserversList.hpp>
-#include <core/network/tcp/connectionsManager.hpp>
 #include <core/network/server.hpp>
 #include <protocol/readStream.hpp>
 #include <common/asio.hpp>
@@ -31,12 +30,12 @@ public:
 
     bool onStartup();
     void onCleanup();
-    void onAccept(size_t hash);
-    void onReceive(size_t hash, const core::network::Payload &payload);
-    void onClose(size_t hash);
+    void onAccept(User &user);
+    void onReceive(User &user);
+    void onClose(User &user);
 
 private:
-    void handleReadStream(size_t hash, const protocol::ReadStream &stream);
+    void handleReadStream(User &user, const protocol::ReadStream &stream);
 
     void onDataserverReceive(core::network::tcp::Connection &connection);
     void onDataserverClose(core::network::tcp::Connection &connection);

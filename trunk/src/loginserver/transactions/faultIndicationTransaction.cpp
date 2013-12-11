@@ -9,23 +9,32 @@ namespace loginserver
 namespace transactions
 {
 
-FaultIndicationTransaction::FaultIndicationTransaction(core::network::tcp::ConnectionsManager &connectionsManager,
-                                                       core::common::UsersFactory<User> &usersFactory,
+FaultIndicationTransaction::FaultIndicationTransaction(core::common::Factory<User> &usersFactory,
                                                        const protocol::dataserver::FaultIndication &indication):
-    connectionsManager_(connectionsManager),
     usersFactory_(usersFactory),
     indication_(indication) {}
 
 bool FaultIndicationTransaction::isValid() const
 {
-    return usersFactory_.exists(indication_.getClientHash());
+    bool result = true;
+
+    try
+    {
+        usersFactory_.find(indication_.getClientHash());
+    }
+    catch(const core::common::Factory<User>::ObjectNotFoundException&)
+    {
+        result = false;
+    }
+
+    return result;
 }
 
 void FaultIndicationTransaction::handleValid()
 {
     User &user = usersFactory_.find(indication_.getClientHash());
     LOG(ERROR) << "hash: " << user.getHash() << ", accountId: " << user.getAccountId() << ", fault from dataserver received! message: " << indication_.getMessage();
-    connectionsManager_.disconnect(user.getHash());
+    user.getConnection().disconnect();
 }
 
 void FaultIndicationTransaction::handleInvalid()

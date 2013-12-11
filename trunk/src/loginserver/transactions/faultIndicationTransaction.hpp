@@ -1,12 +1,9 @@
 #pragma once
 
 #include <core/transactions/transaction.hpp>
-#include <core/network/tcp/connectionsManager.hpp>
-#include <core/common/usersFactory.hpp>
-
 #include <loginserver/user.hpp>
-
 #include <protocol/dataserver/faultIndication.hpp>
+#include <core/common/factory.hpp>
 
 namespace eMU
 {
@@ -18,8 +15,7 @@ namespace transactions
 class FaultIndicationTransaction: public core::transactions::Transaction
 {
 public:
-    FaultIndicationTransaction(core::network::tcp::ConnectionsManager &connectionsManager,
-                               core::common::UsersFactory<User> &usersFactory,
+    FaultIndicationTransaction(core::common::Factory<User> &usersFactory,
                                const protocol::dataserver::FaultIndication &indication);
 
 private:
@@ -27,8 +23,7 @@ private:
     void handleValid();
     void handleInvalid();
 
-    core::network::tcp::ConnectionsManager &connectionsManager_;
-    core::common::UsersFactory<User> &usersFactory_;
+    core::common::Factory<User> &usersFactory_;
     protocol::dataserver::FaultIndication indication_;
 };
 

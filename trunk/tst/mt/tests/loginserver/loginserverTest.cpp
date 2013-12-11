@@ -13,6 +13,8 @@
 #include <protocol/dataserver/checkAccountResponse.hpp>
 #include <protocol/dataserver/faultIndication.hpp>
 
+#include <core/network/tcp/networkUser.hpp>
+
 using eMU::loginserver::Server;
 using eMU::mt::env::asioStub::io_service;
 using eMU::protocol::ReadStream;
@@ -26,6 +28,7 @@ using eMU::protocol::dataserver::CheckAccountResult;
 using eMU::protocol::dataserver::CheckAccountRequest;
 using eMU::protocol::dataserver::CheckAccountResponse;
 using eMU::protocol::dataserver::FaultIndication;
+using eMU::core::network::tcp::NetworkUser;
 
 class LoginserverTest: public ::testing::Test
 {
@@ -64,7 +67,7 @@ protected:
         ASSERT_EQ(eMU::protocol::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
         CheckAccountRequest checkAccountRequest(checkAccountRequestStream);
 
-        size_t clientHash = clientHashExists ? checkAccountRequest.getClientHash() : 0x1234;
+        NetworkUser::Hash clientHash = clientHashExists ? checkAccountRequest.getClientHash() : NetworkUser::Hash(0x1234);
         IO_CHECK(ioService_.sendToClientTcpSocket(FaultIndication(clientHash, "test message").getWriteStream()));
 
         bool connectionShouldExists = clientHashExists ? false : true;
@@ -113,7 +116,7 @@ TEST_F(LoginserverTest, WhenCheckAccountWithInvalidClientHashReceivedThenNothing
     const ReadStream &checkAccountRequestStream = ioService_.receiveFromClientTcpSocket();
     ASSERT_EQ(eMU::protocol::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
 
-    IO_CHECK(ioService_.sendToClientTcpSocket(CheckAccountResponse(0x1234, CheckAccountResult::Succeed).getWriteStream()));
+    IO_CHECK(ioService_.sendToClientTcpSocket(CheckAccountResponse(NetworkUser::Hash(0x1234), CheckAccountResult::Succeed).getWriteStream()));
     ASSERT_TRUE(ioService_.tcpConnectionEstablished(connectionHash));
 }
 

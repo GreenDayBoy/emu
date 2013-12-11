@@ -1,39 +1,39 @@
 #include <loginserver/transactions/faultIndicationTransaction.hpp>
 #include <loginserver/user.hpp>
-#include <core/common/usersFactory.hpp>
-#include <ut/env/core/network/tcp/connectionsManagerMock.hpp>
 #include <protocol/dataserver/faultIndication.hpp>
+#include <ut/env/core/network/tcp/connectionMock.hpp>
 
 using eMU::loginserver::User;
 using eMU::loginserver::transactions::FaultIndicationTransaction;
-using eMU::core::common::UsersFactory;
-using eMU::ut::env::core::network::tcp::ConnectionsManagerMock;
+using eMU::core::common::Factory;
 using eMU::protocol::ReadStream;
 using eMU::protocol::dataserver::FaultIndication;
+using eMU::ut::env::core::network::tcp::ConnectionMock;
 
 class FaultIndicationTransactionTest: public ::testing::Test
 {
 protected:
     FaultIndicationTransactionTest():
-        usersFactory_(1),
         clientHashExists_(false) {}
 
     void scenario()
     {
-        size_t hash = 0x12345;
+        User::Hash hash(0x12345);
+        ConnectionMock connection;
 
         if(clientHashExists_)
         {
-            hash = usersFactory_.create();
-            EXPECT_CALL(connectionsManager_, disconnect(hash));
+            User &user = usersFactory_.create(connection);
+            hash = user.getHash();
+
+            EXPECT_CALL(connection, disconnect());
         }
 
         FaultIndication indication(hash, "testMessage");
-        FaultIndicationTransaction(connectionsManager_, usersFactory_, ReadStream(indication.getWriteStream().getPayload())).handle();
+        FaultIndicationTransaction(usersFactory_, ReadStream(indication.getWriteStream().getPayload())).handle();
     }
 
-    UsersFactory<User> usersFactory_;
-    ConnectionsManagerMock connectionsManager_;
+    Factory<User> usersFactory_;
     bool clientHashExists_;
 };
 

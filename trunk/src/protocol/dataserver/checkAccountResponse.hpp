@@ -3,6 +3,7 @@
 #include <protocol/readStream.hpp>
 #include <protocol/writeStream.hpp>
 #include <protocol/dataserver/checkAccountResult.hpp>
+#include <core/network/tcp/networkUser.hpp>
 
 #include <string>
 
@@ -17,17 +18,17 @@ class CheckAccountResponse
 {
 public:
     CheckAccountResponse(const ReadStream &readStream);
-    CheckAccountResponse(size_t clientHash, CheckAccountResult result);
+    CheckAccountResponse(core::network::tcp::NetworkUser::Hash clientHash, CheckAccountResult result);
 
     const WriteStream& getWriteStream() const;
-    size_t getClientHash() const;
+    core::network::tcp::NetworkUser::Hash getClientHash() const;
     CheckAccountResult getResult() const;
 
 private:
     ReadStream readStream_;
     WriteStream writeStream_;
 
-    size_t clientHash_;
+    core::network::tcp::NetworkUser::Hash clientHash_;
     CheckAccountResult result_;
 };
 

@@ -12,16 +12,25 @@ namespace loginserver
 namespace transactions
 {
 
-CheckAccountResponseTransaction::CheckAccountResponseTransaction(core::network::tcp::ConnectionsManager &connectionsManager,
-                                                                 core::common::UsersFactory<User> &usersFactory,
+CheckAccountResponseTransaction::CheckAccountResponseTransaction(core::common::Factory<User> &usersFactory,
                                                                  const protocol::dataserver::CheckAccountResponse &response):
-    connectionsManager_(connectionsManager),
     usersFactory_(usersFactory),
     response_(response) {}
 
 bool CheckAccountResponseTransaction::isValid() const
 {
-    return usersFactory_.exists(response_.getClientHash());
+    bool result = true;
+
+    try
+    {
+        usersFactory_.find(response_.getClientHash());
+    }
+    catch(const core::common::Factory<User>::ObjectNotFoundException&)
+    {
+        result = false;
+    }
+
+    return result;
 }
 
 void CheckAccountResponseTransaction::handleValid()
@@ -48,7 +57,7 @@ void CheckAccountResponseTransaction::handleValid()
               << ", login result: " << static_cast<uint32_t>(result);
 
     protocol::loginserver::LoginResponse response(result);
-    connectionsManager_.send(user.getHash(), response.getWriteStream().getPayload());
+    user.getConnection().send(response.getWriteStream().getPayload());
 }
 
 void CheckAccountResponseTransaction::handleInvalid()
