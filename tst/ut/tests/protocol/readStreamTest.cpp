@@ -52,8 +52,8 @@ TEST_F(ReadStreamTest, readNextWideString)
     size_t string1Length = 10;
     for(size_t i = 0; i < string1Length; ++i)
     {
-        size_t offset = i * sizeof(int16_t);
-        string1.push_back(reinterpret_cast<int16_t&>(samplePayloads_.fullFilledPayload_[6 + offset]));
+        size_t offset = i * sizeof(char16_t);
+        string1.push_back(reinterpret_cast<char16_t&>(samplePayloads_.fullFilledPayload_[6 + offset]));
     }
 
     ASSERT_EQ(string1, readStream_.readNextWideString(string1Length));
@@ -62,8 +62,8 @@ TEST_F(ReadStreamTest, readNextWideString)
     size_t string2Length = 20;
     for(size_t i = 0; i < string2Length; ++i)
     {
-        size_t offset = i * sizeof(int16_t);
-        string2.push_back(reinterpret_cast<const int16_t&>(samplePayloads_.fullFilledPayload_[26 + offset]));
+        size_t offset = i * sizeof(char16_t);
+        string2.push_back(reinterpret_cast<const char16_t&>(samplePayloads_.fullFilledPayload_[26 + offset]));
     }
 
     ASSERT_EQ(string2, readStream_.readNextWideString(string2Length));

@@ -3,6 +3,7 @@
 #include <loginserver/transactions/checkAccountResponseTransaction.hpp>
 #include <loginserver/transactions/faultIndicationTransaction.hpp>
 #include <loginserver/transactions/gameserversListRequestTransaction.hpp>
+#include <loginserver/transactions/gameserverDetailsRequestTransaction.hpp>
 
 #include <protocol/readStreamsExtractor.hpp>
 #include <protocol/writeStream.hpp>
@@ -10,6 +11,7 @@
 #include <protocol/loginserver/messageIds.hpp>
 #include <protocol/loginserver/loginRequest.hpp>
 #include <protocol/loginserver/gameserversListRequest.hpp>
+#include <protocol/loginserver/gameserverDetailsRequest.hpp>
 
 #include <protocol/dataserver/messageIds.hpp>
 #include <protocol/dataserver/checkAccountResponse.hpp>
@@ -156,6 +158,14 @@ void Server::handleReadStream(size_t hash, const protocol::ReadStream &stream)
                                                                                         gameserversList_,
                                                                                         request)));
     }
+    else if(messageId == protocol::loginserver::MessageIds::kGameserverDetailsRequest)
+    {
+        protocol::loginserver::GameserverDetailsRequest request(stream);
+        transactionsManager_.queue((new transactions::GameserverDetailsRequestTransaction(hash,
+                                                                                          connectionsManager_,
+                                                                                          gameserversList_,
+                                                                                          request)));
+    }
 }
 
 void Server::onDataserverReceive(core::network::tcp::Connection &connection)
@@ -227,6 +237,7 @@ void Server::handleDataserverReadStream(const protocol::ReadStream &stream)
 #ifdef eMU_TARGET
 int main(int argsCount, char *args[])
 {
+    FLAGS_colorlogtostderr = true;
     FLAGS_logtostderr = true;
     google::ParseCommandLineFlags(&argsCount, &args, true);
     google::InitGoogleLogging(args[0]);

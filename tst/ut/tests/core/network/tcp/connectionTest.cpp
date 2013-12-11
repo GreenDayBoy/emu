@@ -152,17 +152,6 @@ TEST_F(TcpConnectionTest, receiveWithOperationAbortedErrorShouldNotTriggerCloseE
     receiveHandler_(boost::asio::error::operation_aborted, 0);
 }
 
-TEST_F(TcpConnectionTest, receiveWithConnectionResetErrorShouldNotTriggerCloseEvent)
-{
-    expectAsyncReceiveCallAndSaveArguments();
-
-    connection_.queueReceive();
-
-    EXPECT_CALL(connectionEvents_, closeEvent(_)).Times(0);
-
-    receiveHandler_(boost::asio::error::connection_reset, 0);
-}
-
 TEST_F(TcpConnectionTest, send)
 {
     expectAsyncSendCallAndSaveArguments();
@@ -276,6 +265,7 @@ TEST_F(TcpConnectionTest, connectShouldReturnFalseWhenErrorOccuredAndDoNotCloseS
 TEST_F(TcpConnectionTest, connectShouldReturnTrueWhenNoErrorOccured)
 {
     EXPECT_CALL(*socket_, connect(endpoint_, _)).WillOnce(SetArgReferee<1>(boost::system::error_code()));
+    EXPECT_CALL(*socket_, async_receive(_, _));
     ASSERT_TRUE(connection_.connect(endpoint_));
 }
 

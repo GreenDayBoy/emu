@@ -55,8 +55,8 @@ void Connection::close()
     }
     catch(const boost::system::system_error &error)
     {
-        LOG(ERROR) << "Error during closing socket, error: " << error.what()
-                   << ", code: " << error.code();
+        LOG(WARNING) << "Error during closing socket, error: " << error.what()
+                     << ", code: " << error.code();
     }
 }
 
@@ -158,19 +158,14 @@ void Connection::sendHandler(const boost::system::error_code& errorCode, size_t 
 
 void Connection::errorHandler(const boost::system::error_code &errorCode, const std::string &operationName)
 {
-    if(boost::asio::error::operation_aborted == errorCode ||
-
-
-            boost::asio::error::connection_reset == errorCode)
-    {
-        return;
-    }
-
     LOG(ERROR) << "Error during handling async operation: " << operationName
                << ", error: " << errorCode.message()
                << ", code: " << errorCode.value();
 
-    this->disconnect();
+    if(boost::asio::error::operation_aborted != errorCode)
+    {
+        this->disconnect();
+    }
 }
 
 bool Connection::isOpen() const
