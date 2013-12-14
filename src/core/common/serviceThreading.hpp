@@ -41,13 +41,16 @@ public:
             {
                 threads_.create_thread(std::bind(static_cast<size_t (boost::asio::io_service::*)()>(&boost::asio::io_service::run), &ioService_));
             }
-
-            threads_.join_all();
         }
         else
         {
             LOG(ERROR) << "Startup server failed.";
         }
+    }
+
+    void join()
+    {
+        threads_.join_all();
     }
 
     void stopHandler()

@@ -27,7 +27,7 @@ public:
 
     Hash getHash() const;
 
-private:
+protected:
     NetworkUser();
 
     Connection &connection_;
