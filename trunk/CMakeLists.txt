@@ -9,6 +9,7 @@ set(eMU_core_DIR ${eMU_src_DIR}/core)
 set(eMU_protocol_DIR ${eMU_src_DIR}/protocol)
 set(eMU_dataserver_DIR ${eMU_src_DIR}/dataserver)
 set(eMU_loginserver_DIR ${eMU_src_DIR}/loginserver)
+set(eMU_analyzer_DIR ${eMU_src_DIR}/analyzer)
 
 set(eMU_tst_DIR ${eMU_base_DIR}/tst)
 set(eMU_ut_DIR ${eMU_tst_DIR}/ut)
@@ -25,10 +26,11 @@ message(STATUS "Configuring build type ${CMAKE_BUILD_TYPE}")
 # Includes ----------------------
 include_directories(${eMU_src_DIR})
 include_directories(${eMU_tst_DIR})
+include_directories(${QT_ROOT}/include)
 #--------------------------------
 
 # Libs --------------------------
-link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${QT_ROOT}/lib)
 # -------------------------------
 
 # core setup -----------------
@@ -69,8 +71,19 @@ add_executable(mt EXCLUDE_FROM_ALL ${mt_SOURCES} ${core_SOURCES} ${dataserver_SO
 target_link_libraries(mt gtest pthread glog boost_system boost_thread mysqlclient)
 # -------------------------------
 
+# analyzer setup -------------
+file(GLOB_RECURSE analyzer_SOURCES "${eMU_analyzer_DIR}/*.cpp")
+add_executable(analyzer ${analyzer_SOURCES})
+
+set(QT_MOC_EXECUTABLE ${QT_ROOT}/bin/moc)
+qt_wrap_cpp(analyzerGui analyzer "${eMU_analyzer_DIR}/*.hpp")
+
+add_dependencies(analyzer core protocol)
+target_link_libraries(analyzer core protocol pthread Qt5Core Qt5Gui Qt5Widgets)
+# ----------------------------
+
 # Compiler flags ----------------
-set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -pedantic")
+set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -pedantic -fPIC")
 
 if(NOT COVERAGE)
     set(COVERAGE_FLAGS "")

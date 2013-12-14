@@ -12,7 +12,8 @@ namespace tcp
 
 ConnectionsAcceptor::ConnectionsAcceptor(common::Factory<Connection> &connectionsFactory, AcceptorPointer acceptor):
     connectionsFactory_(connectionsFactory),
-    acceptor_(acceptor) {}
+    acceptor_(acceptor),
+    strand_(acceptor_->get_io_service()) {}
 
 ConnectionsAcceptor::~ConnectionsAcceptor() {}
 
@@ -21,10 +22,10 @@ void ConnectionsAcceptor::queueAccept()
     Connection::SocketPointer socket(new asio::ip::tcp::socket(acceptor_->get_io_service()));
 
     acceptor_->async_accept(*socket,
-                            std::bind(&ConnectionsAcceptor::acceptHandler,
-                                      this,
-                                      socket,
-                                      std::placeholders::_1));
+                            strand_.wrap(std::bind(&ConnectionsAcceptor::acceptHandler,
+                                                   this,
+                                                   socket,
+                                                   std::placeholders::_1)));
 }
 
 void ConnectionsAcceptor::acceptHandler(Connection::SocketPointer socket, const boost::system::error_code &errorCode)

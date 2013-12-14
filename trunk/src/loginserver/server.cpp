@@ -249,6 +249,7 @@ int main(int argsCount, char *args[])
     eMU::loginserver::Server server(service, configuration);
     eMU::core::common::ServiceThreading<eMU::loginserver::User> serviceThreading(FLAGS_max_threads, service, server);
     serviceThreading.start();
+    serviceThreading.join();
 
     return 0;
 }

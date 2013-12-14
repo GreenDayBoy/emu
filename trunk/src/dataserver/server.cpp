@@ -146,6 +146,7 @@ int main(int argsCount, char *args[])
     eMU::dataserver::Server server(service, mysqlInterface, configuration);
     eMU::core::common::ServiceThreading<eMU::dataserver::User> serviceThreading(FLAGS_max_threads, service, server);
     serviceThreading.start();
+    serviceThreading.join();
 
     mysqlInterface.cleanup();
 

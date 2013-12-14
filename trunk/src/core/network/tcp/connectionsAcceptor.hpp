@@ -34,6 +34,7 @@ private:
     common::Factory<Connection> &connectionsFactory_;
     AcceptorPointer acceptor_;
     AcceptEventCallback acceptEventCallback_;
+    asio::io_service::strand strand_;
 };
 
 }
