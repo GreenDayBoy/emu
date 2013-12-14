@@ -33,16 +33,6 @@ protected:
 
     void TearDown() {}
 
-    void expectAsyncReceiveCallAndSaveArguments()
-    {
-        EXPECT_CALL(*socket_, async_receive(_, _)).WillOnce(DoAll(SaveArg<0>(&receiveBuffer_), SaveArg<1>(&receiveHandler_)));
-    }
-
-    void expectAsyncSendCallAndSaveArguments()
-    {
-        EXPECT_CALL(*socket_, async_send(_, _)).WillOnce(DoAll(SaveArg<0>(&sendBuffer_), SaveArg<1>(&sendHandler_)));
-    }
-
     MOCK_METHOD1(connectEvent, void(Connection &connection));
     MOCK_METHOD1(receiveEvent, void(Connection &connection));
     MOCK_METHOD1(closeEvent, void(Connection &connection));
@@ -52,10 +42,7 @@ protected:
     Connection connection_;
     boost::asio::ip::tcp::endpoint endpoint_;
 
-    asioStub::io_service::IoHandler receiveHandler_;
     boost::asio::mutable_buffer receiveBuffer_;
-
-    asioStub::io_service::IoHandler sendHandler_;
     boost::asio::mutable_buffer sendBuffer_;
 
     SamplePayloads samplePayloads_;
@@ -87,19 +74,19 @@ TEST_F(TcpConnectionTest, disconnectAtNotOpenedSocketShouldNotTriggerCloseEvent)
 
 TEST_F(TcpConnectionTest, receiveWithEofErrorShouldTriggerCloseEvent)
 {
-    expectAsyncReceiveCallAndSaveArguments();
+    EXPECT_CALL(*socket_, async_receive(_, _));
 
     connection_.queueReceive();
 
     EXPECT_CALL(*socket_, is_open()).WillOnce(Return(true));
     EXPECT_CALL(*this, closeEvent(Ref(connection_)));
 
-    receiveHandler_(boost::asio::error::eof, 0);
+    connection_.receiveHandler(boost::asio::error::eof, 0);
 }
 
 TEST_F(TcpConnectionTest, receive)
 {
-    expectAsyncReceiveCallAndSaveArguments();
+    EXPECT_CALL(*socket_, async_receive(_, _)).WillOnce(SaveArg<0>(&receiveBuffer_));
 
     connection_.queueReceive();
 
@@ -111,7 +98,7 @@ TEST_F(TcpConnectionTest, receive)
     EXPECT_CALL(*socket_, async_receive(_, _));
     EXPECT_CALL(*this, receiveEvent(Ref(connection_)));
 
-    receiveHandler_(boost::system::error_code(), samplePayloads_.payload1_.getSize());
+    connection_.receiveHandler(boost::system::error_code(), samplePayloads_.payload1_.getSize());
 
     ASSERT_EQ(samplePayloads_.payload1_.getSize(), connection_.getReadPayload().getSize());
     EXPECT_EQ(memcmp(&samplePayloads_.payload1_[0], &connection_.getReadPayload()[0], samplePayloads_.payload1_.getSize()), 0);
@@ -119,42 +106,42 @@ TEST_F(TcpConnectionTest, receive)
 
 TEST_F(TcpConnectionTest, receiveErrorShouldTriggerCloseEvent)
 {
-    expectAsyncReceiveCallAndSaveArguments();
+    EXPECT_CALL(*socket_, async_receive(_, _));
 
     connection_.queueReceive();
 
     EXPECT_CALL(*socket_, is_open()).WillOnce(Return(true));
     EXPECT_CALL(*this, closeEvent(Ref(connection_)));
 
-    receiveHandler_(boost::asio::error::broken_pipe, 0);
+    connection_.receiveHandler(boost::asio::error::broken_pipe, 0);
 }
 
 TEST_F(TcpConnectionTest, receiveErrorShouldNotTriggerCloseEventWhenSocketIsNotOpen)
 {
-    expectAsyncReceiveCallAndSaveArguments();
+    EXPECT_CALL(*socket_, async_receive(_, _));
 
     connection_.queueReceive();
 
     EXPECT_CALL(*socket_, is_open()).WillOnce(Return(false));
     EXPECT_CALL(*this, closeEvent(_)).Times(0);
 
-    receiveHandler_(boost::asio::error::broken_pipe, 0);
+    connection_.receiveHandler(boost::asio::error::broken_pipe, 0);
 }
 
 TEST_F(TcpConnectionTest, receiveWithOperationAbortedErrorShouldNotTriggerCloseEvent)
 {
-    expectAsyncReceiveCallAndSaveArguments();
+    EXPECT_CALL(*socket_, async_receive(_, _));
 
     connection_.queueReceive();
 
     EXPECT_CALL(*this, closeEvent(_)).Times(0);
 
-    receiveHandler_(boost::asio::error::operation_aborted, 0);
+    connection_.receiveHandler(boost::asio::error::operation_aborted, 0);
 }
 
 TEST_F(TcpConnectionTest, send)
 {
-    expectAsyncSendCallAndSaveArguments();
+    EXPECT_CALL(*socket_, async_send(_, _)).WillOnce(SaveArg<0>(&sendBuffer_));
 
     connection_.send(samplePayloads_.payload2_);
 
@@ -169,9 +156,7 @@ TEST_F(TcpConnectionTest, PendingBuffersShouldBeSendTogether)
     for(size_t i = 0; i < attempts; ++i)
     {
         boost::asio::mutable_buffer sendBuffer1;
-        asio::io_service::IoHandler sendHandler1;
-        EXPECT_CALL(*socket_, async_send(_, _)).WillOnce(DoAll(SaveArg<0>(&sendBuffer1), SaveArg<1>(&sendHandler1)));
-
+        EXPECT_CALL(*socket_, async_send(_, _)).WillOnce(SaveArg<0>(&sendBuffer1));
         connection_.send(samplePayloads_.payload1_);
 
         ASSERT_EQ(samplePayloads_.payload1_.getSize(), boost::asio::buffer_size(sendBuffer1));
@@ -181,40 +166,37 @@ TEST_F(TcpConnectionTest, PendingBuffersShouldBeSendTogether)
         connection_.send(samplePayloads_.halfFilledPayload_);
 
         boost::asio::mutable_buffer sendBuffer2;
-        asio::io_service::IoHandler sendHandler2;
-        EXPECT_CALL(*socket_, async_send(_, _)).WillOnce(DoAll(SaveArg<0>(&sendBuffer2), SaveArg<1>(&sendHandler2)));
+        EXPECT_CALL(*socket_, async_send(_, _)).WillOnce(SaveArg<0>(&sendBuffer2));
 
-        sendHandler1(boost::system::error_code(), samplePayloads_.payload1_.getSize());
+        connection_.sendHandler(boost::system::error_code(), samplePayloads_.payload1_.getSize());
 
         ASSERT_EQ(samplePayloads_.fullFilledPayload_.getSize(), boost::asio::buffer_size(sendBuffer2));
         EXPECT_EQ(memcmp(&samplePayloads_.fullFilledPayload_[0], boost::asio::buffer_cast<const uint8_t*>(sendBuffer2), samplePayloads_.fullFilledPayload_.getSize()), 0);
 
-        sendHandler2(boost::system::error_code(), samplePayloads_.fullFilledPayload_.getSize());
+        connection_.sendHandler(boost::system::error_code(), samplePayloads_.fullFilledPayload_.getSize());
     }
 }
 
 TEST_F(TcpConnectionTest, sendErrorShouldTriggerCloseEvent)
 {
-    expectAsyncSendCallAndSaveArguments();
-
+    EXPECT_CALL(*socket_, async_send(_, _));
     connection_.send(samplePayloads_.payload3_);
 
     EXPECT_CALL(*socket_, is_open()).WillOnce(Return(true));
     EXPECT_CALL(*this, closeEvent(Ref(connection_)));
 
-    sendHandler_(boost::asio::error::bad_descriptor, 0);
+    connection_.sendHandler(boost::asio::error::bad_descriptor, 0);
 }
 
 TEST_F(TcpConnectionTest, sendErrorShouldNotTiggerCloseEventWhenSocketIsNotOpen)
 {
-    expectAsyncSendCallAndSaveArguments();
-
+    EXPECT_CALL(*socket_, async_send(_, _));
     connection_.send(samplePayloads_.payload1_);
 
     EXPECT_CALL(*socket_, is_open()).WillOnce(Return(false));
     EXPECT_CALL(*this, closeEvent(_)).Times(0);
 
-    sendHandler_(boost::asio::error::already_started, 0);
+    connection_.sendHandler(boost::asio::error::already_started, 0);
 }
 
 TEST_F(TcpConnectionTest, overflowSecondarySendBufferShouldTriggerCloseEvent)
@@ -233,13 +215,12 @@ TEST_F(TcpConnectionTest, overflowSecondarySendBufferShouldTriggerCloseEvent)
 
 TEST_F(TcpConnectionTest, sendWithOperationAbortedErrorShouldNotTriggerCloseEvent)
 {
-    expectAsyncSendCallAndSaveArguments();
-
+    EXPECT_CALL(*socket_, async_send(_, _));
     connection_.send(samplePayloads_.payload2_);
 
     EXPECT_CALL(*this, closeEvent(_)).Times(0);
 
-    sendHandler_(boost::asio::error::operation_aborted, 0);
+    connection_.sendHandler(boost::asio::error::operation_aborted, 0);
 }
 
 TEST_F(TcpConnectionTest, connectShouldReturnFalseWhenErrorOccuredAndCloseSocketIfOpened)

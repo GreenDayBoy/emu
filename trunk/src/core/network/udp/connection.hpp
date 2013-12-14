@@ -30,13 +30,13 @@ public:
     void queueReceiveFrom();
     void sendTo(const boost::asio::ip::udp::endpoint &endpoint, const Payload &payload);
 
+    void receiveFromHandler(const boost::system::error_code &errorCode, size_t bytesTransferred);
+    void sendToHandler(const boost::asio::ip::udp::endpoint &endpoint, const boost::system::error_code &errorCode, size_t bytesTransferred);
+
 private:
     Connection();
 
-    void receiveFromHandler(const boost::system::error_code &errorCode, size_t bytesTransferred);
     void queueSendTo(const boost::asio::ip::udp::endpoint &endpoint, WriteBuffer &writeBuffer);
-    void sendToHandler(const boost::asio::ip::udp::endpoint &endpoint, const boost::system::error_code &errorCode, size_t bytesTransferred);
-
     void errorHandler(const boost::system::error_code &errorCode, const std::string &operationName);
 
     SocketPointer socket_;

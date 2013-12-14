@@ -38,6 +38,9 @@ public:
     MOCKABLE bool connect(const boost::asio::ip::tcp::endpoint &endpoint);
     MOCKABLE bool isOpen() const;
 
+    void receiveHandler(const boost::system::error_code &errorCode, size_t bytesTransferred);
+    void sendHandler(const boost::system::error_code &errorCode, size_t bytesTransferred);
+
     bool operator==(const Connection &connection) const;
 
 private:
@@ -45,8 +48,6 @@ private:
 
     void queueSend();
 
-    void receiveHandler(const boost::system::error_code &errorCode, size_t bytesTransferred);
-    void sendHandler(const boost::system::error_code &errorCode, size_t bytesTransferred);
     void errorHandler(const boost::system::error_code &errorCode, const std::string &operationName);
 
     SocketPointer socket_;
