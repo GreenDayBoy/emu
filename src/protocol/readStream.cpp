@@ -1,6 +1,7 @@
 #include <protocol/readStream.hpp>
 
 #include <string.h>
+#include <iomanip>
 
 namespace eMU
 {
@@ -19,6 +20,11 @@ ReadStream::ReadStream():
 uint16_t ReadStream::getId() const
 {
     return this->readFromOffset<uint16_t>(4);
+}
+
+size_t ReadStream::getSize() const
+{
+    return payload_.getSize();
 }
 
 std::string ReadStream::readNextString(size_t length)
@@ -43,6 +49,16 @@ std::wstring ReadStream::readNextWideString(size_t length)
     }
 
     return std::move(value);
+}
+
+std::ostream& operator<<(std::ostream &out, const ReadStream &stream)
+{
+    for(size_t i = 0; i < stream.payload_.getSize(); ++i)
+    {
+        out << std::hex << std::setfill('0') << std::setw(2) << static_cast<uint32_t>(stream.payload_[i]) << " ";
+    }
+
+    return out;
 }
 
 }

@@ -53,9 +53,41 @@ QStandardItem* StandardItemWrapper::findChild(const std::string &name)
     return nullptr;
 }
 
+StandardItemWrapper StandardItemWrapper::find(const QModelIndex &index)
+{
+    QStandardItem *child = this->findChild(index);
+
+    if(child != nullptr)
+    {
+        return StandardItemWrapper(child);
+    }
+    else
+    {
+        throw ItemNotFoundException();
+    }
+}
+
+QStandardItem* StandardItemWrapper::findChild(const QModelIndex &index)
+{
+    for(uint32_t i = 0; i < item_->rowCount(); ++i)
+    {
+        if(item_->child(i)->index() == index)
+        {
+            return item_->child(i);
+        }
+    }
+
+    return nullptr;
+}
+
 void StandardItemWrapper::clear()
 {
     item_->removeRows(0, item_->rowCount());
+}
+
+std::string StandardItemWrapper::getText() const
+{
+    return item_->text().toStdString();
 }
 
 }
