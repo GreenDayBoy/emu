@@ -24,6 +24,8 @@ public:
 
     void setController(Controller *controller);
 
+    core::common::Factory<User>& getUsersFactory();
+
 private:
     Controller *controller_;
 };

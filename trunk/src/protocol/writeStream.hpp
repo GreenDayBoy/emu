@@ -38,6 +38,8 @@ public:
         payload_.setSize(size_ + sizeof(uint32_t));
     }
 
+    friend std::ostream& operator<<(std::ostream &out, const WriteStream &stream);
+
 private:
     core::network::Payload payload_;
     uint32_t currentOffset_;

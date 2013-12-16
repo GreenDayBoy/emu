@@ -47,5 +47,10 @@ void Server::setController(Controller *controller)
     controller_ = controller;
 }
 
+core::common::Factory<User>& Server::getUsersFactory()
+{
+    return usersFactory_;
+}
+
 }
 }

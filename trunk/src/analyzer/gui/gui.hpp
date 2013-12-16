@@ -1,23 +1,24 @@
 /********************************************************************************
-** Form generated from reading UI file 'analyzerK14799.ui'
+** Form generated from reading UI file 'analyzerxJ9899.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.2.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef ANALYZERK14799_H
-#define ANALYZERK14799_H
+#ifndef ANALYZERXJ9899_H
+#define ANALYZERXJ9899_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QFrame>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QScrollArea>
+#include <QtWidgets/QSlider>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QTreeView>
@@ -37,8 +38,12 @@ public:
     QLabel *streamSizeTitleLabel;
     QLabel *streamSizeLabel;
     QTextEdit *streamTextEdit;
-    QFrame *parserFrame;
     QLabel *streamParserTitleLabel;
+    QScrollArea *parserFrame;
+    QWidget *scrollAreaWidgetContents;
+    QLabel *numberOfFieldsLabel;
+    QSlider *numberOfFieldsSlider;
+    QLabel *numberOfFieldsTitleLabel;
     QWidget *senderTab;
     QTreeView *usersView;
     QPushButton *removeStreamButton;
@@ -48,12 +53,12 @@ public:
     {
         if (Gui->objectName().isEmpty())
             Gui->setObjectName(QStringLiteral("Gui"));
-        Gui->resize(868, 720);
+        Gui->resize(868, 870);
         centralwidget = new QWidget(Gui);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         tabWidget = new QTabWidget(centralwidget);
         tabWidget->setObjectName(QStringLiteral("tabWidget"));
-        tabWidget->setGeometry(QRect(260, 0, 621, 721));
+        tabWidget->setGeometry(QRect(260, 0, 621, 871));
         receiverTab = new QWidget();
         receiverTab->setObjectName(QStringLiteral("receiverTab"));
         streamHexDumpTitleLabel = new QLabel(receiverTab);
@@ -76,27 +81,42 @@ public:
         streamTextEdit->setGeometry(QRect(10, 30, 591, 61));
         streamTextEdit->setUndoRedoEnabled(false);
         streamTextEdit->setReadOnly(true);
-        parserFrame = new QFrame(receiverTab);
-        parserFrame->setObjectName(QStringLiteral("parserFrame"));
-        parserFrame->setGeometry(QRect(20, 160, 571, 511));
-        parserFrame->setFrameShape(QFrame::StyledPanel);
-        parserFrame->setFrameShadow(QFrame::Raised);
         streamParserTitleLabel = new QLabel(receiverTab);
         streamParserTitleLabel->setObjectName(QStringLiteral("streamParserTitleLabel"));
         streamParserTitleLabel->setGeometry(QRect(20, 140, 101, 16));
+        parserFrame = new QScrollArea(receiverTab);
+        parserFrame->setObjectName(QStringLiteral("parserFrame"));
+        parserFrame->setGeometry(QRect(10, 130, 591, 691));
+        parserFrame->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        parserFrame->setWidgetResizable(true);
+        scrollAreaWidgetContents = new QWidget();
+        scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 576, 689));
+        numberOfFieldsLabel = new QLabel(scrollAreaWidgetContents);
+        numberOfFieldsLabel->setObjectName(QStringLiteral("numberOfFieldsLabel"));
+        numberOfFieldsLabel->setGeometry(QRect(170, 10, 41, 16));
+        numberOfFieldsSlider = new QSlider(scrollAreaWidgetContents);
+        numberOfFieldsSlider->setObjectName(QStringLiteral("numberOfFieldsSlider"));
+        numberOfFieldsSlider->setGeometry(QRect(220, 10, 160, 21));
+        numberOfFieldsSlider->setOrientation(Qt::Horizontal);
+        numberOfFieldsTitleLabel = new QLabel(scrollAreaWidgetContents);
+        numberOfFieldsTitleLabel->setObjectName(QStringLiteral("numberOfFieldsTitleLabel"));
+        numberOfFieldsTitleLabel->setGeometry(QRect(40, 10, 131, 16));
+        parserFrame->setWidget(scrollAreaWidgetContents);
         tabWidget->addTab(receiverTab, QString());
         senderTab = new QWidget();
         senderTab->setObjectName(QStringLiteral("senderTab"));
         tabWidget->addTab(senderTab, QString());
         usersView = new QTreeView(centralwidget);
         usersView->setObjectName(QStringLiteral("usersView"));
-        usersView->setGeometry(QRect(-5, 0, 266, 641));
+        usersView->setGeometry(QRect(-5, 0, 266, 791));
+        usersView->setEditTriggers(QAbstractItemView::NoEditTriggers);
         removeStreamButton = new QPushButton(centralwidget);
         removeStreamButton->setObjectName(QStringLiteral("removeStreamButton"));
-        removeStreamButton->setGeometry(QRect(50, 680, 121, 27));
+        removeStreamButton->setGeometry(QRect(50, 830, 121, 27));
         disconnectUserButton = new QPushButton(centralwidget);
         disconnectUserButton->setObjectName(QStringLiteral("disconnectUserButton"));
-        disconnectUserButton->setGeometry(QRect(50, 650, 121, 27));
+        disconnectUserButton->setGeometry(QRect(50, 800, 121, 27));
         Gui->setCentralWidget(centralwidget);
 
         retranslateUi(Gui);
@@ -121,6 +141,8 @@ public:
 "</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", 0));
         streamParserTitleLabel->setText(QApplication::translate("Gui", "Stream parser", 0));
+        numberOfFieldsLabel->setText(QApplication::translate("Gui", "0", 0));
+        numberOfFieldsTitleLabel->setText(QApplication::translate("Gui", "Number of fields:", 0));
         tabWidget->setTabText(tabWidget->indexOf(receiverTab), QApplication::translate("Gui", "Receiver", 0));
         tabWidget->setTabText(tabWidget->indexOf(senderTab), QApplication::translate("Gui", "Sender", 0));
         removeStreamButton->setText(QApplication::translate("Gui", "Remove stream", 0));
@@ -135,4 +157,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // ANALYZERK14799_H
+#endif // ANALYZERXJ9899_H

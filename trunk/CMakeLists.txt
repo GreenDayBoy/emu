@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.10)
 project(eMU CXX)
 
 # Common variables --------------
@@ -34,26 +34,26 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${QT_ROOT}/lib)
 # -------------------------------
 
 # core setup -----------------
-file(GLOB_RECURSE core_SOURCES "${eMU_core_DIR}/*.cpp")
+file(GLOB_RECURSE core_SOURCES "${eMU_core_DIR}/*[.cpp.hpp]")
 add_library(core SHARED ${core_SOURCES})
 target_link_libraries(core glog boost_system boost_thread)
 # -------------------------------
 
 # protocol setup -----------------
-file(GLOB_RECURSE protocol_SOURCES "${eMU_protocol_DIR}/*.cpp")
+file(GLOB_RECURSE protocol_SOURCES "${eMU_protocol_DIR}/*[.cpp.hpp]")
 add_library(protocol SHARED ${protocol_SOURCES})
 add_dependencies(protocol core)
 # -------------------------------
 
 # dataserver setup ----------------
-file(GLOB_RECURSE dataserver_SOURCES "${eMU_dataserver_DIR}/*.cpp")
+file(GLOB_RECURSE dataserver_SOURCES "${eMU_dataserver_DIR}/*[.cpp.hpp]")
 add_executable(dataserver ${dataserver_SOURCES})
 target_link_libraries(dataserver pthread core protocol mysqlclient gflags)
 add_dependencies(dataserver core protocol)
 # ------------------------------------
 
 # loginserver setup ----------------
-file(GLOB_RECURSE loginserver_SOURCES "${eMU_loginserver_DIR}/*.cpp")
+file(GLOB_RECURSE loginserver_SOURCES "${eMU_loginserver_DIR}/*[.cpp.hpp]")
 add_executable(loginserver ${loginserver_SOURCES})
 target_link_libraries(loginserver pthread core protocol gflags)
 add_dependencies(loginserver core protocol)
@@ -61,29 +61,25 @@ add_dependencies(loginserver core protocol)
 
 # mt/ut tests setup ----------------
 # ut -------
-file(GLOB_RECURSE ut_SOURCES "${eMU_ut_DIR}/*.cpp")
+file(GLOB_RECURSE ut_SOURCES "${eMU_ut_DIR}/*[.cpp.hpp]")
 add_executable(ut EXCLUDE_FROM_ALL ${ut_SOURCES} ${core_SOURCES} ${dataserver_SOURCES} ${protocol_SOURCES} ${loginserver_SOURCES})
 target_link_libraries(ut gmock gtest pthread glog boost_system boost_thread mysqlclient)
 
 # mt -------
-file(GLOB_RECURSE mt_SOURCES "${eMU_mt_DIR}/*.cpp")
+file(GLOB_RECURSE mt_SOURCES "${eMU_mt_DIR}/*[.cpp.hpp]")
 add_executable(mt EXCLUDE_FROM_ALL ${mt_SOURCES} ${core_SOURCES} ${dataserver_SOURCES} ${protocol_SOURCES} ${loginserver_SOURCES})
 target_link_libraries(mt gtest pthread glog boost_system boost_thread mysqlclient)
 # -------------------------------
 
 # analyzer setup -------------
-file(GLOB_RECURSE analyzer_SOURCES "${eMU_analyzer_DIR}/*.cpp")
+file(GLOB_RECURSE analyzer_SOURCES "${eMU_analyzer_DIR}/*[.cpp.hpp]")
 add_executable(analyzer ${analyzer_SOURCES})
-
-set(QT_MOC_EXECUTABLE ${QT_ROOT}/bin/moc)
-qt_wrap_cpp(analyzerGui analyzer "${eMU_analyzer_DIR}/*.hpp")
-
+target_link_libraries(analyzer core protocol pthread Qt5Widgets Qt5Core Qt5Gui)
 add_dependencies(analyzer core protocol)
-target_link_libraries(analyzer core protocol pthread Qt5Core Qt5Gui Qt5Widgets)
 # ----------------------------
 
 # Compiler flags ----------------
-set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -pedantic -fPIC")
+set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -pedantic -fPIE")
 
 if(NOT COVERAGE)
     set(COVERAGE_FLAGS "")

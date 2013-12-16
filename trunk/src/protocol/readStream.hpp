@@ -19,6 +19,7 @@ public:
     ReadStream();
 
     uint16_t getId() const;
+    size_t getSize() const;
 
     template<typename T>
     T readNext()
@@ -31,6 +32,8 @@ public:
 
     std::string readNextString(size_t length);
     std::wstring readNextWideString(size_t length);
+
+    friend std::ostream& operator<<(std::ostream &out, const ReadStream &stream);
 
 private:
     template<typename T>

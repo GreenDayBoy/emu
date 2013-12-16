@@ -1,9 +1,11 @@
 #pragma once
 
-#include <analyzer/user.hpp>
 #include <analyzer/gui/gui.hpp>
+#include <analyzer/parserView.hpp>
 #include <analyzer/standardItemWrapper.hpp>
 #include <QtGui/QStandardItemModel>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QLineEdit>
 
 namespace eMU
 {
@@ -12,24 +14,29 @@ namespace analyzer
 
 class Controller;
 
-class View
-{
+class View: public QMainWindow
+{ Q_OBJECT
 public:
     View();
 
-    void displayUser(User &user);
-    void removeUserFromDisplay(User &user);
-    void displayUserReadStreams(User &user);
+    void displayUser(const std::string &userId);
+    void removeUserFromDisplay(const std::string &userId);
+    void displayUserReadStreams(const std::string &userId, const std::vector<std::string> &streamIds);
     void setController(Controller *controller);
+    void display();
+    void displayReadStream(const std::string &streamHex, uint16_t streamId, size_t streamSize);
 
-    void show();
+public slots:
+    void loadReadStream(const QModelIndex &index);
+    void disconnectUser();
+    void refreshReadStreamFields(int numberOfFields);
 
 private:
     Ui::Gui gui_;
-    QMainWindow mainWindow_;
     QStandardItemModel *usersViewItemModel_;
     StandardItemWrapper usersViewItem_;
     Controller *controller_;
+    ParserView readStreamParserView_;
 };
 
 }
