@@ -28,7 +28,7 @@ GameserversListResponse::GameserversListResponse(const GameserversInfoContainer 
         writeStream_.writeNext<uint32_t>(info.name_.length());
 
         std::wstring name = boost::locale::conv::utf_to_utf<std::wstring::value_type>(info.name_);
-        writeStream_.writeNext(name);
+        writeStream_.writeNextWideString(name);
 
         writeStream_.writeNext<uint32_t>(0); // dummy3
         writeStream_.writeNext<uint32_t>(0); // dummy3

@@ -26,10 +26,10 @@ CheckAccountRequest::CheckAccountRequest(core::network::tcp::NetworkUser::Hash c
     writeStream_.writeNext<core::network::tcp::NetworkUser::Hash>(clientHash);
 
     writeStream_.writeNext<uint32_t>(accountId.length());
-    writeStream_.writeNext(accountId);
+    writeStream_.writeNextString(accountId);
 
     writeStream_.writeNext<uint32_t>(password.length());
-    writeStream_.writeNext(password);
+    writeStream_.writeNextString(password);
 }
 
 const WriteStream& CheckAccountRequest::getWriteStream() const

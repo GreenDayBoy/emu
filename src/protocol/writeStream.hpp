@@ -38,6 +38,9 @@ public:
         payload_.setSize(size_ + sizeof(uint32_t));
     }
 
+    void writeNextWideString(const std::wstring &value);
+    void writeNextString(const std::string &value);
+
     friend std::ostream& operator<<(std::ostream &out, const WriteStream &stream);
 
 private:

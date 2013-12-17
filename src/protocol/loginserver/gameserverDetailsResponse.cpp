@@ -15,7 +15,7 @@ GameserverDetailsResponse::GameserverDetailsResponse():
 {
     writeStream_.writeNext<uint32_t>(0);
     std::string ip = "10.0.0.3";
-    writeStream_.writeNext(ip);
+    writeStream_.writeNextString(ip);
     writeStream_.writeNext<uint32_t>(0);
     writeStream_.writeNext<uint32_t>(0);
 
