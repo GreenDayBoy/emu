@@ -22,7 +22,7 @@ FaultIndication::FaultIndication(core::network::tcp::NetworkUser::Hash clientHas
 {
     writeStream_.writeNext<core::network::tcp::NetworkUser::Hash>(clientHash);
     writeStream_.writeNext<uint32_t>(message.length());
-    writeStream_.writeNext(message);
+    writeStream_.writeNextString(message);
 }
 
 const WriteStream& FaultIndication::getWriteStream() const

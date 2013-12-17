@@ -1,7 +1,8 @@
 #pragma once
 
 #include <analyzer/gui/gui.hpp>
-#include <analyzer/parserView.hpp>
+#include <analyzer/stream/views/readStreamView.hpp>
+#include <analyzer/stream/views/writeStreamView.hpp>
 #include <analyzer/standardItemWrapper.hpp>
 #include <QtGui/QStandardItemModel>
 #include <QtWidgets/QComboBox>
@@ -29,14 +30,22 @@ public:
 public slots:
     void loadReadStream(const QModelIndex &index);
     void disconnectUser();
-    void refreshReadStreamFields(int numberOfFields);
+    void resizeWriteStreamFieldsCount(int numberOfFields);
+    void parseReadStreamNumericField();
+    void parseReadStreamStringField();
+    void sendFields();
+    void sendHexDump();
+    void getWriteStreamHexDump();
+    void clearWriteStreamHexDump();
+    void clearWriteStreamView();
 
 private:
     Ui::Gui gui_;
     QStandardItemModel *usersViewItemModel_;
     StandardItemWrapper usersViewItem_;
     Controller *controller_;
-    ParserView readStreamParserView_;
+    stream::views::ReadStreamView readStreamView_;
+    stream::views::WriteStreamView writeStreamView_;
 };
 
 }

@@ -21,7 +21,6 @@ public:
     class SizeOutOfBoundException: public common::Exception {};
 
     Payload();
-    Payload(const uint8_t *data, size_t length);
 
     static size_t getMaxSize();
     size_t getSize() const;

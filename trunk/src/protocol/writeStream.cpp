@@ -23,21 +23,19 @@ const core::network::Payload& WriteStream::getPayload() const
     return payload_;
 }
 
-template<>
-void WriteStream::writeNext(const std::string &value)
-{
-    for(size_t i = 0; i < value.length(); ++i)
-    {
-        this->writeNext<std::string::value_type>(value[i]);
-    }
-}
-
-template<>
-void WriteStream::writeNext(const std::wstring &value)
+void WriteStream::writeNextWideString(const std::wstring &value)
 {
     for(size_t i = 0; i < value.length(); ++i)
     {
         this->writeNext<char16_t>(value[i]);
+    }
+}
+
+void WriteStream::writeNextString(const std::string &value)
+{
+    for(size_t i = 0; i < value.length(); ++i)
+    {
+        this->writeNext<std::string::value_type>(value[i]);
     }
 }
 

@@ -32,10 +32,10 @@ LoginRequest::LoginRequest(const std::wstring &accountId, const std::wstring &pa
     writeStream_.writeNext<uint32_t>(0); // dummy2
 
     writeStream_.writeNext<uint32_t>(accountId.length());
-    writeStream_.writeNext(accountId);
+    writeStream_.writeNextWideString(accountId);
 
     writeStream_.writeNext<uint32_t>(password.length());
-    writeStream_.writeNext(password);
+    writeStream_.writeNextWideString(password);
 }
 
 const WriteStream& LoginRequest::getWriteStream() const

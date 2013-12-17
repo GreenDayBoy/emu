@@ -33,7 +33,7 @@ TEST_F(WriteStreamTest, writeNext)
 
     WriteStream writeStream(id);
     writeStream.writeNext<uint32_t>(testStringLength);
-    writeStream.writeNext(testString);
+    writeStream.writeNextString(testString);
 
     ASSERT_EQ(payload.getSize(), writeStream.getPayload().getSize());
 
@@ -47,7 +47,7 @@ TEST_F(WriteStreamTest, writeNextShouldThrowExceptionWhenOffsetIsOutOfBound)
 
    std::string value(Payload::getMaxSize(), 'A');
 
-   ASSERT_THROW(writeStream.writeNext(value), WriteStream::OverflowException);
+   ASSERT_THROW(writeStream.writeNextString(value), WriteStream::OverflowException);
 }
 
 TEST_F(WriteStreamTest, writeNextWideString)
@@ -55,7 +55,7 @@ TEST_F(WriteStreamTest, writeNextWideString)
    WriteStream writeStream(0xFFFF);
 
    std::wstring expectedValue = L"Another perfect wide string";
-   writeStream.writeNext(expectedValue);
+   writeStream.writeNextWideString(expectedValue);
 
    size_t dataOffset = 6; // sizeof(uint32) -> size + sizeof(uint16_t) -> id
 
