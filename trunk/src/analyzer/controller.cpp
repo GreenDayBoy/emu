@@ -151,9 +151,6 @@ void Controller::send(const std::string &userId, std::string hexDump)
 {
     hexDump.erase(std::remove(hexDump.begin(), hexDump.end(), ' '), hexDump.end());
 
-    LOG(ERROR) << hexDump;
-    LOG(ERROR) << hexDump.length();
-
     core::network::Payload payload;
     payload.setSize(hexDump.length() / 2);
 
