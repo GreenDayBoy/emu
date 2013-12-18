@@ -1,31 +1,28 @@
 #pragma once
 
-#include <analyzer/stream/fields/field.hpp>
+#include <analyzer/views/field.hpp>
 
 namespace eMU
 {
 namespace analyzer
 {
-namespace stream
-{
 namespace views
 {
 
-class StreamView
+class Payload
 {
 public:
-    StreamView();
-    virtual ~StreamView();
+    Payload();
+    virtual ~Payload();
 
     void setParent(QWidget *parent);
     void clear();
 
 protected:
     QWidget *parent_;
-    fields::FieldsContainer fields_;
+    FieldsContainer fields_;
 };
 
-}
 }
 }
 }

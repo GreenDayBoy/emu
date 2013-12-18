@@ -1,8 +1,8 @@
 #pragma once
 
 #include <analyzer/gui/gui.hpp>
-#include <analyzer/stream/views/readStreamView.hpp>
-#include <analyzer/stream/views/writeStreamView.hpp>
+#include <analyzer/views/readPayload.hpp>
+#include <analyzer/views/writePayload.hpp>
 #include <analyzer/standardItemWrapper.hpp>
 #include <QtGui/QStandardItemModel>
 #include <QtWidgets/QComboBox>
@@ -20,32 +20,34 @@ class View: public QMainWindow
 public:
     View();
 
-    void displayUser(const std::string &userId);
-    void removeUserFromDisplay(const std::string &userId);
-    void displayUserReadStreams(const std::string &userId, const std::vector<std::string> &streamIds);
+    void displayConnection(const std::string &connectionId);
+    void removeConnectionFromDisplay(const std::string &connectionId);
+    void displayConnectionReadPayloads(const std::string &connectionId, const std::vector<std::string> &payloadIds);
     void setController(Controller *controller);
     void display();
-    void displayReadStream(const std::string &streamHex, uint16_t streamId, size_t streamSize);
+    void displayReadPayload(const std::string &readPayloadDump);
 
 public slots:
-    void loadReadStream(const QModelIndex &index);
-    void disconnectUser();
-    void resizeWriteStreamFieldsCount(int numberOfFields);
-    void parseReadStreamNumericField();
-    void parseReadStreamStringField();
+    void displayReadPayload(const QModelIndex &index);
+    void disconnect();
+    void resizeWritePayloadFieldsCount(int numberOfFields);
+    void parseNumericField();
+    void parseStringField();
+    void sendDump();
     void sendFields();
-    void sendHexDump();
-    void getWriteStreamHexDump();
-    void clearWriteStreamHexDump();
-    void clearWriteStreamView();
+    void generateDump();
+    void clearReadPayloadView();
+    void clearWritePayloadView();
 
 private:
+    std::string getSelectedConnectionId() const;
+
     Ui::Gui gui_;
-    QStandardItemModel *usersViewItemModel_;
-    StandardItemWrapper usersViewItem_;
+    QStandardItemModel *connectionsViewItemModel_;
+    StandardItemWrapper connectionsViewItem_;
     Controller *controller_;
-    stream::views::ReadStreamView readStreamView_;
-    stream::views::WriteStreamView writeStreamView_;
+    views::ReadPayload readPayloadView_;
+    views::WritePayload writePayloadView_;
 };
 
 }

@@ -20,7 +20,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_eMU__analyzer__View_t {
     QByteArrayData data[14];
-    char stringdata[247];
+    char stringdata[214];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -30,26 +30,26 @@ struct qt_meta_stringdata_eMU__analyzer__View_t {
 static const qt_meta_stringdata_eMU__analyzer__View_t qt_meta_stringdata_eMU__analyzer__View = {
     {
 QT_MOC_LITERAL(0, 0, 19),
-QT_MOC_LITERAL(1, 20, 14),
-QT_MOC_LITERAL(2, 35, 0),
-QT_MOC_LITERAL(3, 36, 5),
-QT_MOC_LITERAL(4, 42, 14),
-QT_MOC_LITERAL(5, 57, 28),
-QT_MOC_LITERAL(6, 86, 14),
-QT_MOC_LITERAL(7, 101, 27),
-QT_MOC_LITERAL(8, 129, 26),
-QT_MOC_LITERAL(9, 156, 10),
-QT_MOC_LITERAL(10, 167, 11),
-QT_MOC_LITERAL(11, 179, 21),
-QT_MOC_LITERAL(12, 201, 23),
-QT_MOC_LITERAL(13, 225, 20)
+QT_MOC_LITERAL(1, 20, 18),
+QT_MOC_LITERAL(2, 39, 0),
+QT_MOC_LITERAL(3, 40, 5),
+QT_MOC_LITERAL(4, 46, 10),
+QT_MOC_LITERAL(5, 57, 29),
+QT_MOC_LITERAL(6, 87, 14),
+QT_MOC_LITERAL(7, 102, 17),
+QT_MOC_LITERAL(8, 120, 16),
+QT_MOC_LITERAL(9, 137, 8),
+QT_MOC_LITERAL(10, 146, 10),
+QT_MOC_LITERAL(11, 157, 12),
+QT_MOC_LITERAL(12, 170, 20),
+QT_MOC_LITERAL(13, 191, 21)
     },
-    "eMU::analyzer::View\0loadReadStream\0\0"
-    "index\0disconnectUser\0resizeWriteStreamFieldsCount\0"
-    "numberOfFields\0parseReadStreamNumericField\0"
-    "parseReadStreamStringField\0sendFields\0"
-    "sendHexDump\0getWriteStreamHexDump\0"
-    "clearWriteStreamHexDump\0clearWriteStreamView\0"
+    "eMU::analyzer::View\0displayReadPayload\0"
+    "\0index\0disconnect\0resizeWritePayloadFieldsCount\0"
+    "numberOfFields\0parseNumericField\0"
+    "parseStringField\0sendDump\0sendFields\0"
+    "generateDump\0clearReadPayloadView\0"
+    "clearWritePayloadView\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -98,16 +98,16 @@ void eMU::analyzer::View::qt_static_metacall(QObject *_o, QMetaObject::Call _c, 
     if (_c == QMetaObject::InvokeMetaMethod) {
         View *_t = static_cast<View *>(_o);
         switch (_id) {
-        case 0: _t->loadReadStream((*reinterpret_cast< const QModelIndex(*)>(_a[1]))); break;
-        case 1: _t->disconnectUser(); break;
-        case 2: _t->resizeWriteStreamFieldsCount((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 3: _t->parseReadStreamNumericField(); break;
-        case 4: _t->parseReadStreamStringField(); break;
-        case 5: _t->sendFields(); break;
-        case 6: _t->sendHexDump(); break;
-        case 7: _t->getWriteStreamHexDump(); break;
-        case 8: _t->clearWriteStreamHexDump(); break;
-        case 9: _t->clearWriteStreamView(); break;
+        case 0: _t->displayReadPayload((*reinterpret_cast< const QModelIndex(*)>(_a[1]))); break;
+        case 1: _t->disconnect(); break;
+        case 2: _t->resizeWritePayloadFieldsCount((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 3: _t->parseNumericField(); break;
+        case 4: _t->parseStringField(); break;
+        case 5: _t->sendDump(); break;
+        case 6: _t->sendFields(); break;
+        case 7: _t->generateDump(); break;
+        case 8: _t->clearReadPayloadView(); break;
+        case 9: _t->clearWritePayloadView(); break;
         default: ;
         }
     }

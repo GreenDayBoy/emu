@@ -1,28 +1,26 @@
-#include <analyzer/stream/views/streamView.hpp>
+#include <analyzer/views/payload.hpp>
 
 namespace eMU
 {
 namespace analyzer
 {
-namespace stream
-{
 namespace views
 {
 
-StreamView::StreamView():
+Payload::Payload():
     parent_(nullptr) {}
 
-StreamView::~StreamView()
+Payload::~Payload()
 {
     clear();
 }
 
-void StreamView::setParent(QWidget *parent)
+void Payload::setParent(QWidget *parent)
 {
     parent_ = parent;
 }
 
-void StreamView::clear()
+void Payload::clear()
 {
     for(auto field : fields_)
     {
@@ -32,7 +30,6 @@ void StreamView::clear()
     fields_.clear();
 }
 
-}
 }
 }
 }

@@ -26,7 +26,7 @@ void StandardItemWrapper::remove(const std::string &name)
     }
 }
 
-StandardItemWrapper StandardItemWrapper::find(const std::string &name)
+StandardItemWrapper StandardItemWrapper::find(const std::string &name) const
 {
     QStandardItem *child = this->findChild(name);
 
@@ -40,7 +40,7 @@ StandardItemWrapper StandardItemWrapper::find(const std::string &name)
     }
 }
 
-QStandardItem* StandardItemWrapper::findChild(const std::string &name)
+QStandardItem* StandardItemWrapper::findChild(const std::string &name) const
 {
     for(uint32_t i = 0; i < item_->rowCount(); ++i)
     {
@@ -53,7 +53,7 @@ QStandardItem* StandardItemWrapper::findChild(const std::string &name)
     return nullptr;
 }
 
-StandardItemWrapper StandardItemWrapper::find(const QModelIndex &index)
+StandardItemWrapper StandardItemWrapper::find(const QModelIndex &index) const
 {
     QStandardItem *child = this->findChild(index);
 
@@ -67,7 +67,7 @@ StandardItemWrapper StandardItemWrapper::find(const QModelIndex &index)
     }
 }
 
-QStandardItem* StandardItemWrapper::findChild(const QModelIndex &index)
+QStandardItem* StandardItemWrapper::findChild(const QModelIndex &index) const
 {
     for(uint32_t i = 0; i < item_->rowCount(); ++i)
     {

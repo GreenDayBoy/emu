@@ -1,7 +1,6 @@
 #include <protocol/readStream.hpp>
 
 #include <string.h>
-#include <iomanip>
 
 namespace eMU
 {
@@ -51,14 +50,9 @@ std::wstring ReadStream::readNextWideString(size_t length)
     return std::move(value);
 }
 
-std::ostream& operator<<(std::ostream &out, const ReadStream &stream)
+const core::network::Payload& ReadStream::getPayload() const
 {
-    for(size_t i = 0; i < stream.payload_.getSize(); ++i)
-    {
-        out << std::hex << std::setfill('0') << std::setw(2) << static_cast<uint32_t>(stream.payload_[i]) << " ";
-    }
-
-    return out;
+    return payload_;
 }
 
 }

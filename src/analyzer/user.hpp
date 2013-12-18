@@ -16,12 +16,12 @@ public:
     User(core::network::tcp::Connection &connection);
 
     void parseReadPayload();
-    std::list<protocol::ReadStream>& getReadStreams();
+    std::list<core::network::Payload>& getReadPayloads();
 
 private:
     User();
 
-    std::list<protocol::ReadStream> readStreams_;
+    std::list<core::network::Payload> readPayloads_;
 };
 
 }

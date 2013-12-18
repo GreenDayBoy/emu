@@ -1,5 +1,4 @@
 #include <analyzer/controller.hpp>
-#include <protocol/writeStream.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/locale.hpp>
@@ -29,155 +28,105 @@ View& Controller::getView()
 
 void Controller::onAccept(User &user)
 {
-    view_.displayUser(boost::lexical_cast<std::string>(user.getHash()));
+    view_.displayConnection(boost::lexical_cast<std::string>(user.getHash()));
 }
 
 void Controller::onReceive(User &user)
 {
-    std::vector<std::string> streamHashes;
+    std::vector<std::string> payloadHashes;
 
-    for(const auto& stream: user.getReadStreams())
+    for(const auto& payload: user.getReadPayloads())
     {
-        size_t streamHash = reinterpret_cast<size_t>(&stream);
-        streamHashes.push_back(boost::lexical_cast<std::string>(streamHash));
+        size_t payloadHash = reinterpret_cast<size_t>(&payload);
+        payloadHashes.push_back(boost::lexical_cast<std::string>(payloadHash));
     }
 
-    view_.displayUserReadStreams(boost::lexical_cast<std::string>(user.getHash()), streamHashes);
+    view_.displayConnectionReadPayloads(boost::lexical_cast<std::string>(user.getHash()), payloadHashes);
 }
 
 void Controller::onClose(User &user)
 {
-    view_.removeUserFromDisplay(boost::lexical_cast<std::string>(user.getHash()));
+    view_.removeConnectionFromDisplay(boost::lexical_cast<std::string>(user.getHash()));
 }
 
-void Controller::loadReadStream(const std::string &userId, const std::string &streamId)
+std::string Controller::getReadPayloadDump(const std::string &connectionId, const std::string &payloadId)
 {
     try
     {
-        User::Hash userHash = User::Hash(boost::lexical_cast<size_t>(userId));
+        User::Hash userHash = User::Hash(boost::lexical_cast<size_t>(connectionId));
         User &user = server_.getUsersFactory().find(userHash);
 
-        for(const auto &stream: user.getReadStreams())
+        for(const auto &payload: user.getReadPayloads())
         {
-            size_t streamHash = reinterpret_cast<size_t>(&stream);
+            size_t payloadHash = reinterpret_cast<size_t>(&payload);
 
-            if(streamId == boost::lexical_cast<std::string>(streamHash))
+            if(payloadId == boost::lexical_cast<std::string>(payloadHash))
             {
-                std::stringstream streamHex; streamHex << stream;
-                view_.displayReadStream(streamHex.str(), stream.getId(), stream.getSize());
-                break;
+                std::stringstream payloadDump; payloadDump << payload;
+                return payloadDump.str();
             }
         }
     }
     catch(const core::common::Factory<User>::ObjectNotFoundException&)
     {
-        LOG(ERROR) << "Cound not find userId: " << userId;
+        LOG(ERROR) << "Cound not find user! Id: " << connectionId;
     }
+
+    return "";
 }
 
-void Controller::disconnectUser(const std::string &userId)
+void Controller::disconnect(const std::string &connectionId)
 {
     try
     {
-        User::Hash userHash = User::Hash(boost::lexical_cast<size_t>(userId));
+        User::Hash userHash = User::Hash(boost::lexical_cast<size_t>(connectionId));
         User &user = server_.getUsersFactory().find(userHash);
 
         user.getConnection().disconnect();
     }
     catch(const core::common::Factory<User>::ObjectNotFoundException&)
     {
-        LOG(ERROR) << "Cound not find userId: " << userId;
+        LOG(ERROR) << "Cound not find user! Id: " << connectionId;
     }
 }
 
-void Controller::send(const std::string &userId, const std::string &streamId, const stream::fields::FieldsContainer &fields)
+void Controller::send(const std::string &connectionId, const std::string &dump)
 {
-    const protocol::WriteStream &stream = this->generateWriteStream(streamId, fields);
-
     try
     {
-        User::Hash userHash = User::Hash(boost::lexical_cast<size_t>(userId));
+        User::Hash userHash = User::Hash(boost::lexical_cast<size_t>(connectionId));
         User &user = server_.getUsersFactory().find(userHash);
 
-        user.getConnection().send(stream.getPayload());
+        const core::network::Payload &payload = this->convertDumpToPayload(dump);
+        user.getConnection().send(payload);
     }
     catch(const core::common::Factory<User>::ObjectNotFoundException&)
     {
-        LOG(ERROR) << "Cound not find userId: " << userId;
+        LOG(ERROR) << "Cound not find connectionId: " << connectionId;
     }
 }
 
-protocol::WriteStream Controller::generateWriteStream(const std::string &streamId, const stream::fields::FieldsContainer &fields) const
+core::network::Payload Controller::convertDumpToPayload(std::string dump) const
 {
-    protocol::WriteStream stream(boost::lexical_cast<uint16_t>(streamId));
-
-    for(const auto field : fields)
-    {
-        if(field->getType() == stream::fields::Field::kInt8Type)
-        {
-            stream.writeNext<uint8_t>(boost::lexical_cast<uint16_t>(field->getValue()));
-        }
-        else if(field->getType() == stream::fields::Field::kInt16Type)
-        {
-            stream.writeNext<uint16_t>(boost::lexical_cast<uint16_t>(field->getValue()));
-        }
-        else if(field->getType() == stream::fields::Field::kInt32Type)
-        {
-            stream.writeNext<uint32_t>(boost::lexical_cast<uint32_t>(field->getValue()));
-        }
-        else if(field->getType() == stream::fields::Field::kStringType)
-        {
-            stream.writeNextString(field->getValue());
-        }
-        else if(field->getType() == stream::fields::Field::kWStringType)
-        {
-            std::wstring value = boost::locale::conv::utf_to_utf<std::wstring::value_type>(field->getValue());
-            stream.writeNextWideString(value);
-        }
-    }
-
-    return stream;
-}
-
-std::string Controller::generateStreamPreview(const std::string &streamId, const stream::fields::FieldsContainer &fields) const
-{
-    const protocol::WriteStream &stream = this->generateWriteStream(streamId, fields);
-
-    std::stringstream ss; ss << stream;
-    return ss.str();
-}
-
-void Controller::send(const std::string &userId, std::string hexDump)
-{
-    hexDump.erase(std::remove(hexDump.begin(), hexDump.end(), ' '), hexDump.end());
+    dump.erase(std::remove(dump.begin(), dump.end(), ' '), dump.end());
 
     core::network::Payload payload;
-    payload.setSize(hexDump.length() / 2);
+    payload.setSize(dump.length() / 2);
 
     size_t byte = 0;
-    for(size_t i = 0; i < hexDump.length(); i += 2)
+    for(size_t i = 0; i < dump.length(); i += 2)
     {
-        std::string v(hexDump, i, 2);
+        std::string byteDump(dump, i, 2);
 
         std::stringstream ss;
-        ss << std::hex << v;
+        ss << std::hex << byteDump;
         int16_t dec = 0;
         ss >> dec;
 
         payload[byte++] = dec;
     }
 
-    try
-    {
-        User::Hash userHash = User::Hash(boost::lexical_cast<size_t>(userId));
-        User &user = server_.getUsersFactory().find(userHash);
-
-        user.getConnection().send(payload);
-    }
-    catch(const core::common::Factory<User>::ObjectNotFoundException&)
-    {
-        LOG(ERROR) << "Cound not find userId: " << userId;
-    }
+    return payload;
 }
 
 }

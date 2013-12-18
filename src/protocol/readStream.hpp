@@ -32,8 +32,7 @@ public:
 
     std::string readNextString(size_t length);
     std::wstring readNextWideString(size_t length);
-
-    friend std::ostream& operator<<(std::ostream &out, const ReadStream &stream);
+    const core::network::Payload& getPayload() const;
 
 private:
     template<typename T>

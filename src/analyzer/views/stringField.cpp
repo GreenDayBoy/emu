@@ -1,4 +1,4 @@
-#include <analyzer/stream/fields/stringField.hpp>
+#include <analyzer/views/stringField.hpp>
 
 #include <sstream>
 
@@ -6,13 +6,14 @@ namespace eMU
 {
 namespace analyzer
 {
-namespace stream
-{
-namespace fields
+namespace views
 {
 
 StringField::StringField(QWidget *parent, size_t index, const std::string &value):
-    Field(parent, index, value) {}
+    Field(parent, index, value)
+{
+    valueEdit_.setReadOnly(true);
+}
 
 void StringField::prepare()
 {
@@ -36,7 +37,6 @@ void StringField::prepare()
     valueEdit_.setText(QString::fromStdString(str));
 }
 
-}
 }
 }
 }

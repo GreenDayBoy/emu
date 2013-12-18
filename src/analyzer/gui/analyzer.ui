@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>868</width>
-    <height>901</height>
+    <height>898</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,91 +24,26 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="receiverTab">
      <attribute name="title">
       <string>Receiver</string>
      </attribute>
-     <widget class="QLabel" name="readStreamHexDumpTitleLabel">
+     <widget class="QTextEdit" name="readPayloadDumpEdit">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>10</y>
-        <width>121</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Hex dump</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="readStreamIdTitleLabel">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>160</y>
-        <width>67</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Stream id:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="readStreamIdLabel">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>160</y>
-        <width>67</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>0</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="readStreamSizeTitleLabel">
-      <property name="geometry">
-       <rect>
-        <x>210</x>
-        <y>160</y>
-        <width>91</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Stream size:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="readStreamSizeLabel">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>160</y>
-        <width>67</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>0</string>
-      </property>
-     </widget>
-     <widget class="QTextEdit" name="readStreamHexDumpEdit">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
+        <y>2</y>
         <width>591</width>
-        <height>121</height>
+        <height>100</height>
        </rect>
       </property>
       <property name="undoRedoEnabled">
        <bool>false</bool>
       </property>
       <property name="readOnly">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <property name="html">
        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -118,13 +53,13 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
-     <widget class="QScrollArea" name="readStreamFieldsFrame">
+     <widget class="QScrollArea" name="readPayloadFieldsFrame">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>190</y>
+        <y>136</y>
         <width>591</width>
-        <height>641</height>
+        <height>725</height>
        </rect>
       </property>
       <property name="verticalScrollBarPolicy">
@@ -139,35 +74,48 @@ p, li { white-space: pre-wrap; }
          <x>0</x>
          <y>0</y>
          <width>589</width>
-         <height>639</height>
+         <height>723</height>
         </rect>
        </property>
       </widget>
      </widget>
-     <widget class="QPushButton" name="readStreamParseNumericFieldButton">
+     <widget class="QPushButton" name="parseNumericButton">
       <property name="geometry">
        <rect>
         <x>470</x>
-        <y>160</y>
+        <y>106</y>
         <width>131</width>
-        <height>25</height>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
        <string>Parse numeric</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="readStreamParseStringFieldButton">
+     <widget class="QPushButton" name="parseStringButton">
       <property name="geometry">
        <rect>
-        <x>350</x>
-        <y>160</y>
-        <width>111</width>
-        <height>25</height>
+        <x>356</x>
+        <y>106</y>
+        <width>110</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
        <string>Parse string</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="clearReadPayloadFieldsButton">
+      <property name="geometry">
+       <rect>
+        <x>291</x>
+        <y>106</y>
+        <width>61</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Clear</string>
       </property>
      </widget>
     </widget>
@@ -175,58 +123,13 @@ p, li { white-space: pre-wrap; }
      <attribute name="title">
       <string>Sender</string>
      </attribute>
-     <widget class="QSlider" name="writeStreamFieldsCountSlider">
-      <property name="geometry">
-       <rect>
-        <x>414</x>
-        <y>10</y>
-        <width>181</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="maximum">
-       <number>24</number>
-      </property>
-      <property name="pageStep">
-       <number>1</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-     <widget class="QLabel" name="writeStreamFieldsCountTitleLabel">
-      <property name="geometry">
-       <rect>
-        <x>250</x>
-        <y>10</y>
-        <width>131</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Number of fields:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="writeStreamFieldsCountLabel">
-      <property name="geometry">
-       <rect>
-        <x>380</x>
-        <y>10</y>
-        <width>41</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>0</string>
-      </property>
-     </widget>
-     <widget class="QScrollArea" name="writeStreamFieldsFrame">
+     <widget class="QScrollArea" name="writePayloadFieldsFrame">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>170</y>
+        <y>134</y>
         <width>591</width>
-        <height>701</height>
+        <height>706</height>
        </rect>
       </property>
       <property name="verticalScrollBarPolicy">
@@ -241,57 +144,18 @@ p, li { white-space: pre-wrap; }
          <x>0</x>
          <y>0</y>
          <width>589</width>
-         <height>699</height>
+         <height>704</height>
         </rect>
        </property>
-       <widget class="QPushButton" name="sendWriteStreamFieldsButton">
-        <property name="geometry">
-         <rect>
-          <x>470</x>
-          <y>677</y>
-          <width>99</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Send</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="getWriteStreamHexDumpButton">
-        <property name="geometry">
-         <rect>
-          <x>360</x>
-          <y>677</y>
-          <width>99</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Hex dump</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="clearWriteStreamFieldsButton">
-        <property name="geometry">
-         <rect>
-          <x>250</x>
-          <y>677</y>
-          <width>99</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Clear</string>
-        </property>
-       </widget>
       </widget>
      </widget>
-     <widget class="QTextEdit" name="writeStreamHexDumpEdit">
+     <widget class="QTextEdit" name="writePayloadDumpEdit">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>40</y>
+        <y>2</y>
         <width>591</width>
-        <height>102</height>
+        <height>100</height>
        </rect>
       </property>
       <property name="undoRedoEnabled">
@@ -308,97 +172,155 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="writeStreamIdEdit">
+     <widget class="QPushButton" name="sendDumpButton">
       <property name="geometry">
        <rect>
-        <x>93</x>
-        <y>7</y>
-        <width>113</width>
+        <x>502</x>
+        <y>106</y>
+        <width>99</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Send dump</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="sendFieldsButton">
+      <property name="geometry">
+       <rect>
+        <x>540</x>
+        <y>843</y>
+        <width>61</width>
         <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>0</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="writeStreamIdTitleLabel">
-      <property name="geometry">
-       <rect>
-        <x>15</x>
-        <y>10</y>
-        <width>67</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Stream id:</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="clearWriteStreamHexDumpButton">
-      <property name="geometry">
-       <rect>
-        <x>390</x>
-        <y>146</y>
-        <width>99</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Clear</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="sendWriteStreamHexDumpButton">
-      <property name="geometry">
-       <rect>
-        <x>500</x>
-        <y>146</y>
-        <width>99</width>
-        <height>20</height>
        </rect>
       </property>
       <property name="text">
        <string>Send</string>
       </property>
      </widget>
+     <widget class="QPushButton" name="clearWritePayloadButton">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>843</y>
+        <width>61</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Clear</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="dumpButton">
+      <property name="geometry">
+       <rect>
+        <x>478</x>
+        <y>843</y>
+        <width>58</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Dump</string>
+      </property>
+     </widget>
+     <widget class="QSlider" name="writePayloadFieldsCountSlider">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>107</y>
+        <width>161</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>25</number>
+      </property>
+      <property name="pageStep">
+       <number>1</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="writePayloadFieldsCountLabel">
+      <property name="geometry">
+       <rect>
+        <x>107</x>
+        <y>110</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="writePayloadFieldsCountTitleLabel">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>110</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Fields count:</string>
+      </property>
+     </widget>
     </widget>
    </widget>
-   <widget class="QTreeView" name="usersView">
+   <widget class="QTreeView" name="connectionsView">
     <property name="geometry">
      <rect>
       <x>-5</x>
-      <y>0</y>
+      <y>30</y>
       <width>266</width>
-      <height>791</height>
+      <height>831</height>
      </rect>
     </property>
     <property name="editTriggers">
      <set>QAbstractItemView::NoEditTriggers</set>
     </property>
    </widget>
-   <widget class="QPushButton" name="removeStreamButton">
+   <widget class="QPushButton" name="removePayloadButton">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>830</y>
+      <x>2</x>
+      <y>867</y>
       <width>121</width>
       <height>27</height>
      </rect>
     </property>
     <property name="text">
-     <string>Remove stream</string>
+     <string>Remove payload</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="disconnectUserButton">
+   <widget class="QPushButton" name="disconnectButton">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>800</y>
+      <x>132</x>
+      <y>867</y>
       <width>121</width>
       <height>27</height>
      </rect>
     </property>
     <property name="text">
-     <string>Disconnect user</string>
+     <string>Disconnect</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="activeConnectionsTitleLabel">
+    <property name="geometry">
+     <rect>
+      <x>2</x>
+      <y>10</y>
+      <width>131</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Active connections</string>
     </property>
    </widget>
   </widget>

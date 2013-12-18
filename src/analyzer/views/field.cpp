@@ -1,17 +1,13 @@
-#include <analyzer/stream/fields/field.hpp>
+#include <analyzer/views/field.hpp>
 
-#include <sstream>
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
-#include <boost/locale.hpp>
 
 namespace eMU
 {
 namespace analyzer
 {
-namespace stream
-{
-namespace fields
+namespace views
 {
 
 const std::string Field::kInt8Type = "int8_t";
@@ -32,6 +28,8 @@ Field::Field(QWidget *parent, size_t index, const std::string &value):
     valueEdit_.show();
 }
 
+Field::~Field() {}
+
 void Field::prepare()
 {
     typeComboBox_.insertItem(0, QString::fromStdString(kInt8Type));
@@ -48,14 +46,41 @@ std::string Field::getType() const
     return typeComboBox_.currentText().toStdString();
 }
 
-std::string Field::getValue() const
+std::string Field::getValueHex() const
 {
-    return valueEdit_.text().toStdString();
+    std::string type = typeComboBox_.currentText().toStdString();
+    std::string hex;
+
+    if(type == kInt8Type)
+    {
+        hex = this->dumpValue<uint8_t>(boost::lexical_cast<uint16_t>(valueEdit_.text().toStdString()));
+    }
+    else if(type == kInt16Type)
+    {
+        hex = this->dumpValue(boost::lexical_cast<uint16_t>(valueEdit_.text().toStdString()));
+    }
+    else if(type == kInt32Type)
+    {
+        hex = this->dumpValue(boost::lexical_cast<uint32_t>(valueEdit_.text().toStdString()));
+    }
+    else if(type == kWStringType)
+    {
+        for(const char16_t c : valueEdit_.text().toStdWString())
+        {
+            hex += this->dumpValue(c);
+        }
+    }
+    else if(type == kStringType)
+    {
+        for(const std::string::value_type c : valueEdit_.text().toStdString())
+        {
+            hex += this->dumpValue(c);
+        }
+    }
+
+    return hex;
 }
 
-Field::~Field() {}
-
-}
 }
 }
 }

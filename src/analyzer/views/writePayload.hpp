@@ -1,28 +1,26 @@
 #pragma once
 
-#include <analyzer/stream/views/streamView.hpp>
+#include <analyzer/views/payload.hpp>
 
 namespace eMU
 {
 namespace analyzer
 {
-namespace stream
-{
 namespace views
 {
 
-class WriteStreamView: public StreamView
+class WritePayload: public Payload
 {
 public:
     void resize(size_t fieldsCount);
-    const fields::FieldsContainer& getFields() const;
+    const FieldsContainer& getFields() const;
+    std::string getDump() const;
 
 private:
     void insertFields(size_t fieldsCount);
     void removeFields(size_t fieldsCount);
 };
 
-}
 }
 }
 }

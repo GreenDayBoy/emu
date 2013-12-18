@@ -1,7 +1,6 @@
 #include <protocol/writeStream.hpp>
 
 #include <string.h>
-#include <iomanip>
 
 namespace eMU
 {
@@ -37,16 +36,6 @@ void WriteStream::writeNextString(const std::string &value)
     {
         this->writeNext<std::string::value_type>(value[i]);
     }
-}
-
-std::ostream& operator<<(std::ostream &out, const WriteStream &stream)
-{
-    for(size_t i = 0; i < stream.payload_.getSize(); ++i)
-    {
-        out << std::hex << std::setfill('0') << std::setw(2) << static_cast<uint32_t>(stream.payload_[i]) << " ";
-    }
-
-    return out;
 }
 
 }

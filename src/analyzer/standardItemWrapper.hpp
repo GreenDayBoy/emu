@@ -17,14 +17,14 @@ public:
 
     void insert(const std::string &name);
     void remove(const std::string &name);
-    StandardItemWrapper find(const std::string &name);
-    StandardItemWrapper find(const QModelIndex &index);
+    StandardItemWrapper find(const std::string &name) const;
+    StandardItemWrapper find(const QModelIndex &index) const;
     void clear();
     std::string getText() const;
 
 private:
-    QStandardItem* findChild(const std::string &name);
-    QStandardItem* findChild(const QModelIndex &index);
+    QStandardItem* findChild(const std::string &name) const;
+    QStandardItem* findChild(const QModelIndex &index) const;
 
     QStandardItem *item_;
 };

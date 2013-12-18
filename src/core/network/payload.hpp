@@ -31,6 +31,8 @@ public:
     uint8_t& operator[](size_t offset);
     const uint8_t& operator[](size_t offset) const;
 
+    friend std::ostream& operator<<(std::ostream &out, const Payload &payload);
+
 private:
     Data data_;
     size_t size_;
