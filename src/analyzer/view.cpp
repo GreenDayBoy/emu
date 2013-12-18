@@ -89,6 +89,7 @@ void View::display()
     connect(gui_.sendDumpButton, SIGNAL(clicked()), this, SLOT(sendDump()));
     connect(gui_.dumpButton, SIGNAL(clicked()), this, SLOT(generateDump()));
     connect(gui_.clearWritePayloadButton, SIGNAL(clicked()), this, SLOT(clearWritePayloadView()));
+    connect(gui_.calculateSizeButton, SIGNAL(clicked()), this, SLOT(calculatehWritePayloadSize()));
 
     this->show();
 }
@@ -182,6 +183,11 @@ std::string View::getSelectedConnectionId() const
     }
 
     return "";
+}
+
+void View::calculatehWritePayloadSize()
+{
+    gui_.writePayloadSizeLabel->setText(QString::fromStdString(boost::lexical_cast<std::string>(writePayloadView_.getFieldsSize())));
 }
 
 }

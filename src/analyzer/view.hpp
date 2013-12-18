@@ -38,6 +38,7 @@ public slots:
     void generateDump();
     void clearReadPayloadView();
     void clearWritePayloadView();
+    void calculatehWritePayloadSize();
 
 private:
     std::string getSelectedConnectionId() const;

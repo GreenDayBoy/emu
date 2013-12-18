@@ -22,6 +22,7 @@ public:
     virtual void prepare();
     std::string getType() const;
     std::string getValueHex() const;
+    size_t getSize() const;
 
 protected:
     static const std::string kInt8Type;

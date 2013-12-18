@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="receiverTab">
      <attribute name="title">
@@ -227,7 +227,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QSlider" name="writePayloadFieldsCountSlider">
       <property name="geometry">
        <rect>
-        <x>140</x>
+        <x>307</x>
         <y>107</y>
         <width>161</width>
         <height>23</height>
@@ -246,8 +246,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="writePayloadFieldsCountLabel">
       <property name="geometry">
        <rect>
-        <x>107</x>
-        <y>110</y>
+        <x>476</x>
+        <y>109</y>
         <width>31</width>
         <height>16</height>
        </rect>
@@ -256,17 +256,56 @@ p, li { white-space: pre-wrap; }
        <string>0</string>
       </property>
      </widget>
-     <widget class="QLabel" name="writePayloadFieldsCountTitleLabel">
+     <widget class="QLabel" name="writePayloadFieldsTitleLabel">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>258</x>
         <y>110</y>
-        <width>91</width>
+        <width>41</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
-       <string>Fields count:</string>
+       <string>Fields</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="writePayloadSizeTitleLabel">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>110</y>
+        <width>41</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Size:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="writePayloadSizeLabel">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>110</y>
+        <width>67</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="calculateSizeButton">
+      <property name="geometry">
+       <rect>
+        <x>96</x>
+        <y>106</y>
+        <width>99</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Calculate size</string>
       </property>
      </widget>
     </widget>
