@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'analyzerwv2554.ui'
+** Form generated from reading UI file 'analyzerBa2554.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.2.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef ANALYZERWV2554_H
-#define ANALYZERWV2554_H
+#ifndef ANALYZERBA2554_H
+#define ANALYZERBA2554_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
@@ -92,7 +92,7 @@ public:
         parseWideStringButton->setGeometry(QRect(356, 106, 110, 24));
         clearReadPayloadFieldsButton = new QPushButton(receiverTab);
         clearReadPayloadFieldsButton->setObjectName(QStringLiteral("clearReadPayloadFieldsButton"));
-        clearReadPayloadFieldsButton->setGeometry(QRect(180, 106, 61, 24));
+        clearReadPayloadFieldsButton->setGeometry(QRect(10, 106, 61, 24));
         parseStringButton = new QPushButton(receiverTab);
         parseStringButton->setObjectName(QStringLiteral("parseStringButton"));
         parseStringButton->setGeometry(QRect(243, 106, 110, 24));
@@ -153,7 +153,7 @@ public:
         connectionsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
         removePayloadButton = new QPushButton(centralwidget);
         removePayloadButton->setObjectName(QStringLiteral("removePayloadButton"));
-        removePayloadButton->setGeometry(QRect(2, 867, 121, 27));
+        removePayloadButton->setGeometry(QRect(5, 867, 121, 27));
         disconnectButton = new QPushButton(centralwidget);
         disconnectButton->setObjectName(QStringLiteral("disconnectButton"));
         disconnectButton->setGeometry(QRect(132, 867, 121, 27));
@@ -172,7 +172,7 @@ public:
 
     void retranslateUi(QMainWindow *Gui)
     {
-        Gui->setWindowTitle(QApplication::translate("Gui", "MainWindow", 0));
+        Gui->setWindowTitle(QApplication::translate("Gui", "eMU :: Analyzer - TCP Network protocol dumper", 0));
         readPayloadDumpEdit->setHtml(QApplication::translate("Gui", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -211,4 +211,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // ANALYZERWV2554_H
+#endif // ANALYZERBA2554_H
