@@ -14,6 +14,7 @@ class ReadPayload: public Payload
 public:
     void insertNumericField(const std::string &value);
     void insertStringField(const std::string &value);
+    void insertWideStringField(const std::string &value);
 };
 
 }

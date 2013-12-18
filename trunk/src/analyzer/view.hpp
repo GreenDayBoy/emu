@@ -33,6 +33,7 @@ public slots:
     void resizeWritePayloadFieldsCount(int numberOfFields);
     void parseNumericField();
     void parseStringField();
+    void parseWideStringField();
     void sendDump();
     void sendFields();
     void generateDump();

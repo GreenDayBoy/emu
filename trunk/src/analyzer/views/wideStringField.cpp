@@ -1,4 +1,4 @@
-#include <analyzer/views/stringField.hpp>
+#include <analyzer/views/wideStringField.hpp>
 
 #include <sstream>
 
@@ -9,19 +9,19 @@ namespace analyzer
 namespace views
 {
 
-StringField::StringField(QWidget *parent, size_t index, const std::string &value):
+WideStringField::WideStringField(QWidget *parent, size_t index, const std::string &value):
     Field(parent, index, value)
 {
     valueEdit_.setReadOnly(true);
 }
 
-void StringField::prepare()
+void WideStringField::prepare()
 {
     value_.erase(std::remove(value_.begin(), value_.end(), ' '), value_.end());
 
     std::string str;
 
-    for(size_t i = 0; i < value_.length(); i += 2)
+    for(size_t i = 0; i < value_.length(); i += 4)
     {
         std::string c(value_, i, 2);
 
@@ -33,7 +33,7 @@ void StringField::prepare()
         str.push_back(dec);
     }
 
-    typeComboBox_.insertItem(0, QString::fromStdString(kStringType));
+    typeComboBox_.insertItem(0, QString::fromStdString(kWStringType));
     valueEdit_.setText(QString::fromStdString(str));
 }
 
