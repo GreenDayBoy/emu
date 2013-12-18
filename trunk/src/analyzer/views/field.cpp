@@ -81,6 +81,34 @@ std::string Field::getValueHex() const
     return hex;
 }
 
+size_t Field::getSize() const
+{
+    std::string type = typeComboBox_.currentText().toStdString();
+
+    if(type == kInt8Type)
+    {
+        return sizeof(uint8_t);
+    }
+    else if(type == kInt16Type)
+    {
+        return sizeof(uint16_t);
+    }
+    else if(type == kInt32Type)
+    {
+        return sizeof(uint32_t);
+    }
+    else if(type == kWStringType)
+    {
+        return valueEdit_.text().length() * sizeof(char16_t);
+    }
+    else if(type == kStringType)
+    {
+        return valueEdit_.text().length();
+    }
+
+    return 0;
+}
+
 }
 }
 }

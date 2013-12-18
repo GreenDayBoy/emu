@@ -59,6 +59,18 @@ std::string WritePayload::getDump() const
     return dump;
 }
 
+size_t WritePayload::getFieldsSize() const
+{
+    size_t size = 0;
+
+    for(const auto field : fields_)
+    {
+        size += field->getSize();
+    }
+
+    return size;
+}
+
 }
 }
 }

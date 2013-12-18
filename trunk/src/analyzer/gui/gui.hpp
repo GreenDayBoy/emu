@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'analyzerjL2554.ui'
+** Form generated from reading UI file 'analyzerhU2554.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.2.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef ANALYZERJL2554_H
-#define ANALYZERJL2554_H
+#ifndef ANALYZERHU2554_H
+#define ANALYZERHU2554_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
@@ -48,7 +48,10 @@ public:
     QPushButton *dumpButton;
     QSlider *writePayloadFieldsCountSlider;
     QLabel *writePayloadFieldsCountLabel;
-    QLabel *writePayloadFieldsCountTitleLabel;
+    QLabel *writePayloadFieldsTitleLabel;
+    QLabel *writePayloadSizeTitleLabel;
+    QLabel *writePayloadSizeLabel;
+    QPushButton *calculateSizeButton;
     QTreeView *connectionsView;
     QPushButton *removePayloadButton;
     QPushButton *disconnectButton;
@@ -120,16 +123,25 @@ public:
         dumpButton->setGeometry(QRect(478, 843, 58, 23));
         writePayloadFieldsCountSlider = new QSlider(senderTab);
         writePayloadFieldsCountSlider->setObjectName(QStringLiteral("writePayloadFieldsCountSlider"));
-        writePayloadFieldsCountSlider->setGeometry(QRect(140, 107, 161, 23));
+        writePayloadFieldsCountSlider->setGeometry(QRect(307, 107, 161, 23));
         writePayloadFieldsCountSlider->setMaximum(25);
         writePayloadFieldsCountSlider->setPageStep(1);
         writePayloadFieldsCountSlider->setOrientation(Qt::Horizontal);
         writePayloadFieldsCountLabel = new QLabel(senderTab);
         writePayloadFieldsCountLabel->setObjectName(QStringLiteral("writePayloadFieldsCountLabel"));
-        writePayloadFieldsCountLabel->setGeometry(QRect(107, 110, 31, 16));
-        writePayloadFieldsCountTitleLabel = new QLabel(senderTab);
-        writePayloadFieldsCountTitleLabel->setObjectName(QStringLiteral("writePayloadFieldsCountTitleLabel"));
-        writePayloadFieldsCountTitleLabel->setGeometry(QRect(10, 110, 91, 16));
+        writePayloadFieldsCountLabel->setGeometry(QRect(476, 109, 31, 16));
+        writePayloadFieldsTitleLabel = new QLabel(senderTab);
+        writePayloadFieldsTitleLabel->setObjectName(QStringLiteral("writePayloadFieldsTitleLabel"));
+        writePayloadFieldsTitleLabel->setGeometry(QRect(258, 110, 41, 16));
+        writePayloadSizeTitleLabel = new QLabel(senderTab);
+        writePayloadSizeTitleLabel->setObjectName(QStringLiteral("writePayloadSizeTitleLabel"));
+        writePayloadSizeTitleLabel->setGeometry(QRect(10, 110, 41, 17));
+        writePayloadSizeLabel = new QLabel(senderTab);
+        writePayloadSizeLabel->setObjectName(QStringLiteral("writePayloadSizeLabel"));
+        writePayloadSizeLabel->setGeometry(QRect(50, 110, 67, 17));
+        calculateSizeButton = new QPushButton(senderTab);
+        calculateSizeButton->setObjectName(QStringLiteral("calculateSizeButton"));
+        calculateSizeButton->setGeometry(QRect(96, 106, 99, 24));
         tabWidget->addTab(senderTab, QString());
         connectionsView = new QTreeView(centralwidget);
         connectionsView->setObjectName(QStringLiteral("connectionsView"));
@@ -148,7 +160,7 @@ public:
 
         retranslateUi(Gui);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(Gui);
@@ -176,7 +188,10 @@ public:
         clearWritePayloadButton->setText(QApplication::translate("Gui", "Clear", 0));
         dumpButton->setText(QApplication::translate("Gui", "Dump", 0));
         writePayloadFieldsCountLabel->setText(QApplication::translate("Gui", "0", 0));
-        writePayloadFieldsCountTitleLabel->setText(QApplication::translate("Gui", "Fields count:", 0));
+        writePayloadFieldsTitleLabel->setText(QApplication::translate("Gui", "Fields", 0));
+        writePayloadSizeTitleLabel->setText(QApplication::translate("Gui", "Size:", 0));
+        writePayloadSizeLabel->setText(QApplication::translate("Gui", "0", 0));
+        calculateSizeButton->setText(QApplication::translate("Gui", "Calculate size", 0));
         tabWidget->setTabText(tabWidget->indexOf(senderTab), QApplication::translate("Gui", "Sender", 0));
         removePayloadButton->setText(QApplication::translate("Gui", "Remove payload", 0));
         disconnectButton->setText(QApplication::translate("Gui", "Disconnect", 0));
@@ -191,4 +206,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // ANALYZERJL2554_H
+#endif // ANALYZERHU2554_H
