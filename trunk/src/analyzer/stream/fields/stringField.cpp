@@ -16,7 +16,7 @@ StringField::StringField(QWidget *parent, size_t index, const std::string &value
 
 void StringField::prepare()
 {
-    value_.erase(std::remove(value_.begin(), value_.end(), ' '));
+    value_.erase(std::remove(value_.begin(), value_.end(), ' '), value_.end());
 
     std::string str;
 
