@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'analyzerhU2554.ui'
+** Form generated from reading UI file 'analyzerEN2554.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.2.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef ANALYZERHU2554_H
-#define ANALYZERHU2554_H
+#ifndef ANALYZEREN2554_H
+#define ANALYZEREN2554_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
@@ -160,7 +160,7 @@ public:
 
         retranslateUi(Gui);
 
-        tabWidget->setCurrentIndex(1);
+        tabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(Gui);
@@ -206,4 +206,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // ANALYZERHU2554_H
+#endif // ANALYZEREN2554_H

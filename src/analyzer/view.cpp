@@ -68,6 +68,8 @@ void View::displayReadPayload(const QModelIndex &index)
         readPayloadView_.clear();
         gui_.readPayloadDumpEdit->clear();
         gui_.readPayloadDumpEdit->insertPlainText(QString::fromStdString(dump));
+
+        gui_.tabWidget->setCurrentIndex(0);
     }
     else
     {
