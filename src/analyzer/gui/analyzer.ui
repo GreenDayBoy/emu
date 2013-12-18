@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>eMU :: Analyzer - TCP Network protocol dumper</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
@@ -108,7 +108,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="clearReadPayloadFieldsButton">
       <property name="geometry">
        <rect>
-        <x>180</x>
+        <x>10</x>
         <y>106</y>
         <width>61</width>
         <height>24</height>
