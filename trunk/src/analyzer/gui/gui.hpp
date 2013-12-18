@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'analyzeray2676.ui'
+** Form generated from reading UI file 'analyzerjL2554.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.2.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef ANALYZERAY2676_H
-#define ANALYZERAY2676_H
+#ifndef ANALYZERJL2554_H
+#define ANALYZERJL2554_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
@@ -15,7 +15,6 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QScrollArea>
@@ -33,39 +32,33 @@ public:
     QWidget *centralwidget;
     QTabWidget *tabWidget;
     QWidget *receiverTab;
-    QLabel *readStreamHexDumpTitleLabel;
-    QLabel *readStreamIdTitleLabel;
-    QLabel *readStreamIdLabel;
-    QLabel *readStreamSizeTitleLabel;
-    QLabel *readStreamSizeLabel;
-    QTextEdit *readStreamHexDumpEdit;
-    QScrollArea *readStreamFieldsFrame;
+    QTextEdit *readPayloadDumpEdit;
+    QScrollArea *readPayloadFieldsFrame;
     QWidget *scrollAreaWidgetContents;
-    QPushButton *readStreamParseNumericFieldButton;
-    QPushButton *readStreamParseStringFieldButton;
+    QPushButton *parseNumericButton;
+    QPushButton *parseStringButton;
+    QPushButton *clearReadPayloadFieldsButton;
     QWidget *senderTab;
-    QSlider *writeStreamFieldsCountSlider;
-    QLabel *writeStreamFieldsCountTitleLabel;
-    QLabel *writeStreamFieldsCountLabel;
-    QScrollArea *writeStreamFieldsFrame;
+    QScrollArea *writePayloadFieldsFrame;
     QWidget *scrollAreaWidgetContents_2;
-    QPushButton *sendWriteStreamFieldsButton;
-    QPushButton *getWriteStreamHexDumpButton;
-    QPushButton *clearWriteStreamFieldsButton;
-    QTextEdit *writeStreamHexDumpEdit;
-    QLineEdit *writeStreamIdEdit;
-    QLabel *writeStreamIdTitleLabel;
-    QPushButton *clearWriteStreamHexDumpButton;
-    QPushButton *sendWriteStreamHexDumpButton;
-    QTreeView *usersView;
-    QPushButton *removeStreamButton;
-    QPushButton *disconnectUserButton;
+    QTextEdit *writePayloadDumpEdit;
+    QPushButton *sendDumpButton;
+    QPushButton *sendFieldsButton;
+    QPushButton *clearWritePayloadButton;
+    QPushButton *dumpButton;
+    QSlider *writePayloadFieldsCountSlider;
+    QLabel *writePayloadFieldsCountLabel;
+    QLabel *writePayloadFieldsCountTitleLabel;
+    QTreeView *connectionsView;
+    QPushButton *removePayloadButton;
+    QPushButton *disconnectButton;
+    QLabel *activeConnectionsTitleLabel;
 
     void setupUi(QMainWindow *Gui)
     {
         if (Gui->objectName().isEmpty())
             Gui->setObjectName(QStringLiteral("Gui"));
-        Gui->resize(868, 901);
+        Gui->resize(868, 898);
         centralwidget = new QWidget(Gui);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         tabWidget = new QTabWidget(centralwidget);
@@ -73,102 +66,84 @@ public:
         tabWidget->setGeometry(QRect(260, 0, 621, 911));
         receiverTab = new QWidget();
         receiverTab->setObjectName(QStringLiteral("receiverTab"));
-        readStreamHexDumpTitleLabel = new QLabel(receiverTab);
-        readStreamHexDumpTitleLabel->setObjectName(QStringLiteral("readStreamHexDumpTitleLabel"));
-        readStreamHexDumpTitleLabel->setGeometry(QRect(10, 10, 121, 16));
-        readStreamIdTitleLabel = new QLabel(receiverTab);
-        readStreamIdTitleLabel->setObjectName(QStringLiteral("readStreamIdTitleLabel"));
-        readStreamIdTitleLabel->setGeometry(QRect(10, 160, 67, 17));
-        readStreamIdLabel = new QLabel(receiverTab);
-        readStreamIdLabel->setObjectName(QStringLiteral("readStreamIdLabel"));
-        readStreamIdLabel->setGeometry(QRect(90, 160, 67, 17));
-        readStreamSizeTitleLabel = new QLabel(receiverTab);
-        readStreamSizeTitleLabel->setObjectName(QStringLiteral("readStreamSizeTitleLabel"));
-        readStreamSizeTitleLabel->setGeometry(QRect(210, 160, 91, 16));
-        readStreamSizeLabel = new QLabel(receiverTab);
-        readStreamSizeLabel->setObjectName(QStringLiteral("readStreamSizeLabel"));
-        readStreamSizeLabel->setGeometry(QRect(300, 160, 67, 17));
-        readStreamHexDumpEdit = new QTextEdit(receiverTab);
-        readStreamHexDumpEdit->setObjectName(QStringLiteral("readStreamHexDumpEdit"));
-        readStreamHexDumpEdit->setGeometry(QRect(10, 30, 591, 121));
-        readStreamHexDumpEdit->setUndoRedoEnabled(false);
-        readStreamHexDumpEdit->setReadOnly(true);
-        readStreamFieldsFrame = new QScrollArea(receiverTab);
-        readStreamFieldsFrame->setObjectName(QStringLiteral("readStreamFieldsFrame"));
-        readStreamFieldsFrame->setGeometry(QRect(10, 190, 591, 641));
-        readStreamFieldsFrame->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-        readStreamFieldsFrame->setWidgetResizable(true);
+        readPayloadDumpEdit = new QTextEdit(receiverTab);
+        readPayloadDumpEdit->setObjectName(QStringLiteral("readPayloadDumpEdit"));
+        readPayloadDumpEdit->setGeometry(QRect(10, 2, 591, 100));
+        readPayloadDumpEdit->setUndoRedoEnabled(false);
+        readPayloadDumpEdit->setReadOnly(false);
+        readPayloadFieldsFrame = new QScrollArea(receiverTab);
+        readPayloadFieldsFrame->setObjectName(QStringLiteral("readPayloadFieldsFrame"));
+        readPayloadFieldsFrame->setGeometry(QRect(10, 136, 591, 725));
+        readPayloadFieldsFrame->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        readPayloadFieldsFrame->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 589, 639));
-        readStreamFieldsFrame->setWidget(scrollAreaWidgetContents);
-        readStreamParseNumericFieldButton = new QPushButton(receiverTab);
-        readStreamParseNumericFieldButton->setObjectName(QStringLiteral("readStreamParseNumericFieldButton"));
-        readStreamParseNumericFieldButton->setGeometry(QRect(470, 160, 131, 25));
-        readStreamParseStringFieldButton = new QPushButton(receiverTab);
-        readStreamParseStringFieldButton->setObjectName(QStringLiteral("readStreamParseStringFieldButton"));
-        readStreamParseStringFieldButton->setGeometry(QRect(350, 160, 111, 25));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 589, 723));
+        readPayloadFieldsFrame->setWidget(scrollAreaWidgetContents);
+        parseNumericButton = new QPushButton(receiverTab);
+        parseNumericButton->setObjectName(QStringLiteral("parseNumericButton"));
+        parseNumericButton->setGeometry(QRect(470, 106, 131, 24));
+        parseStringButton = new QPushButton(receiverTab);
+        parseStringButton->setObjectName(QStringLiteral("parseStringButton"));
+        parseStringButton->setGeometry(QRect(356, 106, 110, 24));
+        clearReadPayloadFieldsButton = new QPushButton(receiverTab);
+        clearReadPayloadFieldsButton->setObjectName(QStringLiteral("clearReadPayloadFieldsButton"));
+        clearReadPayloadFieldsButton->setGeometry(QRect(291, 106, 61, 24));
         tabWidget->addTab(receiverTab, QString());
         senderTab = new QWidget();
         senderTab->setObjectName(QStringLiteral("senderTab"));
-        writeStreamFieldsCountSlider = new QSlider(senderTab);
-        writeStreamFieldsCountSlider->setObjectName(QStringLiteral("writeStreamFieldsCountSlider"));
-        writeStreamFieldsCountSlider->setGeometry(QRect(414, 10, 181, 21));
-        writeStreamFieldsCountSlider->setMaximum(24);
-        writeStreamFieldsCountSlider->setPageStep(1);
-        writeStreamFieldsCountSlider->setOrientation(Qt::Horizontal);
-        writeStreamFieldsCountTitleLabel = new QLabel(senderTab);
-        writeStreamFieldsCountTitleLabel->setObjectName(QStringLiteral("writeStreamFieldsCountTitleLabel"));
-        writeStreamFieldsCountTitleLabel->setGeometry(QRect(250, 10, 131, 16));
-        writeStreamFieldsCountLabel = new QLabel(senderTab);
-        writeStreamFieldsCountLabel->setObjectName(QStringLiteral("writeStreamFieldsCountLabel"));
-        writeStreamFieldsCountLabel->setGeometry(QRect(380, 10, 41, 16));
-        writeStreamFieldsFrame = new QScrollArea(senderTab);
-        writeStreamFieldsFrame->setObjectName(QStringLiteral("writeStreamFieldsFrame"));
-        writeStreamFieldsFrame->setGeometry(QRect(10, 170, 591, 701));
-        writeStreamFieldsFrame->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-        writeStreamFieldsFrame->setWidgetResizable(true);
+        writePayloadFieldsFrame = new QScrollArea(senderTab);
+        writePayloadFieldsFrame->setObjectName(QStringLiteral("writePayloadFieldsFrame"));
+        writePayloadFieldsFrame->setGeometry(QRect(10, 134, 591, 706));
+        writePayloadFieldsFrame->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        writePayloadFieldsFrame->setWidgetResizable(true);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QStringLiteral("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 589, 699));
-        sendWriteStreamFieldsButton = new QPushButton(scrollAreaWidgetContents_2);
-        sendWriteStreamFieldsButton->setObjectName(QStringLiteral("sendWriteStreamFieldsButton"));
-        sendWriteStreamFieldsButton->setGeometry(QRect(470, 677, 99, 20));
-        getWriteStreamHexDumpButton = new QPushButton(scrollAreaWidgetContents_2);
-        getWriteStreamHexDumpButton->setObjectName(QStringLiteral("getWriteStreamHexDumpButton"));
-        getWriteStreamHexDumpButton->setGeometry(QRect(360, 677, 99, 20));
-        clearWriteStreamFieldsButton = new QPushButton(scrollAreaWidgetContents_2);
-        clearWriteStreamFieldsButton->setObjectName(QStringLiteral("clearWriteStreamFieldsButton"));
-        clearWriteStreamFieldsButton->setGeometry(QRect(250, 677, 99, 20));
-        writeStreamFieldsFrame->setWidget(scrollAreaWidgetContents_2);
-        writeStreamHexDumpEdit = new QTextEdit(senderTab);
-        writeStreamHexDumpEdit->setObjectName(QStringLiteral("writeStreamHexDumpEdit"));
-        writeStreamHexDumpEdit->setGeometry(QRect(10, 40, 591, 102));
-        writeStreamHexDumpEdit->setUndoRedoEnabled(false);
-        writeStreamHexDumpEdit->setReadOnly(false);
-        writeStreamIdEdit = new QLineEdit(senderTab);
-        writeStreamIdEdit->setObjectName(QStringLiteral("writeStreamIdEdit"));
-        writeStreamIdEdit->setGeometry(QRect(93, 7, 113, 23));
-        writeStreamIdTitleLabel = new QLabel(senderTab);
-        writeStreamIdTitleLabel->setObjectName(QStringLiteral("writeStreamIdTitleLabel"));
-        writeStreamIdTitleLabel->setGeometry(QRect(15, 10, 67, 17));
-        clearWriteStreamHexDumpButton = new QPushButton(senderTab);
-        clearWriteStreamHexDumpButton->setObjectName(QStringLiteral("clearWriteStreamHexDumpButton"));
-        clearWriteStreamHexDumpButton->setGeometry(QRect(390, 146, 99, 20));
-        sendWriteStreamHexDumpButton = new QPushButton(senderTab);
-        sendWriteStreamHexDumpButton->setObjectName(QStringLiteral("sendWriteStreamHexDumpButton"));
-        sendWriteStreamHexDumpButton->setGeometry(QRect(500, 146, 99, 20));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 589, 704));
+        writePayloadFieldsFrame->setWidget(scrollAreaWidgetContents_2);
+        writePayloadDumpEdit = new QTextEdit(senderTab);
+        writePayloadDumpEdit->setObjectName(QStringLiteral("writePayloadDumpEdit"));
+        writePayloadDumpEdit->setGeometry(QRect(10, 2, 591, 100));
+        writePayloadDumpEdit->setUndoRedoEnabled(false);
+        writePayloadDumpEdit->setReadOnly(false);
+        sendDumpButton = new QPushButton(senderTab);
+        sendDumpButton->setObjectName(QStringLiteral("sendDumpButton"));
+        sendDumpButton->setGeometry(QRect(502, 106, 99, 24));
+        sendFieldsButton = new QPushButton(senderTab);
+        sendFieldsButton->setObjectName(QStringLiteral("sendFieldsButton"));
+        sendFieldsButton->setGeometry(QRect(540, 843, 61, 23));
+        clearWritePayloadButton = new QPushButton(senderTab);
+        clearWritePayloadButton->setObjectName(QStringLiteral("clearWritePayloadButton"));
+        clearWritePayloadButton->setGeometry(QRect(9, 843, 61, 23));
+        dumpButton = new QPushButton(senderTab);
+        dumpButton->setObjectName(QStringLiteral("dumpButton"));
+        dumpButton->setGeometry(QRect(478, 843, 58, 23));
+        writePayloadFieldsCountSlider = new QSlider(senderTab);
+        writePayloadFieldsCountSlider->setObjectName(QStringLiteral("writePayloadFieldsCountSlider"));
+        writePayloadFieldsCountSlider->setGeometry(QRect(140, 107, 161, 23));
+        writePayloadFieldsCountSlider->setMaximum(25);
+        writePayloadFieldsCountSlider->setPageStep(1);
+        writePayloadFieldsCountSlider->setOrientation(Qt::Horizontal);
+        writePayloadFieldsCountLabel = new QLabel(senderTab);
+        writePayloadFieldsCountLabel->setObjectName(QStringLiteral("writePayloadFieldsCountLabel"));
+        writePayloadFieldsCountLabel->setGeometry(QRect(107, 110, 31, 16));
+        writePayloadFieldsCountTitleLabel = new QLabel(senderTab);
+        writePayloadFieldsCountTitleLabel->setObjectName(QStringLiteral("writePayloadFieldsCountTitleLabel"));
+        writePayloadFieldsCountTitleLabel->setGeometry(QRect(10, 110, 91, 16));
         tabWidget->addTab(senderTab, QString());
-        usersView = new QTreeView(centralwidget);
-        usersView->setObjectName(QStringLiteral("usersView"));
-        usersView->setGeometry(QRect(-5, 0, 266, 791));
-        usersView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        removeStreamButton = new QPushButton(centralwidget);
-        removeStreamButton->setObjectName(QStringLiteral("removeStreamButton"));
-        removeStreamButton->setGeometry(QRect(50, 830, 121, 27));
-        disconnectUserButton = new QPushButton(centralwidget);
-        disconnectUserButton->setObjectName(QStringLiteral("disconnectUserButton"));
-        disconnectUserButton->setGeometry(QRect(50, 800, 121, 27));
+        connectionsView = new QTreeView(centralwidget);
+        connectionsView->setObjectName(QStringLiteral("connectionsView"));
+        connectionsView->setGeometry(QRect(-5, 30, 266, 831));
+        connectionsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        removePayloadButton = new QPushButton(centralwidget);
+        removePayloadButton->setObjectName(QStringLiteral("removePayloadButton"));
+        removePayloadButton->setGeometry(QRect(2, 867, 121, 27));
+        disconnectButton = new QPushButton(centralwidget);
+        disconnectButton->setObjectName(QStringLiteral("disconnectButton"));
+        disconnectButton->setGeometry(QRect(132, 867, 121, 27));
+        activeConnectionsTitleLabel = new QLabel(centralwidget);
+        activeConnectionsTitleLabel->setObjectName(QStringLiteral("activeConnectionsTitleLabel"));
+        activeConnectionsTitleLabel->setGeometry(QRect(2, 10, 131, 17));
         Gui->setCentralWidget(centralwidget);
 
         retranslateUi(Gui);
@@ -182,36 +157,30 @@ public:
     void retranslateUi(QMainWindow *Gui)
     {
         Gui->setWindowTitle(QApplication::translate("Gui", "MainWindow", 0));
-        readStreamHexDumpTitleLabel->setText(QApplication::translate("Gui", "Hex dump", 0));
-        readStreamIdTitleLabel->setText(QApplication::translate("Gui", "Stream id:", 0));
-        readStreamIdLabel->setText(QApplication::translate("Gui", "0", 0));
-        readStreamSizeTitleLabel->setText(QApplication::translate("Gui", "Stream size:", 0));
-        readStreamSizeLabel->setText(QApplication::translate("Gui", "0", 0));
-        readStreamHexDumpEdit->setHtml(QApplication::translate("Gui", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        readPayloadDumpEdit->setHtml(QApplication::translate("Gui", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", 0));
-        readStreamParseNumericFieldButton->setText(QApplication::translate("Gui", "Parse numeric", 0));
-        readStreamParseStringFieldButton->setText(QApplication::translate("Gui", "Parse string", 0));
+        parseNumericButton->setText(QApplication::translate("Gui", "Parse numeric", 0));
+        parseStringButton->setText(QApplication::translate("Gui", "Parse string", 0));
+        clearReadPayloadFieldsButton->setText(QApplication::translate("Gui", "Clear", 0));
         tabWidget->setTabText(tabWidget->indexOf(receiverTab), QApplication::translate("Gui", "Receiver", 0));
-        writeStreamFieldsCountTitleLabel->setText(QApplication::translate("Gui", "Number of fields:", 0));
-        writeStreamFieldsCountLabel->setText(QApplication::translate("Gui", "0", 0));
-        sendWriteStreamFieldsButton->setText(QApplication::translate("Gui", "Send", 0));
-        getWriteStreamHexDumpButton->setText(QApplication::translate("Gui", "Hex dump", 0));
-        clearWriteStreamFieldsButton->setText(QApplication::translate("Gui", "Clear", 0));
-        writeStreamHexDumpEdit->setHtml(QApplication::translate("Gui", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        writePayloadDumpEdit->setHtml(QApplication::translate("Gui", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", 0));
-        writeStreamIdEdit->setText(QApplication::translate("Gui", "0", 0));
-        writeStreamIdTitleLabel->setText(QApplication::translate("Gui", "Stream id:", 0));
-        clearWriteStreamHexDumpButton->setText(QApplication::translate("Gui", "Clear", 0));
-        sendWriteStreamHexDumpButton->setText(QApplication::translate("Gui", "Send", 0));
+        sendDumpButton->setText(QApplication::translate("Gui", "Send dump", 0));
+        sendFieldsButton->setText(QApplication::translate("Gui", "Send", 0));
+        clearWritePayloadButton->setText(QApplication::translate("Gui", "Clear", 0));
+        dumpButton->setText(QApplication::translate("Gui", "Dump", 0));
+        writePayloadFieldsCountLabel->setText(QApplication::translate("Gui", "0", 0));
+        writePayloadFieldsCountTitleLabel->setText(QApplication::translate("Gui", "Fields count:", 0));
         tabWidget->setTabText(tabWidget->indexOf(senderTab), QApplication::translate("Gui", "Sender", 0));
-        removeStreamButton->setText(QApplication::translate("Gui", "Remove stream", 0));
-        disconnectUserButton->setText(QApplication::translate("Gui", "Disconnect user", 0));
+        removePayloadButton->setText(QApplication::translate("Gui", "Remove payload", 0));
+        disconnectButton->setText(QApplication::translate("Gui", "Disconnect", 0));
+        activeConnectionsTitleLabel->setText(QApplication::translate("Gui", "Active connections", 0));
     } // retranslateUi
 
 };
@@ -222,4 +191,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // ANALYZERAY2676_H
+#endif // ANALYZERJL2554_H

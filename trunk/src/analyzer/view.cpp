@@ -12,41 +12,42 @@ namespace analyzer
 {
 
 View::View():
-    usersViewItemModel_(new QStandardItemModel()),
-    usersViewItem_(usersViewItemModel_->invisibleRootItem())
+    connectionsViewItemModel_(new QStandardItemModel()),
+    connectionsViewItem_(connectionsViewItemModel_->invisibleRootItem())
 {
     gui_.setupUi(this);
     gui_.retranslateUi(this);
-    gui_.usersView->setModel(usersViewItemModel_);
-    readStreamView_.setParent(gui_.scrollAreaWidgetContents);
-    writeStreamView_.setParent(gui_.scrollAreaWidgetContents_2);
+    gui_.connectionsView->setModel(connectionsViewItemModel_);
+
+    readPayloadView_.setParent(gui_.scrollAreaWidgetContents);
+    writePayloadView_.setParent(gui_.scrollAreaWidgetContents_2);
 }
 
-void View::displayUser(const std::string &userId)
+void View::displayConnection(const std::string &connectionId)
 {
-    usersViewItem_.insert(userId);
+    connectionsViewItem_.insert(connectionId);
 }
 
-void View::removeUserFromDisplay(const std::string &userId)
+void View::removeConnectionFromDisplay(const std::string &connectionId)
 {
-    usersViewItem_.remove(userId);
+    connectionsViewItem_.remove(connectionId);
 }
 
-void View::displayUserReadStreams(const std::string &userId, const std::vector<std::string> &streamIds)
+void View::displayConnectionReadPayloads(const std::string &connectionId, const std::vector<std::string> &payloadIds)
 {
     try
     {
-        StandardItemWrapper userReadStreamsViewItem = usersViewItem_.find(userId);
-        userReadStreamsViewItem.clear();
+        StandardItemWrapper readPayloadsViewItem = connectionsViewItem_.find(connectionId);
+        readPayloadsViewItem.clear();
 
-        for(const auto& streamId: streamIds)
+        for(const auto& payloadId: payloadIds)
         {
-            userReadStreamsViewItem.insert(streamId);
+            readPayloadsViewItem.insert(payloadId);
         }
     }
     catch(const StandardItemWrapper::ItemNotFoundException&)
     {
-        LOG(ERROR) << "Could not find userId: " << userId;
+        LOG(ERROR) << "Could not find connectionId: " << connectionId;
     }
 }
 
@@ -55,166 +56,132 @@ void View::setController(Controller *controller)
     controller_ = controller;
 }
 
-void View::loadReadStream(const QModelIndex &index)
+void View::displayReadPayload(const QModelIndex &index)
 {
     if(index.isValid() && index.parent().isValid())
     {
-        StandardItemWrapper userId = usersViewItem_.find(gui_.usersView->currentIndex().parent());
-        StandardItemWrapper streamId = userId.find(gui_.usersView->currentIndex());
+        StandardItemWrapper connectionId = connectionsViewItem_.find(gui_.connectionsView->currentIndex().parent());
+        StandardItemWrapper payloadId = connectionId.find(gui_.connectionsView->currentIndex());
 
-        controller_->loadReadStream(userId.getText(), streamId.getText());
+        const std::string &dump = controller_->getReadPayloadDump(connectionId.getText(), payloadId.getText());
+
+        readPayloadView_.clear();
+        gui_.readPayloadDumpEdit->clear();
+        gui_.readPayloadDumpEdit->insertPlainText(QString::fromStdString(dump));
     }
     else
     {
-        LOG(ERROR) << "Could not load stream from selected object, row: " << gui_.usersView->currentIndex().row();
+        LOG(ERROR) << "Could not get dump for selected payload!";
     }
 }
 
 void View::display()
 {
-    connect(gui_.usersView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(loadReadStream(const QModelIndex&)));
-    connect(gui_.disconnectUserButton, SIGNAL(clicked()), this, SLOT(disconnectUser()));
-    connect(gui_.writeStreamFieldsCountSlider, SIGNAL(valueChanged(int)), this, SLOT(resizeWriteStreamFieldsCount(int)));
-    connect(gui_.readStreamParseNumericFieldButton, SIGNAL(clicked()), this, SLOT(parseReadStreamNumericField()));
-    connect(gui_.readStreamParseStringFieldButton, SIGNAL(clicked()), this, SLOT(parseReadStreamStringField()));
-    connect(gui_.sendWriteStreamFieldsButton, SIGNAL(clicked()), this, SLOT(sendFields()));
-    connect(gui_.getWriteStreamHexDumpButton, SIGNAL(clicked()), this, SLOT(getWriteStreamHexDump()));
-    connect(gui_.clearWriteStreamFieldsButton, SIGNAL(clicked()), this, SLOT(clearWriteStreamView()));
-    connect(gui_.clearWriteStreamHexDumpButton, SIGNAL(clicked()), this, SLOT(clearWriteStreamHexDump()));
-    connect(gui_.sendWriteStreamHexDumpButton, SIGNAL(clicked()), this, SLOT(sendHexDump()));
+    connect(gui_.connectionsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(displayReadPayload(const QModelIndex&)));
+    connect(gui_.disconnectButton, SIGNAL(clicked()), this, SLOT(disconnect()));
+
+    connect(gui_.parseNumericButton, SIGNAL(clicked()), this, SLOT(parseNumericField()));
+    connect(gui_.parseStringButton, SIGNAL(clicked()), this, SLOT(parseStringField()));
+    connect(gui_.clearReadPayloadFieldsButton, SIGNAL(clicked()), this, SLOT(clearReadPayloadView()));
+
+    connect(gui_.writePayloadFieldsCountSlider, SIGNAL(valueChanged(int)), this, SLOT(resizeWritePayloadFieldsCount(int)));
+    connect(gui_.sendFieldsButton, SIGNAL(clicked()), this, SLOT(sendFields()));
+    connect(gui_.sendDumpButton, SIGNAL(clicked()), this, SLOT(sendDump()));
+    connect(gui_.dumpButton, SIGNAL(clicked()), this, SLOT(generateDump()));
+    connect(gui_.clearWritePayloadButton, SIGNAL(clicked()), this, SLOT(clearWritePayloadView()));
+
     this->show();
 }
 
-void View::displayReadStream(const std::string &streamHex, uint16_t streamId, size_t streamSize)
+void View::disconnect()
 {
-    readStreamView_.clear();
+    const std::string &connectionId = getSelectedConnectionId();
 
-    gui_.readStreamHexDumpEdit->clear();
-    gui_.readStreamHexDumpEdit->insertPlainText(QString::fromStdString(streamHex));
-
-    std::stringstream streamIdHex; streamIdHex << std::hex << streamId;
-    gui_.readStreamIdLabel->setText(QString::fromStdString(streamIdHex.str()));
-    gui_.readStreamSizeLabel->setText(QString::fromStdString(boost::lexical_cast<std::string>(streamSize)));
-}
-
-void View::disconnectUser()
-{
-    QModelIndex index = gui_.usersView->currentIndex();
-
-    if(index.isValid())
+    if(!connectionId.empty())
     {
-        try
-        {
-            StandardItemWrapper userId = usersViewItem_.find(index);
-            controller_->disconnectUser(userId.getText());
-        }
-        catch(const StandardItemWrapper::ItemNotFoundException)
-        {
-            LOG(ERROR) << "Could not find user index: " << index.row();
-        }
-
+        controller_->disconnect(connectionId);
     }
 }
 
-void View::resizeWriteStreamFieldsCount(int numberOfFields)
+void View::resizeWritePayloadFieldsCount(int numberOfFields)
 {
-    gui_.writeStreamFieldsCountLabel->setText(QString::fromStdString(boost::lexical_cast<std::string>(numberOfFields)));
-    writeStreamView_.resize(numberOfFields);
+    gui_.writePayloadFieldsCountLabel->setText(QString::fromStdString(boost::lexical_cast<std::string>(numberOfFields)));
+    writePayloadView_.resize(numberOfFields);
 }
 
-void View::parseReadStreamNumericField()
+void View::parseNumericField()
 {
-    QString selectedString = gui_.readStreamHexDumpEdit->textCursor().selectedText();
+    QString selectedString = gui_.readPayloadDumpEdit->textCursor().selectedText();
 
     if(selectedString.length() > 0)
     {
-        readStreamView_.insertNumericField(selectedString.toStdString());
+        readPayloadView_.insertNumericField(selectedString.toStdString());
     }
 }
 
-void View::parseReadStreamStringField()
+void View::parseStringField()
 {
-    QString selectedString = gui_.readStreamHexDumpEdit->textCursor().selectedText();
+    QString selectedString = gui_.readPayloadDumpEdit->textCursor().selectedText();
 
     if(selectedString.length() > 0)
     {
-        readStreamView_.insertStringField(selectedString.toStdString());
+        readPayloadView_.insertStringField(selectedString.toStdString());
     }
 }
 
 void View::sendFields()
 {
-    if(gui_.writeStreamIdEdit->text().length() == 0)
-    {
-        LOG(ERROR) << "stream id not set!";
-        return;
-    }
+    const std::string &connectionId = this->getSelectedConnectionId();
 
-    QModelIndex index = gui_.usersView->currentIndex();
-
-    if(index.isValid())
+    if(!connectionId.empty())
     {
-        try
-        {
-            StandardItemWrapper userId = usersViewItem_.find(index);
-            controller_->send(userId.getText(), gui_.writeStreamIdEdit->text().toStdString(), writeStreamView_.getFields());
-        }
-        catch(const StandardItemWrapper::ItemNotFoundException)
-        {
-            LOG(ERROR) << "Could not find user index: " << index.row();
-        }
+        const std::string &dump = writePayloadView_.getDump();
+        controller_->send(connectionId, dump);
     }
 }
 
-void View::getWriteStreamHexDump()
+void View::generateDump()
 {
-    if(gui_.writeStreamIdEdit->text().length() == 0)
-    {
-        LOG(ERROR) << "stream id not set!";
-        return;
-    }
-
-    clearWriteStreamHexDump();
-
-    const std::string preview = controller_->generateStreamPreview(gui_.writeStreamIdEdit->text().toStdString(), writeStreamView_.getFields());
-    gui_.writeStreamHexDumpEdit->insertPlainText(QString::fromStdString(preview));
+    gui_.writePayloadDumpEdit->clear();
+    gui_.writePayloadDumpEdit->insertPlainText(QString::fromStdString(writePayloadView_.getDump()));
 }
 
-void View::clearWriteStreamHexDump()
+void View::clearWritePayloadView()
 {
-    gui_.writeStreamHexDumpEdit->clear();
+    gui_.writePayloadDumpEdit->clear();
+    gui_.writePayloadFieldsCountSlider->setValue(0);
+    gui_.writePayloadFieldsCountLabel->setText("0");
+    writePayloadView_.clear();
 }
 
-void View::clearWriteStreamView()
+void View::clearReadPayloadView()
 {
-    gui_.writeStreamFieldsCountSlider->setValue(0);
-    writeStreamView_.clear();
+    readPayloadView_.clear();
 }
 
-void View::sendHexDump()
+void View::sendDump()
 {
-    const std::string &dump = gui_.writeStreamHexDumpEdit->toPlainText().toStdString();
+    const std::string &connectionId = this->getSelectedConnectionId();
 
-    if(dump.length() == 0)
+    if(!connectionId.empty())
     {
-        LOG(ERROR) << "empty hex dump!";
-        return;
+        controller_->send(connectionId, gui_.writePayloadDumpEdit->toPlainText().toStdString());
+    }
+}
+
+std::string View::getSelectedConnectionId() const
+{
+    try
+    {
+        StandardItemWrapper connectionId = connectionsViewItem_.find(gui_.connectionsView->currentIndex());
+        return connectionId.getText();
+    }
+    catch(const StandardItemWrapper::ItemNotFoundException&)
+    {
+        LOG(ERROR) << "Selected object is not a connection!";
     }
 
-    QModelIndex index = gui_.usersView->currentIndex();
-
-    if(index.isValid())
-    {
-        try
-        {
-            StandardItemWrapper userId = usersViewItem_.find(index);
-            controller_->send(userId.getText(), dump);
-        }
-        catch(const StandardItemWrapper::ItemNotFoundException)
-        {
-            LOG(ERROR) << "Could not find user index: " << index.row();
-        }
-    }
+    return "";
 }
 
 }

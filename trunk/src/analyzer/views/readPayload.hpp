@@ -1,24 +1,21 @@
 #pragma once
 
-#include <analyzer/stream/views/streamView.hpp>
+#include <analyzer/views/payload.hpp>
 
 namespace eMU
 {
 namespace analyzer
 {
-namespace stream
-{
 namespace views
 {
 
-class ReadStreamView: public StreamView
+class ReadPayload: public Payload
 {
 public:
     void insertNumericField(const std::string &value);
     void insertStringField(const std::string &value);
 };
 
-}
 }
 }
 }

@@ -1,5 +1,7 @@
 #include <core/network/payload.hpp>
 
+#include <iomanip>
+
 namespace eMU
 {
 namespace core
@@ -51,6 +53,16 @@ uint8_t& Payload::operator[](size_t offset)
 const uint8_t& Payload::operator[](size_t offset) const
 {
     return data_[offset];
+}
+
+std::ostream& operator<<(std::ostream &out, const Payload &payload)
+{
+    for(size_t i = 0; i < payload.getSize(); ++i)
+    {
+        out << std::hex << std::setfill('0') << std::setw(2) << static_cast<uint32_t>(payload[i]) << " ";
+    }
+
+    return out;
 }
 
 }

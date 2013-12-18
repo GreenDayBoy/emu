@@ -41,8 +41,6 @@ public:
     void writeNextWideString(const std::wstring &value);
     void writeNextString(const std::string &value);
 
-    friend std::ostream& operator<<(std::ostream &out, const WriteStream &stream);
-
 private:
     core::network::Payload payload_;
     uint32_t currentOffset_;

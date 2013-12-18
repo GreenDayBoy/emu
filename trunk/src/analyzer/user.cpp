@@ -20,7 +20,7 @@ void User::parseReadPayload()
 
         for(const auto &stream : readStreamsExtractor.getStreams())
         {
-            readStreams_.push_back(stream);
+            readPayloads_.push_back(stream.getPayload());
         }
     }
     catch(const protocol::ReadStreamsExtractor::EmptyPayloadException&)
@@ -40,9 +40,9 @@ void User::parseReadPayload()
     }
 }
 
-std::list<protocol::ReadStream> &User::getReadStreams()
+std::list<core::network::Payload> &User::getReadPayloads()
 {
-    return readStreams_;
+    return readPayloads_;
 }
 
 }

@@ -1,14 +1,12 @@
 #pragma once
 
-#include <analyzer/stream/fields/field.hpp>
+#include <analyzer/views/field.hpp>
 
 namespace eMU
 {
 namespace analyzer
 {
-namespace stream
-{
-namespace fields
+namespace views
 {
 
 class NumericField: public Field
@@ -19,7 +17,6 @@ public:
     void prepare();
 };
 
-}
 }
 }
 }
