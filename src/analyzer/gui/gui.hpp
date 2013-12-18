@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'analyzerEN2554.ui'
+** Form generated from reading UI file 'analyzerwv2554.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.2.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef ANALYZEREN2554_H
-#define ANALYZEREN2554_H
+#ifndef ANALYZERWV2554_H
+#define ANALYZERWV2554_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
@@ -36,8 +36,9 @@ public:
     QScrollArea *readPayloadFieldsFrame;
     QWidget *scrollAreaWidgetContents;
     QPushButton *parseNumericButton;
-    QPushButton *parseStringButton;
+    QPushButton *parseWideStringButton;
     QPushButton *clearReadPayloadFieldsButton;
+    QPushButton *parseStringButton;
     QWidget *senderTab;
     QScrollArea *writePayloadFieldsFrame;
     QWidget *scrollAreaWidgetContents_2;
@@ -86,12 +87,15 @@ public:
         parseNumericButton = new QPushButton(receiverTab);
         parseNumericButton->setObjectName(QStringLiteral("parseNumericButton"));
         parseNumericButton->setGeometry(QRect(470, 106, 131, 24));
-        parseStringButton = new QPushButton(receiverTab);
-        parseStringButton->setObjectName(QStringLiteral("parseStringButton"));
-        parseStringButton->setGeometry(QRect(356, 106, 110, 24));
+        parseWideStringButton = new QPushButton(receiverTab);
+        parseWideStringButton->setObjectName(QStringLiteral("parseWideStringButton"));
+        parseWideStringButton->setGeometry(QRect(356, 106, 110, 24));
         clearReadPayloadFieldsButton = new QPushButton(receiverTab);
         clearReadPayloadFieldsButton->setObjectName(QStringLiteral("clearReadPayloadFieldsButton"));
-        clearReadPayloadFieldsButton->setGeometry(QRect(291, 106, 61, 24));
+        clearReadPayloadFieldsButton->setGeometry(QRect(180, 106, 61, 24));
+        parseStringButton = new QPushButton(receiverTab);
+        parseStringButton->setObjectName(QStringLiteral("parseStringButton"));
+        parseStringButton->setGeometry(QRect(243, 106, 110, 24));
         tabWidget->addTab(receiverTab, QString());
         senderTab = new QWidget();
         senderTab->setObjectName(QStringLiteral("senderTab"));
@@ -175,8 +179,9 @@ public:
 "</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", 0));
         parseNumericButton->setText(QApplication::translate("Gui", "Parse numeric", 0));
-        parseStringButton->setText(QApplication::translate("Gui", "Parse string", 0));
+        parseWideStringButton->setText(QApplication::translate("Gui", "Parse wstring", 0));
         clearReadPayloadFieldsButton->setText(QApplication::translate("Gui", "Clear", 0));
+        parseStringButton->setText(QApplication::translate("Gui", "Parse string", 0));
         tabWidget->setTabText(tabWidget->indexOf(receiverTab), QApplication::translate("Gui", "Receiver", 0));
         writePayloadDumpEdit->setHtml(QApplication::translate("Gui", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
@@ -206,4 +211,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // ANALYZEREN2554_H
+#endif // ANALYZERWV2554_H

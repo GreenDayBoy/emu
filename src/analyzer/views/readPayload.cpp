@@ -1,6 +1,7 @@
 #include <analyzer/views/readPayload.hpp>
 #include <analyzer/views/numericField.hpp>
 #include <analyzer/views/stringField.hpp>
+#include <analyzer/views/wideStringField.hpp>
 
 namespace eMU
 {
@@ -18,6 +19,12 @@ void ReadPayload::insertNumericField(const std::string &value)
 void ReadPayload::insertStringField(const std::string &value)
 {
     fields_.push_back(new StringField(parent_, fields_.size(), value));
+    fields_.back()->prepare();
+}
+
+void ReadPayload::insertWideStringField(const std::string &value)
+{
+    fields_.push_back(new WideStringField(parent_, fields_.size(), value));
     fields_.back()->prepare();
 }
 

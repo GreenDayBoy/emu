@@ -84,6 +84,7 @@ void View::display()
 
     connect(gui_.parseNumericButton, SIGNAL(clicked()), this, SLOT(parseNumericField()));
     connect(gui_.parseStringButton, SIGNAL(clicked()), this, SLOT(parseStringField()));
+    connect(gui_.parseWideStringButton, SIGNAL(clicked()), this, SLOT(parseWideStringField()));
     connect(gui_.clearReadPayloadFieldsButton, SIGNAL(clicked()), this, SLOT(clearReadPayloadView()));
 
     connect(gui_.writePayloadFieldsCountSlider, SIGNAL(valueChanged(int)), this, SLOT(resizeWritePayloadFieldsCount(int)));
@@ -129,6 +130,16 @@ void View::parseStringField()
     if(selectedString.length() > 0)
     {
         readPayloadView_.insertStringField(selectedString.toStdString());
+    }
+}
+
+void View::parseWideStringField()
+{
+    QString selectedString = gui_.readPayloadDumpEdit->textCursor().selectedText();
+
+    if(selectedString.length() > 0)
+    {
+        readPayloadView_.insertWideStringField(selectedString.toStdString());
     }
 }
 
