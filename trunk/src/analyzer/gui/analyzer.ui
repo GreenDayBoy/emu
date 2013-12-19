@@ -339,7 +339,7 @@ p, li { white-space: pre-wrap; }
    <widget class="QPushButton" name="removePayloadButton">
     <property name="geometry">
      <rect>
-      <x>2</x>
+      <x>5</x>
       <y>867</y>
       <width>121</width>
       <height>27</height>
