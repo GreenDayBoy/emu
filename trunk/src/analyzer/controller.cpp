@@ -28,7 +28,7 @@ View& Controller::getView()
 
 void Controller::onAccept(User &user)
 {
-    view_.displayConnection(boost::lexical_cast<std::string>(user.getHash()));
+    view_.emitConnectionAccepted(boost::lexical_cast<std::string>(user.getHash()));
 }
 
 void Controller::onReceive(User &user)
@@ -41,12 +41,12 @@ void Controller::onReceive(User &user)
         payloadHashes.push_back(boost::lexical_cast<std::string>(payloadHash));
     }
 
-    view_.displayConnectionReadPayloads(boost::lexical_cast<std::string>(user.getHash()), payloadHashes);
+    view_.emitPayloadReceived(boost::lexical_cast<std::string>(user.getHash()), payloadHashes);
 }
 
 void Controller::onClose(User &user)
 {
-    view_.removeConnectionFromDisplay(boost::lexical_cast<std::string>(user.getHash()));
+    view_.emitConnectionClosed(boost::lexical_cast<std::string>(user.getHash()));
 }
 
 std::string Controller::getReadPayloadDump(const std::string &connectionId, const std::string &payloadId)

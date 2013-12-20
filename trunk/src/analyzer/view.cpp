@@ -15,6 +15,9 @@ View::View():
     connectionsViewItemModel_(new QStandardItemModel()),
     connectionsViewItem_(connectionsViewItemModel_->invisibleRootItem())
 {
+    qRegisterMetaType<std::string>("std::string");
+    qRegisterMetaType<std::vector<std::string>>("std::vector<std::string>");
+
     gui_.setupUi(this);
     gui_.retranslateUi(this);
     gui_.connectionsView->setModel(connectionsViewItemModel_);
@@ -75,10 +78,16 @@ void View::displayReadPayload(const QModelIndex &index)
     {
         LOG(ERROR) << "Could not get dump for selected payload!";
     }
+
+    emit
 }
 
 void View::display()
 {
+    connect(this, SIGNAL(connectionAccepted(const std::string&)), this, SLOT(displayConnection(const std::string&)));
+    connect(this, SIGNAL(payloadReceived(const std::string&, const std::vector<std::string>&)), this, SLOT(displayConnectionReadPayloads(const std::string&, const std::vector<std::string>&)));
+    connect(this, SIGNAL(connectionClosed(const std::string&)), this, SLOT(removeConnectionFromDisplay(const std::string&)));
+
     connect(gui_.connectionsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(displayReadPayload(const QModelIndex&)));
     connect(gui_.disconnectButton, SIGNAL(clicked()), this, SLOT(disconnect()));
 
@@ -201,6 +210,21 @@ std::string View::getSelectedConnectionId() const
 void View::calculatehWritePayloadSize()
 {
     gui_.writePayloadSizeLabel->setText(QString::fromStdString(boost::lexical_cast<std::string>(writePayloadView_.getFieldsSize())));
+}
+
+void View::emitConnectionAccepted(const std::string &connectionId)
+{
+    emit connectionAccepted(connectionId);
+}
+
+void View::emitPayloadReceived(const std::string &connectionId, const std::vector<std::string> &payloadIds)
+{
+    emit payloadReceived(connectionId, payloadIds);
+}
+
+void View::emitConnectionClosed(const std::string &connectionId)
+{
+    emit connectionClosed(connectionId);
 }
 
 }

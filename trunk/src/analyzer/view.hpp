@@ -8,6 +8,9 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QLineEdit>
 
+Q_DECLARE_METATYPE(std::string)
+Q_DECLARE_METATYPE(std::vector<std::string>)
+
 namespace eMU
 {
 namespace analyzer
@@ -20,14 +23,15 @@ class View: public QMainWindow
 public:
     View();
 
-    void displayConnection(const std::string &connectionId);
-    void removeConnectionFromDisplay(const std::string &connectionId);
-    void displayConnectionReadPayloads(const std::string &connectionId, const std::vector<std::string> &payloadIds);
     void setController(Controller *controller);
     void display();
     void displayReadPayload(const std::string &readPayloadDump);
 
-public slots:
+    void emitConnectionAccepted(const std::string &connectionId);
+    void emitPayloadReceived(const std::string &connectionId, const std::vector<std::string> &payloadIds);
+    void emitConnectionClosed(const std::string &connectionId);
+
+private slots:
     void displayReadPayload(const QModelIndex &index);
     void disconnect();
     void resizeWritePayloadFieldsCount(int numberOfFields);
@@ -40,6 +44,15 @@ public slots:
     void clearReadPayloadView();
     void clearWritePayloadView();
     void calculatehWritePayloadSize();
+
+    void displayConnection(const std::string &connectionId);
+    void removeConnectionFromDisplay(const std::string &connectionId);
+    void displayConnectionReadPayloads(const std::string &connectionId, const std::vector<std::string> &payloadIds);
+
+signals:
+    void connectionAccepted(const std::string &connectionId);
+    void payloadReceived(const std::string &connectionId, const std::vector<std::string> &payloadIds);
+    void connectionClosed(const std::string &connectionId);
 
 private:
     std::string getSelectedConnectionId() const;
