@@ -1,10 +1,9 @@
-#include <loginserver/transactions/faultIndicationTransaction.hpp>
+#include <loginserver/transactions/faultIndication.hpp>
 #include <loginserver/user.hpp>
 #include <protocol/dataserver/faultIndication.hpp>
 #include <ut/env/core/network/tcp/connectionMock.hpp>
 
 using eMU::loginserver::User;
-using eMU::loginserver::transactions::FaultIndicationTransaction;
 using eMU::core::common::Factory;
 using eMU::protocol::ReadStream;
 using eMU::protocol::dataserver::FaultIndication;
@@ -30,7 +29,7 @@ protected:
         }
 
         FaultIndication indication(hash, "testMessage");
-        FaultIndicationTransaction(usersFactory_, ReadStream(indication.getWriteStream().getPayload())).handle();
+        eMU::loginserver::transactions::FaultIndication(usersFactory_, ReadStream(indication.getWriteStream().getPayload())).handle();
     }
 
     Factory<User> usersFactory_;

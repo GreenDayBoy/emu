@@ -1,4 +1,4 @@
-#include <dataserver/transactions/checkAccountRequestTransaction.hpp>
+#include <dataserver/transactions/checkAccountRequest.hpp>
 #include <protocol/dataserver/checkAccountResponse.hpp>
 #include <protocol/dataserver/faultIndication.hpp>
 #include <protocol/dataserver/checkAccountResult.hpp>
@@ -13,19 +13,19 @@ namespace dataserver
 namespace transactions
 {
 
-CheckAccountRequestTransaction::CheckAccountRequestTransaction(User &user,
-                                                               database::SqlInterface &sqlInterface,
-                                                               const protocol::dataserver::CheckAccountRequest &request):
+CheckAccountRequest::CheckAccountRequest(User &user,
+                                         database::SqlInterface &sqlInterface,
+                                         const protocol::dataserver::CheckAccountRequest &request):
     user_(user),
     sqlInterface_(sqlInterface),
     request_(request) {}
 
-bool CheckAccountRequestTransaction::isValid() const
+bool CheckAccountRequest::isValid() const
 {
     return sqlInterface_.isAlive();
 }
 
-void CheckAccountRequestTransaction::handleValid()
+void CheckAccountRequest::handleValid()
 {
     LOG(INFO) << "hash: " << user_.getHash() << ", clientHash: " << request_.getClientHash() << ", checking account: " << request_.getAccountId();
 
@@ -59,14 +59,14 @@ void CheckAccountRequestTransaction::handleValid()
     }
 }
 
-void CheckAccountRequestTransaction::handleInvalid()
+void CheckAccountRequest::handleInvalid()
 {
     LOG(ERROR) << "hash: " << user_.getHash() << ", Connection to database is died!";
 
     this->sendFaultIndication("Connection to database is died");
 }
 
-void CheckAccountRequestTransaction::sendFaultIndication(const std::string &message)
+void CheckAccountRequest::sendFaultIndication(const std::string &message)
 {
     protocol::dataserver::FaultIndication indication(request_.getClientHash(), message);
     user_.getConnection().send(indication.getWriteStream().getPayload());

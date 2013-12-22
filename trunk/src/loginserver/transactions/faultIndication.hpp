@@ -12,11 +12,11 @@ namespace loginserver
 namespace transactions
 {
 
-class FaultIndicationTransaction: public core::transactions::Transaction
+class FaultIndication: public core::transactions::Transaction
 {
 public:
-    FaultIndicationTransaction(core::common::Factory<User> &usersFactory,
-                               const protocol::dataserver::FaultIndication &indication);
+    FaultIndication(core::common::Factory<User> &usersFactory,
+                    const protocol::dataserver::FaultIndication &indication);
 
 private:
     bool isValid() const;

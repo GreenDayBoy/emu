@@ -1,4 +1,4 @@
-#include <loginserver/transactions/loginRequestTransaction.hpp>
+#include <loginserver/transactions/loginRequest.hpp>
 #include <protocol/dataserver/checkAccountRequest.hpp>
 
 #include <glog/logging.h>
@@ -10,19 +10,19 @@ namespace loginserver
 namespace transactions
 {
 
-LoginRequestTransaction::LoginRequestTransaction(User &user,
-                                                 core::network::tcp::Connection &dataserverConnection,
-                                                 const protocol::loginserver::LoginRequest &request):
+LoginRequest::LoginRequest(User &user,
+                           core::network::tcp::Connection &dataserverConnection,
+                           const protocol::loginserver::LoginRequest &request):
     user_(user),
     dataserverConnection_(dataserverConnection),
     request_(request) {}
 
-bool LoginRequestTransaction::isValid() const
+bool LoginRequest::isValid() const
 {
     return dataserverConnection_.isOpen();
 }
 
-void LoginRequestTransaction::handleValid()
+void LoginRequest::handleValid()
 {
     user_.setAccountId(request_.getAccountId());
 
@@ -32,7 +32,7 @@ void LoginRequestTransaction::handleValid()
     dataserverConnection_.send(checkAccountRequest.getWriteStream().getPayload());
 }
 
-void LoginRequestTransaction::handleInvalid()
+void LoginRequest::handleInvalid()
 {
     LOG(ERROR) << "hash: " << user_.getHash() << ", accountId: " << request_.getAccountId()
                << ", connection to dataserver not established! Disconnected.";

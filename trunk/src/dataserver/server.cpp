@@ -1,6 +1,6 @@
 #include <dataserver/server.hpp>
 #include <dataserver/database/mySqlInterface.hpp>
-#include <dataserver/transactions/checkAccountRequestTransaction.hpp>
+#include <dataserver/transactions/checkAccountRequest.hpp>
 
 #include <protocol/readStreamsExtractor.hpp>
 #include <protocol/writeStream.hpp>
@@ -108,9 +108,7 @@ void Server::handleReadStream(User &user, const protocol::ReadStream &stream)
     if(messageId == protocol::dataserver::MessageIds::kCheckAccountRequest)
     {
         protocol::dataserver::CheckAccountRequest request(stream);
-        transactionsManager_.queue(new transactions::CheckAccountRequestTransaction(user,
-                                                                                    sqlInterface_,
-                                                                                    request));
+        transactionsManager_.queue(new transactions::CheckAccountRequest(user, sqlInterface_, request));
     }
 }
 

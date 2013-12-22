@@ -12,12 +12,12 @@ namespace dataserver
 namespace transactions
 {
 
-class CheckAccountRequestTransaction: public core::transactions::Transaction
+class CheckAccountRequest: public core::transactions::Transaction
 {
 public:
-    CheckAccountRequestTransaction(User &user,
-                                   database::SqlInterface &sqlInterface,
-                                   const protocol::dataserver::CheckAccountRequest &request);
+    CheckAccountRequest(User &user,
+                        database::SqlInterface &sqlInterface,
+                        const protocol::dataserver::CheckAccountRequest &request);
 
 private:
     bool isValid() const;
