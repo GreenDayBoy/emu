@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/network/tcp/networkUser.hpp>
-#include <protocol/readStream.hpp>
+#include <core/network/payload.hpp>
 
 #include <list>
 
@@ -15,7 +15,7 @@ class User: public core::network::tcp::NetworkUser
 public:
     User(core::network::tcp::Connection &connection);
 
-    void parseReadPayload();
+    void storeReadPayload();
     std::list<core::network::Payload>& getReadPayloads();
 
 private:

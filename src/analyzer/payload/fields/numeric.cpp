@@ -1,4 +1,4 @@
-#include <analyzer/views/numericField.hpp>
+#include <analyzer/payload/fields/numeric.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/asio.hpp>
@@ -7,16 +7,18 @@ namespace eMU
 {
 namespace analyzer
 {
-namespace views
+namespace payload
+{
+namespace fields
 {
 
-NumericField::NumericField(QWidget *parent, size_t index, const std::string &value):
+Numeric::Numeric(QWidget *parent, size_t index, const std::string &value):
     Field(parent, index, value)
 {
     valueEdit_.setReadOnly(true);
 }
 
-void NumericField::prepare()
+void Numeric::prepare()
 {
     value_.erase(std::remove(value_.begin(), value_.end(), ' '), value_.end());
 
@@ -46,6 +48,7 @@ void NumericField::prepare()
     }
 }
 
+}
 }
 }
 }

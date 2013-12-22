@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'analyzerBa2554.ui'
+** Form generated from reading UI file 'analyzergc2991.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.2.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef ANALYZERBA2554_H
-#define ANALYZERBA2554_H
+#ifndef ANALYZERGC2991_H
+#define ANALYZERGC2991_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
@@ -54,7 +54,6 @@ public:
     QLabel *writePayloadSizeLabel;
     QPushButton *calculateSizeButton;
     QTreeView *connectionsView;
-    QPushButton *removePayloadButton;
     QPushButton *disconnectButton;
     QLabel *activeConnectionsTitleLabel;
 
@@ -151,12 +150,9 @@ public:
         connectionsView->setObjectName(QStringLiteral("connectionsView"));
         connectionsView->setGeometry(QRect(-5, 30, 266, 831));
         connectionsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        removePayloadButton = new QPushButton(centralwidget);
-        removePayloadButton->setObjectName(QStringLiteral("removePayloadButton"));
-        removePayloadButton->setGeometry(QRect(5, 867, 121, 27));
         disconnectButton = new QPushButton(centralwidget);
         disconnectButton->setObjectName(QStringLiteral("disconnectButton"));
-        disconnectButton->setGeometry(QRect(132, 867, 121, 27));
+        disconnectButton->setGeometry(QRect(0, 870, 121, 27));
         activeConnectionsTitleLabel = new QLabel(centralwidget);
         activeConnectionsTitleLabel->setObjectName(QStringLiteral("activeConnectionsTitleLabel"));
         activeConnectionsTitleLabel->setGeometry(QRect(2, 10, 131, 17));
@@ -198,7 +194,6 @@ public:
         writePayloadSizeLabel->setText(QApplication::translate("Gui", "0", 0));
         calculateSizeButton->setText(QApplication::translate("Gui", "Calculate size", 0));
         tabWidget->setTabText(tabWidget->indexOf(senderTab), QApplication::translate("Gui", "Sender", 0));
-        removePayloadButton->setText(QApplication::translate("Gui", "Remove payload", 0));
         disconnectButton->setText(QApplication::translate("Gui", "Disconnect", 0));
         activeConnectionsTitleLabel->setText(QApplication::translate("Gui", "Active connections", 0));
     } // retranslateUi
@@ -211,4 +206,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // ANALYZERBA2554_H
+#endif // ANALYZERGC2991_H

@@ -1,5 +1,4 @@
 #include <analyzer/user.hpp>
-#include <protocol/readStreamsExtractor.hpp>
 
 #include <glog/logging.h>
 
@@ -11,33 +10,9 @@ namespace analyzer
 User::User(core::network::tcp::Connection &connection):
     NetworkUser(connection) {}
 
-void User::parseReadPayload()
+void User::storeReadPayload()
 {
-    try
-    {
-        protocol::ReadStreamsExtractor readStreamsExtractor(connection_.getReadPayload());
-        readStreamsExtractor.extract();
-
-        for(const auto &stream : readStreamsExtractor.getStreams())
-        {
-            readPayloads_.push_back(stream.getPayload());
-        }
-    }
-    catch(const protocol::ReadStreamsExtractor::EmptyPayloadException&)
-    {
-        LOG(ERROR) << "Received empty payload! hash: " << this->getHash();
-        connection_.disconnect();
-    }
-    catch(const protocol::ReadStreamsExtractor::EmptyStreamException&)
-    {
-        LOG(ERROR) << "Received empty stream! hash: " << this->getHash();
-        connection_.disconnect();
-    }
-    catch(const protocol::ReadStreamsExtractor::UnknownStreamFormatException&)
-    {
-        LOG(ERROR) << "Received stream with unknown format! hash: " << this->getHash();
-        connection_.disconnect();
-    }
+    readPayloads_.push_back(connection_.getReadPayload());
 }
 
 std::list<core::network::Payload> &User::getReadPayloads()

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <analyzer/server.hpp>
-#include <analyzer/view.hpp>
+#include <analyzer/views/main.hpp>
 
 namespace eMU
 {
@@ -21,13 +21,13 @@ public:
     void send(const std::string &connectionId, const std::string &dump);
 
     Server& getServer();
-    View& getView();
+    views::Main& getMainView();
 
 private:
     core::network::Payload convertDumpToPayload(std::string dump) const;
 
     Server server_;
-    View view_;
+    views::Main mainView_;
 };
 
 }

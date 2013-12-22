@@ -10,7 +10,9 @@ namespace eMU
 {
 namespace analyzer
 {
-namespace views
+namespace payload
+{
+namespace fields
 {
 
 class Field
@@ -21,7 +23,7 @@ public:
 
     virtual void prepare();
     std::string getType() const;
-    std::string getValueHex() const;
+    std::string asHex() const;
     size_t getSize() const;
 
 protected:
@@ -33,7 +35,7 @@ protected:
     const size_t kHeight = 28;
 
     template<typename T>
-    std::string dumpValue(const T &value) const
+    std::string getHex(const T &value) const
     {
         std::stringstream s;
 
@@ -52,8 +54,9 @@ protected:
     std::string value_;
 };
 
-typedef std::vector<Field*> FieldsContainer;
+typedef std::vector<Field*> Container;
 
+}
 }
 }
 }

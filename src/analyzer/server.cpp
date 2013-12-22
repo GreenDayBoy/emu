@@ -31,7 +31,7 @@ void Server::onReceive(User &user)
 {
     LOG(INFO) << "hash: " << user.getHash() << ", received bytes: " << user.getConnection().getReadPayload().getSize();
 
-    user.parseReadPayload();
+    user.storeReadPayload();
     controller_->onReceive(user);
 }
 

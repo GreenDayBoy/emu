@@ -1,4 +1,4 @@
-#include <analyzer/views/wideStringField.hpp>
+#include <analyzer/payload/fields/wideString.hpp>
 
 #include <sstream>
 
@@ -6,16 +6,18 @@ namespace eMU
 {
 namespace analyzer
 {
-namespace views
+namespace payload
+{
+namespace fields
 {
 
-WideStringField::WideStringField(QWidget *parent, size_t index, const std::string &value):
+WideString::WideString(QWidget *parent, size_t index, const std::string &value):
     Field(parent, index, value)
 {
     valueEdit_.setReadOnly(true);
 }
 
-void WideStringField::prepare()
+void WideString::prepare()
 {
     value_.erase(std::remove(value_.begin(), value_.end(), ' '), value_.end());
 
@@ -37,6 +39,7 @@ void WideStringField::prepare()
     valueEdit_.setText(QString::fromStdString(str));
 }
 
+}
 }
 }
 }
