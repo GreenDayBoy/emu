@@ -21,7 +21,6 @@
 
 #include <glog/logging.h>
 #include <gflags/gflags.h>
-#include <boost/lexical_cast.hpp>
 
 #ifdef eMU_TARGET
 DEFINE_string(dataserver1_host, "127.0.0.1", "Master dataserver address");

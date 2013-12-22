@@ -25,8 +25,10 @@ bool GameserverDetailsRequest::isValid() const
 void GameserverDetailsRequest::handleValid()
 {
     LOG(INFO) << "hash: " << user_.getHash() << ", requested gameserver details, gameserverCode: " << request_.getGameserverCode();
-    protocol::loginserver::GameserverDetailsResponse response;
 
+    const protocol::loginserver::GameserverInfo &gameserverInfo = gameserversList_.getGameserverInfo(request_.getGameserverCode());
+
+    protocol::loginserver::GameserverDetailsResponse response(gameserverInfo.address_, gameserverInfo.port_);
     user_.getConnection().send(response.getWriteStream().getPayload());
 }
 

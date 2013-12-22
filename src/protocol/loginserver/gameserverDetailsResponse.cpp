@@ -10,16 +10,21 @@ namespace protocol
 namespace loginserver
 {
 
-GameserverDetailsResponse::GameserverDetailsResponse():
+GameserverDetailsResponse::GameserverDetailsResponse(const std::string &ipAddress, uint16_t port):
     writeStream_(MessageIds::kGameserverDetailsResponse)
 {
     writeStream_.writeNext<uint32_t>(0);
-    std::string ip = "10.0.0.3";
-    writeStream_.writeNextString(ip);
     writeStream_.writeNext<uint32_t>(0);
     writeStream_.writeNext<uint32_t>(0);
 
-    writeStream_.writeNext<uint16_t>(55960);
+    writeStream_.writeNextString(ipAddress);
+
+    for(size_t i = ipAddress.length(); i < 16; ++i)
+    {
+        writeStream_.writeNext<uint8_t>(0);
+    }
+
+    writeStream_.writeNext<uint16_t>(port);
 }
 
 const WriteStream& GameserverDetailsResponse::getWriteStream() const

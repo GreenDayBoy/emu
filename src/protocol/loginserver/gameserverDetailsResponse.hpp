@@ -14,7 +14,7 @@ namespace loginserver
 class GameserverDetailsResponse
 {
 public:
-    GameserverDetailsResponse();
+    GameserverDetailsResponse(const std::string &ipAddress, uint16_t port);
 
     const WriteStream& getWriteStream() const;
 

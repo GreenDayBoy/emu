@@ -1,12 +1,7 @@
-#include <dataserver/server.hpp>
-#include <dataserver/database/mySqlInterface.hpp>
-#include <dataserver/transactions/checkAccountRequest.hpp>
+#include <gameserver/server.hpp>
 
 #include <protocol/readStreamsExtractor.hpp>
 #include <protocol/writeStream.hpp>
-
-#include <protocol/dataserver/messageIds.hpp>
-#include <protocol/dataserver/checkAccountRequest.hpp>
 
 #include <core/common/serviceThreading.hpp>
 
@@ -14,11 +9,6 @@
 #include <gflags/gflags.h>
 
 #ifdef eMU_TARGET
-DEFINE_string(db_host, "127.0.0.1", "Database engine address");
-DEFINE_int32(db_port, 3306, "Database engine listen port");
-DEFINE_string(db_name, "mu2", "Database name");
-DEFINE_string(db_user, "root", "Database engine user name");
-DEFINE_string(db_password, "root", "Database engine user password");
 DEFINE_int32(max_users, 5, "Max number of users to connect");
 DEFINE_int32(port, 44405, "server listen port");
 DEFINE_int32(max_threads, 2, "max number of concurrent threads");
@@ -26,12 +16,16 @@ DEFINE_int32(max_threads, 2, "max number of concurrent threads");
 
 namespace eMU
 {
-namespace dataserver
+namespace gameserver
 {
 
-Server::Server(asio::io_service &ioService, database::SqlInterface &sqlInterface, const Configuration &configuration):
+Server::Server(asio::io_service &ioService, const Configuration &configuration):
     core::network::Server<User>(ioService, configuration.port_, configuration.maxNumberOfUsers_),
-    sqlInterface_(sqlInterface) {}
+    loginserverConnection_(ioService, configuration.port_)
+{
+    loginserverConnection_.setReceiveFromEventCallback(std::bind(&Server::onLoginserverReceive, this, std::placeholders::_1));
+    loginserverConnection_.queueReceiveFrom();
+}
 
 bool Server::onStartup()
 {
@@ -103,12 +97,11 @@ void Server::handleReadStream(User &user, const protocol::ReadStream &stream)
     uint16_t messageId = stream.getId();
 
     LOG(INFO) << "hash: " << user.getHash() << ", received stream, id: " << messageId;
+}
 
-    if(messageId == protocol::dataserver::MessageIds::kCheckAccountRequest)
-    {
-        protocol::dataserver::CheckAccountRequest request(stream);
-        transactionsManager_.queue(new transactions::CheckAccountRequest(user, sqlInterface_, request));
-    }
+void Server::onLoginserverReceive(core::network::udp::Connection &connection)
+{
+
 }
 
 }
@@ -122,30 +115,15 @@ int main(int argsCount, char *args[])
     google::ParseCommandLineFlags(&argsCount, &args, true);
     google::InitGoogleLogging(args[0]);
 
-    eMU::dataserver::database::MySqlInterface mysqlInterface;
-    if(!mysqlInterface.initialize())
-    {
-        LOG(ERROR) << "Initialization of database engine failed.";
-        return 1;
-    }
-
-    if(!mysqlInterface.connect(FLAGS_db_host, FLAGS_db_port, FLAGS_db_user, FLAGS_db_password, FLAGS_db_name))
-    {
-        LOG(ERROR) << "Connect to database engine failed.";
-        return 1;
-    }
-
-    eMU::dataserver::Server::Configuration configuration = {0};
+    eMU::gameserver::Server::Configuration configuration = {0};
     configuration.maxNumberOfUsers_ = FLAGS_max_users;
     configuration.port_ = FLAGS_port;
 
     boost::asio::io_service service;
-    eMU::dataserver::Server server(service, mysqlInterface, configuration);
-    eMU::core::common::ServiceThreading<eMU::dataserver::User> serviceThreading(FLAGS_max_threads, service, server);
+    eMU::gameserver::Server server(service, configuration);
+    eMU::core::common::ServiceThreading<eMU::gameserver::User> serviceThreading(FLAGS_max_threads, service, server);
     serviceThreading.start();
     serviceThreading.join();
-
-    mysqlInterface.cleanup();
 
     return 0;
 }
