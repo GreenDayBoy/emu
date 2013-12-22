@@ -1,4 +1,4 @@
-#include <dataserver/transactions/checkAccountRequestTransaction.hpp>
+#include <dataserver/transactions/checkAccountRequest.hpp>
 #include <dataserver/user.hpp>
 #include <core/network/tcp/networkUser.hpp>
 
@@ -25,7 +25,7 @@ using eMU::ut::env::dataserver::database::SqlInterfaceMock;
 using eMU::dataserver::User;
 using eMU::dataserver::database::QueryResult;
 using eMU::dataserver::database::Row;
-using eMU::dataserver::transactions::CheckAccountRequestTransaction;
+namespace transactions = eMU::dataserver::transactions;
 
 using eMU::protocol::ReadStream;
 using eMU::protocol::dataserver::CheckAccountResult;
@@ -69,7 +69,7 @@ TEST_F(CheckAccountRequestTransactionTest, handle)
     EXPECT_CALL(sqlInterface_, executeQuery(_)).WillOnce(Return(true));
     EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
 
-    CheckAccountRequestTransaction(user_, sqlInterface_, request_).handle();
+    eMU::dataserver::transactions::CheckAccountRequest(user_, sqlInterface_, request_).handle();
 
     ReadStream readStream(payload_);
     ASSERT_EQ(MessageIds::kCheckAccountResponse, readStream.getId());
@@ -89,7 +89,7 @@ TEST_F(CheckAccountRequestTransactionTest, WhenExecutionOfQueryIsFailedThenFault
 
     EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
 
-    CheckAccountRequestTransaction(user_, sqlInterface_, request_).handle();
+    eMU::dataserver::transactions::CheckAccountRequest(user_, sqlInterface_, request_).handle();
 
     ReadStream readStream(payload_);
     ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());
@@ -106,7 +106,7 @@ TEST_F(CheckAccountRequestTransactionTest, WhenQueryResultIsEmptyThenFaultIndica
     EXPECT_CALL(sqlInterface_, executeQuery(_)).WillOnce(Return(true));
     EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
 
-    CheckAccountRequestTransaction(user_, sqlInterface_, request_).handle();
+    eMU::dataserver::transactions::CheckAccountRequest(user_, sqlInterface_, request_).handle();
 
     ReadStream readStream(payload_);
     ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());
@@ -120,7 +120,7 @@ TEST_F(CheckAccountRequestTransactionTest, WhenConnectionToDatabaseIsDiedThenFau
     EXPECT_CALL(sqlInterface_, isAlive()).WillOnce(Return(false));
     EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
 
-    CheckAccountRequestTransaction(user_, sqlInterface_, request_).handle();
+    eMU::dataserver::transactions::CheckAccountRequest(user_, sqlInterface_, request_).handle();
 
     ReadStream readStream(payload_);
     ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());

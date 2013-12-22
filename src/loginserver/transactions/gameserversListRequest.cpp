@@ -1,4 +1,4 @@
-#include <loginserver/transactions/gameserversListRequestTransaction.hpp>
+#include <loginserver/transactions/gameserversListRequest.hpp>
 #include <protocol/loginserver/gameserversListResponse.hpp>
 
 #include <glog/logging.h>
@@ -10,19 +10,19 @@ namespace loginserver
 namespace transactions
 {
 
-GameserversListRequestTransaction::GameserversListRequestTransaction(User &user,
-                                                                     const GameserversList &gameserversList,
-                                                                     const protocol::loginserver::GameserversListRequest &request):
+GameserversListRequest::GameserversListRequest(User &user,
+                                               const GameserversList &gameserversList,
+                                               const protocol::loginserver::GameserversListRequest &request):
     user_(user),
     gameserversList_(gameserversList),
     request_(request) {}
 
-bool GameserversListRequestTransaction::isValid() const
+bool GameserversListRequest::isValid() const
 {
     return true;
 }
 
-void GameserversListRequestTransaction::handleValid()
+void GameserversListRequest::handleValid()
 {
     LOG(INFO) << "hash: " << user_.getHash() << ", requested gameservers list.";
     protocol::loginserver::GameserversListResponse response(gameserversList_.getServers());

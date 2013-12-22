@@ -13,12 +13,12 @@ namespace loginserver
 namespace transactions
 {
 
-class LoginRequestTransaction: public core::transactions::Transaction
+class LoginRequest: public core::transactions::Transaction
 {
 public:
-    LoginRequestTransaction(User &user,
-                            core::network::tcp::Connection &dataserverConnection,
-                            const protocol::loginserver::LoginRequest &request);
+    LoginRequest(User &user,
+                 core::network::tcp::Connection &dataserverConnection,
+                 const protocol::loginserver::LoginRequest &request);
 
 private:
     bool isValid() const;

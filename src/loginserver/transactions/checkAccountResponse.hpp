@@ -12,11 +12,11 @@ namespace loginserver
 namespace transactions
 {
 
-class CheckAccountResponseTransaction: public core::transactions::Transaction
+class CheckAccountResponse: public core::transactions::Transaction
 {
 public:
-    CheckAccountResponseTransaction(core::common::Factory<User> &usersFactory,
-                                    const protocol::dataserver::CheckAccountResponse &response);
+    CheckAccountResponse(core::common::Factory<User> &usersFactory,
+                         const protocol::dataserver::CheckAccountResponse &response);
 
 private:
     bool isValid() const;

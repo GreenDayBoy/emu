@@ -1,9 +1,9 @@
 #include <loginserver/server.hpp>
-#include <loginserver/transactions/loginRequestTransaction.hpp>
-#include <loginserver/transactions/checkAccountResponseTransaction.hpp>
-#include <loginserver/transactions/faultIndicationTransaction.hpp>
-#include <loginserver/transactions/gameserversListRequestTransaction.hpp>
-#include <loginserver/transactions/gameserverDetailsRequestTransaction.hpp>
+#include <loginserver/transactions/loginRequest.hpp>
+#include <loginserver/transactions/checkAccountResponse.hpp>
+#include <loginserver/transactions/faultIndication.hpp>
+#include <loginserver/transactions/gameserversListRequest.hpp>
+#include <loginserver/transactions/gameserverDetailsRequest.hpp>
 
 #include <protocol/readStreamsExtractor.hpp>
 #include <protocol/writeStream.hpp>
@@ -142,23 +142,17 @@ void Server::handleReadStream(User &user, const protocol::ReadStream &stream)
     if(messageId == protocol::loginserver::MessageIds::kLoginRequest)
     {
         protocol::loginserver::LoginRequest request(stream);
-        transactionsManager_.queue(new transactions::LoginRequestTransaction(user,
-                                                                             dataserverConnection_,
-                                                                             request));
+        transactionsManager_.queue(new transactions::LoginRequest(user, dataserverConnection_, request));
     }
     else if(messageId == protocol::loginserver::MessageIds::kGameserversListRequest)
     {
         protocol::loginserver::GameserversListRequest request(stream);
-        transactionsManager_.queue((new transactions::GameserversListRequestTransaction(user,
-                                                                                        gameserversList_,
-                                                                                        request)));
+        transactionsManager_.queue((new transactions::GameserversListRequest(user, gameserversList_, request)));
     }
     else if(messageId == protocol::loginserver::MessageIds::kGameserverDetailsRequest)
     {
         protocol::loginserver::GameserverDetailsRequest request(stream);
-        transactionsManager_.queue((new transactions::GameserverDetailsRequestTransaction(user,
-                                                                                          gameserversList_,
-                                                                                          request)));
+        transactionsManager_.queue((new transactions::GameserverDetailsRequest(user, gameserversList_, request)));
     }
 }
 
@@ -216,12 +210,12 @@ void Server::handleDataserverReadStream(const protocol::ReadStream &stream)
     if(messageId == protocol::dataserver::MessageIds::kCheckAccountResponse)
     {
         protocol::dataserver::CheckAccountResponse response(stream);
-        transactionsManager_.queue(new transactions::CheckAccountResponseTransaction(usersFactory_, response));
+        transactionsManager_.queue(new transactions::CheckAccountResponse(usersFactory_, response));
     }
     if(messageId == protocol::dataserver::MessageIds::kFaultIndication)
     {
         protocol::dataserver::FaultIndication indication(stream);
-        transactionsManager_.queue(new transactions::FaultIndicationTransaction(usersFactory_, indication));
+        transactionsManager_.queue(new transactions::FaultIndication(usersFactory_, indication));
     }
 }
 

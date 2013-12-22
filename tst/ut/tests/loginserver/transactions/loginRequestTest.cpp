@@ -1,4 +1,4 @@
-#include <loginserver/transactions/loginRequestTransaction.hpp>
+#include <loginserver/transactions/loginRequest.hpp>
 #include <loginserver/user.hpp>
 
 #include <protocol/readStream.hpp>
@@ -19,7 +19,6 @@ using eMU::ut::env::core::network::tcp::ConnectionMock;
 using eMU::core::network::Payload;
 using eMU::protocol::ReadStream;
 using eMU::protocol::loginserver::LoginRequest;
-using eMU::loginserver::transactions::LoginRequestTransaction;
 using eMU::loginserver::User;
 using eMU::protocol::dataserver::CheckAccountRequest;
 namespace MessageIds = eMU::protocol::dataserver::MessageIds;
@@ -47,7 +46,7 @@ TEST_F(LoginRequestTransactionTest, handle)
     EXPECT_CALL(dataserverConnection_, send(_)).WillOnce(SaveArg<0>(&payload));
     EXPECT_CALL(dataserverConnection_, isOpen()).WillOnce((Return(true)));
 
-    LoginRequestTransaction(user_, dataserverConnection_, request_).handle();
+    eMU::loginserver::transactions::LoginRequest(user_, dataserverConnection_, request_).handle();
 
     ReadStream readStream(payload);
     ASSERT_EQ(MessageIds::kCheckAccountRequest, readStream.getId());
@@ -64,5 +63,5 @@ TEST_F(LoginRequestTransactionTest, WhenConnectionToDataserverIsNotOpenThenClien
     EXPECT_CALL(dataserverConnection_, isOpen()).WillOnce((Return(false)));
     EXPECT_CALL(connection_, disconnect());
 
-    LoginRequestTransaction(user_, dataserverConnection_, request_).handle();
+    eMU::loginserver::transactions::LoginRequest(user_, dataserverConnection_, request_).handle();
 }

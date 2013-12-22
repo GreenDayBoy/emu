@@ -1,4 +1,4 @@
-#include <loginserver/transactions/faultIndicationTransaction.hpp>
+#include <loginserver/transactions/faultIndication.hpp>
 
 #include <glog/logging.h>
 
@@ -9,12 +9,12 @@ namespace loginserver
 namespace transactions
 {
 
-FaultIndicationTransaction::FaultIndicationTransaction(core::common::Factory<User> &usersFactory,
-                                                       const protocol::dataserver::FaultIndication &indication):
+FaultIndication::FaultIndication(core::common::Factory<User> &usersFactory,
+                                 const protocol::dataserver::FaultIndication &indication):
     usersFactory_(usersFactory),
     indication_(indication) {}
 
-bool FaultIndicationTransaction::isValid() const
+bool FaultIndication::isValid() const
 {
     bool result = true;
 
@@ -30,14 +30,14 @@ bool FaultIndicationTransaction::isValid() const
     return result;
 }
 
-void FaultIndicationTransaction::handleValid()
+void FaultIndication::handleValid()
 {
     User &user = usersFactory_.find(indication_.getClientHash());
     LOG(ERROR) << "hash: " << user.getHash() << ", accountId: " << user.getAccountId() << ", fault from dataserver received! message: " << indication_.getMessage();
     user.getConnection().disconnect();
 }
 
-void FaultIndicationTransaction::handleInvalid()
+void FaultIndication::handleInvalid()
 {
     LOG(ERROR) << "hash: " << indication_.getClientHash() << " given in dataserver fault indication does not exist!";
 }

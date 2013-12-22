@@ -1,4 +1,4 @@
-#include <loginserver/transactions/gameserversListRequestTransaction.hpp>
+#include <loginserver/transactions/gameserversListRequest.hpp>
 #include <loginserver/user.hpp>
 #include <core/network/payload.hpp>
 #include <protocol/loginserver/gameserversListRequest.hpp>
@@ -20,7 +20,6 @@ using eMU::core::network::Payload;
 using eMU::protocol::loginserver::GameserversListRequest;
 using eMU::protocol::loginserver::GameserversListResponse;
 using eMU::protocol::loginserver::GameserversInfoContainer;
-using eMU::loginserver::transactions::GameserversListRequestTransaction;
 using eMU::loginserver::User;
 using eMU::ut::env::core::network::tcp::ConnectionMock;
 using eMU::ut::env::loginserver::GameserversListMock;
@@ -38,7 +37,7 @@ protected:
     User user_;
     GameserversListMock gameserversList_;
     GameserversListRequest request_;
-    GameserversListRequestTransaction transaction_;
+    eMU::loginserver::transactions::GameserversListRequest transaction_;
 };
 
 

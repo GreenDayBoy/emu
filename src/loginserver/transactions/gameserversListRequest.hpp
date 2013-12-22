@@ -13,12 +13,12 @@ namespace loginserver
 namespace transactions
 {
 
-class GameserversListRequestTransaction: public core::transactions::Transaction
+class GameserversListRequest: public core::transactions::Transaction
 {
 public:
-    GameserversListRequestTransaction(User &user,
-                            const GameserversList &gameserversList,
-                            const protocol::loginserver::GameserversListRequest &request);
+    GameserversListRequest(User &user,
+                           const GameserversList &gameserversList,
+                           const protocol::loginserver::GameserversListRequest &request);
 
 private:
     bool isValid() const;

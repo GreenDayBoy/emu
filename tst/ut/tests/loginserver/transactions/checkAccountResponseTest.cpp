@@ -1,4 +1,4 @@
-#include <loginserver/transactions/checkAccountResponseTransaction.hpp>
+#include <loginserver/transactions/checkAccountResponse.hpp>
 #include <loginserver/user.hpp>
 #include <protocol/dataserver/checkAccountResponse.hpp>
 #include <protocol/loginserver/messageIds.hpp>
@@ -11,7 +11,6 @@ using ::testing::_;
 using ::testing::SaveArg;
 
 using eMU::loginserver::User;
-using eMU::loginserver::transactions::CheckAccountResponseTransaction;
 using eMU::core::common::Factory;
 using eMU::core::network::Payload;
 using eMU::ut::env::core::network::tcp::ConnectionMock;
@@ -37,7 +36,7 @@ protected:
         CheckAccountResponse checkAccountResponse(CheckAccountResponse(user.getHash(), checkAccountResult_).getWriteStream().getPayload());
 
         EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
-        CheckAccountResponseTransaction(usersFactory_, checkAccountResponse).handle();
+        eMU::loginserver::transactions::CheckAccountResponse(usersFactory_, checkAccountResponse).handle();
 
         ReadStream readStream(payload_);
         ASSERT_EQ(MessageIds::kLoginResponse, readStream.getId());
@@ -85,5 +84,5 @@ TEST_F(CheckAccountResponseTransactionTest, WhenHashGivenFromDataServerIsInvalid
 
     CheckAccountResponse checkAccountResponse(CheckAccountResponse(User::Hash(0x12345), CheckAccountResult::Succeed).getWriteStream().getPayload());
 
-    CheckAccountResponseTransaction(usersFactory_, checkAccountResponse).handle();
+    eMU::loginserver::transactions::CheckAccountResponse(usersFactory_, checkAccountResponse).handle();
 }

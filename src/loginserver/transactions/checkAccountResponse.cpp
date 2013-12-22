@@ -1,4 +1,4 @@
-#include <loginserver/transactions/checkAccountResponseTransaction.hpp>
+#include <loginserver/transactions/checkAccountResponse.hpp>
 #include <protocol/dataserver/checkAccountResult.hpp>
 #include <protocol/loginserver/loginResponse.hpp>
 #include <protocol/loginserver/loginResult.hpp>
@@ -12,12 +12,12 @@ namespace loginserver
 namespace transactions
 {
 
-CheckAccountResponseTransaction::CheckAccountResponseTransaction(core::common::Factory<User> &usersFactory,
-                                                                 const protocol::dataserver::CheckAccountResponse &response):
+CheckAccountResponse::CheckAccountResponse(core::common::Factory<User> &usersFactory,
+                                           const protocol::dataserver::CheckAccountResponse &response):
     usersFactory_(usersFactory),
     response_(response) {}
 
-bool CheckAccountResponseTransaction::isValid() const
+bool CheckAccountResponse::isValid() const
 {
     bool result = true;
 
@@ -33,7 +33,7 @@ bool CheckAccountResponseTransaction::isValid() const
     return result;
 }
 
-void CheckAccountResponseTransaction::handleValid()
+void CheckAccountResponse::handleValid()
 {
     User &user = usersFactory_.find(response_.getClientHash());
 
@@ -60,7 +60,7 @@ void CheckAccountResponseTransaction::handleValid()
     user.getConnection().send(response.getWriteStream().getPayload());
 }
 
-void CheckAccountResponseTransaction::handleInvalid()
+void CheckAccountResponse::handleInvalid()
 {
     LOG(ERROR) << "hash: " << response_.getClientHash() << " given in dataserver response does not exist!";
 }
