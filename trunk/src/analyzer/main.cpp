@@ -16,7 +16,7 @@ int main(int argsCount, char *args[])
 
     boost::asio::io_service service;
     eMU::analyzer::Controller controller(service);
-    controller.getView().display();
+    controller.getMainView().display();
 
     eMU::core::common::ServiceThreading<eMU::analyzer::User> serviceThreading(1, service, controller.getServer());
     serviceThreading.start();

@@ -1,25 +1,33 @@
 #pragma once
 
-#include <analyzer/views/payload.hpp>
+#include <analyzer/payload/fields/field.hpp>
 
 namespace eMU
 {
 namespace analyzer
 {
-namespace views
+namespace payload
 {
 
-class WritePayload: public Payload
+class Builder
 {
 public:
+    virtual ~Builder();
+
     void resize(size_t fieldsCount);
-    const FieldsContainer& getFields() const;
+    const fields::Container& getFields() const;
     std::string getDump() const;
     size_t getFieldsSize() const;
+
+    void setParent(QWidget *parent);
+    void clear();
 
 private:
     void insertFields(size_t fieldsCount);
     void removeFields(size_t fieldsCount);
+
+    QWidget *parent_;
+    fields::Container fields_;
 };
 
 }

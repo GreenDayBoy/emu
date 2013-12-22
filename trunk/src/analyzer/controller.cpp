@@ -13,7 +13,7 @@ Controller::Controller(asio::io_service &ioService):
     server_(ioService)
 {
     server_.setController(this);
-    view_.setController(this);
+    mainView_.initialize(this);
 }
 
 Server& Controller::getServer()
@@ -21,32 +21,26 @@ Server& Controller::getServer()
     return server_;
 }
 
-View& Controller::getView()
+views::Main& Controller::getMainView()
 {
-    return view_;
+    return mainView_;
 }
 
 void Controller::onAccept(User &user)
 {
-    view_.emitConnectionAccepted(boost::lexical_cast<std::string>(user.getHash()));
+    mainView_.getConnectionsListView().emitConnectionAcceptedSignal(boost::lexical_cast<std::string>(user.getHash()));
 }
 
 void Controller::onReceive(User &user)
 {
-    std::vector<std::string> payloadHashes;
+    size_t payloadHash = reinterpret_cast<size_t>(&user.getReadPayloads().back());
 
-    for(const auto& payload: user.getReadPayloads())
-    {
-        size_t payloadHash = reinterpret_cast<size_t>(&payload);
-        payloadHashes.push_back(boost::lexical_cast<std::string>(payloadHash));
-    }
-
-    view_.emitPayloadReceived(boost::lexical_cast<std::string>(user.getHash()), payloadHashes);
+    mainView_.getConnectionsListView().emitPayloadReceivedSignal(boost::lexical_cast<std::string>(user.getHash()), boost::lexical_cast<std::string>(payloadHash));
 }
 
 void Controller::onClose(User &user)
 {
-    view_.emitConnectionClosed(boost::lexical_cast<std::string>(user.getHash()));
+    mainView_.getConnectionsListView().emitConnectionClosedSignal(boost::lexical_cast<std::string>(user.getHash()));
 }
 
 std::string Controller::getReadPayloadDump(const std::string &connectionId, const std::string &payloadId)
