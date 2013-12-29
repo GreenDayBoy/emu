@@ -24,6 +24,8 @@ bool DataserverProtocol::attach(core::network::tcp::Connection::Pointer connecti
 
 void DataserverProtocol::detach(core::network::tcp::Connection::Pointer connection)
 {
+    LOG(INFO) << "Dataserver connection closed.";
+
     // TODO: Recovery when connection to dataserver lost.
     context_.setDataserverConnection(nullptr);
 }

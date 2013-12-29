@@ -17,8 +17,6 @@ protected:
                             <server code=\"0\" name=\"eMU_Test\" address=\"localhost\" port=\"55901\" /> \
                             <server code=\"20\" name=\"eMU_Test2\" address=\"127.0.0.1\" port=\"55902\" /> \
                         </servers>";
-
-        xmlReader_.parse(xmlContent_, "servers");
     }
 
     void prepareSampleServers()
@@ -52,13 +50,15 @@ protected:
     void initialize()
     {
         prepareXmlContent();
+
+        XmlReader xmlReader(xmlContent_);
+        xmlReader.parse("servers");
+
         prepareSampleServers();
-        gameserversList_.initialize(xmlReader_);
+        gameserversList_.initialize(xmlReader);
     }
 
     std::string xmlContent_;
-    XmlReader xmlReader_;
-
     GameserversInfoContainer sampleServers_;
     GameserversList gameserversList_;
 };
