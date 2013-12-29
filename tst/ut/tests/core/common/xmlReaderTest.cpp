@@ -15,15 +15,14 @@ protected:
                    </servers>";
     }
 
-    void checkRecord(uint16_t code, const std::string &name, const std::string &address, uint16_t port)
+    void checkRecord(XmlReader &xmlReader, uint16_t code, const std::string &name, const std::string &address, uint16_t port)
     {
-        EXPECT_EQ(code, xmlReader_.get<uint16_t>("server", "code"));
-        EXPECT_EQ(name, xmlReader_.get<std::string>("server", "name"));
-        EXPECT_EQ(address, xmlReader_.get<std::string>("server", "address"));
-        EXPECT_EQ(port, xmlReader_.get<uint16_t>("server", "port"));
+        EXPECT_EQ(code, xmlReader.get<uint16_t>("server", "code"));
+        EXPECT_EQ(name, xmlReader.get<std::string>("server", "name"));
+        EXPECT_EQ(address, xmlReader.get<std::string>("server", "address"));
+        EXPECT_EQ(port, xmlReader.get<uint16_t>("server", "port"));
     }
 
-    XmlReader xmlReader_;
     std::string content_;
 };
 
@@ -31,57 +30,65 @@ TEST_F(XmlReaderTest, parseCorrectContent)
 {
     prepareContent();
 
-    xmlReader_.parse(content_, "servers");
-    ASSERT_FALSE(xmlReader_.end());
-    checkRecord(21, "eMU_Test", "localhost", 55901);
+    XmlReader xmlReader(content_);
+    xmlReader.parse("servers");
 
-    xmlReader_.next();
-    ASSERT_FALSE(xmlReader_.end());
-    checkRecord(22, "eMU_Test2", "127.0.0.1", 55902);
+    ASSERT_FALSE(xmlReader.end());
+    checkRecord(xmlReader, 21, "eMU_Test", "localhost", 55901);
 
-    xmlReader_.next();
-    ASSERT_TRUE(xmlReader_.end());
+    xmlReader.next();
+    ASSERT_FALSE(xmlReader.end());
+    checkRecord(xmlReader, 22, "eMU_Test2", "127.0.0.1", 55902);
 
-    xmlReader_.next();
-    ASSERT_TRUE(xmlReader_.end());
+    xmlReader.next();
+    ASSERT_TRUE(xmlReader.end());
 
-    xmlReader_.clear();
+    xmlReader.next();
+    ASSERT_TRUE(xmlReader.end());
+
+    xmlReader.clear();
 }
 
 TEST_F(XmlReaderTest, exceptionShouldBeThrownWhenContentIsEmpty)
 {
-    ASSERT_THROW(xmlReader_.parse(content_, "servers"), XmlReader::EmptyXmlContentException);
+    XmlReader xmlReader("");
+    ASSERT_THROW(xmlReader.parse("servers"), XmlReader::EmptyXmlContentException);
 }
 
 TEST_F(XmlReaderTest, exceptionShouldBeThrownWhenFirstNodeDoesNotMatch)
 {
     prepareContent();
 
-    ASSERT_THROW(xmlReader_.parse(content_, "ssservverrs"), XmlReader::NotMatchedXmlNodeException);
+    XmlReader xmlReader(content_);
+    ASSERT_THROW(xmlReader.parse("ssservverrs"), XmlReader::NotMatchedXmlNodeException);
 }
 
 TEST_F(XmlReaderTest, parseContentWithoutRecords)
 {
     content_ = "<servers></servers>";
-    xmlReader_.parse(content_, "servers");
 
-    ASSERT_TRUE(xmlReader_.end());
+    XmlReader xmlReader(content_);
+    xmlReader.parse("servers");
 
-    xmlReader_.clear();
+    ASSERT_TRUE(xmlReader.end());
+
+    xmlReader.clear();
 }
 
 TEST_F(XmlReaderTest, getShouldReturnDefaultValueWhenContentDoesNotHaveAtributes)
 {
     content_ = "<servers><server /></servers>";
-    xmlReader_.parse(content_, "servers");
 
-    ASSERT_FALSE(xmlReader_.end());
+    XmlReader xmlReader(content_);
+    xmlReader.parse("servers");
 
-    EXPECT_EQ("default", xmlReader_.get<std::string>("server", "name", "default"));
-    EXPECT_EQ("", xmlReader_.get<std::string>("server", "name"));
+    ASSERT_FALSE(xmlReader.end());
 
-    EXPECT_EQ(0, xmlReader_.get<int32_t>("server", "code"));
-    EXPECT_EQ(45, xmlReader_.get<int32_t>("server", "code", 45));
+    EXPECT_EQ("default", xmlReader.get<std::string>("server", "name", "default"));
+    EXPECT_EQ("", xmlReader.get<std::string>("server", "name"));
 
-    xmlReader_.clear();
+    EXPECT_EQ(0, xmlReader.get<int32_t>("server", "code"));
+    EXPECT_EQ(45, xmlReader.get<int32_t>("server", "code", 45));
+
+    xmlReader.clear();
 }

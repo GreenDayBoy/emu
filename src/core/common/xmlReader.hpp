@@ -19,9 +19,9 @@ public:
     class EmptyXmlContentException: public Exception {};
     class NotMatchedXmlNodeException: public Exception {};
 
-    XmlReader();
+    XmlReader(const std::string &content);
 
-    void parse(std::string content, std::string firstNodeName);
+    void parse(std::string firstNodeName);
     bool end();
     void next();
     void clear();
@@ -53,6 +53,9 @@ public:
     static std::string getXmlFileContent(const std::string &filePath);
 
 private:
+    XmlReader();
+
+    std::string content_;
     rapidxml::xml_document<> document_;
     rapidxml::xml_node<> *currentNode_;
 };

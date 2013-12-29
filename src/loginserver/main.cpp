@@ -3,6 +3,7 @@
 #include <loginserver/protocol.hpp>
 #include <loginserver/dataserverProtocol.hpp>
 #include <core/network/tcp/connectionsAcceptor.hpp>
+#include <core/common/xmlReader.hpp>
 
 #include <boost/thread.hpp>
 #include <glog/logging.h>
@@ -23,11 +24,30 @@ int main(int argsCount, char *args[])
     google::InitGoogleLogging(args[0]);
 
     eMU::loginserver::Context loginserverContext(FLAGS_max_users);
+
+    try
+    {
+        eMU::core::common::XmlReader xmlReader(eMU::core::common::XmlReader::getXmlFileContent("./data/gameserversList.xml"));
+        xmlReader.parse("servers");
+
+        loginserverContext.getGameserversList().initialize(xmlReader);
+    }
+    catch(eMU::core::common::XmlReader::EmptyXmlContentException&)
+    {
+        LOG(ERROR) << "Got empty xml servers list file!";
+        return 1;
+    }
+    catch(eMU::core::common::XmlReader::NotMatchedXmlNodeException&)
+    {
+        LOG(ERROR) << "Got corrupted xml servers list file!";
+        return 1;
+    }
+
     eMU::loginserver::DataserverProtocol dataserverProtocol(loginserverContext);
 
     boost::asio::io_service ioService;
-    eMU::core::network::tcp::Connection dataserverConnection(ioService, dataserverProtocol);
-    if(!dataserverConnection.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(FLAGS_dataserver_host),
+    eMU::core::network::tcp::Connection::Pointer dataserverConnection(new eMU::core::network::tcp::Connection(ioService, dataserverProtocol));
+    if(!dataserverConnection->connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(FLAGS_dataserver_host),
                                                                     FLAGS_dataserver_port)))
     {
         LOG(ERROR) << "Connection to datserver failed. Address: " << FLAGS_dataserver_host << ", port: " << FLAGS_dataserver_port;

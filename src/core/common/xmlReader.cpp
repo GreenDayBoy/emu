@@ -9,17 +9,18 @@ namespace core
 namespace common
 {
 
-XmlReader::XmlReader():
+XmlReader::XmlReader(const std::string &content):
+    content_(content),
     currentNode_(nullptr) {}
 
-void XmlReader::parse(std::string content, std::string firstNodeName)
+void XmlReader::parse(std::string firstNodeName)
 {
-    if(content.empty())
+    if(content_.empty())
     {
         throw EmptyXmlContentException();
     }
 
-    document_.parse<0>(const_cast<char*>(content.c_str()));
+    document_.parse<0>(const_cast<char*>(content_.c_str()));
     currentNode_ = document_.first_node(const_cast<char*>(firstNodeName.c_str()));
 
     if(this->end())
