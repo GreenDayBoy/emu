@@ -16,20 +16,18 @@ namespace network
 namespace tcp
 {
 
-class Connection: boost::noncopyable
+class Protocol;
+
+class Connection: boost::noncopyable, public std::enable_shared_from_this<Connection>
 {
 public:
-    typedef std::function<void(Connection&)> EventCallback;
-    typedef std::shared_ptr<asio::ip::tcp::socket> SocketPointer;
+    typedef std::shared_ptr<Connection> Pointer;
 
-    Connection(asio::io_service &ioService);
-    Connection(SocketPointer socket);
+    Connection(asio::io_service &ioService, Protocol& protocol);
     virtual ~Connection();
 
     Payload& getReadPayload();
-
-    MOCKABLE void setReceiveEventCallback(const EventCallback &callback);
-    MOCKABLE void setCloseEventCallback(const EventCallback &callback);
+    void accept();
 
     MOCKABLE void disconnect();
     MOCKABLE void close();
@@ -37,6 +35,8 @@ public:
     MOCKABLE void queueReceive();
     MOCKABLE bool connect(const boost::asio::ip::tcp::endpoint &endpoint);
     MOCKABLE bool isOpen() const;
+
+    asio::ip::tcp::socket& getSocket();
 
     void receiveHandler(const boost::system::error_code &errorCode, size_t bytesTransferred);
     void sendHandler(const boost::system::error_code &errorCode, size_t bytesTransferred);
@@ -47,19 +47,16 @@ private:
     Connection();
 
     void queueSend();
-
     void errorHandler(const boost::system::error_code &errorCode, const std::string &operationName);
 
-    SocketPointer socket_;
+    Protocol &protocol_;
+    asio::ip::tcp::socket socket_;
 
     Payload readPayload_;
     WriteBuffer writeBuffer_;
 
     asio::io_service::strand strand_;
     bool closeOngoing_;
-
-    EventCallback receiveEventCallback_;
-    EventCallback closeEventCallback_;
 };
 
 }

@@ -18,14 +18,14 @@ protected:
     void scenario()
     {
         User::Hash hash(0x12345);
-        ConnectionMock connection;
+        ConnectionMock::Pointer connection(new ConnectionMock());
 
         if(clientHashExists_)
         {
             User &user = usersFactory_.create(connection);
             hash = user.getHash();
 
-            EXPECT_CALL(connection, disconnect());
+            EXPECT_CALL(*connection, disconnect());
         }
 
         FaultIndication indication(hash, "testMessage");

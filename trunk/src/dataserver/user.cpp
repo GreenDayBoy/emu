@@ -5,7 +5,7 @@ namespace eMU
 namespace dataserver
 {
 
-User::User(core::network::tcp::Connection &connection):
+User::User(core::network::tcp::Connection::Pointer connection):
     NetworkUser(connection) {}
 
 }

@@ -1,5 +1,6 @@
 #include <analyzer/controller.hpp>
 
+#include <glog/logging.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/locale.hpp>
 #include <sstream>
@@ -9,16 +10,10 @@ namespace eMU
 namespace analyzer
 {
 
-Controller::Controller(asio::io_service &ioService):
-    server_(ioService)
+Controller::Controller(size_t maxNumberOfUsers):
+    maxNumberOfUsers_(maxNumberOfUsers)
 {
-    server_.setController(this);
     mainView_.initialize(this);
-}
-
-Server& Controller::getServer()
-{
-    return server_;
 }
 
 views::Main& Controller::getMainView()
@@ -48,7 +43,7 @@ std::string Controller::getReadPayloadDump(const std::string &connectionId, cons
     try
     {
         User::Hash userHash = User::Hash(boost::lexical_cast<size_t>(connectionId));
-        User &user = server_.getUsersFactory().find(userHash);
+        User &user = usersFactory_.find(userHash);
 
         for(const auto &payload: user.getReadPayloads())
         {
@@ -74,7 +69,7 @@ void Controller::disconnect(const std::string &connectionId)
     try
     {
         User::Hash userHash = User::Hash(boost::lexical_cast<size_t>(connectionId));
-        User &user = server_.getUsersFactory().find(userHash);
+        User &user = usersFactory_.find(userHash);
 
         user.getConnection().disconnect();
     }
@@ -89,7 +84,7 @@ void Controller::send(const std::string &connectionId, const std::string &dump)
     try
     {
         User::Hash userHash = User::Hash(boost::lexical_cast<size_t>(connectionId));
-        User &user = server_.getUsersFactory().find(userHash);
+        User &user = usersFactory_.find(userHash);
 
         const core::network::Payload &payload = this->convertDumpToPayload(dump);
         user.getConnection().send(payload);
@@ -121,6 +116,16 @@ core::network::Payload Controller::convertDumpToPayload(std::string dump) const
     }
 
     return payload;
+}
+
+core::common::Factory<User>& Controller::getUsersFactory()
+{
+    return usersFactory_;
+}
+
+size_t Controller::getMaxNumberOfUsers()
+{
+    return maxNumberOfUsers_;
 }
 
 }

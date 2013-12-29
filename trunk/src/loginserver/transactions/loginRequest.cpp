@@ -11,7 +11,7 @@ namespace transactions
 {
 
 LoginRequest::LoginRequest(User &user,
-                           core::network::tcp::Connection &dataserverConnection,
+                           core::network::tcp::Connection::Pointer dataserverConnection,
                            const protocol::loginserver::LoginRequest &request):
     user_(user),
     dataserverConnection_(dataserverConnection),
@@ -19,7 +19,7 @@ LoginRequest::LoginRequest(User &user,
 
 bool LoginRequest::isValid() const
 {
-    return dataserverConnection_.isOpen();
+    return dataserverConnection_ != nullptr && dataserverConnection_->isOpen();
 }
 
 void LoginRequest::handleValid()
@@ -29,7 +29,7 @@ void LoginRequest::handleValid()
     LOG(INFO) << "hash: " << user_.getHash() << ", accountId: " << user_.getAccountId() << ", sending request for account check.";
 
     protocol::dataserver::CheckAccountRequest checkAccountRequest(user_.getHash(), request_.getAccountId(), request_.getPassword());
-    dataserverConnection_.send(checkAccountRequest.getWriteStream().getPayload());
+    dataserverConnection_->send(checkAccountRequest.getWriteStream().getPayload());
 }
 
 void LoginRequest::handleInvalid()

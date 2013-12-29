@@ -15,13 +15,9 @@ class ReadStreamsExtractor
 public:
     typedef std::vector<ReadStream> StreamsContainer;
 
-    class EmptyPayloadException: public core::common::Exception {};
-    class EmptyStreamException: public core::common::Exception {};
-    class UnknownStreamFormatException: public core::common::Exception {};
-
     ReadStreamsExtractor(const core::network::Payload &payload);
 
-    void extract();
+    bool extract();
     StreamsContainer& getStreams();
 
 private:
@@ -29,7 +25,8 @@ private:
 
     size_t calculateStreamSize(size_t currentOffset) const;
     size_t calculateStreamOffset(size_t currentOffset) const;
-    bool validateStream(size_t currentOffset) const;
+    bool isStreamValid(size_t currentOffset) const;
+    size_t extractStream(size_t streamOffset);
 
     const core::network::Payload &payload_;
     StreamsContainer streams_;

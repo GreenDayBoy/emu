@@ -9,17 +9,17 @@ namespace network
 namespace tcp
 {
 
-NetworkUser::NetworkUser(Connection &connection):
+NetworkUser::NetworkUser(Connection::Pointer connection):
     connection_(connection) {}
 
 NetworkUser::~NetworkUser() {}
 
 Connection& NetworkUser::getConnection()
 {
-    return connection_;
+    return *connection_;
 }
 
-bool NetworkUser::operator==(const Connection &connection) const
+bool NetworkUser::operator==(const Connection::Pointer connection) const
 {
     return connection_ == connection;
 }

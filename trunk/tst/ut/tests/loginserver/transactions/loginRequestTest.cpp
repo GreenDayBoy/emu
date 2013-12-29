@@ -30,21 +30,23 @@ protected:
         accountId_(L"testAccount"),
         password_(L"testPassword"),
         request_(ReadStream(LoginRequest(accountId_, password_).getWriteStream().getPayload())),
+        dataserverConnection_(new ConnectionMock()),
+        connection_(new ConnectionMock()),
         user_(connection_) {}
 
     std::wstring accountId_;
     std::wstring password_;
     LoginRequest request_;
-    ConnectionMock dataserverConnection_;
-    ConnectionMock connection_;
+    ConnectionMock::Pointer dataserverConnection_;
+    ConnectionMock::Pointer connection_;
     User user_;
 };
 
 TEST_F(LoginRequestTransactionTest, handle)
 {
     Payload payload;
-    EXPECT_CALL(dataserverConnection_, send(_)).WillOnce(SaveArg<0>(&payload));
-    EXPECT_CALL(dataserverConnection_, isOpen()).WillOnce((Return(true)));
+    EXPECT_CALL(*dataserverConnection_, send(_)).WillOnce(SaveArg<0>(&payload));
+    EXPECT_CALL(*dataserverConnection_, isOpen()).WillOnce((Return(true)));
 
     eMU::loginserver::transactions::LoginRequest(user_, dataserverConnection_, request_).handle();
 
@@ -60,8 +62,15 @@ TEST_F(LoginRequestTransactionTest, handle)
 
 TEST_F(LoginRequestTransactionTest, WhenConnectionToDataserverIsNotOpenThenClientShouldBeDisconnected)
 {
-    EXPECT_CALL(dataserverConnection_, isOpen()).WillOnce((Return(false)));
-    EXPECT_CALL(connection_, disconnect());
+    EXPECT_CALL(*dataserverConnection_, isOpen()).WillOnce((Return(false)));
+    EXPECT_CALL(*connection_, disconnect());
 
     eMU::loginserver::transactions::LoginRequest(user_, dataserverConnection_, request_).handle();
+}
+
+TEST_F(LoginRequestTransactionTest, WhenNullPtrAsDataserverConnectionProvidedThenClientShouldBeDisconnected)
+{
+    EXPECT_CALL(*connection_, disconnect());
+
+    eMU::loginserver::transactions::LoginRequest(user_, nullptr, request_).handle();
 }

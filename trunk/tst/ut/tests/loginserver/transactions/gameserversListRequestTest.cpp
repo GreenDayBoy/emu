@@ -29,11 +29,12 @@ class GameserversListRequestTransactionTest: public ::testing::Test
 {
 protected:
     GameserversListRequestTransactionTest():
+        connection_(new ConnectionMock()),
         user_(connection_),
         request_(ReadStream(GameserversListRequest().getWriteStream().getPayload())),
         transaction_(user_, gameserversList_, request_) {}
 
-    ConnectionMock connection_;
+    ConnectionMock::Pointer connection_;
     User user_;
     GameserversListMock gameserversList_;
     GameserversListRequest request_;
@@ -49,7 +50,7 @@ TEST_F(GameserversListRequestTransactionTest, handle)
     EXPECT_CALL(gameserversList_, getServers()).WillOnce(ReturnRef(servers));
 
     Payload payload;
-    EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&payload));
+    EXPECT_CALL(*connection_, send(_)).WillOnce(SaveArg<0>(&payload));
     transaction_.handle();
 
     ReadStream readStream(payload);

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <analyzer/server.hpp>
+#include <analyzer/user.hpp>
 #include <analyzer/views/main.hpp>
+#include <core/common/factory.hpp>
 
 namespace eMU
 {
@@ -11,7 +12,7 @@ namespace analyzer
 class Controller
 {
 public:
-    Controller(asio::io_service &ioService);
+    Controller(size_t maxNumberOfUsers);
 
     void onAccept(User &user);
     void onReceive(User &user);
@@ -20,13 +21,16 @@ public:
     void disconnect(const std::string &connectionId);
     void send(const std::string &connectionId, const std::string &dump);
 
-    Server& getServer();
+    core::common::Factory<User>& getUsersFactory();
+    size_t getMaxNumberOfUsers();
+
     views::Main& getMainView();
 
 private:
     core::network::Payload convertDumpToPayload(std::string dump) const;
 
-    Server server_;
+    core::common::Factory<User> usersFactory_;
+    size_t maxNumberOfUsers_;
     views::Main mainView_;
 };
 
