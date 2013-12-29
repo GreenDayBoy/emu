@@ -28,14 +28,15 @@ class CheckAccountResponseTransactionTest: public ::testing::Test
 protected:
     CheckAccountResponseTransactionTest():
         checkAccountResult_(CheckAccountResult::Succeed),
-        expectedLoginResult_(LoginResult::Succeed) {}
+        expectedLoginResult_(LoginResult::Succeed),
+        connection_(new ConnectionMock()) {}
 
     void scenario()
     {
         User &user = usersFactory_.create(connection_);
         CheckAccountResponse checkAccountResponse(CheckAccountResponse(user.getHash(), checkAccountResult_).getWriteStream().getPayload());
 
-        EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
+        EXPECT_CALL(*connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
         eMU::loginserver::transactions::CheckAccountResponse(usersFactory_, checkAccountResponse).handle();
 
         ReadStream readStream(payload_);
@@ -49,7 +50,7 @@ protected:
     Payload payload_;
     CheckAccountResult checkAccountResult_;
     LoginResult expectedLoginResult_;
-    ConnectionMock connection_;
+    ConnectionMock::Pointer connection_;
 };
 
 TEST_F(CheckAccountResponseTransactionTest, WhenDataServerReturnSucceedThenLoginResponseShouldBeSucceed)

@@ -29,12 +29,6 @@ public:
         }
     }
 
-    ObjectType& create()
-    {
-        objects_.push_back(new ObjectType());
-        return *(objects_.back());
-    }
-
     template<typename ParameterType>
     ObjectType& create(ParameterType &parameter)
     {

@@ -43,6 +43,7 @@ class CheckAccountRequestTransactionTest: public ::testing::Test
 protected:
     CheckAccountRequestTransactionTest():
         clientHash_(0x12345),
+        connection_(new ConnectionMock()),
         user_(connection_),
         request_(ReadStream(CheckAccountRequest(clientHash_,
                                                 "testAccount",
@@ -53,7 +54,7 @@ protected:
     Payload payload_;
 
     NetworkUser::Hash clientHash_;
-    ConnectionMock connection_;
+    ConnectionMock::Pointer connection_;
     User user_;
     CheckAccountRequest request_;
 };
@@ -67,7 +68,7 @@ TEST_F(CheckAccountRequestTransactionTest, handle)
     EXPECT_CALL(sqlInterface_, isAlive()).WillOnce(Return(true));
     EXPECT_CALL(sqlInterface_, fetchQueryResult()).WillOnce(Return((queryResult_)));
     EXPECT_CALL(sqlInterface_, executeQuery(_)).WillOnce(Return(true));
-    EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
+    EXPECT_CALL(*connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
 
     eMU::dataserver::transactions::CheckAccountRequest(user_, sqlInterface_, request_).handle();
 
@@ -87,7 +88,7 @@ TEST_F(CheckAccountRequestTransactionTest, WhenExecutionOfQueryIsFailedThenFault
     std::string errorMessage = "database error";
     EXPECT_CALL(sqlInterface_, getErrorMessage()).WillOnce(Return(errorMessage));
 
-    EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
+    EXPECT_CALL(*connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
 
     eMU::dataserver::transactions::CheckAccountRequest(user_, sqlInterface_, request_).handle();
 
@@ -104,7 +105,7 @@ TEST_F(CheckAccountRequestTransactionTest, WhenQueryResultIsEmptyThenFaultIndica
     EXPECT_CALL(sqlInterface_, isAlive()).WillOnce(Return(true));
     EXPECT_CALL(sqlInterface_, fetchQueryResult()).WillOnce(Return((queryResult_)));
     EXPECT_CALL(sqlInterface_, executeQuery(_)).WillOnce(Return(true));
-    EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
+    EXPECT_CALL(*connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
 
     eMU::dataserver::transactions::CheckAccountRequest(user_, sqlInterface_, request_).handle();
 
@@ -118,7 +119,7 @@ TEST_F(CheckAccountRequestTransactionTest, WhenQueryResultIsEmptyThenFaultIndica
 TEST_F(CheckAccountRequestTransactionTest, WhenConnectionToDatabaseIsDiedThenFaultIndicationShouldBeSent)
 {
     EXPECT_CALL(sqlInterface_, isAlive()).WillOnce(Return(false));
-    EXPECT_CALL(connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
+    EXPECT_CALL(*connection_, send(_)).WillOnce(SaveArg<0>(&payload_));
 
     eMU::dataserver::transactions::CheckAccountRequest(user_, sqlInterface_, request_).handle();
 

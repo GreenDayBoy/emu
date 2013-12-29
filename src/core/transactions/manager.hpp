@@ -14,8 +14,6 @@ namespace transactions
 class Manager
 {
 public:
-    typedef std::shared_ptr<Manager> Pointer;
-
     void queue(Transaction *transaction);
     void dequeueAll();
 

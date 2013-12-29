@@ -51,23 +51,23 @@ TEST_F(ReadStreamsExtractorTest, extract)
     ASSERT_EQ(0xFFFFFFFF, streams[2].readNext<uint32_t>());
 }
 
-TEST_F(ReadStreamsExtractorTest, ExceptionShouldBeThrownWhenEmptyPayloadWasProvided)
+TEST_F(ReadStreamsExtractorTest, FalseShouldBeReturnWhenEmptyPayloadWasProvided)
 {
-    ASSERT_THROW(extractor_.extract(), ReadStreamsExtractor::EmptyPayloadException);
+    ASSERT_FALSE(extractor_.extract());
 }
 
-TEST_F(ReadStreamsExtractorTest, ExceptionShouldBeThrownWhenStreamWithTooLargeSizeWasProvided)
+TEST_F(ReadStreamsExtractorTest, FalseShouldBeReturnWhenStreamWithTooLargeSizeWasProvided)
 {
     reinterpret_cast<uint32_t&>(payload_[0]) = 5;
     payload_.setSize(4);
 
-    ASSERT_THROW(extractor_.extract(), ReadStreamsExtractor::UnknownStreamFormatException);
+    ASSERT_FALSE(extractor_.extract());
 }
 
-TEST_F(ReadStreamsExtractorTest, ExceptionShouldBeThrownWhenStreamWithZeroSizeWasProvided)
+TEST_F(ReadStreamsExtractorTest, FalseShouldBeReturnWhenStreamWithZeroSizeWasProvided)
 {
     reinterpret_cast<uint32_t&>(payload_[0]) = 0;
     payload_.setSize(20);
 
-    ASSERT_THROW(extractor_.extract(), ReadStreamsExtractor::EmptyStreamException);
+    ASSERT_FALSE(extractor_.extract());
 }

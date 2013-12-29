@@ -17,7 +17,7 @@ class LoginRequest: public core::transactions::Transaction
 {
 public:
     LoginRequest(User &user,
-                 core::network::tcp::Connection &dataserverConnection,
+                 core::network::tcp::Connection::Pointer dataserverConnection,
                  const protocol::loginserver::LoginRequest &request);
 
 private:
@@ -26,7 +26,7 @@ private:
     void handleInvalid();
 
     User &user_;
-    core::network::tcp::Connection &dataserverConnection_;
+    core::network::tcp::Connection::Pointer dataserverConnection_;
     protocol::loginserver::LoginRequest request_;
 };
 

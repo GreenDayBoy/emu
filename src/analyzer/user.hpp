@@ -13,7 +13,7 @@ namespace analyzer
 class User: public core::network::tcp::NetworkUser
 {
 public:
-    User(core::network::tcp::Connection &connection);
+    User(core::network::tcp::Connection::Pointer connection);
 
     void storeReadPayload();
     std::list<core::network::Payload>& getReadPayloads();

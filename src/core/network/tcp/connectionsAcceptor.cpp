@@ -10,42 +10,45 @@ namespace network
 namespace tcp
 {
 
-ConnectionsAcceptor::ConnectionsAcceptor(common::Factory<Connection> &connectionsFactory, AcceptorPointer acceptor):
-    connectionsFactory_(connectionsFactory),
-    acceptor_(acceptor),
-    strand_(acceptor_->get_io_service()) {}
+ConnectionsAcceptor::ConnectionsAcceptor(asio::io_service &ioService, uint16_t port, Protocol &protocol):
+    acceptor_(ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
+    strand_(ioService),
+    protocol_(protocol) {}
 
 ConnectionsAcceptor::~ConnectionsAcceptor() {}
 
 void ConnectionsAcceptor::queueAccept()
 {
-    Connection::SocketPointer socket(new asio::ip::tcp::socket(acceptor_->get_io_service()));
+    Connection::Pointer connection = Connection::Pointer(new Connection(acceptor_.get_io_service(), protocol_));
 
-    acceptor_->async_accept(*socket,
-                            strand_.wrap(std::bind(&ConnectionsAcceptor::acceptHandler,
-                                                   this,
-                                                   socket,
-                                                   std::placeholders::_1)));
+    acceptor_.async_accept(connection->getSocket(),
+                           strand_.wrap(std::bind(&ConnectionsAcceptor::acceptHandler,
+                                                  this,
+                                                  connection,
+                                                  std::placeholders::_1)));
 }
 
-void ConnectionsAcceptor::acceptHandler(Connection::SocketPointer socket, const boost::system::error_code &errorCode)
+void ConnectionsAcceptor::acceptHandler(Connection::Pointer connection, const boost::system::error_code &errorCode)
 {
-    if(errorCode)
+    if(!errorCode)
+    {
+        connection->accept();
+    }
+    else if(errorCode != boost::asio::error::operation_aborted)
     {
         LOG(ERROR) << "Error during establishing connection, error: " << errorCode.message();
     }
     else
     {
-        Connection &connection = connectionsFactory_.create(socket);
-        acceptEventCallback_(connection);
+        return;
     }
 
     this->queueAccept();
 }
 
-void ConnectionsAcceptor::setAcceptEventCallback(const AcceptEventCallback &callback)
+asio::ip::tcp::acceptor& ConnectionsAcceptor::getAcceptor()
 {
-    acceptEventCallback_ = callback;
+    return acceptor_;
 }
 
 }

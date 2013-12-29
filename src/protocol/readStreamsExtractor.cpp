@@ -1,6 +1,6 @@
 #include <protocol/readStreamsExtractor.hpp>
 
-#include <string.h>
+#include <glog/logging.h>
 
 namespace eMU
 {
@@ -10,32 +10,40 @@ namespace protocol
 ReadStreamsExtractor::ReadStreamsExtractor(const core::network::Payload &payload):
     payload_(payload) {}
 
-void ReadStreamsExtractor::extract()
+bool ReadStreamsExtractor::extract()
 {
     if(payload_.empty())
     {
-        throw EmptyPayloadException();
+        LOG(ERROR) << "Cannot extract streams from empty payload!";
+        return false;
     }
 
     size_t currentOffset = 0;
 
     while(currentOffset < payload_.getSize())
     {
-        if(!this->validateStream(currentOffset))
+        if(this->isStreamValid(currentOffset))
         {
-            throw UnknownStreamFormatException();
+            size_t size = this->extractStream(currentOffset);
+
+            if(size > 0)
+            {
+                currentOffset += size;
+            }
+            else
+            {
+                LOG(ERROR) << "Extracted stream has 0 size!";
+                return false;
+            }
         }
-
-        size_t payloadSize = this->calculateStreamSize(currentOffset) + sizeof(uint32_t);
-
-        core::network::Payload payload;
-        payload.setSize(payloadSize);
-        memcpy(&payload[0], &payload_[currentOffset], payloadSize);
-
-        streams_.push_back(std::move(ReadStream(payload)));
-
-        currentOffset += payloadSize;
+        else
+        {
+            LOG(ERROR) << "Invalid stream format!";
+            return false;
+        }
     }
+
+   return true;
 }
 
 ReadStreamsExtractor::StreamsContainer &ReadStreamsExtractor::getStreams()
@@ -45,14 +53,7 @@ ReadStreamsExtractor::StreamsContainer &ReadStreamsExtractor::getStreams()
 
 size_t ReadStreamsExtractor::calculateStreamSize(size_t currentOffset) const
 {
-    size_t size = reinterpret_cast<const uint32_t&>(payload_[currentOffset]);
-
-    if(size == 0)
-    {
-        throw EmptyStreamException();
-    }
-
-    return size;
+    return reinterpret_cast<const uint32_t&>(payload_[currentOffset]);
 }
 
 size_t ReadStreamsExtractor::calculateStreamOffset(size_t currentOffset) const
@@ -60,7 +61,7 @@ size_t ReadStreamsExtractor::calculateStreamOffset(size_t currentOffset) const
     return currentOffset + sizeof(uint32_t);
 }
 
-bool ReadStreamsExtractor::validateStream(size_t currentOffset) const
+bool ReadStreamsExtractor::isStreamValid(size_t currentOffset) const
 {
     size_t streamOffset = this->calculateStreamOffset(currentOffset);
 
@@ -69,7 +70,36 @@ bool ReadStreamsExtractor::validateStream(size_t currentOffset) const
         return false;
     }
 
-    return (streamOffset + this->calculateStreamSize(currentOffset) <= payload_.getSize());
+    size_t streamSize = this->calculateStreamSize(currentOffset);
+
+    if(streamSize > 0 && streamOffset + streamSize <= payload_.getSize())
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+size_t ReadStreamsExtractor::extractStream(size_t streamOffset)
+{
+    try
+    {
+        size_t payloadSize = this->calculateStreamSize(streamOffset) + sizeof(uint32_t);
+
+        core::network::Payload payload;
+        payload.setSize(payloadSize);
+        memcpy(&payload[0], &payload_[streamOffset], payloadSize);
+        streams_.push_back(std::move(ReadStream(payload)));
+
+        return payloadSize;
+    }
+    catch(const core::network::Payload::SizeOutOfBoundException&)
+    {
+        LOG(ERROR) << "Size of payload with stream is out of bound!";
+        return 0;
+    }
 }
 
 }

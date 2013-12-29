@@ -14,7 +14,7 @@ namespace tcp
 {
 
 ConnectionMock::ConnectionMock():
-    Connection((ioService_)) {}
+    Connection(ioService_, protocol_) {}
 
 }
 }

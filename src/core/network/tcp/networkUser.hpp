@@ -17,11 +17,11 @@ class NetworkUser: boost::noncopyable
 public:
     BOOST_STRONG_TYPEDEF(size_t, Hash)
 
-    NetworkUser(Connection &connection);
+    NetworkUser(Connection::Pointer connection);
     virtual ~NetworkUser();
 
     Connection& getConnection();
-    bool operator==(const Connection &connection) const;
+    bool operator==(const Connection::Pointer connection) const;
     bool operator==(Hash hash) const;
     bool operator==(const NetworkUser &user) const;
 
@@ -30,7 +30,7 @@ public:
 protected:
     NetworkUser();
 
-    Connection &connection_;
+    Connection::Pointer connection_;
 };
 
 }

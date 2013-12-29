@@ -11,7 +11,7 @@ namespace loginserver
 class User: public core::network::tcp::NetworkUser
 {
 public:
-    User(core::network::tcp::Connection &connection);
+    User(core::network::tcp::Connection::Pointer connection);
 
     void setAccountId(const std::string &accountId);
     const std::string& getAccountId() const;

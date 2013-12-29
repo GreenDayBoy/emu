@@ -10,9 +10,6 @@ protected:
     class SimpleObject
     {
     public:
-        SimpleObject():
-            value_(0) {}
-
         SimpleObject(int32_t value):
             value_(value) {}
 
@@ -35,15 +32,6 @@ protected:
     Factory<SimpleObject> factory_;
 };
 
-TEST_F(FactoryTest, AfterCreateObjectShouldExistsInFactory)
-{
-    SimpleObject &object = factory_.create();
-
-    ASSERT_EQ(object, factory_.find(object));
-
-    factory_.destroy(object);
-}
-
 TEST_F(FactoryTest, AfterDestroyObjectShouldNotExistInFactory)
 {
     int32_t value = 1;
@@ -60,7 +48,7 @@ TEST_F(FactoryTest, AfterDestroyObjectShouldNotExistInFactory)
 
 TEST_F(FactoryTest, DestroyObjectNotBelongsToFactoryShouldThrowException)
 {
-    SimpleObject object;
+    SimpleObject object(12);
 
     ASSERT_THROW(factory_.destroy(object), Factory<SimpleObject>::ObjectNotFoundException);
 }
