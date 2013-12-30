@@ -1,4 +1,5 @@
 #include <dataserver/main.hpp>
+#include <dataserver/database/mySqlInterface.hpp>
 #include <dataserver/context.hpp>
 #include <dataserver/protocol.hpp>
 #include <core/network/tcp/connectionsAcceptor.hpp>
@@ -23,19 +24,20 @@ int main(int argsCount, char *args[])
     google::ParseCommandLineFlags(&argsCount, &args, true);
     google::InitGoogleLogging(args[0]);
 
-    eMU::dataserver::Context dataserverContext(FLAGS_max_users);
-    if(!dataserverContext.getSqlInterface().initialize())
+    eMU::dataserver::database::MySqlInterface mysqlInterface;
+    if(!mysqlInterface.initialize())
     {
         LOG(ERROR) << "Initialization of database engine failed.";
         return 1;
     }
 
-    if(!dataserverContext.getSqlInterface().connect(FLAGS_db_host, FLAGS_db_port, FLAGS_db_user, FLAGS_db_password, FLAGS_db_name))
+    if(!mysqlInterface.connect(FLAGS_db_host, FLAGS_db_port, FLAGS_db_user, FLAGS_db_password, FLAGS_db_name))
     {
         LOG(ERROR) << "Connect to database engine failed.";
         return 1;
     }
 
+    eMU::dataserver::Context dataserverContext(mysqlInterface, FLAGS_max_users);
     eMU::dataserver::Protocol dataserverProtocol(dataserverContext);
     boost::asio::io_service ioService;
 
@@ -50,7 +52,7 @@ int main(int argsCount, char *args[])
 
     threads.join_all();
 
-    dataserverContext.getSqlInterface().cleanup();
+    mysqlInterface.cleanup();
 
     return 0;
 }

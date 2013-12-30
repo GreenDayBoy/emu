@@ -22,11 +22,11 @@ public:
 
     void async_receive_from(const boost::asio::mutable_buffers_1 &buffer,
                             boost::asio::ip::udp::endpoint &senderEndpoint,
-                            const IoHandler &handler);
+                            const io_service::IoHandler &handler);
 
     void async_send_to(const boost::asio::mutable_buffers_1 &buffer,
                        boost::asio::ip::udp::endpoint endpoint,
-                       const IoHandler &handler);
+                       const io_service::IoHandler &handler);
 };
 
 }

@@ -1,8 +1,8 @@
 #include <mt/env/asioStub/baseSocket.hpp>
-#include <mt/env/asioStub/types.hpp>
 #include <mt/env/asioStub/ioService.hpp>
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 namespace eMU
 {
@@ -16,40 +16,28 @@ namespace asioStub
 BaseSocket::BaseSocket(io_service &ioService):
     ioService_(ioService) {}
 
-void BaseSocket::insertPayload(const core::network::Payload &payload)
+void BaseSocket::send(const core::network::Payload &payload)
 {
-    if(payload.getSize() > boost::asio::buffer_size(receiveBuffer_))
-    {
-        throw PayloadSizeOutOfBoundException();
-    }
+    ASSERT_GT(boost::asio::buffer_size(receiveBuffer_), payload.getSize()) << "Sent payload size is out of bound!";
 
     uint8_t *buffer = boost::asio::buffer_cast<uint8_t*>(receiveBuffer_);
 
-    if(buffer == nullptr)
-    {
-        throw ReceiveNotStartedException();
-    }
+    ASSERT_THAT(buffer, ::testing::NotNull()) << "Receive not queued!";
 
     memcpy(buffer, &payload[0], payload.getSize());
     receiveBuffer_ = boost::asio::mutable_buffer();
     receiveHandler_(boost::system::error_code(), payload.getSize());
 }
 
-core::network::Payload BaseSocket::getPayload()
+core::network::Payload BaseSocket::receive()
 {
     const uint8_t *buffer = boost::asio::buffer_cast<const uint8_t*>(sendBuffer_);
 
-    if(buffer == nullptr)
-    {
-        throw SendNotStartedException();
-    }
+    EXPECT_THAT(buffer, ::testing::NotNull()) << "Send not queued!";
 
     size_t size = boost::asio::buffer_size(sendBuffer_);
 
-    if(size > core::network::Payload::getMaxSize())
-    {
-        throw PayloadSizeOutOfBoundException();
-    }
+    EXPECT_GT(eMU::core::network::Payload::getMaxSize(), size) << "Received payload size is out of bound!";
 
     core::network::Payload payload;
     memcpy(&payload[0], buffer, size);
@@ -66,7 +54,7 @@ io_service& BaseSocket::get_io_service()
     return ioService_;
 }
 
-bool BaseSocket::hasUnreadPayload() const
+bool BaseSocket::isUnread() const
 {
     return boost::asio::buffer_size(sendBuffer_) > 0;
 }
