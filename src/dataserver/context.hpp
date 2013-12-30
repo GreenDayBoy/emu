@@ -3,7 +3,7 @@
 #include <core/common/factory.hpp>
 #include <core/transactions/manager.hpp>
 #include <dataserver/user.hpp>
-#include <dataserver/database/mySqlInterface.hpp>
+#include <dataserver/database/sqlInterface.hpp>
 
 namespace eMU
 {
@@ -13,7 +13,7 @@ namespace dataserver
 class Context: boost::noncopyable
 {
 public:
-    Context(size_t maxNumberOfUsers);
+    Context(database::SqlInterface &sqlInterface, size_t maxNumberOfUsers);
 
     core::common::Factory<User>& getUsersFactory();
     core::transactions::Manager& getTransactionsManager();
@@ -25,7 +25,7 @@ private:
 
     core::common::Factory<User> usersFactory_;
     core::transactions::Manager transactionsManager_;
-    database::MySqlInterface mySqlInterface_;
+    database::SqlInterface &sqlInterface_;
     size_t maxNumberOfUsers_;
 };
 

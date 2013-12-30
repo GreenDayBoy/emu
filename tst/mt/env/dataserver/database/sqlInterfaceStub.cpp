@@ -24,10 +24,7 @@ std::string SqlInterfaceStub::getErrorMessage() { return ""; }
 
 bool SqlInterfaceStub::executeQuery(std::string query)
 {
-    if(queriesStatus_.empty())
-    {
-        throw UnexpectedQueryExecutionException();
-    }
+    EXPECT_FALSE(queriesStatus_.empty()) << "Unexpected database query execution!";
 
     bool status = queriesStatus_.front();
     queriesStatus_.pop();
@@ -37,10 +34,7 @@ bool SqlInterfaceStub::executeQuery(std::string query)
 
 eMU::dataserver::database::QueryResult SqlInterfaceStub::fetchQueryResult()
 {
-    if(queriesResult_.empty())
-    {
-        throw UnexpectedFetchResultExecutionException();
-    }
+    EXPECT_FALSE(queriesResult_.empty()) << "No results to fetch!";
 
     eMU::dataserver::database::QueryResult result = queriesResult_.front();
     queriesResult_.pop();

@@ -25,9 +25,6 @@ public:
         eMU::dataserver::database::QueryResult queryResult_;
     };
 
-    class UnexpectedQueryExecutionException {};
-    class UnexpectedFetchResultExecutionException {};
-
     SqlInterfaceStub();
 
     typedef std::queue<bool> QueryStatusContainer;

@@ -5,7 +5,8 @@ namespace eMU
 namespace dataserver
 {
 
-Context::Context(size_t maxNumberOfUsers):
+Context::Context(database::SqlInterface &sqlInterface, size_t maxNumberOfUsers):
+    sqlInterface_(sqlInterface),
     maxNumberOfUsers_(maxNumberOfUsers) {}
 
 core::common::Factory<User>& Context::getUsersFactory()
@@ -20,7 +21,7 @@ core::transactions::Manager& Context::getTransactionsManager()
 
 database::SqlInterface& Context::getSqlInterface()
 {
-    return mySqlInterface_;
+    return sqlInterface_;
 }
 
 size_t Context::getMaxNumberOfUsers()

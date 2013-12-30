@@ -19,17 +19,15 @@ socket::socket(io_service &ioService, const boost::asio::ip::udp::endpoint&):
 
 void socket::async_receive_from(const boost::asio::mutable_buffers_1 &buffer,
                                 boost::asio::ip::udp::endpoint &senderEndpoint,
-                                const IoHandler &handler)
+                                const io_service::IoHandler &handler)
 {
     receiveBuffer_ = buffer;
     receiveHandler_ = handler;
-
-    ioService_.establishUdpConnection(this);
 }
 
 void socket::async_send_to(const boost::asio::mutable_buffers_1 &buffer,
                            boost::asio::ip::udp::endpoint endpoint,
-                           const IoHandler &handler)
+                           const io_service::IoHandler &handler)
 {
     sendBuffer_ = buffer;
     sendHandler_ = handler;
