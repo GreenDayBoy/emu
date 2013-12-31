@@ -22,6 +22,7 @@ using eMU::loginserver::Protocol;
 using eMU::loginserver::DataserverProtocol;
 using eMU::core::common::XmlReader;
 using eMU::core::network::tcp::Connection;
+using eMU::core::network::tcp::NetworkUser;
 using eMU::mt::env::asioStub::io_service;
 using eMU::protocol::ReadStream;
 using eMU::protocol::loginserver::LoginRequest;
@@ -105,4 +106,23 @@ TEST_F(LoginserverTest, Login)
 
     LoginResponse loginResponse(loginResponseStream);
     ASSERT_EQ(LoginResult::Succeed, loginResponse.getResult());
+}
+
+TEST_F(LoginserverTest, WhenCheckAccountWithInvalidClientHashReceivedThenNothingHappens)
+{
+    LoginRequest loginRequest(L"accountTest", L"passwordTest");
+    CHECK(connection_->getSocket().send(loginRequest.getWriteStream().getPayload()));
+
+    ASSERT_TRUE(loginserverContext_.getDataserverConnection()->getSocket().isUnread());
+    const ReadStream &checkAccountRequestStream = loginserverContext_.getDataserverConnection()->getSocket().receive();
+    ASSERT_EQ(eMU::protocol::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
+
+    CheckAccountRequest checkAccountRequest(checkAccountRequestStream);
+    ASSERT_EQ("accountTest", checkAccountRequest.getAccountId());
+    ASSERT_EQ("passwordTest", checkAccountRequest.getPassword());
+
+    CHECK(loginserverContext_.getDataserverConnection()->getSocket().send(CheckAccountResponse(NetworkUser::Hash(0x1234),
+                                                                                               CheckAccountResult::Succeed).getWriteStream().getPayload()));
+
+    ASSERT_EQ(1, loginserverContext_.getUsersFactory().getObjects().size());
 }
