@@ -27,6 +27,9 @@ public:
     void async_send(const boost::asio::mutable_buffers_1 &buffer, const io_service::IoHandler &handler);
     void connect(const boost::asio::ip::tcp::endpoint &endpoint, boost::system::error_code& errorCode);
     void disconnect();
+
+private:
+    bool opened_;
 };
 
 }
