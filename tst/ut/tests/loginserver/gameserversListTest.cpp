@@ -52,10 +52,9 @@ protected:
         prepareXmlContent();
 
         XmlReader xmlReader(xmlContent_);
-        xmlReader.parse("servers");
 
         prepareSampleServers();
-        gameserversList_.initialize(xmlReader);
+        ASSERT_TRUE(gameserversList_.initialize(xmlReader));
     }
 
     std::string xmlContent_;

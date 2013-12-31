@@ -16,12 +16,9 @@ namespace common
 class XmlReader
 {
 public:
-    class EmptyXmlContentException: public Exception {};
-    class NotMatchedXmlNodeException: public Exception {};
-
     XmlReader(const std::string &content);
 
-    void parse(std::string firstNodeName);
+    bool parse(const std::string &firstNodeName);
     bool end();
     void next();
     void clear();

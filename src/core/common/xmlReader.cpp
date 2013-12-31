@@ -1,6 +1,7 @@
 #include <core/common/xmlReader.hpp>
 
 #include <fstream>
+#include <glog/logging.h>
 
 namespace eMU
 {
@@ -13,11 +14,12 @@ XmlReader::XmlReader(const std::string &content):
     content_(content),
     currentNode_(nullptr) {}
 
-void XmlReader::parse(std::string firstNodeName)
+bool XmlReader::parse(const std::string &firstNodeName)
 {
     if(content_.empty())
     {
-        throw EmptyXmlContentException();
+        LOG(ERROR) << "Xml content is empty!";
+        return false;
     }
 
     document_.parse<0>(const_cast<char*>(content_.c_str()));
@@ -25,10 +27,12 @@ void XmlReader::parse(std::string firstNodeName)
 
     if(this->end())
     {
-        throw NotMatchedXmlNodeException();
+        LOG(ERROR) << "Xml root node: " << firstNodeName << " not found!";
+        return false;
     }
 
     currentNode_ = currentNode_->first_node();
+    return true;
 }
 
 bool XmlReader::end()

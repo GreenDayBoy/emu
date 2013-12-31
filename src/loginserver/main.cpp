@@ -24,22 +24,11 @@ int main(int argsCount, char *args[])
     google::InitGoogleLogging(args[0]);
 
     eMU::loginserver::Context loginserverContext(FLAGS_max_users);
+    eMU::core::common::XmlReader xmlReader(eMU::core::common::XmlReader::getXmlFileContent("./data/gameserversList.xml"));
 
-    try
+    if(!loginserverContext.getGameserversList().initialize(xmlReader))
     {
-        eMU::core::common::XmlReader xmlReader(eMU::core::common::XmlReader::getXmlFileContent("./data/gameserversList.xml"));
-        xmlReader.parse("servers");
-
-        loginserverContext.getGameserversList().initialize(xmlReader);
-    }
-    catch(eMU::core::common::XmlReader::EmptyXmlContentException&)
-    {
-        LOG(ERROR) << "Got empty xml servers list file!";
-        return 1;
-    }
-    catch(eMU::core::common::XmlReader::NotMatchedXmlNodeException&)
-    {
-        LOG(ERROR) << "Got corrupted xml servers list file!";
+        LOG(ERROR) << "Unable to parse gameservers list!";
         return 1;
     }
 

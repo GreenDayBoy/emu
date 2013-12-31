@@ -31,7 +31,7 @@ TEST_F(XmlReaderTest, parseCorrectContent)
     prepareContent();
 
     XmlReader xmlReader(content_);
-    xmlReader.parse("servers");
+    ASSERT_TRUE(xmlReader.parse("servers"));
 
     ASSERT_FALSE(xmlReader.end());
     checkRecord(xmlReader, 21, "eMU_Test", "localhost", 55901);
@@ -49,18 +49,18 @@ TEST_F(XmlReaderTest, parseCorrectContent)
     xmlReader.clear();
 }
 
-TEST_F(XmlReaderTest, exceptionShouldBeThrownWhenContentIsEmpty)
+TEST_F(XmlReaderTest, WhenContentIsEmptyThenParseShouldReturnFalse)
 {
     XmlReader xmlReader("");
-    ASSERT_THROW(xmlReader.parse("servers"), XmlReader::EmptyXmlContentException);
+    ASSERT_FALSE(xmlReader.parse("servers"));
 }
 
-TEST_F(XmlReaderTest, exceptionShouldBeThrownWhenFirstNodeDoesNotMatch)
+TEST_F(XmlReaderTest, WhenFirstNodeDoesNotMatchThenParseShouldReturnFalse)
 {
     prepareContent();
 
     XmlReader xmlReader(content_);
-    ASSERT_THROW(xmlReader.parse("ssservverrs"), XmlReader::NotMatchedXmlNodeException);
+    ASSERT_FALSE(xmlReader.parse("ssservverrs"));
 }
 
 TEST_F(XmlReaderTest, parseContentWithoutRecords)
@@ -68,7 +68,7 @@ TEST_F(XmlReaderTest, parseContentWithoutRecords)
     content_ = "<servers></servers>";
 
     XmlReader xmlReader(content_);
-    xmlReader.parse("servers");
+    ASSERT_TRUE(xmlReader.parse("servers"));
 
     ASSERT_TRUE(xmlReader.end());
 
@@ -80,7 +80,7 @@ TEST_F(XmlReaderTest, getShouldReturnDefaultValueWhenContentDoesNotHaveAtributes
     content_ = "<servers><server /></servers>";
 
     XmlReader xmlReader(content_);
-    xmlReader.parse("servers");
+    ASSERT_TRUE(xmlReader.parse("servers"));
 
     ASSERT_FALSE(xmlReader.end());
 

@@ -1,6 +1,8 @@
 #include <loginserver/gameserversList.hpp>
 #include <core/common/exception.hpp>
 
+#include <glog/logging.h>
+
 namespace eMU
 {
 namespace loginserver
@@ -8,8 +10,15 @@ namespace loginserver
 
 GameserversList::~GameserversList() {}
 
-void GameserversList::initialize(eMU::core::common::XmlReader &xmlReader)
+bool GameserversList::initialize(eMU::core::common::XmlReader &xmlReader)
 {
+    if(!xmlReader.parse("servers"))
+    {
+        LOG(ERROR) << "Cannot parse servers list xml!";
+
+        return false;
+    }
+
     while(!xmlReader.end())
     {
         protocol::loginserver::GameserverInfo info = {};
@@ -22,6 +31,8 @@ void GameserversList::initialize(eMU::core::common::XmlReader &xmlReader)
 
         xmlReader.next();
     }
+
+    return true;
 }
 
 const protocol::loginserver::GameserversInfoContainer &GameserversList::getServers() const
