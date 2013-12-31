@@ -5,15 +5,17 @@
 #include <core/network/tcp/connection.hpp>
 #include <mt/env/asioStub/ioService.hpp>
 #include <mt/env/check.hpp>
-
 #include <protocol/loginserver/messageIds.hpp>
 #include <protocol/loginserver/loginRequest.hpp>
 #include <protocol/loginserver/loginResponse.hpp>
 #include <protocol/loginserver/loginResult.hpp>
+#include <protocol/loginserver/gameserversListRequest.hpp>
+#include <protocol/loginserver/gameserversListResponse.hpp>
 #include <protocol/dataserver/messageIds.hpp>
 #include <protocol/dataserver/checkAccountRequest.hpp>
 #include <protocol/dataserver/checkAccountResponse.hpp>
 #include <protocol/dataserver/checkAccountResult.hpp>
+#include <protocol/dataserver/faultIndication.hpp>
 
 #include <gtest/gtest.h>
 
@@ -28,10 +30,13 @@ using eMU::protocol::ReadStream;
 using eMU::protocol::loginserver::LoginRequest;
 using eMU::protocol::loginserver::LoginResponse;
 using eMU::protocol::loginserver::LoginResult;
+using eMU::protocol::loginserver::GameserversListRequest;
+using eMU::protocol::loginserver::GameserversListResponse;
 namespace MessageIds = eMU::protocol::loginserver::MessageIds;
 using eMU::protocol::dataserver::CheckAccountRequest;
 using eMU::protocol::dataserver::CheckAccountResponse;
 using eMU::protocol::dataserver::CheckAccountResult;
+using eMU::protocol::dataserver::FaultIndication;
 
 class LoginserverTest: public ::testing::Test
 {
@@ -67,6 +72,23 @@ protected:
         Connection::Pointer dataserverConnection(new Connection(ioService_, dataserverProtocol_));
         dataserverConnection->connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), 55960));
         ASSERT_EQ(dataserverConnection, loginserverContext_.getDataserverConnection());
+    }
+
+    void faultIndicationScenario(bool clientHashExists)
+    {
+        LoginRequest loginRequest(L"accountTest", L"passwordTest");
+        CHECK(connection_->getSocket().send(loginRequest.getWriteStream().getPayload()));
+
+        ASSERT_TRUE(loginserverContext_.getDataserverConnection()->getSocket().isUnread());
+        const ReadStream &checkAccountRequestStream = loginserverContext_.getDataserverConnection()->getSocket().receive();
+        ASSERT_EQ(eMU::protocol::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
+
+        CheckAccountRequest checkAccountRequest(checkAccountRequestStream);
+        NetworkUser::Hash clientHash = clientHashExists ? checkAccountRequest.getClientHash() : NetworkUser::Hash(0x1234);
+        CHECK(loginserverContext_.getDataserverConnection()->getSocket().send(FaultIndication(clientHash, "test message").getWriteStream().getPayload()));
+
+        bool connectionExists = !clientHashExists;
+        ASSERT_EQ(connectionExists, connection_->getSocket().is_open());
     }
 
     void TearDown()
@@ -117,12 +139,38 @@ TEST_F(LoginserverTest, WhenCheckAccountWithInvalidClientHashReceivedThenNothing
     const ReadStream &checkAccountRequestStream = loginserverContext_.getDataserverConnection()->getSocket().receive();
     ASSERT_EQ(eMU::protocol::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
 
-    CheckAccountRequest checkAccountRequest(checkAccountRequestStream);
-    ASSERT_EQ("accountTest", checkAccountRequest.getAccountId());
-    ASSERT_EQ("passwordTest", checkAccountRequest.getPassword());
-
     CHECK(loginserverContext_.getDataserverConnection()->getSocket().send(CheckAccountResponse(NetworkUser::Hash(0x1234),
                                                                                                CheckAccountResult::Succeed).getWriteStream().getPayload()));
+    ASSERT_TRUE(connection_->getSocket().is_open());
+}
 
-    ASSERT_EQ(1, loginserverContext_.getUsersFactory().getObjects().size());
+TEST_F(LoginserverTest, WhenFaultIndicationReceivedThenClientShouldBeDisconnected)
+{
+    bool clientHashExists = true;
+    faultIndicationScenario(clientHashExists);
+}
+
+TEST_F(LoginserverTest, WhenFaultIndicationWithInvalidClientHashReceivedThenNothingHappens)
+{
+    bool clientHashExists = false;
+    faultIndicationScenario(clientHashExists);
+}
+
+TEST_F(LoginserverTest, checkGameserversListRequest)
+{
+    CHECK(connection_->getSocket().send(GameserversListRequest().getWriteStream().getPayload()));
+
+    ASSERT_TRUE(connection_->getSocket().isUnread());
+    const ReadStream &gameserversListResponseStream = connection_->getSocket().receive();
+    ASSERT_EQ(eMU::protocol::loginserver::MessageIds::kGameserversListResponse, gameserversListResponseStream.getId());
+
+    GameserversListResponse response(gameserversListResponseStream);
+
+    ASSERT_EQ(2, response.getServers().size());
+
+    ASSERT_EQ(0, response.getServers()[0].code_);
+    ASSERT_EQ("eMU_TEST1", response.getServers()[0].name_);
+
+    ASSERT_EQ(1, response.getServers()[1].code_);
+    ASSERT_EQ("eMU_TEST2", response.getServers()[1].name_);
 }

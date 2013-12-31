@@ -16,16 +16,17 @@ namespace tcp
 {
 
 socket::socket(io_service &ioService):
-    BaseSocket(ioService) {}
+    BaseSocket(ioService),
+    opened_(true) {}
 
 void socket::close()
 {
-
+    opened_ = false;
 }
 
 bool socket::is_open() const
 {
-    return true;
+    return opened_;
 }
 
 void socket::shutdown(boost::asio::ip::tcp::socket::shutdown_type type) {}
