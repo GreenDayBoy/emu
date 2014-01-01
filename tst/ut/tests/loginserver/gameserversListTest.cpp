@@ -4,8 +4,8 @@
 #include <core/common/exception.hpp>
 
 using eMU::loginserver::GameserversList;
-using eMU::protocol::loginserver::GameserverInfo;
-using eMU::protocol::loginserver::GameserversInfoContainer;
+using eMU::streaming::loginserver::GameserverInfo;
+using eMU::streaming::loginserver::GameserversInfoContainer;
 using eMU::core::common::XmlReader;
 
 class GameserversListTest: public ::testing::Test

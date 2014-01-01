@@ -1,5 +1,5 @@
 #include <loginserver/transactions/gameserverDetailsRequest.hpp>
-#include <protocol/loginserver/gameserverDetailsResponse.hpp>
+#include <streaming/loginserver/gameserverDetailsResponse.hpp>
 
 #include <glog/logging.h>
 
@@ -12,7 +12,7 @@ namespace transactions
 
 GameserverDetailsRequest::GameserverDetailsRequest(User &user,
                                                    const GameserversList &gameserversList,
-                                                   const protocol::loginserver::GameserverDetailsRequest &request):
+                                                   const streaming::loginserver::GameserverDetailsRequest &request):
     user_(user),
     gameserversList_(gameserversList),
     request_(request) {}
@@ -26,9 +26,9 @@ void GameserverDetailsRequest::handleValid()
 {
     LOG(INFO) << "hash: " << user_.getHash() << ", requested gameserver details, gameserverCode: " << request_.getGameserverCode();
 
-    const protocol::loginserver::GameserverInfo &gameserverInfo = gameserversList_.getGameserverInfo(request_.getGameserverCode());
+    const streaming::loginserver::GameserverInfo &gameserverInfo = gameserversList_.getGameserverInfo(request_.getGameserverCode());
 
-    protocol::loginserver::GameserverDetailsResponse response(gameserverInfo.address_, gameserverInfo.port_);
+    streaming::loginserver::GameserverDetailsResponse response(gameserverInfo.address_, gameserverInfo.port_);
     user_.getConnection().send(response.getWriteStream().getPayload());
 }
 

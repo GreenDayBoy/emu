@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/network/tcp/protocol.hpp>
-#include <protocol/readStream.hpp>
+#include <streaming/readStream.hpp>
 #include <loginserver/context.hpp>
 
 namespace eMU
@@ -19,7 +19,7 @@ public:
     bool dispatch(core::network::tcp::Connection::Pointer connection);
 
 private:
-    bool handleReadStream(User &user, const protocol::ReadStream &stream);
+    bool handleReadStream(User &user, const streaming::ReadStream &stream);
 
     Context &context_;
 };

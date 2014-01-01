@@ -5,17 +5,17 @@
 #include <core/network/tcp/connection.hpp>
 #include <mt/env/asioStub/ioService.hpp>
 #include <mt/env/check.hpp>
-#include <protocol/loginserver/messageIds.hpp>
-#include <protocol/loginserver/loginRequest.hpp>
-#include <protocol/loginserver/loginResponse.hpp>
-#include <protocol/loginserver/loginResult.hpp>
-#include <protocol/loginserver/gameserversListRequest.hpp>
-#include <protocol/loginserver/gameserversListResponse.hpp>
-#include <protocol/dataserver/messageIds.hpp>
-#include <protocol/dataserver/checkAccountRequest.hpp>
-#include <protocol/dataserver/checkAccountResponse.hpp>
-#include <protocol/dataserver/checkAccountResult.hpp>
-#include <protocol/dataserver/faultIndication.hpp>
+#include <streaming/loginserver/messageIds.hpp>
+#include <streaming/loginserver/loginRequest.hpp>
+#include <streaming/loginserver/loginResponse.hpp>
+#include <streaming/loginserver/loginResult.hpp>
+#include <streaming/loginserver/gameserversListRequest.hpp>
+#include <streaming/loginserver/gameserversListResponse.hpp>
+#include <streaming/dataserver/messageIds.hpp>
+#include <streaming/dataserver/checkAccountRequest.hpp>
+#include <streaming/dataserver/checkAccountResponse.hpp>
+#include <streaming/dataserver/checkAccountResult.hpp>
+#include <streaming/dataserver/faultIndication.hpp>
 
 #include <gtest/gtest.h>
 
@@ -26,17 +26,17 @@ using eMU::core::common::XmlReader;
 using eMU::core::network::tcp::Connection;
 using eMU::core::network::tcp::NetworkUser;
 using eMU::mt::env::asioStub::io_service;
-using eMU::protocol::ReadStream;
-using eMU::protocol::loginserver::LoginRequest;
-using eMU::protocol::loginserver::LoginResponse;
-using eMU::protocol::loginserver::LoginResult;
-using eMU::protocol::loginserver::GameserversListRequest;
-using eMU::protocol::loginserver::GameserversListResponse;
-namespace MessageIds = eMU::protocol::loginserver::MessageIds;
-using eMU::protocol::dataserver::CheckAccountRequest;
-using eMU::protocol::dataserver::CheckAccountResponse;
-using eMU::protocol::dataserver::CheckAccountResult;
-using eMU::protocol::dataserver::FaultIndication;
+using eMU::streaming::ReadStream;
+using eMU::streaming::loginserver::LoginRequest;
+using eMU::streaming::loginserver::LoginResponse;
+using eMU::streaming::loginserver::LoginResult;
+using eMU::streaming::loginserver::GameserversListRequest;
+using eMU::streaming::loginserver::GameserversListResponse;
+namespace MessageIds = eMU::streaming::loginserver::MessageIds;
+using eMU::streaming::dataserver::CheckAccountRequest;
+using eMU::streaming::dataserver::CheckAccountResponse;
+using eMU::streaming::dataserver::CheckAccountResult;
+using eMU::streaming::dataserver::FaultIndication;
 
 class LoginserverTest: public ::testing::Test
 {
@@ -81,7 +81,7 @@ protected:
 
         ASSERT_TRUE(loginserverContext_.getDataserverConnection()->getSocket().isUnread());
         const ReadStream &checkAccountRequestStream = loginserverContext_.getDataserverConnection()->getSocket().receive();
-        ASSERT_EQ(eMU::protocol::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
+        ASSERT_EQ(eMU::streaming::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
 
         CheckAccountRequest checkAccountRequest(checkAccountRequestStream);
         NetworkUser::Hash clientHash = clientHashExists ? checkAccountRequest.getClientHash() : NetworkUser::Hash(0x1234);
@@ -114,7 +114,7 @@ TEST_F(LoginserverTest, Login)
 
     ASSERT_TRUE(loginserverContext_.getDataserverConnection()->getSocket().isUnread());
     const ReadStream &checkAccountRequestStream = loginserverContext_.getDataserverConnection()->getSocket().receive();
-    ASSERT_EQ(eMU::protocol::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
+    ASSERT_EQ(eMU::streaming::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
 
     CheckAccountRequest checkAccountRequest(checkAccountRequestStream);
     ASSERT_EQ("accountTest", checkAccountRequest.getAccountId());
@@ -137,7 +137,7 @@ TEST_F(LoginserverTest, WhenCheckAccountWithInvalidClientHashReceivedThenNothing
 
     ASSERT_TRUE(loginserverContext_.getDataserverConnection()->getSocket().isUnread());
     const ReadStream &checkAccountRequestStream = loginserverContext_.getDataserverConnection()->getSocket().receive();
-    ASSERT_EQ(eMU::protocol::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
+    ASSERT_EQ(eMU::streaming::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
 
     CHECK(loginserverContext_.getDataserverConnection()->getSocket().send(CheckAccountResponse(NetworkUser::Hash(0x1234),
                                                                                                CheckAccountResult::Succeed).getWriteStream().getPayload()));
@@ -162,7 +162,7 @@ TEST_F(LoginserverTest, checkGameserversListRequest)
 
     ASSERT_TRUE(connection_->getSocket().isUnread());
     const ReadStream &gameserversListResponseStream = connection_->getSocket().receive();
-    ASSERT_EQ(eMU::protocol::loginserver::MessageIds::kGameserversListResponse, gameserversListResponseStream.getId());
+    ASSERT_EQ(eMU::streaming::loginserver::MessageIds::kGameserversListResponse, gameserversListResponseStream.getId());
 
     GameserversListResponse response(gameserversListResponseStream);
 

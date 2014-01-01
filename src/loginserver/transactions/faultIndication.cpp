@@ -10,7 +10,7 @@ namespace transactions
 {
 
 FaultIndication::FaultIndication(core::common::Factory<User> &usersFactory,
-                                 const protocol::dataserver::FaultIndication &indication):
+                                 const streaming::dataserver::FaultIndication &indication):
     usersFactory_(usersFactory),
     indication_(indication) {}
 

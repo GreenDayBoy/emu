@@ -1,7 +1,7 @@
 #include <loginserver/transactions/checkAccountResponse.hpp>
-#include <protocol/dataserver/checkAccountResult.hpp>
-#include <protocol/loginserver/loginResponse.hpp>
-#include <protocol/loginserver/loginResult.hpp>
+#include <streaming/dataserver/checkAccountResult.hpp>
+#include <streaming/loginserver/loginResponse.hpp>
+#include <streaming/loginserver/loginResult.hpp>
 
 #include <glog/logging.h>
 
@@ -13,7 +13,7 @@ namespace transactions
 {
 
 CheckAccountResponse::CheckAccountResponse(core::common::Factory<User> &usersFactory,
-                                           const protocol::dataserver::CheckAccountResponse &response):
+                                           const streaming::dataserver::CheckAccountResponse &response):
     usersFactory_(usersFactory),
     response_(response) {}
 
@@ -37,26 +37,26 @@ void CheckAccountResponse::handleValid()
 {
     User &user = usersFactory_.find(response_.getClientHash());
 
-    protocol::loginserver::LoginResult result = protocol::loginserver::LoginResult::Succeed;
+    streaming::loginserver::LoginResult result = streaming::loginserver::LoginResult::Succeed;
 
-    if(response_.getResult() == protocol::dataserver::CheckAccountResult::AccountInUse)
+    if(response_.getResult() == streaming::dataserver::CheckAccountResult::AccountInUse)
     {
-        result = protocol::loginserver::LoginResult::AccountInUse;
+        result = streaming::loginserver::LoginResult::AccountInUse;
     }
-    else if(response_.getResult() == protocol::dataserver::CheckAccountResult::InvalidAccountId)
+    else if(response_.getResult() == streaming::dataserver::CheckAccountResult::InvalidAccountId)
     {
-        result = protocol::loginserver::LoginResult::InvalidAccountId;
+        result = streaming::loginserver::LoginResult::InvalidAccountId;
     }
-    else if(response_.getResult() == protocol::dataserver::CheckAccountResult::InvalidPassword)
+    else if(response_.getResult() == streaming::dataserver::CheckAccountResult::InvalidPassword)
     {
-        result = protocol::loginserver::LoginResult::InvalidPassword;
+        result = streaming::loginserver::LoginResult::InvalidPassword;
     }
 
     LOG(INFO) << "hash: " << user.getHash() << ", accountId: " << user.getAccountId()
               << ", check account result: " << static_cast<uint32_t>(response_.getResult())
               << ", login result: " << static_cast<uint32_t>(result);
 
-    protocol::loginserver::LoginResponse response(result);
+    streaming::loginserver::LoginResponse response(result);
     user.getConnection().send(response.getWriteStream().getPayload());
 }
 

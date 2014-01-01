@@ -2,8 +2,8 @@
 #include <loginserver/transactions/checkAccountResponse.hpp>
 #include <loginserver/transactions/faultIndication.hpp>
 
-#include <protocol/readStreamsExtractor.hpp>
-#include <protocol/dataserver/messageIds.hpp>
+#include <streaming/readStreamsExtractor.hpp>
+#include <streaming/dataserver/messageIds.hpp>
 
 #include <glog/logging.h>
 
@@ -32,7 +32,7 @@ void DataserverProtocol::detach(core::network::tcp::Connection::Pointer connecti
 
 bool DataserverProtocol::dispatch(core::network::tcp::Connection::Pointer connection)
 {
-    protocol::ReadStreamsExtractor readStreamsExtractor(connection->getReadPayload());
+    streaming::ReadStreamsExtractor readStreamsExtractor(connection->getReadPayload());
     if(!readStreamsExtractor.extract())
     {
         LOG(ERROR) << "Streams extraction failed.";
@@ -49,20 +49,20 @@ bool DataserverProtocol::dispatch(core::network::tcp::Connection::Pointer connec
     return true;
 }
 
-void DataserverProtocol::handleReadStream(const protocol::ReadStream &stream)
+void DataserverProtocol::handleReadStream(const streaming::ReadStream &stream)
 {
     uint16_t messageId = stream.getId();
 
     LOG(INFO) << "Dataserver, received stream, id: " << messageId;
 
-    if(messageId == protocol::dataserver::MessageIds::kCheckAccountResponse)
+    if(messageId == streaming::dataserver::MessageIds::kCheckAccountResponse)
     {
-        protocol::dataserver::CheckAccountResponse response(stream);
+        streaming::dataserver::CheckAccountResponse response(stream);
         context_.getTransactionsManager().queue(new transactions::CheckAccountResponse(context_.getUsersFactory(), response));
     }
-    if(messageId == protocol::dataserver::MessageIds::kFaultIndication)
+    if(messageId == streaming::dataserver::MessageIds::kFaultIndication)
     {
-        protocol::dataserver::FaultIndication indication(stream);
+        streaming::dataserver::FaultIndication indication(stream);
         context_.getTransactionsManager().queue(new transactions::FaultIndication(context_.getUsersFactory(), indication));
     }
 }

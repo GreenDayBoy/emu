@@ -2,7 +2,7 @@
 
 #include <core/transactions/transaction.hpp>
 #include <loginserver/user.hpp>
-#include <protocol/dataserver/faultIndication.hpp>
+#include <streaming/dataserver/faultIndication.hpp>
 #include <core/common/factory.hpp>
 
 namespace eMU
@@ -16,7 +16,7 @@ class FaultIndication: public core::transactions::Transaction
 {
 public:
     FaultIndication(core::common::Factory<User> &usersFactory,
-                    const protocol::dataserver::FaultIndication &indication);
+                    const streaming::dataserver::FaultIndication &indication);
 
 private:
     bool isValid() const;
@@ -24,7 +24,7 @@ private:
     void handleInvalid();
 
     core::common::Factory<User> &usersFactory_;
-    protocol::dataserver::FaultIndication indication_;
+    streaming::dataserver::FaultIndication indication_;
 };
 
 }

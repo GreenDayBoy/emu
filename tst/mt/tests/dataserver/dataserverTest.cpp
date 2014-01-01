@@ -3,12 +3,12 @@
 #include <mt/env/check.hpp>
 #include <dataserver/context.hpp>
 #include <dataserver/protocol.hpp>
-#include <protocol/readStream.hpp>
-#include <protocol/dataserver/messageIds.hpp>
-#include <protocol/dataserver/checkAccountResult.hpp>
-#include <protocol/dataserver/checkAccountRequest.hpp>
-#include <protocol/dataserver/checkAccountResponse.hpp>
-#include <protocol/dataserver/faultIndication.hpp>
+#include <streaming/readStream.hpp>
+#include <streaming/dataserver/messageIds.hpp>
+#include <streaming/dataserver/checkAccountResult.hpp>
+#include <streaming/dataserver/checkAccountRequest.hpp>
+#include <streaming/dataserver/checkAccountResponse.hpp>
+#include <streaming/dataserver/faultIndication.hpp>
 
 #include <core/network/tcp/networkUser.hpp>
 #include <core/network/tcp/connection.hpp>
@@ -24,12 +24,12 @@ using eMU::core::network::tcp::NetworkUser;
 using eMU::core::network::Payload;
 using eMU::mt::env::dataserver::database::SqlInterfaceStub;
 using eMU::mt::env::asioStub::io_service;
-using eMU::protocol::ReadStream;
-using eMU::protocol::dataserver::CheckAccountResult;
-using eMU::protocol::dataserver::CheckAccountRequest;
-using eMU::protocol::dataserver::CheckAccountResponse;
-using eMU::protocol::dataserver::FaultIndication;
-namespace MessageIds = eMU::protocol::dataserver::MessageIds;
+using eMU::streaming::ReadStream;
+using eMU::streaming::dataserver::CheckAccountResult;
+using eMU::streaming::dataserver::CheckAccountRequest;
+using eMU::streaming::dataserver::CheckAccountResponse;
+using eMU::streaming::dataserver::FaultIndication;
+namespace MessageIds = eMU::streaming::dataserver::MessageIds;
 
 class DataserverTest: public ::testing::Test
 {

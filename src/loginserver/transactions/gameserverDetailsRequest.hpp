@@ -4,7 +4,7 @@
 #include <loginserver/gameserversList.hpp>
 #include <loginserver/user.hpp>
 
-#include <protocol/loginserver/gameserverDetailsRequest.hpp>
+#include <streaming/loginserver/gameserverDetailsRequest.hpp>
 
 namespace eMU
 {
@@ -18,7 +18,7 @@ class GameserverDetailsRequest: public core::transactions::Transaction
 public:
     GameserverDetailsRequest(User &user,
                              const GameserversList &gameserversList,
-                             const protocol::loginserver::GameserverDetailsRequest &request);
+                             const streaming::loginserver::GameserverDetailsRequest &request);
 
 private:
     bool isValid() const;
@@ -27,7 +27,7 @@ private:
 
     User &user_;
     const GameserversList &gameserversList_;
-    protocol::loginserver::GameserverDetailsRequest request_;
+    streaming::loginserver::GameserverDetailsRequest request_;
 };
 
 }

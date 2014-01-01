@@ -1,7 +1,7 @@
 #include <gameserver/protocol.hpp>
 
-#include <protocol/readStreamsExtractor.hpp>
-#include <protocol/loginserver/messageIds.hpp>
+#include <streaming/readStreamsExtractor.hpp>
+#include <streaming/loginserver/messageIds.hpp>
 
 #include <glog/logging.h>
 
@@ -48,7 +48,7 @@ void Protocol::detach(core::network::tcp::Connection::Pointer connection)
 
 bool Protocol::dispatch(core::network::tcp::Connection::Pointer connection)
 {
-    protocol::ReadStreamsExtractor readStreamsExtractor(connection->getReadPayload());
+    streaming::ReadStreamsExtractor readStreamsExtractor(connection->getReadPayload());
     if(!readStreamsExtractor.extract())
     {
         LOG(ERROR) << "Streams extraction failed.";
@@ -78,7 +78,7 @@ bool Protocol::dispatch(core::network::tcp::Connection::Pointer connection)
     return true;
 }
 
-bool Protocol::handleReadStream(User &user, const protocol::ReadStream &stream)
+bool Protocol::handleReadStream(User &user, const streaming::ReadStream &stream)
 {
     uint16_t messageId = stream.getId();
 
