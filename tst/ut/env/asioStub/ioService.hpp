@@ -21,16 +21,16 @@ public:
     public:
         strand(io_service& service);
 
-        template<typename CompletionHandler>
-        CompletionHandler wrap(const CompletionHandler &handler)
+        template<typename CompletionHandlerType>
+        CompletionHandlerType wrap(const CompletionHandlerType &handler)
         {
             return handler;
         }
 
     };
 
-    template<typename CompletionHandler>
-    void post(const CompletionHandler &handler)
+    template<typename CompletionHandlerType>
+    void post(const CompletionHandlerType &handler)
     {
         handler();
     }

@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#define CHECK(statement) \
+#define IO_CHECK(statement) \
   GTEST_AMBIGUOUS_ELSE_BLOCKER_ \
   if (::testing::internal::AlwaysTrue()) { \
     ::testing::internal::HasNewFatalFailureHelper gtest_fatal_failure_checker; \
