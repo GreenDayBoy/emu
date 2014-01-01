@@ -1,8 +1,8 @@
 #pragma once
 
 #include <core/network/writeBuffer.hpp>
-#include <common/mockable.hpp>
-#include <common/asio.hpp>
+#include <core/common/mockable.hpp>
+#include <core/common/asio.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <functional>

@@ -9,6 +9,7 @@ set(eMU_core_DIR ${eMU_src_DIR}/core)
 set(eMU_protocol_DIR ${eMU_src_DIR}/protocol)
 set(eMU_dataserver_DIR ${eMU_src_DIR}/dataserver)
 set(eMU_loginserver_DIR ${eMU_src_DIR}/loginserver)
+set(eMU_gameserver_DIR ${eMU_src_DIR}/gameserver)
 set(eMU_analyzer_DIR ${eMU_src_DIR}/analyzer)
 
 set(eMU_tst_DIR ${eMU_base_DIR}/tst)
@@ -59,19 +60,26 @@ target_link_libraries(loginserver pthread core protocol gflags)
 add_dependencies(loginserver core protocol)
 # ------------------------------------
 
+# gameserver setup ----------------
+file(GLOB_RECURSE gameserver_SOURCES "${eMU_gameserver_DIR}/*[.cpp.hpp]")
+add_executable(gameserver ${gameserver_SOURCES})
+target_link_libraries(gameserver pthread core protocol gflags)
+add_dependencies(gameserver core protocol)
+# ------------------------------------
+
 # mt/ut tests setup ----------------
 # ut -------
 file(GLOB_RECURSE ut_SOURCES "${eMU_ut_DIR}/*[.cpp.hpp]")
-list(APPEND ut_SOURCES ${core_SOURCES} ${dataserver_SOURCES} ${protocol_SOURCES} ${loginserver_SOURCES})
-list(REMOVE_ITEM ut_SOURCES ${eMU_dataserver_DIR}/main.cpp ${eMU_loginserver_DIR}/main.cpp ${eMU_core_DIR}/main.cpp)
+list(APPEND ut_SOURCES ${core_SOURCES} ${protocol_SOURCES} ${dataserver_SOURCES} ${loginserver_SOURCES} ${gameserver_SOURCES})
+list(REMOVE_ITEM ut_SOURCES ${eMU_dataserver_DIR}/main.cpp ${eMU_loginserver_DIR}/main.cpp ${eMU_gameserver_DIR}/main.cpp)
 
 add_executable(ut EXCLUDE_FROM_ALL ${ut_SOURCES})
 target_link_libraries(ut gmock gtest pthread glog boost_system boost_thread mysqlclient)
 
 # mt -------
 file(GLOB_RECURSE mt_SOURCES "${eMU_mt_DIR}/*[.cpp.hpp]")
-list(APPEND mt_SOURCES ${core_SOURCES} ${dataserver_SOURCES} ${protocol_SOURCES} ${loginserver_SOURCES})
-list(REMOVE_ITEM mt_SOURCES ${eMU_dataserver_DIR}/main.cpp ${eMU_loginserver_DIR}/main.cpp ${eMU_core_DIR}/main.cpp)
+list(APPEND mt_SOURCES ${core_SOURCES} ${protocol_SOURCES} ${dataserver_SOURCES} ${loginserver_SOURCES} ${gameserver_SOURCES})
+list(REMOVE_ITEM mt_SOURCES ${eMU_dataserver_DIR}/main.cpp ${eMU_loginserver_DIR}/main.cpp ${eMU_gameserver_DIR}/main.cpp)
 
 add_executable(mt EXCLUDE_FROM_ALL ${mt_SOURCES})
 target_link_libraries(mt gtest pthread glog boost_system boost_thread mysqlclient)

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/common/xmlReader.hpp>
-#include <common/mockable.hpp>
+#include <core/common/mockable.hpp>
 #include <protocol/loginserver/gameserverInfo.hpp>
 
 #include <stdint.h>
