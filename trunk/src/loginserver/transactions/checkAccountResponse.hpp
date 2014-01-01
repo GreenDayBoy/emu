@@ -3,7 +3,7 @@
 #include <core/common/factory.hpp>
 #include <core/transactions/transaction.hpp>
 #include <loginserver/user.hpp>
-#include <protocol/dataserver/checkAccountResponse.hpp>
+#include <streaming/dataserver/checkAccountResponse.hpp>
 
 namespace eMU
 {
@@ -16,7 +16,7 @@ class CheckAccountResponse: public core::transactions::Transaction
 {
 public:
     CheckAccountResponse(core::common::Factory<User> &usersFactory,
-                         const protocol::dataserver::CheckAccountResponse &response);
+                         const streaming::dataserver::CheckAccountResponse &response);
 
 private:
     bool isValid() const;
@@ -24,7 +24,7 @@ private:
     void handleInvalid();
 
     core::common::Factory<User> &usersFactory_;
-    protocol::dataserver::CheckAccountResponse response_;
+    streaming::dataserver::CheckAccountResponse response_;
 };
 
 }

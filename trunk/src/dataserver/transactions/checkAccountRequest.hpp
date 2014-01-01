@@ -3,7 +3,7 @@
 #include <dataserver/user.hpp>
 #include <core/transactions/transaction.hpp>
 #include <dataserver/database/sqlInterface.hpp>
-#include <protocol/dataserver/checkAccountRequest.hpp>
+#include <streaming/dataserver/checkAccountRequest.hpp>
 
 namespace eMU
 {
@@ -17,7 +17,7 @@ class CheckAccountRequest: public core::transactions::Transaction
 public:
     CheckAccountRequest(User &user,
                         database::SqlInterface &sqlInterface,
-                        const protocol::dataserver::CheckAccountRequest &request);
+                        const streaming::dataserver::CheckAccountRequest &request);
 
 private:
     bool isValid() const;
@@ -28,7 +28,7 @@ private:
 
     User &user_;
     database::SqlInterface &sqlInterface_;
-    protocol::dataserver::CheckAccountRequest request_;
+    streaming::dataserver::CheckAccountRequest request_;
 };
 
 }

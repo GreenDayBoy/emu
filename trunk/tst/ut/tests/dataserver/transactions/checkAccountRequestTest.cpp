@@ -2,12 +2,12 @@
 #include <dataserver/user.hpp>
 #include <core/network/tcp/networkUser.hpp>
 
-#include <protocol/readStream.hpp>
-#include <protocol/dataserver/messageIds.hpp>
-#include <protocol/dataserver/checkAccountResult.hpp>
-#include <protocol/dataserver/checkAccountRequest.hpp>
-#include <protocol/dataserver/checkAccountResponse.hpp>
-#include <protocol/dataserver/faultIndication.hpp>
+#include <streaming/readStream.hpp>
+#include <streaming/dataserver/messageIds.hpp>
+#include <streaming/dataserver/checkAccountResult.hpp>
+#include <streaming/dataserver/checkAccountRequest.hpp>
+#include <streaming/dataserver/checkAccountResponse.hpp>
+#include <streaming/dataserver/faultIndication.hpp>
 
 #include <ut/env/dataserver/database/sqlInterfaceMock.hpp>
 #include <ut/env/core/network/tcp/connectionMock.hpp>
@@ -27,13 +27,13 @@ using eMU::dataserver::database::QueryResult;
 using eMU::dataserver::database::Row;
 namespace transactions = eMU::dataserver::transactions;
 
-using eMU::protocol::ReadStream;
-using eMU::protocol::dataserver::CheckAccountResult;
-namespace MessageIds = eMU::protocol::dataserver::MessageIds;
+using eMU::streaming::ReadStream;
+using eMU::streaming::dataserver::CheckAccountResult;
+namespace MessageIds = eMU::streaming::dataserver::MessageIds;
 
-using eMU::protocol::dataserver::CheckAccountRequest;
-using eMU::protocol::dataserver::CheckAccountResponse;
-using eMU::protocol::dataserver::FaultIndication;
+using eMU::streaming::dataserver::CheckAccountRequest;
+using eMU::streaming::dataserver::CheckAccountResponse;
+using eMU::streaming::dataserver::FaultIndication;
 
 using eMU::core::network::Payload;
 using eMU::core::network::tcp::NetworkUser;

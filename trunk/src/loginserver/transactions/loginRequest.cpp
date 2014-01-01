@@ -1,5 +1,5 @@
 #include <loginserver/transactions/loginRequest.hpp>
-#include <protocol/dataserver/checkAccountRequest.hpp>
+#include <streaming/dataserver/checkAccountRequest.hpp>
 
 #include <glog/logging.h>
 
@@ -12,7 +12,7 @@ namespace transactions
 
 LoginRequest::LoginRequest(User &user,
                            core::network::tcp::Connection::Pointer dataserverConnection,
-                           const protocol::loginserver::LoginRequest &request):
+                           const streaming::loginserver::LoginRequest &request):
     user_(user),
     dataserverConnection_(dataserverConnection),
     request_(request) {}
@@ -28,7 +28,7 @@ void LoginRequest::handleValid()
 
     LOG(INFO) << "hash: " << user_.getHash() << ", accountId: " << user_.getAccountId() << ", sending request for account check.";
 
-    protocol::dataserver::CheckAccountRequest checkAccountRequest(user_.getHash(), request_.getAccountId(), request_.getPassword());
+    streaming::dataserver::CheckAccountRequest checkAccountRequest(user_.getHash(), request_.getAccountId(), request_.getPassword());
     dataserverConnection_->send(checkAccountRequest.getWriteStream().getPayload());
 }
 

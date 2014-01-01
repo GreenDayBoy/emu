@@ -1,9 +1,9 @@
 #include <dataserver/protocol.hpp>
 #include <dataserver/transactions/checkAccountRequest.hpp>
 
-#include <protocol/readStreamsExtractor.hpp>
-#include <protocol/dataserver/messageIds.hpp>
-#include <protocol/dataserver/checkAccountRequest.hpp>
+#include <streaming/readStreamsExtractor.hpp>
+#include <streaming/dataserver/messageIds.hpp>
+#include <streaming/dataserver/checkAccountRequest.hpp>
 
 #include <glog/logging.h>
 
@@ -50,7 +50,7 @@ void Protocol::detach(core::network::tcp::Connection::Pointer connection)
 
 bool Protocol::dispatch(core::network::tcp::Connection::Pointer connection)
 {
-    protocol::ReadStreamsExtractor readStreamsExtractor(connection->getReadPayload());
+    streaming::ReadStreamsExtractor readStreamsExtractor(connection->getReadPayload());
     if(!readStreamsExtractor.extract())
     {
         LOG(ERROR) << "Streams extraction failed.";
@@ -80,15 +80,15 @@ bool Protocol::dispatch(core::network::tcp::Connection::Pointer connection)
     return true;
 }
 
-bool Protocol::handleReadStream(User &user, const protocol::ReadStream &stream)
+bool Protocol::handleReadStream(User &user, const streaming::ReadStream &stream)
 {
     uint16_t messageId = stream.getId();
 
     LOG(INFO) << "hash: " << user.getHash() << ", received stream, id: " << messageId;
 
-    if(messageId == protocol::dataserver::MessageIds::kCheckAccountRequest)
+    if(messageId == streaming::dataserver::MessageIds::kCheckAccountRequest)
     {
-        protocol::dataserver::CheckAccountRequest request(stream);
+        streaming::dataserver::CheckAccountRequest request(stream);
         context_.getTransactionsManager().queue(new transactions::CheckAccountRequest(user, context_.getSqlInterface(), request));
 
         return true;

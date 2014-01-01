@@ -21,7 +21,7 @@ bool GameserversList::initialize(eMU::core::common::XmlReader &xmlReader)
 
     while(!xmlReader.end())
     {
-        protocol::loginserver::GameserverInfo info = {};
+        streaming::loginserver::GameserverInfo info = {};
 
         info.address_ = xmlReader.get<std::string>("server", "address");
         info.code_ = xmlReader.get<uint16_t>("server", "code");
@@ -35,7 +35,7 @@ bool GameserversList::initialize(eMU::core::common::XmlReader &xmlReader)
     return true;
 }
 
-const protocol::loginserver::GameserversInfoContainer &GameserversList::getServers() const
+const streaming::loginserver::GameserversInfoContainer &GameserversList::getServers() const
 {
     return servers_;
 }
@@ -45,16 +45,16 @@ bool GameserversList::hasGameserver(uint16_t code) const
     return findGameserverInfo(code) != servers_.end();
 }
 
-const protocol::loginserver::GameserverInfo& GameserversList::getGameserverInfo(uint16_t code) const
+const streaming::loginserver::GameserverInfo& GameserversList::getGameserverInfo(uint16_t code) const
 {
     return *findGameserverInfo(code);
 }
 
-protocol::loginserver::GameserversInfoContainer::const_iterator GameserversList::findGameserverInfo(uint16_t code) const
+streaming::loginserver::GameserversInfoContainer::const_iterator GameserversList::findGameserverInfo(uint16_t code) const
 {
     return std::find_if(servers_.begin(),
                         servers_.end(),
-                        [code](const protocol::loginserver::GameserverInfo &info) { return info.code_ == code; });
+                        [code](const streaming::loginserver::GameserverInfo &info) { return info.code_ == code; });
 }
 
 }

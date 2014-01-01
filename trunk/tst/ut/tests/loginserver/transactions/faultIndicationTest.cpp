@@ -1,12 +1,12 @@
 #include <loginserver/transactions/faultIndication.hpp>
 #include <loginserver/user.hpp>
-#include <protocol/dataserver/faultIndication.hpp>
+#include <streaming/dataserver/faultIndication.hpp>
 #include <ut/env/core/network/tcp/connectionMock.hpp>
 
 using eMU::loginserver::User;
 using eMU::core::common::Factory;
-using eMU::protocol::ReadStream;
-using eMU::protocol::dataserver::FaultIndication;
+using eMU::streaming::ReadStream;
+using eMU::streaming::dataserver::FaultIndication;
 using eMU::ut::env::core::network::tcp::ConnectionMock;
 
 class FaultIndicationTransactionTest: public ::testing::Test

@@ -3,8 +3,8 @@
 #include <loginserver/transactions/gameserversListRequest.hpp>
 #include <loginserver/transactions/loginRequest.hpp>
 
-#include <protocol/readStreamsExtractor.hpp>
-#include <protocol/loginserver/messageIds.hpp>
+#include <streaming/readStreamsExtractor.hpp>
+#include <streaming/loginserver/messageIds.hpp>
 
 #include <glog/logging.h>
 
@@ -51,7 +51,7 @@ void Protocol::detach(core::network::tcp::Connection::Pointer connection)
 
 bool Protocol::dispatch(core::network::tcp::Connection::Pointer connection)
 {
-    protocol::ReadStreamsExtractor readStreamsExtractor(connection->getReadPayload());
+    streaming::ReadStreamsExtractor readStreamsExtractor(connection->getReadPayload());
     if(!readStreamsExtractor.extract())
     {
         LOG(ERROR) << "Streams extraction failed.";
@@ -81,29 +81,29 @@ bool Protocol::dispatch(core::network::tcp::Connection::Pointer connection)
     return true;
 }
 
-bool Protocol::handleReadStream(User &user, const protocol::ReadStream &stream)
+bool Protocol::handleReadStream(User &user, const streaming::ReadStream &stream)
 {
     uint16_t messageId = stream.getId();
 
     LOG(INFO) << "hash: " << user.getHash() << ", received stream, id: " << messageId;
 
-    if(messageId == protocol::loginserver::MessageIds::kLoginRequest)
+    if(messageId == streaming::loginserver::MessageIds::kLoginRequest)
     {
-        protocol::loginserver::LoginRequest request(stream);
+        streaming::loginserver::LoginRequest request(stream);
         context_.getTransactionsManager().queue(new transactions::LoginRequest(user, context_.getDataserverConnection(), request));
 
         return true;
     }
-    else if(messageId == protocol::loginserver::MessageIds::kGameserversListRequest)
+    else if(messageId == streaming::loginserver::MessageIds::kGameserversListRequest)
     {
-        protocol::loginserver::GameserversListRequest request(stream);
+        streaming::loginserver::GameserversListRequest request(stream);
         context_.getTransactionsManager().queue((new transactions::GameserversListRequest(user, context_.getGameserversList(), request)));
 
         return true;
     }
-    else if(messageId == protocol::loginserver::MessageIds::kGameserverDetailsRequest)
+    else if(messageId == streaming::loginserver::MessageIds::kGameserverDetailsRequest)
     {
-        protocol::loginserver::GameserverDetailsRequest request(stream);
+        streaming::loginserver::GameserverDetailsRequest request(stream);
         context_.getTransactionsManager().queue((new transactions::GameserverDetailsRequest(user, context_.getGameserversList(), request)));
 
         return true;

@@ -1,9 +1,9 @@
 #include <loginserver/transactions/gameserversListRequest.hpp>
 #include <loginserver/user.hpp>
 #include <core/network/payload.hpp>
-#include <protocol/loginserver/gameserversListRequest.hpp>
-#include <protocol/loginserver/gameserversListResponse.hpp>
-#include <protocol/loginserver/messageIds.hpp>
+#include <streaming/loginserver/gameserversListRequest.hpp>
+#include <streaming/loginserver/gameserversListResponse.hpp>
+#include <streaming/loginserver/messageIds.hpp>
 
 #include <ut/env/core/network/tcp/connectionMock.hpp>
 #include <ut/env/loginserver/gameserversListMock.hpp>
@@ -15,15 +15,15 @@ using ::testing::_;
 using ::testing::ReturnRef;
 using ::testing::SaveArg;
 
-using eMU::protocol::ReadStream;
+using eMU::streaming::ReadStream;
 using eMU::core::network::Payload;
-using eMU::protocol::loginserver::GameserversListRequest;
-using eMU::protocol::loginserver::GameserversListResponse;
-using eMU::protocol::loginserver::GameserversInfoContainer;
+using eMU::streaming::loginserver::GameserversListRequest;
+using eMU::streaming::loginserver::GameserversListResponse;
+using eMU::streaming::loginserver::GameserversInfoContainer;
 using eMU::loginserver::User;
 using eMU::ut::env::core::network::tcp::ConnectionMock;
 using eMU::ut::env::loginserver::GameserversListMock;
-namespace MessageIds = eMU::protocol::loginserver::MessageIds;
+namespace MessageIds = eMU::streaming::loginserver::MessageIds;
 
 class GameserversListRequestTransactionTest: public ::testing::Test
 {

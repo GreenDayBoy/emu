@@ -1,8 +1,8 @@
 #include <loginserver/transactions/checkAccountResponse.hpp>
 #include <loginserver/user.hpp>
-#include <protocol/dataserver/checkAccountResponse.hpp>
-#include <protocol/loginserver/messageIds.hpp>
-#include <protocol/loginserver/loginResponse.hpp>
+#include <streaming/dataserver/checkAccountResponse.hpp>
+#include <streaming/loginserver/messageIds.hpp>
+#include <streaming/loginserver/loginResponse.hpp>
 #include <ut/env/core/network/tcp/connectionMock.hpp>
 
 #include <gtest/gtest.h>
@@ -15,12 +15,12 @@ using eMU::core::common::Factory;
 using eMU::core::network::Payload;
 using eMU::ut::env::core::network::tcp::ConnectionMock;
 
-using eMU::protocol::dataserver::CheckAccountResponse;
-using eMU::protocol::dataserver::CheckAccountResult;
-using eMU::protocol::ReadStream;
-namespace MessageIds = eMU::protocol::loginserver::MessageIds;
-using eMU::protocol::loginserver::LoginResponse;
-using eMU::protocol::loginserver::LoginResult;
+using eMU::streaming::dataserver::CheckAccountResponse;
+using eMU::streaming::dataserver::CheckAccountResult;
+using eMU::streaming::ReadStream;
+namespace MessageIds = eMU::streaming::loginserver::MessageIds;
+using eMU::streaming::loginserver::LoginResponse;
+using eMU::streaming::loginserver::LoginResult;
 using eMU::ut::env::core::network::tcp::ConnectionMock;
 
 class CheckAccountResponseTransactionTest: public ::testing::Test

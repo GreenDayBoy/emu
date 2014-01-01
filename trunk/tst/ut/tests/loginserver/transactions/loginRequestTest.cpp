@@ -1,10 +1,10 @@
 #include <loginserver/transactions/loginRequest.hpp>
 #include <loginserver/user.hpp>
 
-#include <protocol/readStream.hpp>
-#include <protocol/dataserver/checkAccountRequest.hpp>
-#include <protocol/dataserver/messageIds.hpp>
-#include <protocol/loginserver/loginRequest.hpp>
+#include <streaming/readStream.hpp>
+#include <streaming/dataserver/checkAccountRequest.hpp>
+#include <streaming/dataserver/messageIds.hpp>
+#include <streaming/loginserver/loginRequest.hpp>
 
 #include <ut/env/core/network/tcp/connectionMock.hpp>
 
@@ -17,11 +17,11 @@ using ::testing::SaveArg;
 
 using eMU::ut::env::core::network::tcp::ConnectionMock;
 using eMU::core::network::Payload;
-using eMU::protocol::ReadStream;
-using eMU::protocol::loginserver::LoginRequest;
+using eMU::streaming::ReadStream;
+using eMU::streaming::loginserver::LoginRequest;
 using eMU::loginserver::User;
-using eMU::protocol::dataserver::CheckAccountRequest;
-namespace MessageIds = eMU::protocol::dataserver::MessageIds;
+using eMU::streaming::dataserver::CheckAccountRequest;
+namespace MessageIds = eMU::streaming::dataserver::MessageIds;
 
 class LoginRequestTransactionTest: public ::testing::Test
 {

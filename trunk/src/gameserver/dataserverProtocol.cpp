@@ -1,5 +1,5 @@
 #include <gameserver/dataserverProtocol.hpp>
-#include <protocol/readStreamsExtractor.hpp>
+#include <streaming/readStreamsExtractor.hpp>
 
 #include <glog/logging.h>
 
@@ -28,7 +28,7 @@ void DataserverProtocol::detach(core::network::tcp::Connection::Pointer connecti
 
 bool DataserverProtocol::dispatch(core::network::tcp::Connection::Pointer connection)
 {
-    protocol::ReadStreamsExtractor readStreamsExtractor(connection->getReadPayload());
+    streaming::ReadStreamsExtractor readStreamsExtractor(connection->getReadPayload());
     if(!readStreamsExtractor.extract())
     {
         LOG(ERROR) << "Streams extraction failed.";
@@ -45,7 +45,7 @@ bool DataserverProtocol::dispatch(core::network::tcp::Connection::Pointer connec
     return true;
 }
 
-void DataserverProtocol::handleReadStream(const protocol::ReadStream &stream)
+void DataserverProtocol::handleReadStream(const streaming::ReadStream &stream)
 {
     uint16_t messageId = stream.getId();
 

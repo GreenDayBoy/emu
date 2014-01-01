@@ -4,7 +4,7 @@
 #include <core/network/tcp/connection.hpp>
 
 #include <loginserver/user.hpp>
-#include <protocol/loginserver/loginRequest.hpp>
+#include <streaming/loginserver/loginRequest.hpp>
 
 namespace eMU
 {
@@ -18,7 +18,7 @@ class LoginRequest: public core::transactions::Transaction
 public:
     LoginRequest(User &user,
                  core::network::tcp::Connection::Pointer dataserverConnection,
-                 const protocol::loginserver::LoginRequest &request);
+                 const streaming::loginserver::LoginRequest &request);
 
 private:
     bool isValid() const;
@@ -27,7 +27,7 @@ private:
 
     User &user_;
     core::network::tcp::Connection::Pointer dataserverConnection_;
-    protocol::loginserver::LoginRequest request_;
+    streaming::loginserver::LoginRequest request_;
 };
 
 }

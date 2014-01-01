@@ -1,7 +1,7 @@
 #include <dataserver/transactions/checkAccountRequest.hpp>
-#include <protocol/dataserver/checkAccountResponse.hpp>
-#include <protocol/dataserver/faultIndication.hpp>
-#include <protocol/dataserver/checkAccountResult.hpp>
+#include <streaming/dataserver/checkAccountResponse.hpp>
+#include <streaming/dataserver/faultIndication.hpp>
+#include <streaming/dataserver/checkAccountResult.hpp>
 
 #include <sstream>
 #include <glog/logging.h>
@@ -15,7 +15,7 @@ namespace transactions
 
 CheckAccountRequest::CheckAccountRequest(User &user,
                                          database::SqlInterface &sqlInterface,
-                                         const protocol::dataserver::CheckAccountRequest &request):
+                                         const streaming::dataserver::CheckAccountRequest &request):
     user_(user),
     sqlInterface_(sqlInterface),
     request_(request) {}
@@ -42,8 +42,8 @@ void CheckAccountRequest::handleValid()
 
         if(queryResult.getRows().size() > 0)
         {
-            protocol::dataserver::CheckAccountResult result = static_cast<protocol::dataserver::CheckAccountResult>(queryResult.getRows()[0].getValue<uint32_t>(0));
-            protocol::dataserver::CheckAccountResponse response(request_.getClientHash(), result);
+            streaming::dataserver::CheckAccountResult result = static_cast<streaming::dataserver::CheckAccountResult>(queryResult.getRows()[0].getValue<uint32_t>(0));
+            streaming::dataserver::CheckAccountResponse response(request_.getClientHash(), result);
 
             user_.getConnection().send(response.getWriteStream().getPayload());
         }
@@ -68,7 +68,7 @@ void CheckAccountRequest::handleInvalid()
 
 void CheckAccountRequest::sendFaultIndication(const std::string &message)
 {
-    protocol::dataserver::FaultIndication indication(request_.getClientHash(), message);
+    streaming::dataserver::FaultIndication indication(request_.getClientHash(), message);
     user_.getConnection().send(indication.getWriteStream().getPayload());
 }
 
