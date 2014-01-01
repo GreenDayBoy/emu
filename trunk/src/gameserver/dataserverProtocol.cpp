@@ -47,9 +47,9 @@ bool DataserverProtocol::dispatch(core::network::tcp::Connection::Pointer connec
 
 void DataserverProtocol::handleReadStream(const streaming::ReadStream &stream)
 {
-    uint16_t messageId = stream.getId();
+    uint16_t streamId = stream.getId();
 
-    LOG(INFO) << "Dataserver, received stream, id: " << messageId;
+    LOG(INFO) << "Dataserver, received stream, id: " << streamId;
 }
 
 }

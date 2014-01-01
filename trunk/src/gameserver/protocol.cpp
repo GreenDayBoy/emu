@@ -1,7 +1,7 @@
 #include <gameserver/protocol.hpp>
 
 #include <streaming/readStreamsExtractor.hpp>
-#include <streaming/loginserver/messageIds.hpp>
+#include <streaming/loginserver/streamIds.hpp>
 
 #include <glog/logging.h>
 
@@ -80,9 +80,9 @@ bool Protocol::dispatch(core::network::tcp::Connection::Pointer connection)
 
 bool Protocol::handleReadStream(User &user, const streaming::ReadStream &stream)
 {
-    uint16_t messageId = stream.getId();
+    uint16_t streamId = stream.getId();
 
-    LOG(INFO) << "hash: " << user.getHash() << ", received stream, id: " << messageId;
+    LOG(INFO) << "hash: " << user.getHash() << ", received stream, id: " << streamId;
 
     return false;
 }

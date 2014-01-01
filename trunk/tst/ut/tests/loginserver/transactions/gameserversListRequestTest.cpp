@@ -3,7 +3,7 @@
 #include <core/network/payload.hpp>
 #include <streaming/loginserver/gameserversListRequest.hpp>
 #include <streaming/loginserver/gameserversListResponse.hpp>
-#include <streaming/loginserver/messageIds.hpp>
+#include <streaming/loginserver/streamIds.hpp>
 
 #include <ut/env/core/network/tcp/connectionMock.hpp>
 #include <ut/env/loginserver/gameserversListMock.hpp>
@@ -23,7 +23,7 @@ using eMU::streaming::loginserver::GameserversInfoContainer;
 using eMU::loginserver::User;
 using eMU::ut::env::core::network::tcp::ConnectionMock;
 using eMU::ut::env::loginserver::GameserversListMock;
-namespace MessageIds = eMU::streaming::loginserver::MessageIds;
+namespace streamIds = eMU::streaming::loginserver::streamIds;
 
 class GameserversListRequestTransactionTest: public ::testing::Test
 {
@@ -54,7 +54,7 @@ TEST_F(GameserversListRequestTransactionTest, handle)
     transaction_.handle();
 
     ReadStream readStream(payload);
-    ASSERT_EQ(MessageIds::kGameserversListResponse, readStream.getId());
+    ASSERT_EQ(streamIds::kGameserversListResponse, readStream.getId());
 
     GameserversListResponse response(readStream);
     ASSERT_EQ(servers.size(), response.getServers().size());

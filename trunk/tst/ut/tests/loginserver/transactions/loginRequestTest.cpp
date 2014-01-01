@@ -3,7 +3,7 @@
 
 #include <streaming/readStream.hpp>
 #include <streaming/dataserver/checkAccountRequest.hpp>
-#include <streaming/dataserver/messageIds.hpp>
+#include <streaming/dataserver/streamIds.hpp>
 #include <streaming/loginserver/loginRequest.hpp>
 
 #include <ut/env/core/network/tcp/connectionMock.hpp>
@@ -21,7 +21,7 @@ using eMU::streaming::ReadStream;
 using eMU::streaming::loginserver::LoginRequest;
 using eMU::loginserver::User;
 using eMU::streaming::dataserver::CheckAccountRequest;
-namespace MessageIds = eMU::streaming::dataserver::MessageIds;
+namespace streamIds = eMU::streaming::dataserver::streamIds;
 
 class LoginRequestTransactionTest: public ::testing::Test
 {
@@ -51,7 +51,7 @@ TEST_F(LoginRequestTransactionTest, handle)
     eMU::loginserver::transactions::LoginRequest(user_, dataserverConnection_, request_).handle();
 
     ReadStream readStream(payload);
-    ASSERT_EQ(MessageIds::kCheckAccountRequest, readStream.getId());
+    ASSERT_EQ(streamIds::kCheckAccountRequest, readStream.getId());
 
     CheckAccountRequest checkAccountRequest(readStream);
     ASSERT_EQ(user_.getHash(), checkAccountRequest.getClientHash());

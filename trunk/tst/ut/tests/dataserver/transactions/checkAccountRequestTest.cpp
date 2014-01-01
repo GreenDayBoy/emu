@@ -3,7 +3,7 @@
 #include <core/network/tcp/networkUser.hpp>
 
 #include <streaming/readStream.hpp>
-#include <streaming/dataserver/messageIds.hpp>
+#include <streaming/dataserver/streamIds.hpp>
 #include <streaming/dataserver/checkAccountResult.hpp>
 #include <streaming/dataserver/checkAccountRequest.hpp>
 #include <streaming/dataserver/checkAccountResponse.hpp>
@@ -29,7 +29,7 @@ namespace transactions = eMU::dataserver::transactions;
 
 using eMU::streaming::ReadStream;
 using eMU::streaming::dataserver::CheckAccountResult;
-namespace MessageIds = eMU::streaming::dataserver::MessageIds;
+namespace streamIds = eMU::streaming::dataserver::streamIds;
 
 using eMU::streaming::dataserver::CheckAccountRequest;
 using eMU::streaming::dataserver::CheckAccountResponse;
@@ -73,7 +73,7 @@ TEST_F(CheckAccountRequestTransactionTest, handle)
     eMU::dataserver::transactions::CheckAccountRequest(user_, sqlInterface_, request_).handle();
 
     ReadStream readStream(payload_);
-    ASSERT_EQ(MessageIds::kCheckAccountResponse, readStream.getId());
+    ASSERT_EQ(streamIds::kCheckAccountResponse, readStream.getId());
     CheckAccountResponse response(readStream);
 
     ASSERT_EQ(clientHash_, response.getClientHash());
@@ -93,7 +93,7 @@ TEST_F(CheckAccountRequestTransactionTest, WhenExecutionOfQueryIsFailedThenFault
     eMU::dataserver::transactions::CheckAccountRequest(user_, sqlInterface_, request_).handle();
 
     ReadStream readStream(payload_);
-    ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());
+    ASSERT_EQ(streamIds::kFaultIndication, readStream.getId());
     FaultIndication indication(readStream);
 
     ASSERT_EQ(clientHash_, indication.getClientHash());
@@ -110,7 +110,7 @@ TEST_F(CheckAccountRequestTransactionTest, WhenQueryResultIsEmptyThenFaultIndica
     eMU::dataserver::transactions::CheckAccountRequest(user_, sqlInterface_, request_).handle();
 
     ReadStream readStream(payload_);
-    ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());
+    ASSERT_EQ(streamIds::kFaultIndication, readStream.getId());
     FaultIndication indication(readStream);
 
     ASSERT_EQ(clientHash_, indication.getClientHash());
@@ -124,7 +124,7 @@ TEST_F(CheckAccountRequestTransactionTest, WhenConnectionToDatabaseIsDiedThenFau
     eMU::dataserver::transactions::CheckAccountRequest(user_, sqlInterface_, request_).handle();
 
     ReadStream readStream(payload_);
-    ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());
+    ASSERT_EQ(streamIds::kFaultIndication, readStream.getId());
     FaultIndication indication(readStream);
 
     ASSERT_EQ(clientHash_, indication.getClientHash());

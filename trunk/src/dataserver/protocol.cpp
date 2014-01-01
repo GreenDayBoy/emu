@@ -2,7 +2,7 @@
 #include <dataserver/transactions/checkAccountRequest.hpp>
 
 #include <streaming/readStreamsExtractor.hpp>
-#include <streaming/dataserver/messageIds.hpp>
+#include <streaming/dataserver/streamIds.hpp>
 #include <streaming/dataserver/checkAccountRequest.hpp>
 
 #include <glog/logging.h>
@@ -82,11 +82,11 @@ bool Protocol::dispatch(core::network::tcp::Connection::Pointer connection)
 
 bool Protocol::handleReadStream(User &user, const streaming::ReadStream &stream)
 {
-    uint16_t messageId = stream.getId();
+    uint16_t streamId = stream.getId();
 
-    LOG(INFO) << "hash: " << user.getHash() << ", received stream, id: " << messageId;
+    LOG(INFO) << "hash: " << user.getHash() << ", received stream, id: " << streamId;
 
-    if(messageId == streaming::dataserver::MessageIds::kCheckAccountRequest)
+    if(streamId == streaming::dataserver::streamIds::kCheckAccountRequest)
     {
         streaming::dataserver::CheckAccountRequest request(stream);
         context_.getTransactionsManager().queue(new transactions::CheckAccountRequest(user, context_.getSqlInterface(), request));

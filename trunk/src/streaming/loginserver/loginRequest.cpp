@@ -1,5 +1,5 @@
 #include <streaming/loginserver/loginRequest.hpp>
-#include <streaming/loginserver/messageIds.hpp>
+#include <streaming/loginserver/streamIds.hpp>
 
 #include <boost/locale.hpp>
 
@@ -26,7 +26,7 @@ LoginRequest::LoginRequest(const ReadStream &readStream):
 }
 
 LoginRequest::LoginRequest(const std::wstring &accountId, const std::wstring &password):
-    writeStream_(MessageIds::kLoginRequest)
+    writeStream_(streamIds::kLoginRequest)
 {
     writeStream_.writeNext<uint32_t>(0); // dummy1
     writeStream_.writeNext<uint32_t>(0); // dummy2

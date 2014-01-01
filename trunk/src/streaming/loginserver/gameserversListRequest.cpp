@@ -1,5 +1,5 @@
 #include <streaming/loginserver/gameserversListRequest.hpp>
-#include <streaming/loginserver/messageIds.hpp>
+#include <streaming/loginserver/streamIds.hpp>
 
 #include <boost/locale.hpp>
 
@@ -16,7 +16,7 @@ GameserversListRequest::GameserversListRequest(const ReadStream &readStream):
 }
 
 GameserversListRequest::GameserversListRequest():
-    writeStream_(MessageIds::kGameserversListRequest)
+    writeStream_(streamIds::kGameserversListRequest)
 {
 
 }

@@ -1,5 +1,5 @@
 #include <streaming/loginserver/loginResponse.hpp>
-#include <streaming/loginserver/messageIds.hpp>
+#include <streaming/loginserver/streamIds.hpp>
 
 namespace eMU
 {
@@ -17,7 +17,7 @@ LoginResponse::LoginResponse(const ReadStream &readStream):
 }
 
 LoginResponse::LoginResponse(LoginResult result):
-    writeStream_(MessageIds::kLoginResponse)
+    writeStream_(streamIds::kLoginResponse)
 {
     writeStream_.writeNext<uint32_t>(0); // dummy1
     writeStream_.writeNext<uint32_t>(0); // dummy2

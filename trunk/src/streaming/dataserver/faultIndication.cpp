@@ -1,5 +1,5 @@
 #include <streaming/dataserver/faultIndication.hpp>
-#include <streaming/dataserver/messageIds.hpp>
+#include <streaming/dataserver/streamIds.hpp>
 
 namespace eMU
 {
@@ -18,7 +18,7 @@ FaultIndication::FaultIndication(const ReadStream &readStream):
 }
 
 FaultIndication::FaultIndication(core::network::tcp::NetworkUser::Hash clientHash, const std::string &message):
-    writeStream_(MessageIds::kFaultIndication)
+    writeStream_(streamIds::kFaultIndication)
 {
     writeStream_.writeNext<core::network::tcp::NetworkUser::Hash>(clientHash);
     writeStream_.writeNext<uint32_t>(message.length());

@@ -4,7 +4,7 @@
 #include <loginserver/transactions/loginRequest.hpp>
 
 #include <streaming/readStreamsExtractor.hpp>
-#include <streaming/loginserver/messageIds.hpp>
+#include <streaming/loginserver/streamIds.hpp>
 
 #include <glog/logging.h>
 
@@ -83,25 +83,25 @@ bool Protocol::dispatch(core::network::tcp::Connection::Pointer connection)
 
 bool Protocol::handleReadStream(User &user, const streaming::ReadStream &stream)
 {
-    uint16_t messageId = stream.getId();
+    uint16_t streamId = stream.getId();
 
-    LOG(INFO) << "hash: " << user.getHash() << ", received stream, id: " << messageId;
+    LOG(INFO) << "hash: " << user.getHash() << ", received stream, id: " << streamId;
 
-    if(messageId == streaming::loginserver::MessageIds::kLoginRequest)
+    if(streamId == streaming::loginserver::streamIds::kLoginRequest)
     {
         streaming::loginserver::LoginRequest request(stream);
         context_.getTransactionsManager().queue(new transactions::LoginRequest(user, context_.getDataserverConnection(), request));
 
         return true;
     }
-    else if(messageId == streaming::loginserver::MessageIds::kGameserversListRequest)
+    else if(streamId == streaming::loginserver::streamIds::kGameserversListRequest)
     {
         streaming::loginserver::GameserversListRequest request(stream);
         context_.getTransactionsManager().queue((new transactions::GameserversListRequest(user, context_.getGameserversList(), request)));
 
         return true;
     }
-    else if(messageId == streaming::loginserver::MessageIds::kGameserverDetailsRequest)
+    else if(streamId == streaming::loginserver::streamIds::kGameserverDetailsRequest)
     {
         streaming::loginserver::GameserverDetailsRequest request(stream);
         context_.getTransactionsManager().queue((new transactions::GameserverDetailsRequest(user, context_.getGameserversList(), request)));

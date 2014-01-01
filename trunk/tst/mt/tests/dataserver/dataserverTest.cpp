@@ -4,7 +4,7 @@
 #include <dataserver/context.hpp>
 #include <dataserver/protocol.hpp>
 #include <streaming/readStream.hpp>
-#include <streaming/dataserver/messageIds.hpp>
+#include <streaming/dataserver/streamIds.hpp>
 #include <streaming/dataserver/checkAccountResult.hpp>
 #include <streaming/dataserver/checkAccountRequest.hpp>
 #include <streaming/dataserver/checkAccountResponse.hpp>
@@ -29,7 +29,7 @@ using eMU::streaming::dataserver::CheckAccountResult;
 using eMU::streaming::dataserver::CheckAccountRequest;
 using eMU::streaming::dataserver::CheckAccountResponse;
 using eMU::streaming::dataserver::FaultIndication;
-namespace MessageIds = eMU::streaming::dataserver::MessageIds;
+namespace streamIds = eMU::streaming::dataserver::streamIds;
 
 class DataserverTest: public ::testing::Test
 {
@@ -60,7 +60,7 @@ protected:
 
         ASSERT_TRUE(connection_->getSocket().isUnread());
         const ReadStream &readStream = connection_->getSocket().receive();
-        ASSERT_EQ(MessageIds::kFaultIndication, readStream.getId());
+        ASSERT_EQ(streamIds::kFaultIndication, readStream.getId());
 
         FaultIndication indication(readStream);
         ASSERT_EQ(clientHash_, indication.getClientHash());
@@ -88,7 +88,7 @@ TEST_F(DataserverTest, CheckAccountShouldBeSuccesful)
 
     ASSERT_TRUE(connection_->getSocket().isUnread());
     const ReadStream &readStream = connection_->getSocket().receive();
-    ASSERT_EQ(MessageIds::kCheckAccountResponse, readStream.getId());
+    ASSERT_EQ(streamIds::kCheckAccountResponse, readStream.getId());
 
     CheckAccountResponse response(readStream);
     ASSERT_EQ(clientHash_, response.getClientHash());
