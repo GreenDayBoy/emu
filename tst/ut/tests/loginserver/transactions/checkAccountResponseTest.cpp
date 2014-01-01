@@ -1,7 +1,7 @@
 #include <loginserver/transactions/checkAccountResponse.hpp>
 #include <loginserver/user.hpp>
 #include <streaming/dataserver/checkAccountResponse.hpp>
-#include <streaming/loginserver/messageIds.hpp>
+#include <streaming/loginserver/streamIds.hpp>
 #include <streaming/loginserver/loginResponse.hpp>
 #include <ut/env/core/network/tcp/connectionMock.hpp>
 
@@ -18,7 +18,7 @@ using eMU::ut::env::core::network::tcp::ConnectionMock;
 using eMU::streaming::dataserver::CheckAccountResponse;
 using eMU::streaming::dataserver::CheckAccountResult;
 using eMU::streaming::ReadStream;
-namespace MessageIds = eMU::streaming::loginserver::MessageIds;
+namespace streamIds = eMU::streaming::loginserver::streamIds;
 using eMU::streaming::loginserver::LoginResponse;
 using eMU::streaming::loginserver::LoginResult;
 using eMU::ut::env::core::network::tcp::ConnectionMock;
@@ -40,7 +40,7 @@ protected:
         eMU::loginserver::transactions::CheckAccountResponse(usersFactory_, checkAccountResponse).handle();
 
         ReadStream readStream(payload_);
-        ASSERT_EQ(MessageIds::kLoginResponse, readStream.getId());
+        ASSERT_EQ(streamIds::kLoginResponse, readStream.getId());
 
         LoginResponse loginResponse(readStream);
         ASSERT_EQ(expectedLoginResult_, loginResponse.getResult());

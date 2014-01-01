@@ -5,13 +5,13 @@
 #include <core/network/tcp/connection.hpp>
 #include <mt/env/asioStub/ioService.hpp>
 #include <mt/env/check.hpp>
-#include <streaming/loginserver/messageIds.hpp>
+#include <streaming/loginserver/streamIds.hpp>
 #include <streaming/loginserver/loginRequest.hpp>
 #include <streaming/loginserver/loginResponse.hpp>
 #include <streaming/loginserver/loginResult.hpp>
 #include <streaming/loginserver/gameserversListRequest.hpp>
 #include <streaming/loginserver/gameserversListResponse.hpp>
-#include <streaming/dataserver/messageIds.hpp>
+#include <streaming/dataserver/streamIds.hpp>
 #include <streaming/dataserver/checkAccountRequest.hpp>
 #include <streaming/dataserver/checkAccountResponse.hpp>
 #include <streaming/dataserver/checkAccountResult.hpp>
@@ -32,7 +32,7 @@ using eMU::streaming::loginserver::LoginResponse;
 using eMU::streaming::loginserver::LoginResult;
 using eMU::streaming::loginserver::GameserversListRequest;
 using eMU::streaming::loginserver::GameserversListResponse;
-namespace MessageIds = eMU::streaming::loginserver::MessageIds;
+namespace streamIds = eMU::streaming::loginserver::streamIds;
 using eMU::streaming::dataserver::CheckAccountRequest;
 using eMU::streaming::dataserver::CheckAccountResponse;
 using eMU::streaming::dataserver::CheckAccountResult;
@@ -81,7 +81,7 @@ protected:
 
         ASSERT_TRUE(loginserverContext_.getDataserverConnection()->getSocket().isUnread());
         const ReadStream &checkAccountRequestStream = loginserverContext_.getDataserverConnection()->getSocket().receive();
-        ASSERT_EQ(eMU::streaming::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
+        ASSERT_EQ(eMU::streaming::dataserver::streamIds::kCheckAccountRequest, checkAccountRequestStream.getId());
 
         CheckAccountRequest checkAccountRequest(checkAccountRequestStream);
         NetworkUser::Hash clientHash = clientHashExists ? checkAccountRequest.getClientHash() : NetworkUser::Hash(0x1234);
@@ -114,7 +114,7 @@ TEST_F(LoginserverTest, Login)
 
     ASSERT_TRUE(loginserverContext_.getDataserverConnection()->getSocket().isUnread());
     const ReadStream &checkAccountRequestStream = loginserverContext_.getDataserverConnection()->getSocket().receive();
-    ASSERT_EQ(eMU::streaming::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
+    ASSERT_EQ(eMU::streaming::dataserver::streamIds::kCheckAccountRequest, checkAccountRequestStream.getId());
 
     CheckAccountRequest checkAccountRequest(checkAccountRequestStream);
     ASSERT_EQ("accountTest", checkAccountRequest.getAccountId());
@@ -124,7 +124,7 @@ TEST_F(LoginserverTest, Login)
                                                                                                CheckAccountResult::Succeed).getWriteStream().getPayload()));
     ASSERT_TRUE(connection_->getSocket().isUnread());
     const ReadStream &loginResponseStream = connection_->getSocket().receive();
-    ASSERT_EQ(MessageIds::kLoginResponse, loginResponseStream.getId());
+    ASSERT_EQ(streamIds::kLoginResponse, loginResponseStream.getId());
 
     LoginResponse loginResponse(loginResponseStream);
     ASSERT_EQ(LoginResult::Succeed, loginResponse.getResult());
@@ -137,7 +137,7 @@ TEST_F(LoginserverTest, WhenCheckAccountWithInvalidClientHashReceivedThenNothing
 
     ASSERT_TRUE(loginserverContext_.getDataserverConnection()->getSocket().isUnread());
     const ReadStream &checkAccountRequestStream = loginserverContext_.getDataserverConnection()->getSocket().receive();
-    ASSERT_EQ(eMU::streaming::dataserver::MessageIds::kCheckAccountRequest, checkAccountRequestStream.getId());
+    ASSERT_EQ(eMU::streaming::dataserver::streamIds::kCheckAccountRequest, checkAccountRequestStream.getId());
 
     CHECK(loginserverContext_.getDataserverConnection()->getSocket().send(CheckAccountResponse(NetworkUser::Hash(0x1234),
                                                                                                CheckAccountResult::Succeed).getWriteStream().getPayload()));
@@ -162,7 +162,7 @@ TEST_F(LoginserverTest, checkGameserversListRequest)
 
     ASSERT_TRUE(connection_->getSocket().isUnread());
     const ReadStream &gameserversListResponseStream = connection_->getSocket().receive();
-    ASSERT_EQ(eMU::streaming::loginserver::MessageIds::kGameserversListResponse, gameserversListResponseStream.getId());
+    ASSERT_EQ(eMU::streaming::loginserver::streamIds::kGameserversListResponse, gameserversListResponseStream.getId());
 
     GameserversListResponse response(gameserversListResponseStream);
 

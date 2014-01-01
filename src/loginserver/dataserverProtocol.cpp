@@ -3,7 +3,7 @@
 #include <loginserver/transactions/faultIndication.hpp>
 
 #include <streaming/readStreamsExtractor.hpp>
-#include <streaming/dataserver/messageIds.hpp>
+#include <streaming/dataserver/streamIds.hpp>
 
 #include <glog/logging.h>
 
@@ -51,16 +51,16 @@ bool DataserverProtocol::dispatch(core::network::tcp::Connection::Pointer connec
 
 void DataserverProtocol::handleReadStream(const streaming::ReadStream &stream)
 {
-    uint16_t messageId = stream.getId();
+    uint16_t streamId = stream.getId();
 
-    LOG(INFO) << "Dataserver, received stream, id: " << messageId;
+    LOG(INFO) << "Dataserver, received stream, id: " << streamId;
 
-    if(messageId == streaming::dataserver::MessageIds::kCheckAccountResponse)
+    if(streamId == streaming::dataserver::streamIds::kCheckAccountResponse)
     {
         streaming::dataserver::CheckAccountResponse response(stream);
         context_.getTransactionsManager().queue(new transactions::CheckAccountResponse(context_.getUsersFactory(), response));
     }
-    if(messageId == streaming::dataserver::MessageIds::kFaultIndication)
+    if(streamId == streaming::dataserver::streamIds::kFaultIndication)
     {
         streaming::dataserver::FaultIndication indication(stream);
         context_.getTransactionsManager().queue(new transactions::FaultIndication(context_.getUsersFactory(), indication));

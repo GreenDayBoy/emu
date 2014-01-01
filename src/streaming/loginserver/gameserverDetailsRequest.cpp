@@ -1,5 +1,5 @@
 #include <streaming/loginserver/gameserverDetailsRequest.hpp>
-#include <streaming/loginserver/messageIds.hpp>
+#include <streaming/loginserver/streamIds.hpp>
 
 #include <boost/locale.hpp>
 
@@ -20,7 +20,7 @@ GameserverDetailsRequest::GameserverDetailsRequest(const ReadStream &readStream)
 }
 
 GameserverDetailsRequest::GameserverDetailsRequest(uint16_t gameserverCode):
-    writeStream_(MessageIds::kGameserverDetailsRequest)
+    writeStream_(streamIds::kGameserverDetailsRequest)
 {
     writeStream_.writeNext<uint32_t>(0); // dummy1
     writeStream_.writeNext<uint32_t>(0); // dummy2

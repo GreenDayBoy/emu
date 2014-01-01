@@ -1,5 +1,5 @@
 #include <streaming/loginserver/gameserversListResponse.hpp>
-#include <streaming/loginserver/messageIds.hpp>
+#include <streaming/loginserver/streamIds.hpp>
 
 #include <boost/locale.hpp>
 
@@ -11,7 +11,7 @@ namespace loginserver
 {
 
 GameserversListResponse::GameserversListResponse(const GameserversInfoContainer &servers):
-    writeStream_(MessageIds::kGameserversListResponse)
+    writeStream_(streamIds::kGameserversListResponse)
 {
     writeStream_.writeNext<uint32_t>(0); // dummy1
     writeStream_.writeNext<uint32_t>(0); // dummy2

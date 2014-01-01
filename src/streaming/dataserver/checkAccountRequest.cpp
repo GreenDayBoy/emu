@@ -1,5 +1,5 @@
 #include <streaming/dataserver/checkAccountRequest.hpp>
-#include <streaming/dataserver/messageIds.hpp>
+#include <streaming/dataserver/streamIds.hpp>
 
 namespace eMU
 {
@@ -21,7 +21,7 @@ CheckAccountRequest::CheckAccountRequest(const ReadStream &readStream):
 }
 
 CheckAccountRequest::CheckAccountRequest(core::network::tcp::NetworkUser::Hash clientHash, const std::string &accountId, const std::string password):
-    writeStream_(MessageIds::kCheckAccountRequest)
+    writeStream_(streamIds::kCheckAccountRequest)
 {
     writeStream_.writeNext<core::network::tcp::NetworkUser::Hash>(clientHash);
 
