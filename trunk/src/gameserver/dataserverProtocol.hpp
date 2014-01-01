@@ -1,7 +1,6 @@
 #pragma once
 
-#include <core/network/tcp/protocol.hpp>
-#include <streaming/readStream.hpp>
+#include <protocols/client.hpp>
 #include <gameserver/context.hpp>
 
 namespace eMU
@@ -9,17 +8,13 @@ namespace eMU
 namespace gameserver
 {
 
-class DataserverProtocol: public core::network::tcp::Protocol
+class DataserverProtocol: public protocols::Client
 {
 public:
     DataserverProtocol(Context &context);
 
-    bool attach(core::network::tcp::Connection::Pointer connection);
-    void detach(core::network::tcp::Connection::Pointer connection);
-    bool dispatch(core::network::tcp::Connection::Pointer connection);
-
 private:
-    void handleReadStream(const streaming::ReadStream &stream);
+    bool handleReadStream(const streaming::ReadStream &stream);
 
     Context &context_;
 };

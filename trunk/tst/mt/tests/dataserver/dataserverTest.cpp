@@ -56,7 +56,7 @@ protected:
 
     void faultIndicationScenario()
     {
-        CHECK(connection_->getSocket().send(CheckAccountRequest(clientHash_, "Account", "Password").getWriteStream().getPayload()));
+        IO_CHECK(connection_->getSocket().send(CheckAccountRequest(clientHash_, "Account", "Password").getWriteStream().getPayload()));
 
         ASSERT_TRUE(connection_->getSocket().isUnread());
         const ReadStream &readStream = connection_->getSocket().receive();
@@ -84,7 +84,7 @@ TEST_F(DataserverTest, CheckAccountShouldBeSuccesful)
     sqlInterface_.pushQueryResult(queryResult);
     sqlInterface_.pushQueryStatus(true);
 
-    CHECK(connection_->getSocket().send(CheckAccountRequest(clientHash_, "Account", "Password").getWriteStream().getPayload()));
+    IO_CHECK(connection_->getSocket().send(CheckAccountRequest(clientHash_, "Account", "Password").getWriteStream().getPayload()));
 
     ASSERT_TRUE(connection_->getSocket().isUnread());
     const ReadStream &readStream = connection_->getSocket().receive();

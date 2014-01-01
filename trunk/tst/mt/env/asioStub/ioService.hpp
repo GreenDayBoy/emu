@@ -20,14 +20,14 @@ public:
     public:
         strand(io_service& service);
 
-        template<typename CompletionHandler>
-        CompletionHandler wrap(const CompletionHandler &handler) { return handler; }
+        template<typename CompletionHandlerType>
+        CompletionHandlerType wrap(const CompletionHandlerType &handler) { return handler; }
     };
 
     typedef std::function<void(const boost::system::error_code, size_t)> IoHandler;
 
-    template<typename CompletionHandler>
-    void post(const CompletionHandler &handler) { handler(); }
+    template<typename CompletionHandlerType>
+    void post(const CompletionHandlerType &handler) { handler(); }
 
     size_t run();
     void stop();
