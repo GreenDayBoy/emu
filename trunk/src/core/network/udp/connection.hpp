@@ -2,7 +2,7 @@
 
 #include <core/network/udp/writeBufferFactory.hpp>
 #include <core/network/udp/protocol.hpp>
-#include <common/asio.hpp>
+#include <core/common/asio.hpp>
 
 #include <boost/noncopyable.hpp>
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <boost/noncopyable.hpp>
-#include <common/asio.hpp>
+#include <core/common/asio.hpp>
 
 namespace eMU
 {
