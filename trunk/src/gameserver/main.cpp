@@ -14,8 +14,9 @@
 DEFINE_string(dataserver_host, "127.0.0.1", "Dataserver address");
 DEFINE_int32(dataserver_port, 55960, "Dataserver port");
 DEFINE_int32(max_users, 5, "Max number of users to connect");
-DEFINE_int32(port, 55557, "server listen port");
+DEFINE_int32(port, 55901, "server listen port");
 DEFINE_int32(max_threads, 2, "max number of concurrent threads");
+DEFINE_int32(code, 0, "gameserver code");
 
 
 int main(int argsCount, char *args[])
@@ -25,7 +26,7 @@ int main(int argsCount, char *args[])
     google::ParseCommandLineFlags(&argsCount, &args, true);
     google::InitGoogleLogging(args[0]);
 
-    eMU::gameserver::Context gameserverContext(FLAGS_max_users);
+    eMU::gameserver::Context gameserverContext(FLAGS_max_users, FLAGS_code);
 
     eMU::gameserver::DataserverProtocol dataserverProtocol(gameserverContext);
 

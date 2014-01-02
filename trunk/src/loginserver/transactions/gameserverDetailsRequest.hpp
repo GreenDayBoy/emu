@@ -17,7 +17,7 @@ class GameserverDetailsRequest: public core::common::Transaction
 {
 public:
     GameserverDetailsRequest(User &user,
-                             const GameserversList &gameserversList,
+                             GameserversList &gameserversList,
                              core::network::udp::Connection::Pointer udpConnection,
                              const streaming::loginserver::GameserverDetailsRequest &request);
 
@@ -27,7 +27,7 @@ private:
     void handleInvalid();
 
     User &user_;
-    const GameserversList &gameserversList_;
+    GameserversList &gameserversList_;
     core::network::udp::Connection::Pointer udpConnection_;
     streaming::loginserver::GameserverDetailsRequest request_;
 };

@@ -1,52 +1,61 @@
-//#include <loginserver/transactions/gameserverDetailsRequest.hpp>
-//#include <streaming/loginserver/gameserverDetailsResponse.hpp>
-//#include <streaming/gameserver/registerUserRequest.hpp>
+#include <gameserver/transactions/registerUserRequest.hpp>
+#include <streaming/gameserver/registerUserResponse.hpp>
+#include <streaming/gameserver/userRegistrationResult.hpp>
 
-//#include <glog/logging.h>
+#include <glog/logging.h>
 
-//namespace eMU
-//{
-//namespace loginserver
-//{
-//namespace transactions
-//{
+namespace eMU
+{
+namespace gameserver
+{
+namespace transactions
+{
 
-//GameserverDetailsRequest::GameserverDetailsRequest(User &user,
-//                                                   const GameserversList &gameserversList,
-//                                                   core::network::udp::Connection::Pointer gameserverConnection,
-//                                                   const streaming::loginserver::GameserverDetailsRequest &request):
-//    user_(user),
-//    gameserversList_(gameserversList),
-//    gameserverConnection_(gameserverConnection),
-//    request_(request) {}
+RegisterUserRequest::RegisterUserRequest(const boost::asio::ip::udp::endpoint &senderEndpoint,
+                                         core::network::udp::Connection::Pointer udpConnection,
+                                         streaming::gameserver::UserRegistrationInfoContainer &userRegistrationInfos,
+                                         uint16_t gameserverCode,
+                                         const streaming::gameserver::RegisterUserRequest &request):
+    senderEndpoint_(senderEndpoint),
+    udpConnection_(udpConnection),
+    userRegistrationInfos_(userRegistrationInfos),
+    gameserverCode_(gameserverCode),
+    request_(request) {}
 
-//bool GameserverDetailsRequest::isValid() const
-//{
-//    return gameserversList_.hasGameserver(request_.getGameserverCode()) && gameserverConnection_ != nullptr;
-//}
+bool RegisterUserRequest::isValid() const
+{
+    return udpConnection_ != nullptr;
+}
 
-//void GameserverDetailsRequest::handleValid()
-//{
-//    LOG(INFO) << "hash: " << user_.getHash() << ", requested gameserver details, gameserverCode: " << request_.getGameserverCode();
+void RegisterUserRequest::handleValid()
+{
+    LOG(INFO) << "Requested user registration, accountId: " << request_.getUserRegistrationInfo().accountId_
+              << ", hash: " << request_.getUserRegistrationInfo().userHash_;
 
-//    const streaming::loginserver::GameserverInfo &gameserverInfo = gameserversList_.getGameserverInfo(request_.getGameserverCode());
+    streaming::gameserver::UserRegistrationResult result = streaming::gameserver::UserRegistrationResult::Succeed;
 
-//    streaming::gameserver::RegisterUserRequest registerUserRequest(user_.getHash(), user_.getAccountId());
-//    gameserverConnection_->sendTo(boost::asio::ip::udp::endpoint(boost::asio::ip::address::from_string(gameserverInfo.address_),
-//                                                                 gameserverInfo.port_),
-//                                  registerUserRequest.getWriteStream().getPayload());
+    if(std::find(userRegistrationInfos_.begin(),
+                 userRegistrationInfos_.end(),
+                 request_.getUserRegistrationInfo()) == userRegistrationInfos_.end())
+    {
+        userRegistrationInfos_.push_back(request_.getUserRegistrationInfo());
+        LOG(INFO) << "User registered.";
+    }
+    else
+    {
+        LOG(ERROR) << "User is already registered.";
+        result = streaming::gameserver::UserRegistrationResult::Failed;
+    }
 
-//    streaming::loginserver::GameserverDetailsResponse gameserverDetailsResponse(gameserverInfo.address_, gameserverInfo.port_);
-//    user_.getConnection().send(gameserverDetailsResponse.getWriteStream().getPayload());
-//}
+    streaming::gameserver::RegisterUserResponse response(gameserverCode_, request_.getUserRegistrationInfo().userHash_, result);
+    udpConnection_->sendTo(senderEndpoint_, response.getWriteStream().getPayload());
+}
 
-//void GameserverDetailsRequest::handleInvalid()
-//{
-//    LOG(ERROR) << "hash: " << user_.getHash() << ", requested gameserver does not exists! gameserverCode: " << request_.getGameserverCode();
+void RegisterUserRequest::handleInvalid()
+{
+    LOG(ERROR) << "udpConnection is nullptr!";
+}
 
-//    user_.getConnection().disconnect();
-//}
-
-//}
-//}
-//}
+}
+}
+}
