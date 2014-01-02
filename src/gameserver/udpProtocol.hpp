@@ -1,17 +1,17 @@
 #pragma once
 
 #include <protocols/udp.hpp>
-#include <loginserver/context.hpp>
+#include <gameserver/context.hpp>
 
 namespace eMU
 {
-namespace loginserver
+namespace gameserver
 {
 
-class GameserverProtocol: public protocols::Udp
+class UdpProtocol: public protocols::Udp
 {
 public:
-    GameserverProtocol(Context &context);
+    UdpProtocol(Context &context);
 
 private:
     void handleReadStream(const streaming::ReadStream &stream, const boost::asio::ip::udp::endpoint &senderEndpoint);
