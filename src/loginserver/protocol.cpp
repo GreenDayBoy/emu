@@ -19,36 +19,30 @@ Protocol::Protocol(Context &context):
 bool Protocol::handleReadStream(User &user, const streaming::ReadStream &stream)
 {
     uint16_t streamId = stream.getId();
-    bool result = false;
 
     if(streamId == streaming::loginserver::streamIds::kLoginRequest)
     {
         streaming::loginserver::LoginRequest request(stream);
-        context_.getTransactionsManager().queue(new transactions::LoginRequest(user, context_.getClientConnection(), request));
+        transactions::LoginRequest(user, context_.getClientConnection(), request).handle();
 
-        result = true;
+        return true;
     }
     else if(streamId == streaming::loginserver::streamIds::kGameserversListRequest)
     {
         streaming::loginserver::GameserversListRequest request(stream);
-        context_.getTransactionsManager().queue((new transactions::GameserversListRequest(user, context_.getGameserversList(), request)));
+        transactions::GameserversListRequest(user, context_.getGameserversList(), request).handle();
 
-        result = true;
+        return true;
     }
     else if(streamId == streaming::loginserver::streamIds::kGameserverDetailsRequest)
     {
         streaming::loginserver::GameserverDetailsRequest request(stream);
-        context_.getTransactionsManager().queue((new transactions::GameserverDetailsRequest(user, context_.getGameserversList(), request)));
+        transactions::GameserverDetailsRequest(user, context_.getGameserversList(), request).handle();
 
-        result = true;
+        return true;
     }
 
-    if(result)
-    {
-        context_.getTransactionsManager().dequeueAll();
-    }
-
-    return result;
+    return false;
 }
 
 

@@ -21,15 +21,13 @@ bool DataserverProtocol::handleReadStream(const streaming::ReadStream &stream)
     if(streamId == streaming::dataserver::streamIds::kCheckAccountResponse)
     {
         streaming::dataserver::CheckAccountResponse response(stream);
-        context_.getTransactionsManager().queue(new transactions::CheckAccountResponse(context_.getUsersFactory(), response));
+        transactions::CheckAccountResponse(context_.getUsersFactory(), response).handle();
     }
     if(streamId == streaming::dataserver::streamIds::kFaultIndication)
     {
         streaming::dataserver::FaultIndication indication(stream);
-        context_.getTransactionsManager().queue(new transactions::FaultIndication(context_.getUsersFactory(), indication));
+        transactions::FaultIndication(context_.getUsersFactory(), indication).handle();
     }
-
-    context_.getTransactionsManager().dequeueAll();
 
     return true;
 }

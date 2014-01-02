@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/transactions/transaction.hpp>
+#include <core/common/transaction.hpp>
 #include <loginserver/gameserversList.hpp>
 #include <loginserver/user.hpp>
 
@@ -13,7 +13,7 @@ namespace loginserver
 namespace transactions
 {
 
-class GameserverDetailsRequest: public core::transactions::Transaction
+class GameserverDetailsRequest: public core::common::Transaction
 {
 public:
     GameserverDetailsRequest(User &user,

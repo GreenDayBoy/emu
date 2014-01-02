@@ -2,7 +2,6 @@
 
 #include <protocols/contexts/server.hpp>
 #include <protocols/contexts/client.hpp>
-#include <protocols/contexts/executive.hpp>
 
 #include <loginserver/user.hpp>
 #include <loginserver/gameserversList.hpp>
@@ -12,7 +11,7 @@ namespace eMU
 namespace loginserver
 {
 
-class Context: public protocols::contexts::Client, public protocols::contexts::Server<User>, public protocols::contexts::Executive
+class Context: public protocols::contexts::Client, public protocols::contexts::Server<User>
 {
 public:
     Context(size_t maxNumberOfUsers);

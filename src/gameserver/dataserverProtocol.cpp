@@ -13,8 +13,6 @@ DataserverProtocol::DataserverProtocol(Context &context):
 
 bool DataserverProtocol::handleReadStream(const streaming::ReadStream &stream)
 {
-    context_.getTransactionsManager().dequeueAll();
-
     return true;
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/common/factory.hpp>
-#include <core/transactions/transaction.hpp>
+#include <core/common/transaction.hpp>
 #include <loginserver/user.hpp>
 #include <streaming/dataserver/checkAccountResponse.hpp>
 
@@ -12,7 +12,7 @@ namespace loginserver
 namespace transactions
 {
 
-class CheckAccountResponse: public core::transactions::Transaction
+class CheckAccountResponse: public core::common::Transaction
 {
 public:
     CheckAccountResponse(core::common::Factory<User> &usersFactory,

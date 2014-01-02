@@ -1,7 +1,7 @@
 #pragma once
 
 #include <dataserver/user.hpp>
-#include <core/transactions/transaction.hpp>
+#include <core/common/transaction.hpp>
 #include <dataserver/database/sqlInterface.hpp>
 #include <streaming/dataserver/checkAccountRequest.hpp>
 
@@ -12,7 +12,7 @@ namespace dataserver
 namespace transactions
 {
 
-class CheckAccountRequest: public core::transactions::Transaction
+class CheckAccountRequest: public core::common::Transaction
 {
 public:
     CheckAccountRequest(User &user,

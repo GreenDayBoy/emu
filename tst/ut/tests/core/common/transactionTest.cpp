@@ -1,8 +1,8 @@
-#include <core/transactions/transaction.hpp>
+#include <core/common/transaction.hpp>
 
 #include <gtest/gtest.h>
 
-using eMU::core::transactions::Transaction;
+using eMU::core::common::Transaction;
 
 class TransactionsTest: public ::testing::Test
 {
