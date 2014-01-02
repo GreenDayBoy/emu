@@ -42,10 +42,10 @@ class CheckAccountRequestTransactionTest: public ::testing::Test
 {
 protected:
     CheckAccountRequestTransactionTest():
-        clientHash_(0x12345),
+        userHash_(0x12345),
         connection_(new ConnectionMock()),
         user_(connection_),
-        request_(ReadStream(CheckAccountRequest(clientHash_,
+        request_(ReadStream(CheckAccountRequest(userHash_,
                                                 "testAccount",
                                                 "testPassword").getWriteStream().getPayload())) {}
 
@@ -53,7 +53,7 @@ protected:
     QueryResult queryResult_;
     Payload payload_;
 
-    NetworkUser::Hash clientHash_;
+    NetworkUser::Hash userHash_;
     ConnectionMock::Pointer connection_;
     User user_;
     CheckAccountRequest request_;
@@ -76,7 +76,7 @@ TEST_F(CheckAccountRequestTransactionTest, handle)
     ASSERT_EQ(streamIds::kCheckAccountResponse, readStream.getId());
     CheckAccountResponse response(readStream);
 
-    ASSERT_EQ(clientHash_, response.getClientHash());
+    ASSERT_EQ(userHash_, response.getUserHash());
     ASSERT_EQ(result, response.getResult());
 }
 
@@ -96,7 +96,7 @@ TEST_F(CheckAccountRequestTransactionTest, WhenExecutionOfQueryIsFailedThenFault
     ASSERT_EQ(streamIds::kFaultIndication, readStream.getId());
     FaultIndication indication(readStream);
 
-    ASSERT_EQ(clientHash_, indication.getClientHash());
+    ASSERT_EQ(userHash_, indication.getUserHash());
     ASSERT_EQ(errorMessage, indication.getMessage());
 }
 
@@ -113,7 +113,7 @@ TEST_F(CheckAccountRequestTransactionTest, WhenQueryResultIsEmptyThenFaultIndica
     ASSERT_EQ(streamIds::kFaultIndication, readStream.getId());
     FaultIndication indication(readStream);
 
-    ASSERT_EQ(clientHash_, indication.getClientHash());
+    ASSERT_EQ(userHash_, indication.getUserHash());
 }
 
 TEST_F(CheckAccountRequestTransactionTest, WhenConnectionToDatabaseIsDiedThenFaultIndicationShouldBeSent)
@@ -127,5 +127,5 @@ TEST_F(CheckAccountRequestTransactionTest, WhenConnectionToDatabaseIsDiedThenFau
     ASSERT_EQ(streamIds::kFaultIndication, readStream.getId());
     FaultIndication indication(readStream);
 
-    ASSERT_EQ(clientHash_, indication.getClientHash());
+    ASSERT_EQ(userHash_, indication.getUserHash());
 }

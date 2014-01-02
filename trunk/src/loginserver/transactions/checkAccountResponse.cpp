@@ -23,7 +23,7 @@ bool CheckAccountResponse::isValid() const
 
     try
     {
-        usersFactory_.find(response_.getClientHash());
+        usersFactory_.find(response_.getUserHash());
     }
     catch(const core::common::Factory<User>::ObjectNotFoundException&)
     {
@@ -35,7 +35,7 @@ bool CheckAccountResponse::isValid() const
 
 void CheckAccountResponse::handleValid()
 {
-    User &user = usersFactory_.find(response_.getClientHash());
+    User &user = usersFactory_.find(response_.getUserHash());
 
     streaming::loginserver::LoginResult result = streaming::loginserver::LoginResult::Succeed;
 
@@ -62,7 +62,7 @@ void CheckAccountResponse::handleValid()
 
 void CheckAccountResponse::handleInvalid()
 {
-    LOG(ERROR) << "hash: " << response_.getClientHash() << " given in dataserver response does not exist!";
+    LOG(ERROR) << "hash: " << response_.getUserHash() << " given in dataserver response does not exist!";
 }
 
 }

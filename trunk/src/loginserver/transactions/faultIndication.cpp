@@ -20,7 +20,7 @@ bool FaultIndication::isValid() const
 
     try
     {
-        usersFactory_.find(indication_.getClientHash());
+        usersFactory_.find(indication_.getUserHash());
     }
     catch(const core::common::Factory<User>::ObjectNotFoundException&)
     {
@@ -32,14 +32,14 @@ bool FaultIndication::isValid() const
 
 void FaultIndication::handleValid()
 {
-    User &user = usersFactory_.find(indication_.getClientHash());
+    User &user = usersFactory_.find(indication_.getUserHash());
     LOG(ERROR) << "hash: " << user.getHash() << ", accountId: " << user.getAccountId() << ", fault from dataserver received! message: " << indication_.getMessage();
     user.getConnection().disconnect();
 }
 
 void FaultIndication::handleInvalid()
 {
-    LOG(ERROR) << "hash: " << indication_.getClientHash() << " given in dataserver fault indication does not exist!";
+    LOG(ERROR) << "hash: " << indication_.getUserHash() << " given in dataserver fault indication does not exist!";
 }
 
 }

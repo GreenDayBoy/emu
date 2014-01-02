@@ -38,7 +38,7 @@ protected:
         dataserverContext_(sqlInterface_, 5),
         dataserverProtocol_(dataserverContext_),
         connection_(new Connection(ioService_, dataserverProtocol_)),
-        clientHash_(0x12345) {}
+        userHash_(0x12345) {}
 
     void SetUp()
     {
@@ -56,14 +56,14 @@ protected:
 
     void faultIndicationScenario()
     {
-        IO_CHECK(connection_->getSocket().send(CheckAccountRequest(clientHash_, "Account", "Password").getWriteStream().getPayload()));
+        IO_CHECK(connection_->getSocket().send(CheckAccountRequest(userHash_, "Account", "Password").getWriteStream().getPayload()));
 
         ASSERT_TRUE(connection_->getSocket().isUnread());
         const ReadStream &readStream = connection_->getSocket().receive();
         ASSERT_EQ(streamIds::kFaultIndication, readStream.getId());
 
         FaultIndication indication(readStream);
-        ASSERT_EQ(clientHash_, indication.getClientHash());
+        ASSERT_EQ(userHash_, indication.getUserHash());
     }
 
     SqlInterfaceStub sqlInterface_;
@@ -71,7 +71,7 @@ protected:
     Protocol dataserverProtocol_;
     io_service ioService_;
     Connection::Pointer connection_;
-    NetworkUser::Hash clientHash_;
+    NetworkUser::Hash userHash_;
 };
 
 TEST_F(DataserverTest, CheckAccountShouldBeSuccesful)
@@ -84,14 +84,14 @@ TEST_F(DataserverTest, CheckAccountShouldBeSuccesful)
     sqlInterface_.pushQueryResult(queryResult);
     sqlInterface_.pushQueryStatus(true);
 
-    IO_CHECK(connection_->getSocket().send(CheckAccountRequest(clientHash_, "Account", "Password").getWriteStream().getPayload()));
+    IO_CHECK(connection_->getSocket().send(CheckAccountRequest(userHash_, "Account", "Password").getWriteStream().getPayload()));
 
     ASSERT_TRUE(connection_->getSocket().isUnread());
     const ReadStream &readStream = connection_->getSocket().receive();
     ASSERT_EQ(streamIds::kCheckAccountResponse, readStream.getId());
 
     CheckAccountResponse response(readStream);
-    ASSERT_EQ(clientHash_, response.getClientHash());
+    ASSERT_EQ(userHash_, response.getUserHash());
     ASSERT_EQ(checkAccountResult, response.getResult());
 }
 

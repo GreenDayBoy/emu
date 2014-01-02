@@ -27,7 +27,7 @@ bool CheckAccountRequest::isValid() const
 
 void CheckAccountRequest::handleValid()
 {
-    LOG(INFO) << "hash: " << user_.getHash() << ", clientHash: " << request_.getClientHash() << ", checking account: " << request_.getAccountId();
+    LOG(INFO) << "hash: " << user_.getHash() << ", userHash: " << request_.getUserHash() << ", checking account: " << request_.getAccountId();
 
     std::stringstream query;
     query << "SELECT"
@@ -43,7 +43,7 @@ void CheckAccountRequest::handleValid()
         if(queryResult.getRows().size() > 0)
         {
             streaming::dataserver::CheckAccountResult result = static_cast<streaming::dataserver::CheckAccountResult>(queryResult.getRows()[0].getValue<uint32_t>(0));
-            streaming::dataserver::CheckAccountResponse response(request_.getClientHash(), result);
+            streaming::dataserver::CheckAccountResponse response(request_.getUserHash(), result);
 
             user_.getConnection().send(response.getWriteStream().getPayload());
         }
@@ -68,7 +68,7 @@ void CheckAccountRequest::handleInvalid()
 
 void CheckAccountRequest::sendFaultIndication(const std::string &message)
 {
-    streaming::dataserver::FaultIndication indication(request_.getClientHash(), message);
+    streaming::dataserver::FaultIndication indication(request_.getUserHash(), message);
     user_.getConnection().send(indication.getWriteStream().getPayload());
 }
 
