@@ -2,8 +2,10 @@
 #include <gameserver/context.hpp>
 #include <gameserver/protocol.hpp>
 #include <gameserver/dataserverProtocol.hpp>
+#include <gameserver/loginserverProtocol.hpp>
 #include <core/network/tcp/connectionsAcceptor.hpp>
 #include <core/common/concurrency.hpp>
+#include <core/network/tcp/connection.hpp>
 
 #include <boost/thread.hpp>
 #include <glog/logging.h>
@@ -36,8 +38,11 @@ int main(int argsCount, char *args[])
         return 1;
     }
 
-    eMU::gameserver::Protocol gameserverProtocol(gameserverContext);
+    eMU::gameserver::LoginserverProtocol loginserverProtocol(gameserverContext);
+    eMU::core::network::udp::Connection loginserverConnection(ioService, FLAGS_port, loginserverProtocol);
+    loginserverConnection.queueReceiveFrom();
 
+    eMU::gameserver::Protocol gameserverProtocol(gameserverContext);
     eMU::core::network::tcp::ConnectionsAcceptor connectionsAcceptor(ioService, FLAGS_port, gameserverProtocol);
     connectionsAcceptor.queueAccept();
 

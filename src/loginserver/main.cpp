@@ -2,9 +2,11 @@
 #include <loginserver/context.hpp>
 #include <loginserver/protocol.hpp>
 #include <loginserver/dataserverProtocol.hpp>
+#include <loginserver/gameserverProtocol.hpp>
 #include <core/network/tcp/connectionsAcceptor.hpp>
 #include <core/common/xmlReader.hpp>
 #include <core/common/concurrency.hpp>
+#include <core/network/udp/connection.hpp>
 
 #include <boost/thread.hpp>
 #include <glog/logging.h>
@@ -44,8 +46,11 @@ int main(int argsCount, char *args[])
         return 1;
     }
 
-    eMU::loginserver::Protocol loginserverProtocol(loginserverContext);
+    eMU::loginserver::GameserverProtocol gameserverProtocol(loginserverContext);
+    eMU::core::network::udp::Connection gameserverConnection(ioService, FLAGS_port, gameserverProtocol);
+    gameserverConnection.queueReceiveFrom();
 
+    eMU::loginserver::Protocol loginserverProtocol(loginserverContext);
     eMU::core::network::tcp::ConnectionsAcceptor connectionsAcceptor(ioService, FLAGS_port, loginserverProtocol);
     connectionsAcceptor.queueAccept();
 

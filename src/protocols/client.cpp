@@ -36,10 +36,10 @@ bool Client::dispatch(core::network::tcp::Connection::Pointer connection)
 
     for(const auto &stream : readStreamsExtractor.getStreams())
     {
+        LOG(INFO) << "Client protocol, received stream, id: " << stream.getId();
+
         if(!this->handleReadStream(stream))
         {
-            LOG(INFO) << "Client protocol, received stream, id: " << stream.getId();
-
             return false;
         }
     }

@@ -39,9 +39,9 @@ public:
     UdpConnectionTest():
         connection_(ioService_, 44405, protocol_) {}
 
-    Connection connection_;
-    asioStub::io_service ioService_;
     ProtocolMock protocol_;
+    asioStub::io_service ioService_;
+    Connection connection_;
 
     boost::asio::mutable_buffer receiveBuffer_;
     boost::asio::ip::udp::endpoint* senderEndpoint_;
