@@ -18,17 +18,17 @@ class CheckAccountResponse
 {
 public:
     CheckAccountResponse(const ReadStream &readStream);
-    CheckAccountResponse(core::network::tcp::NetworkUser::Hash clientHash, CheckAccountResult result);
+    CheckAccountResponse(core::network::tcp::NetworkUser::Hash userHash, CheckAccountResult result);
 
     const WriteStream& getWriteStream() const;
-    core::network::tcp::NetworkUser::Hash getClientHash() const;
+    core::network::tcp::NetworkUser::Hash getUserHash() const;
     CheckAccountResult getResult() const;
 
 private:
     ReadStream readStream_;
     WriteStream writeStream_;
 
-    core::network::tcp::NetworkUser::Hash clientHash_;
+    core::network::tcp::NetworkUser::Hash userHash_;
     CheckAccountResult result_;
 };
 

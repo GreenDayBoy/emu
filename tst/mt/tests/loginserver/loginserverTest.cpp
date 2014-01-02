@@ -74,7 +74,7 @@ protected:
         ASSERT_EQ(dataserverConnection, loginserverContext_.getClientConnection());
     }
 
-    void faultIndicationScenario(bool clientHashExists)
+    void faultIndicationScenario(bool userHashExists)
     {
         LoginRequest loginRequest(L"accountTest", L"passwordTest");
         IO_CHECK(connection_->getSocket().send(loginRequest.getWriteStream().getPayload()));
@@ -84,10 +84,10 @@ protected:
         ASSERT_EQ(eMU::streaming::dataserver::streamIds::kCheckAccountRequest, checkAccountRequestStream.getId());
 
         CheckAccountRequest checkAccountRequest(checkAccountRequestStream);
-        NetworkUser::Hash clientHash = clientHashExists ? checkAccountRequest.getClientHash() : NetworkUser::Hash(0x1234);
-        IO_CHECK(loginserverContext_.getClientConnection()->getSocket().send(FaultIndication(clientHash, "test message").getWriteStream().getPayload()));
+        NetworkUser::Hash userHash = userHashExists ? checkAccountRequest.getUserHash() : NetworkUser::Hash(0x1234);
+        IO_CHECK(loginserverContext_.getClientConnection()->getSocket().send(FaultIndication(userHash, "test message").getWriteStream().getPayload()));
 
-        bool connectionExists = !clientHashExists;
+        bool connectionExists = !userHashExists;
         ASSERT_EQ(connectionExists, connection_->getSocket().is_open());
     }
 
@@ -120,7 +120,7 @@ TEST_F(LoginserverTest, Login)
     ASSERT_EQ("accountTest", checkAccountRequest.getAccountId());
     ASSERT_EQ("passwordTest", checkAccountRequest.getPassword());
 
-    IO_CHECK(loginserverContext_.getClientConnection()->getSocket().send(CheckAccountResponse(checkAccountRequest.getClientHash(),
+    IO_CHECK(loginserverContext_.getClientConnection()->getSocket().send(CheckAccountResponse(checkAccountRequest.getUserHash(),
                                                                                                CheckAccountResult::Succeed).getWriteStream().getPayload()));
     ASSERT_TRUE(connection_->getSocket().isUnread());
     const ReadStream &loginResponseStream = connection_->getSocket().receive();
@@ -130,7 +130,7 @@ TEST_F(LoginserverTest, Login)
     ASSERT_EQ(LoginResult::Succeed, loginResponse.getResult());
 }
 
-TEST_F(LoginserverTest, WhenCheckAccountWithInvalidClientHashReceivedThenNothingHappens)
+TEST_F(LoginserverTest, WhenCheckAccountWithInvalidUserHashReceivedThenNothingHappens)
 {
     LoginRequest loginRequest(L"accountTest", L"passwordTest");
     IO_CHECK(connection_->getSocket().send(loginRequest.getWriteStream().getPayload()));
@@ -146,14 +146,14 @@ TEST_F(LoginserverTest, WhenCheckAccountWithInvalidClientHashReceivedThenNothing
 
 TEST_F(LoginserverTest, WhenFaultIndicationReceivedThenClientShouldBeDisconnected)
 {
-    bool clientHashExists = true;
-    faultIndicationScenario(clientHashExists);
+    bool userHashExists = true;
+    faultIndicationScenario(userHashExists);
 }
 
-TEST_F(LoginserverTest, WhenFaultIndicationWithInvalidClientHashReceivedThenNothingHappens)
+TEST_F(LoginserverTest, WhenFaultIndicationWithInvalidUserHashReceivedThenNothingHappens)
 {
-    bool clientHashExists = false;
-    faultIndicationScenario(clientHashExists);
+    bool userHashExists = false;
+    faultIndicationScenario(userHashExists);
 }
 
 TEST_F(LoginserverTest, checkGameserversListRequest)

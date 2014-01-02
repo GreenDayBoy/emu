@@ -54,7 +54,7 @@ TEST_F(LoginRequestTransactionTest, handle)
     ASSERT_EQ(streamIds::kCheckAccountRequest, readStream.getId());
 
     CheckAccountRequest checkAccountRequest(readStream);
-    ASSERT_EQ(user_.getHash(), checkAccountRequest.getClientHash());
+    ASSERT_EQ(user_.getHash(), checkAccountRequest.getUserHash());
     ASSERT_EQ(boost::locale::conv::utf_to_utf<std::string::value_type>(accountId_), checkAccountRequest.getAccountId());
     ASSERT_EQ(boost::locale::conv::utf_to_utf<std::string::value_type>(password_), checkAccountRequest.getPassword());
     ASSERT_EQ(boost::locale::conv::utf_to_utf<std::string::value_type>(accountId_), user_.getAccountId());

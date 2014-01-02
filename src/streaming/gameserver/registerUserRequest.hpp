@@ -10,19 +10,19 @@ namespace eMU
 {
 namespace streaming
 {
-namespace dataserver
+namespace gameserver
 {
 
-class CheckAccountRequest
+class RegisterUserRequest
 {
 public:
-    CheckAccountRequest(const ReadStream &readStream);
-    CheckAccountRequest(core::network::tcp::NetworkUser::Hash userHash, const std::string &accountId, const std::string password);
+    RegisterUserRequest(const ReadStream &readStream);
+    RegisterUserRequest(core::network::tcp::NetworkUser::Hash userHash, const std::string &accountId);
 
     const WriteStream& getWriteStream() const;
+
     core::network::tcp::NetworkUser::Hash getUserHash() const;
-    const std::string& getAccountId() const;
-    const std::string& getPassword() const;
+    std::string getAccountId() const;
 
 private:
     ReadStream readStream_;
@@ -30,7 +30,6 @@ private:
 
     core::network::tcp::NetworkUser::Hash userHash_;
     std::string accountId_;
-    std::string password_;
 };
 
 }

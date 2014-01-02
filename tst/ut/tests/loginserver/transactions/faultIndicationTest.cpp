@@ -13,14 +13,14 @@ class FaultIndicationTransactionTest: public ::testing::Test
 {
 protected:
     FaultIndicationTransactionTest():
-        clientHashExists_(false) {}
+        userHashExists_(false) {}
 
     void scenario()
     {
         User::Hash hash(0x12345);
         ConnectionMock::Pointer connection(new ConnectionMock());
 
-        if(clientHashExists_)
+        if(userHashExists_)
         {
             User &user = usersFactory_.create(connection);
             hash = user.getHash();
@@ -33,16 +33,16 @@ protected:
     }
 
     Factory<User> usersFactory_;
-    bool clientHashExists_;
+    bool userHashExists_;
 };
 
-TEST_F(FaultIndicationTransactionTest, WhenClientHashIsValidThenConnectionShouldBeDisconnect)
+TEST_F(FaultIndicationTransactionTest, WhenUserHashIsValidThenConnectionShouldBeDisconnect)
 {
-    clientHashExists_ = true;
+    userHashExists_ = true;
     scenario();
 }
 
-TEST_F(FaultIndicationTransactionTest, WhenClientHashIsInvalidThenNothingHappens)
+TEST_F(FaultIndicationTransactionTest, WhenUserHashIsInvalidThenNothingHappens)
 {
     scenario();
 }
