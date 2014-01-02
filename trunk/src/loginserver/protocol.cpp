@@ -37,7 +37,7 @@ bool Protocol::handleReadStream(User &user, const streaming::ReadStream &stream)
     else if(streamId == streaming::loginserver::streamIds::kGameserverDetailsRequest)
     {
         streaming::loginserver::GameserverDetailsRequest request(stream);
-        transactions::GameserverDetailsRequest(user, context_.getGameserversList(), request).handle();
+        transactions::GameserverDetailsRequest(user, context_.getGameserversList(), context_.getUdpConnection(), request).handle();
 
         return true;
     }

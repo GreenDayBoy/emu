@@ -12,12 +12,12 @@ Udp::Udp():
 
 Udp::~Udp() {}
 
-void Udp::setUdpConnection(core::network::udp::Connection *connection)
+void Udp::setUdpConnection(core::network::udp::Connection::Pointer connection)
 {
     udpConnection_ = connection;
 }
 
-core::network::udp::Connection* Udp::getUdpConnection()
+core::network::udp::Connection::Pointer Udp::getUdpConnection()
 {
     return udpConnection_;
 }

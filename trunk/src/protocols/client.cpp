@@ -18,7 +18,7 @@ bool Client::attach(core::network::tcp::Connection::Pointer connection)
     return true;
 }
 
-void Client::detach(core::network::tcp::Connection::Pointer connection)
+void Client::detach(core::network::tcp::Connection::Pointer)
 {
     LOG(INFO) << "Client connection closed.";
 

@@ -14,9 +14,9 @@ class Udp: public core::network::udp::Protocol
 public:
     Udp(contexts::Udp &context);
 
-    void attach(core::network::udp::Connection& connection);
-    void dispatch(core::network::udp::Connection& connection, const boost::asio::ip::udp::endpoint &senderEndpoint);
-    void detach(core::network::udp::Connection& connection);
+    void attach(core::network::udp::Connection::Pointer connection);
+    void dispatch(core::network::udp::Connection::Pointer connection, const boost::asio::ip::udp::endpoint &senderEndpoint);
+    void detach(core::network::udp::Connection::Pointer connection);
 
 protected:
     virtual void handleReadStream(const streaming::ReadStream &stream, const boost::asio::ip::udp::endpoint &senderEndpoint) = 0;

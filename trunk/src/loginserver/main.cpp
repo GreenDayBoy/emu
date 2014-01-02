@@ -47,8 +47,9 @@ int main(int argsCount, char *args[])
     }
 
     eMU::loginserver::GameserverProtocol gameserverProtocol(loginserverContext);
-    eMU::core::network::udp::Connection gameserverConnection(ioService, FLAGS_port, gameserverProtocol);
-    gameserverConnection.queueReceiveFrom();
+    eMU::core::network::udp::Connection::Pointer gameserverConnection(new eMU::core::network::udp::Connection(ioService, FLAGS_port, gameserverProtocol));
+    gameserverConnection->registerConnection();
+    gameserverConnection->queueReceiveFrom();
 
     eMU::loginserver::Protocol loginserverProtocol(loginserverContext);
     eMU::core::network::tcp::ConnectionsAcceptor connectionsAcceptor(ioService, FLAGS_port, loginserverProtocol);
@@ -57,6 +58,8 @@ int main(int argsCount, char *args[])
     eMU::core::common::Concurrency concurrency(ioService, FLAGS_max_threads);
     concurrency.start();
     concurrency.join();
+
+    gameserverConnection->unregisterConnection();
 
     return 0;
 }
