@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/transactions/transaction.hpp>
+#include <core/common/transaction.hpp>
 #include <loginserver/user.hpp>
 #include <streaming/dataserver/faultIndication.hpp>
 #include <core/common/factory.hpp>
@@ -12,7 +12,7 @@ namespace loginserver
 namespace transactions
 {
 
-class FaultIndication: public core::transactions::Transaction
+class FaultIndication: public core::common::Transaction
 {
 public:
     FaultIndication(core::common::Factory<User> &usersFactory,

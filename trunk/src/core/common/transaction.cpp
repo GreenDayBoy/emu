@@ -1,10 +1,10 @@
-#include <core/transactions/transaction.hpp>
+#include <core/common/transaction.hpp>
 
 namespace eMU
 {
 namespace core
 {
-namespace transactions
+namespace common
 {
 
 Transaction::~Transaction()

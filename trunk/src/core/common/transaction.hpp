@@ -4,7 +4,7 @@ namespace eMU
 {
 namespace core
 {
-namespace transactions
+namespace common
 {
 
 class Transaction

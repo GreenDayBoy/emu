@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/transactions/transaction.hpp>
+#include <core/common/transaction.hpp>
 #include <core/network/tcp/connection.hpp>
 
 #include <loginserver/user.hpp>
@@ -13,7 +13,7 @@ namespace loginserver
 namespace transactions
 {
 
-class LoginRequest: public core::transactions::Transaction
+class LoginRequest: public core::common::Transaction
 {
 public:
     LoginRequest(User &user,
