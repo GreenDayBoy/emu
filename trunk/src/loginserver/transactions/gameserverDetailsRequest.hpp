@@ -18,7 +18,7 @@ class GameserverDetailsRequest: public core::common::Transaction
 public:
     GameserverDetailsRequest(User &user,
                              const GameserversList &gameserversList,
-                             core::network::udp::Connection::Pointer gameserverConnection,
+                             core::network::udp::Connection::Pointer udpConnection,
                              const streaming::loginserver::GameserverDetailsRequest &request);
 
 private:
@@ -28,7 +28,7 @@ private:
 
     User &user_;
     const GameserversList &gameserversList_;
-    core::network::udp::Connection::Pointer gameserverConnection_;
+    core::network::udp::Connection::Pointer udpConnection_;
     streaming::loginserver::GameserverDetailsRequest request_;
 };
 

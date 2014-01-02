@@ -2,7 +2,7 @@
 #include <gameserver/context.hpp>
 #include <gameserver/protocol.hpp>
 #include <gameserver/dataserverProtocol.hpp>
-#include <gameserver/loginserverProtocol.hpp>
+#include <gameserver/udpProtocol.hpp>
 #include <core/network/tcp/connectionsAcceptor.hpp>
 #include <core/common/concurrency.hpp>
 #include <core/network/tcp/connection.hpp>
@@ -38,10 +38,10 @@ int main(int argsCount, char *args[])
         return 1;
     }
 
-    eMU::gameserver::LoginserverProtocol loginserverProtocol(gameserverContext);
-    eMU::core::network::udp::Connection::Pointer loginserverConnection(new eMU::core::network::udp::Connection(ioService, FLAGS_port, loginserverProtocol));
-    loginserverConnection->registerConnection();
-    loginserverConnection->queueReceiveFrom();
+    eMU::gameserver::UdpProtocol udpProtocol(gameserverContext);
+    eMU::core::network::udp::Connection::Pointer udpConnection(new eMU::core::network::udp::Connection(ioService, FLAGS_port, udpProtocol));
+    udpConnection->registerConnection();
+    udpConnection->queueReceiveFrom();
 
     eMU::gameserver::Protocol gameserverProtocol(gameserverContext);
     eMU::core::network::tcp::ConnectionsAcceptor connectionsAcceptor(ioService, FLAGS_port, gameserverProtocol);
@@ -51,7 +51,7 @@ int main(int argsCount, char *args[])
     concurrency.start();
     concurrency.join();
 
-    loginserverConnection->unregisterConnection();
+    udpConnection->unregisterConnection();
 
     return 0;
 }
