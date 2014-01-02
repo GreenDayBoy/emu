@@ -14,9 +14,15 @@ namespace udp
 Connection::Connection(asio::io_service &ioService, uint16_t port, Protocol &protocol):
     socket_(ioService, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), port)),
     strand_(ioService),
-    protocol_(protocol) {}
+    protocol_(protocol)
+{
+    protocol_.attach(*this);
+}
 
-Connection::~Connection() {}
+Connection::~Connection()
+{
+    protocol_.detach(*this);
+}
 
 Payload& Connection::getReadPayload()
 {
