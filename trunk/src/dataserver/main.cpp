@@ -3,6 +3,7 @@
 #include <dataserver/context.hpp>
 #include <dataserver/protocol.hpp>
 #include <core/network/tcp/connectionsAcceptor.hpp>
+#include <core/common/concurrency.hpp>
 
 #include <boost/thread.hpp>
 #include <glog/logging.h>
@@ -44,13 +45,9 @@ int main(int argsCount, char *args[])
     eMU::core::network::tcp::ConnectionsAcceptor connectionsAcceptor(ioService, FLAGS_port, dataserverProtocol);
     connectionsAcceptor.queueAccept();
 
-    boost::thread_group threads;
-    for(size_t i = 0; i < FLAGS_max_threads; ++i)
-    {
-        threads.create_thread(std::bind(static_cast<size_t (boost::asio::io_service::*)()>(&boost::asio::io_service::run), &ioService));
-    }
-
-    threads.join_all();
+    eMU::core::common::Concurrency concurrency(ioService, FLAGS_max_threads);
+    concurrency.start();
+    concurrency.join();
 
     mysqlInterface.cleanup();
 

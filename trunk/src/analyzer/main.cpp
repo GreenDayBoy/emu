@@ -2,6 +2,7 @@
 #include <analyzer/controller.hpp>
 #include <analyzer/protocol.hpp>
 #include <core/network/tcp/connectionsAcceptor.hpp>
+#include <core/common/concurrency.hpp>
 
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QStandardItem>
@@ -32,11 +33,8 @@ int main(int argsCount, char *args[])
     eMU::core::network::tcp::ConnectionsAcceptor connectionsAcceptor(ioService, FLAGS_port, analyzerProtocol);
     connectionsAcceptor.queueAccept();
 
-    boost::thread_group threads;
-    for(size_t i = 0; i < FLAGS_max_threads; ++i)
-    {
-        threads.create_thread(std::bind(static_cast<size_t (boost::asio::io_service::*)()>(&boost::asio::io_service::run), &ioService));
-    }
+    eMU::core::common::Concurrency concurrency(ioService, FLAGS_max_threads);
+    concurrency.start();
 
     return analyzer.exec();
 }
