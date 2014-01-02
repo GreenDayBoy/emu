@@ -1,5 +1,8 @@
 #include <gameserver/udpProtocol.hpp>
+#include <gameserver/transactions/registerUserRequest.hpp>
+
 #include <streaming/gameserver/streamIds.hpp>
+#include <streaming/gameserver/registerUserRequest.hpp>
 
 #include <glog/logging.h>
 
@@ -18,7 +21,12 @@ void UdpProtocol::handleReadStream(const streaming::ReadStream &stream, const bo
 
     if(streamId == streaming::gameserver::streamIds::kRegisterUserRequest)
     {
-
+        streaming::gameserver::RegisterUserRequest request(stream);
+        transactions::RegisterUserRequest(senderEndpoint,
+                                          context_.getUdpConnection(),
+                                          context_.getUserRegistrationInfos(),
+                                          context_.getGameserverCode(),
+                                          request).handle();
     }
 }
 

@@ -12,7 +12,7 @@ namespace transactions
 {
 
 GameserverDetailsRequest::GameserverDetailsRequest(User &user,
-                                                   const GameserversList &gameserversList,
+                                                   GameserversList &gameserversList,
                                                    core::network::udp::Connection::Pointer udpConnection,
                                                    const streaming::loginserver::GameserverDetailsRequest &request):
     user_(user),
@@ -31,13 +31,10 @@ void GameserverDetailsRequest::handleValid()
 
     const streaming::loginserver::GameserverInfo &gameserverInfo = gameserversList_.getGameserverInfo(request_.getGameserverCode());
 
-    streaming::gameserver::RegisterUserRequest registerUserRequest(user_.getHash(), user_.getAccountId());
+    streaming::gameserver::RegisterUserRequest registerUserRequest({user_.getHash(), user_.getAccountId()});
     udpConnection_->sendTo(boost::asio::ip::udp::endpoint(boost::asio::ip::address::from_string(gameserverInfo.address_),
                                                           gameserverInfo.port_),
                            registerUserRequest.getWriteStream().getPayload());
-
-    streaming::loginserver::GameserverDetailsResponse gameserverDetailsResponse(gameserverInfo.address_, gameserverInfo.port_);
-    user_.getConnection().send(gameserverDetailsResponse.getWriteStream().getPayload());
 }
 
 void GameserverDetailsRequest::handleInvalid()

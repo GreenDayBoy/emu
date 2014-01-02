@@ -2,7 +2,7 @@
 
 #include <streaming/readStream.hpp>
 #include <streaming/writeStream.hpp>
-#include <core/network/tcp/networkUser.hpp>
+#include <streaming/gameserver/userRegistrationInfo.hpp>
 
 #include <string>
 
@@ -17,19 +17,17 @@ class RegisterUserRequest
 {
 public:
     RegisterUserRequest(const ReadStream &readStream);
-    RegisterUserRequest(core::network::tcp::NetworkUser::Hash userHash, const std::string &accountId);
+    RegisterUserRequest(const UserRegistrationInfo &userInfo);
 
     const WriteStream& getWriteStream() const;
 
-    core::network::tcp::NetworkUser::Hash getUserHash() const;
-    std::string getAccountId() const;
+    const UserRegistrationInfo& getUserRegistrationInfo() const;
 
 private:
     ReadStream readStream_;
     WriteStream writeStream_;
 
-    core::network::tcp::NetworkUser::Hash userHash_;
-    std::string accountId_;
+    UserRegistrationInfo userInfo_;
 };
 
 }

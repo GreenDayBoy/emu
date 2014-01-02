@@ -13,19 +13,19 @@ namespace gameserver
 RegisterUserRequest::RegisterUserRequest(const ReadStream &readStream):
     readStream_(readStream)
 {
-    userHash_ = readStream_.readNext<core::network::tcp::NetworkUser::Hash>();
+    userInfo_.userHash_ = readStream_.readNext<core::network::tcp::NetworkUser::Hash>();
 
     uint32_t accountIdLength = readStream_.readNext<uint32_t>();
-    accountId_ = readStream_.readNextString(accountIdLength);
+    userInfo_.accountId_ = readStream_.readNextString(accountIdLength);
 }
 
-RegisterUserRequest::RegisterUserRequest(core::network::tcp::NetworkUser::Hash userHash, const std::string &accountId):
+RegisterUserRequest::RegisterUserRequest(const UserRegistrationInfo &userInfo):
     writeStream_(streamIds::kRegisterUserRequest)
 {
-    writeStream_.writeNext<core::network::tcp::NetworkUser::Hash>(userHash);
+    writeStream_.writeNext<core::network::tcp::NetworkUser::Hash>(userInfo.userHash_);
 
-    writeStream_.writeNext<uint32_t>(accountId.length());
-    writeStream_.writeNextString(accountId);
+    writeStream_.writeNext<uint32_t>(userInfo.accountId_.length());
+    writeStream_.writeNextString(userInfo.accountId_);
 }
 
 const WriteStream& RegisterUserRequest::getWriteStream() const
@@ -33,14 +33,9 @@ const WriteStream& RegisterUserRequest::getWriteStream() const
     return writeStream_;
 }
 
-core::network::tcp::NetworkUser::Hash RegisterUserRequest::getUserHash() const
+const UserRegistrationInfo& RegisterUserRequest::getUserRegistrationInfo() const
 {
-    return userHash_;
-}
-
-std::string RegisterUserRequest::getAccountId() const
-{
-    return accountId_;
+    return userInfo_;
 }
 
 }
