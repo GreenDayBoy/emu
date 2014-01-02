@@ -1,5 +1,6 @@
 #include <loginserver/transactions/gameserverDetailsRequest.hpp>
 #include <streaming/loginserver/gameserverDetailsResponse.hpp>
+#include <streaming/gameserver/registerUserRequest.hpp>
 
 #include <glog/logging.h>
 
@@ -12,14 +13,16 @@ namespace transactions
 
 GameserverDetailsRequest::GameserverDetailsRequest(User &user,
                                                    const GameserversList &gameserversList,
+                                                   core::network::udp::Connection::Pointer gameserverConnection,
                                                    const streaming::loginserver::GameserverDetailsRequest &request):
     user_(user),
     gameserversList_(gameserversList),
+    gameserverConnection_(gameserverConnection),
     request_(request) {}
 
 bool GameserverDetailsRequest::isValid() const
 {
-    return gameserversList_.hasGameserver(request_.getGameserverCode());
+    return gameserversList_.hasGameserver(request_.getGameserverCode()) && gameserverConnection_ != nullptr;
 }
 
 void GameserverDetailsRequest::handleValid()
@@ -28,8 +31,13 @@ void GameserverDetailsRequest::handleValid()
 
     const streaming::loginserver::GameserverInfo &gameserverInfo = gameserversList_.getGameserverInfo(request_.getGameserverCode());
 
-    streaming::loginserver::GameserverDetailsResponse response(gameserverInfo.address_, gameserverInfo.port_);
-    user_.getConnection().send(response.getWriteStream().getPayload());
+    streaming::gameserver::RegisterUserRequest registerUserRequest(user_.getHash(), user_.getAccountId());
+    gameserverConnection_->sendTo(boost::asio::ip::udp::endpoint(boost::asio::ip::address::from_string(gameserverInfo.address_),
+                                                                 gameserverInfo.port_),
+                                  registerUserRequest.getWriteStream().getPayload());
+
+    streaming::loginserver::GameserverDetailsResponse gameserverDetailsResponse(gameserverInfo.address_, gameserverInfo.port_);
+    user_.getConnection().send(gameserverDetailsResponse.getWriteStream().getPayload());
 }
 
 void GameserverDetailsRequest::handleInvalid()

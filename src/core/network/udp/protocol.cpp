@@ -14,17 +14,17 @@ Protocol::~Protocol()
 
 }
 
-void Protocol::attach(Connection&)
+void Protocol::attach(Connection::Pointer)
 {
 
 }
 
-void Protocol::dispatch(Connection&, const boost::asio::ip::udp::endpoint&)
+void Protocol::dispatch(Connection::Pointer, const boost::asio::ip::udp::endpoint&)
 {
 
 }
 
-void Protocol::detach(Connection&)
+void Protocol::detach(Connection::Pointer)
 {
 
 }

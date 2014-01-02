@@ -1,7 +1,6 @@
 #pragma once
 
 #include <core/network/udp/writeBufferFactory.hpp>
-#include <core/network/udp/protocol.hpp>
 #include <core/common/asio.hpp>
 
 #include <boost/noncopyable.hpp>
@@ -15,11 +14,18 @@ namespace network
 namespace udp
 {
 
-class Connection: private boost::noncopyable
+class Protocol;
+
+class Connection: private boost::noncopyable, public std::enable_shared_from_this<Connection>
 {
 public:
+    typedef std::shared_ptr<Connection> Pointer;
+
     Connection(asio::io_service &ioService, uint16_t port, Protocol &protocol);
     virtual ~Connection();
+
+    void registerConnection();
+    void unregisterConnection();
 
     Payload& getReadPayload();
     void queueReceiveFrom();

@@ -15,11 +15,11 @@ public:
     Udp();
     virtual ~Udp();
 
-    void setUdpConnection(core::network::udp::Connection *connection);
-    core::network::udp::Connection* getUdpConnection();
+    void setUdpConnection(core::network::udp::Connection::Pointer connection);
+    core::network::udp::Connection::Pointer getUdpConnection();
 
 protected:
-    core::network::udp::Connection* udpConnection_;
+    core::network::udp::Connection::Pointer udpConnection_;
 };
 
 }

@@ -1,4 +1,5 @@
 #include <core/network/udp/connection.hpp>
+#include <core/network/udp/protocol.hpp>
 
 #include <glog/logging.h>
 
@@ -14,14 +15,18 @@ namespace udp
 Connection::Connection(asio::io_service &ioService, uint16_t port, Protocol &protocol):
     socket_(ioService, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), port)),
     strand_(ioService),
-    protocol_(protocol)
+    protocol_(protocol) {}
+
+Connection::~Connection() {}
+
+void Connection::registerConnection()
 {
-    protocol_.attach(*this);
+    protocol_.attach(shared_from_this());
 }
 
-Connection::~Connection()
+void Connection::unregisterConnection()
 {
-    protocol_.detach(*this);
+    protocol_.detach(shared_from_this());
 }
 
 Payload& Connection::getReadPayload()
@@ -67,7 +72,7 @@ void Connection::receiveFromHandler(const boost::system::error_code &errorCode, 
     else
     {
         readPayload_.setSize(bytesTransferred); // we should trust ASIO and belive that bytesTransfered never will be greater than maxSize
-        protocol_.dispatch(*this, senderEndpoint_);
+        protocol_.dispatch(shared_from_this(), senderEndpoint_);
     }
 
     this->queueReceiveFrom();

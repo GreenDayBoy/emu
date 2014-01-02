@@ -32,7 +32,12 @@ std::string ReadStream::readNextString(size_t length)
 
     for(size_t i = 0; i < length; ++i)
     {
-        value.push_back(this->readNext<std::string::value_type>());
+        std::string::value_type c = this->readNext<std::string::value_type>();
+
+        if(c != 0)
+        {
+            value.push_back(c);
+        }
     }
 
     return std::move(value);

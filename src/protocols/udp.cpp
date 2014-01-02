@@ -11,14 +11,14 @@ namespace protocols
 Udp::Udp(contexts::Udp &context):
     context_(context) {}
 
-void Udp::attach(core::network::udp::Connection& connection)
+void Udp::attach(core::network::udp::Connection::Pointer connection)
 {
-    context_.setUdpConnection(&connection);
+    context_.setUdpConnection(connection);
 }
 
-void Udp::dispatch(core::network::udp::Connection& connection, const boost::asio::ip::udp::endpoint &senderEndpoint)
+void Udp::dispatch(core::network::udp::Connection::Pointer connection, const boost::asio::ip::udp::endpoint &senderEndpoint)
 {
-    streaming::ReadStreamsExtractor readStreamsExtractor(connection.getReadPayload());
+    streaming::ReadStreamsExtractor readStreamsExtractor(connection->getReadPayload());
     if(!readStreamsExtractor.extract())
     {
         LOG(ERROR) << "Streams extraction failed.";
@@ -32,7 +32,7 @@ void Udp::dispatch(core::network::udp::Connection& connection, const boost::asio
     }
 }
 
-void Udp::detach(core::network::udp::Connection& connection)
+void Udp::detach(core::network::udp::Connection::Pointer)
 {
     context_.setUdpConnection(nullptr);
 }
