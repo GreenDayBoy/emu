@@ -2,6 +2,7 @@
 
 #include <core/network/udp/writeBufferFactory.hpp>
 #include <core/common/asio.hpp>
+#include <core/common/mockable.hpp>
 
 #include <boost/noncopyable.hpp>
 
@@ -29,7 +30,7 @@ public:
 
     Payload& getReadPayload();
     void queueReceiveFrom();
-    void sendTo(const boost::asio::ip::udp::endpoint &endpoint, const Payload &payload);
+    MOCKABLE void sendTo(const boost::asio::ip::udp::endpoint &endpoint, const Payload &payload);
 
     void receiveFromHandler(const boost::system::error_code &errorCode, size_t bytesTransferred);
     void sendToHandler(const boost::asio::ip::udp::endpoint &endpoint, const boost::system::error_code &errorCode, size_t bytesTransferred);

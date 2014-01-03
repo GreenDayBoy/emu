@@ -8,6 +8,7 @@
 
 using ::testing::SaveArg;
 using ::testing::SetArgPointee;
+using ::testing::SetArgReferee;
 using ::testing::_;
 using ::testing::NotNull;
 using ::testing::ActionInterface;
@@ -20,13 +21,6 @@ using eMU::ut::env::core::network::SamplePayloads;
 using eMU::core::network::udp::Protocol;
 using eMU::core::network::udp::Connection;
 using eMU::core::network::Payload;
-
-ACTION_TEMPLATE(SaveArgToPointer,
-                HAS_1_TEMPLATE_PARAMS(int, k),
-                AND_1_VALUE_PARAMS(pointer))
-{
-    *pointer = &(::std::tr1::get<k>(args));
-}
 
 class UdpConnectionTest: public ::testing::Test
 {
@@ -47,8 +41,6 @@ public:
     Connection::Pointer connection_;
 
     boost::asio::mutable_buffer receiveBuffer_;
-    boost::asio::ip::udp::endpoint* senderEndpoint_;
-
     boost::asio::mutable_buffer sendBuffer_;
 
     SamplePayloads samplePayloads_;
@@ -56,8 +48,9 @@ public:
 
 TEST_F(UdpConnectionTest, receiveFrom)
 {
+    boost::asio::ip::udp::endpoint senderEndpoint(boost::asio::ip::address::from_string("1.2.3.4"), 1234);
     EXPECT_CALL(connection_->getSocket(), async_receive_from(_, _, _)).WillOnce(DoAll(SaveArg<0>(&receiveBuffer_),
-                                                                                     SaveArgToPointer<1>(&senderEndpoint_)));
+                                                                                     SetArgReferee<1>(senderEndpoint)));
 
     connection_->queueReceiveFrom();
 
@@ -65,10 +58,6 @@ TEST_F(UdpConnectionTest, receiveFrom)
     ASSERT_EQ(boost::asio::buffer_size(receiveBuffer_), Payload::getMaxSize());
 
     memcpy(boost::asio::buffer_cast<uint8_t*>(receiveBuffer_), &samplePayloads_.payload1_[0], samplePayloads_.payload1_.getSize());
-
-    boost::asio::ip::udp::endpoint senderEndpoint(boost::asio::ip::address::from_string("1.2.3.4"), 1234);
-
-    *senderEndpoint_ = senderEndpoint;
 
     EXPECT_CALL(connection_->getSocket(), async_receive_from(_, _, _));
     EXPECT_CALL(protocol_, dispatch(connection_, senderEndpoint));
