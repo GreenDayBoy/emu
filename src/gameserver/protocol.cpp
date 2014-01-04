@@ -24,8 +24,9 @@ bool Protocol::attach(core::network::tcp::Connection::Pointer connection)
         User &user = *context_.getUsersFactory().getObjects().back();
 
         streaming::gameserver::UserRegistrationInfo &registrationInfo = context_.getUserRegistrationInfos().front();
-        user.setAccountId(registrationInfo.accountId_);
+        LOG(INFO) << "Registration info, hash: " << registrationInfo.userHash_ << ", accountId: " << registrationInfo.accountId_;
 
+        user.setAccountId(registrationInfo.accountId_);
         context_.getUserRegistrationInfos().pop_front();
         return true;
     }
