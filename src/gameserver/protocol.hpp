@@ -13,6 +13,7 @@ class Protocol: public protocols::Server<User>
 {
 public:
     Protocol(Context &context);
+    bool attach(core::network::tcp::Connection::Pointer connection);
 
 private:
     bool handleReadStream(User &user, const streaming::ReadStream &stream);
