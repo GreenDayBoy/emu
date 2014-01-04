@@ -68,14 +68,12 @@ public:
         return *(*it);
     }
 
-    bool exists(const ObjectsContainer &object) const
+    template<typename KeyType>
+    bool exists(const KeyType &key) const
     {
-        typename ObjectsContainer::const_iterator it;
-        it = std::find_if(objects_.begin(),
-                          objects_.end(),
-                          [&object](const ObjectType *objectFromVector) { return *objectFromVector == object; });
-
-        return it != objects_.end();
+        return std::find_if(objects_.begin(),
+                            objects_.end(),
+                            [&key](const ObjectType *object) { return *object == key; }) != objects_.end();
     }
 
     ObjectsContainer& getObjects()

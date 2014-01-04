@@ -37,12 +37,14 @@ TEST_F(FactoryTest, AfterDestroyObjectShouldNotExistInFactory)
     int32_t value = 1;
 
     SimpleObject &object = factory_.create(value);
+    ASSERT_TRUE(factory_.exists(value));
 
     ASSERT_EQ(object, factory_.find(value));
     factory_.destroy(object);
 
     SimpleObject object2(value);
 
+    ASSERT_FALSE(factory_.exists(object2));
     ASSERT_THROW(factory_.find(value), Factory<SimpleObject>::ObjectNotFoundException);
 }
 

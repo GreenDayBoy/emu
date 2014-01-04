@@ -19,19 +19,7 @@ RegisterUserResponse::RegisterUserResponse(core::common::Factory<User> &usersFac
 
 bool RegisterUserResponse::isValid() const
 {
-    bool result = true;
-
-    try
-    {
-        usersFactory_.find(response_.getUserHash());
-        result = gameserversList_.hasGameserver(response_.getGameserverCode());
-    }
-    catch(const core::common::Factory<User>::ObjectNotFoundException&)
-    {
-        result = false;
-    }
-
-    return result;
+    return usersFactory_.exists(response_.getUserHash()) && gameserversList_.hasGameserver(response_.getGameserverCode());
 }
 
 void RegisterUserResponse::handleValid()

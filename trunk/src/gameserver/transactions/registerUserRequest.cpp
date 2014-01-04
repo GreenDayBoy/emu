@@ -45,7 +45,7 @@ void RegisterUserRequest::handleValid()
         result = streaming::gameserver::UserRegistrationResult::Failed;
     }
 
-    LOG(ERROR) << "User registration result: " << static_cast<uint32_t>(result);
+    LOG(INFO) << "User registration result: " << static_cast<uint32_t>(result);
 
     streaming::gameserver::RegisterUserResponse response(gameserverCode_, request_.getUserRegistrationInfo().userHash_, result);
     udpConnection_->sendTo(senderEndpoint_, response.getWriteStream().getPayload());
