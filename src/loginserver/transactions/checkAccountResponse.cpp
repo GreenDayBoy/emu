@@ -19,18 +19,7 @@ CheckAccountResponse::CheckAccountResponse(core::common::Factory<User> &usersFac
 
 bool CheckAccountResponse::isValid() const
 {
-    bool result = true;
-
-    try
-    {
-        usersFactory_.find(response_.getUserHash());
-    }
-    catch(const core::common::Factory<User>::ObjectNotFoundException&)
-    {
-        result = false;
-    }
-
-    return result;
+    return usersFactory_.exists(response_.getUserHash());
 }
 
 void CheckAccountResponse::handleValid()

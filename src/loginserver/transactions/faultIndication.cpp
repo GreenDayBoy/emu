@@ -16,18 +16,7 @@ FaultIndication::FaultIndication(core::common::Factory<User> &usersFactory,
 
 bool FaultIndication::isValid() const
 {
-    bool result = true;
-
-    try
-    {
-        usersFactory_.find(indication_.getUserHash());
-    }
-    catch(const core::common::Factory<User>::ObjectNotFoundException&)
-    {
-        result = false;
-    }
-
-    return result;
+    return usersFactory_.exists(indication_.getUserHash());
 }
 
 void FaultIndication::handleValid()
