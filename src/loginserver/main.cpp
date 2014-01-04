@@ -31,7 +31,7 @@ int main(int argsCount, char *args[])
 
     if(!loginserverContext.getGameserversList().initialize(xmlReader))
     {
-        LOG(ERROR) << "Unable to parse gameservers list!";
+        LOG(ERROR) << "Initialization of gameservers list failed.";
         return 1;
     }
 
@@ -42,7 +42,7 @@ int main(int argsCount, char *args[])
     if(!dataserverConnection->connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(FLAGS_dataserver_host),
                                                                     FLAGS_dataserver_port)))
     {
-        LOG(ERROR) << "Connection to datserver failed. Address: " << FLAGS_dataserver_host << ", port: " << FLAGS_dataserver_port;
+        LOG(ERROR) << "Connection to datserver failed. host: " << FLAGS_dataserver_host << ", port: " << FLAGS_dataserver_port;
         return 1;
     }
 

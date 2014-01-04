@@ -42,11 +42,17 @@ void RegisterUserResponse::handleValid()
 
     if(response_.getResult() == streaming::gameserver::UserRegistrationResult::Failed)
     {
+        LOG(INFO) << "hash: " << user.getHash() << ", registration to gameserver failed. Disconnecting.";
         user.getConnection().disconnect();
     }
     else
     {
+        LOG(INFO) << "hash: " << user.getHash() << ", registered to gameserver, code: " << response_.getGameserverCode();
+
         const streaming::loginserver::GameserverInfo &gameserverInfo = gameserversList_.getGameserverInfo(response_.getGameserverCode());
+
+        LOG(INFO) << "hash: " << user.getHash() << ", sending gameserver details response, address: " << gameserverInfo.address_
+                  << ", port: " << gameserverInfo.port_;
 
         streaming::loginserver::GameserverDetailsResponse gameserverDetailsResponse(gameserverInfo.address_, gameserverInfo.port_);
         user.getConnection().send(gameserverDetailsResponse.getWriteStream().getPayload());
@@ -55,7 +61,7 @@ void RegisterUserResponse::handleValid()
 
 void RegisterUserResponse::handleInvalid()
 {
-    LOG(ERROR) << "Received invalid registration data, hash: " << response_.getUserHash()
+    LOG(ERROR) << "Received invalid user registration data, hash: " << response_.getUserHash()
                << ", gameserverCode: " << response_.getGameserverCode();
 }
 

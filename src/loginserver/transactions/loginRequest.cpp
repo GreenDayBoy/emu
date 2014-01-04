@@ -24,10 +24,10 @@ bool LoginRequest::isValid() const
 
 void LoginRequest::handleValid()
 {
+    LOG(INFO) << "hash: " << user_.getHash() << ", accountId: " << request_.getAccountId();
     user_.setAccountId(request_.getAccountId());
 
-    LOG(INFO) << "hash: " << user_.getHash() << ", accountId: " << user_.getAccountId() << ", sending request for account check.";
-
+    LOG(INFO) << "hash: " << user_.getHash() << ", sending request for account check.";
     streaming::dataserver::CheckAccountRequest checkAccountRequest(user_.getHash(), request_.getAccountId(), request_.getPassword());
     dataserverConnection_->send(checkAccountRequest.getWriteStream().getPayload());
 }

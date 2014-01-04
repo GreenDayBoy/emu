@@ -24,7 +24,7 @@ bool GameserversListRequest::isValid() const
 
 void GameserversListRequest::handleValid()
 {
-    LOG(INFO) << "hash: " << user_.getHash() << ", requested gameservers list.";
+    LOG(INFO) << "hash: " << user_.getHash();
     streaming::loginserver::GameserversListResponse response(gameserversList_.getServers());
 
     user_.getConnection().send(response.getWriteStream().getPayload());

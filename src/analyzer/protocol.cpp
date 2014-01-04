@@ -20,7 +20,7 @@ bool Protocol::attach(core::network::tcp::Connection::Pointer connection)
 
     User &user = controller_.getUsersFactory().create(connection);
 
-    LOG(INFO) << "hash: " << user.getHash() <<  ", user registered.";
+    LOG(INFO) << "User connected, hash: " << user.getHash();
 
     controller_.onAccept(user);
 
@@ -33,16 +33,16 @@ void Protocol::detach(core::network::tcp::Connection::Pointer connection)
     {
         User &user = controller_.getUsersFactory().find(connection);
 
-        LOG(INFO) << "hash: " << user.getHash() <<  ", user closed.";
+        LOG(INFO) << "User closed, hash: " << user.getHash();
 
         controller_.onClose(user);
-
         controller_.getUsersFactory().destroy(user);
+
         connection->close();
     }
     catch(const typename core::common::Factory<User>::ObjectNotFoundException&)
     {
-        LOG(ERROR) << "user not found!";
+        LOG(ERROR) << "could not find user by connection.";
         connection->close();
     }
 }
@@ -53,14 +53,14 @@ bool Protocol::dispatch(core::network::tcp::Connection::Pointer connection)
     {
         User &user = controller_.getUsersFactory().find(connection);
 
-        LOG(INFO) << "hash: " << user.getHash() << ", received bytes: " << user.getConnection().getReadPayload().getSize();
+        LOG(INFO) << "Received, hash: " << user.getHash() << ", #bytes: " << user.getConnection().getReadPayload().getSize();
 
         user.storeReadPayload();
         controller_.onReceive(user);
     }
     catch(const typename core::common::Factory<User>::ObjectNotFoundException&)
     {
-        LOG(ERROR) << "user not found!";
+        LOG(ERROR) << "could not find user by connection.";
         return false;
     }
 

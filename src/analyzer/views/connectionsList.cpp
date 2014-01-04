@@ -41,7 +41,7 @@ std::string ConnectionsList::getConnectionId(const QModelIndex &index) const
     }
     else
     {
-        LOG(ERROR) << "selected object has not valid parent!";
+        LOG(ERROR) << "Selected object has not valid parent!";
     }
 
     return "";
@@ -75,7 +75,7 @@ std::string ConnectionsList::getSelectedReadPayloadId() const
     }
     else
     {
-        LOG(ERROR) << "selected object is not a payload!";
+        LOG(ERROR) << "Selected object is not a payload!";
     }
 
     return "";

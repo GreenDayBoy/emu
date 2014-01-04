@@ -14,7 +14,7 @@ bool GameserversList::initialize(eMU::core::common::XmlReader &xmlReader)
 {
     if(!xmlReader.parse("servers"))
     {
-        LOG(ERROR) << "Cannot parse servers list xml!";
+        LOG(ERROR) << "Cannot parse servers list xml.";
 
         return false;
     }

@@ -59,7 +59,7 @@ bool MySqlInterface::executeQuery(std::string query)
     }
     else
     {
-        LOG(ERROR) << "Execute query failed. Reason: " << this->getErrorMessage() << ", query: " << query;
+        LOG(ERROR) << "Query execution failed, reason: " << this->getErrorMessage() << ", query: " << query;
         return false;
     }
 }
@@ -127,7 +127,7 @@ bool MySqlInterface::isAlive()
     }
     else
     {
-        LOG(ERROR) << "Ping failed. Reason: " << this->getErrorMessage();
+        LOG(ERROR) << "Ping failed, reason: " << this->getErrorMessage();
         return false;
     }
 }

@@ -33,13 +33,14 @@ bool FaultIndication::isValid() const
 void FaultIndication::handleValid()
 {
     User &user = usersFactory_.find(indication_.getUserHash());
-    LOG(ERROR) << "hash: " << user.getHash() << ", accountId: " << user.getAccountId() << ", fault from dataserver received! message: " << indication_.getMessage();
+
+    LOG(ERROR) << "hash: " << user.getHash() << ", accountId: " << user.getAccountId() << ", message: " << indication_.getMessage();
     user.getConnection().disconnect();
 }
 
 void FaultIndication::handleInvalid()
 {
-    LOG(ERROR) << "hash: " << indication_.getUserHash() << " given in dataserver fault indication does not exist!";
+    LOG(ERROR) << "hash: " << indication_.getUserHash() << ", given in dataserver fault indication does not exist!";
 }
 
 }

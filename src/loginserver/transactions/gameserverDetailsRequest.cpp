@@ -27,7 +27,7 @@ bool GameserverDetailsRequest::isValid() const
 
 void GameserverDetailsRequest::handleValid()
 {
-    LOG(INFO) << "hash: " << user_.getHash() << ", requested gameserver details, gameserverCode: " << request_.getGameserverCode();
+    LOG(INFO) << "hash: " << user_.getHash() << ", gameserverCode: " << request_.getGameserverCode();
 
     const streaming::loginserver::GameserverInfo &gameserverInfo = gameserversList_.getGameserverInfo(request_.getGameserverCode());
 
