@@ -1,7 +1,7 @@
 #include <loginserver/context.hpp>
 #include <loginserver/protocol.hpp>
 #include <loginserver/dataserverProtocol.hpp>
-#include <loginserver/gameserverProtocol.hpp>
+#include <loginserver/udpProtocol.hpp>
 #include <core/common/xmlReader.hpp>
 #include <core/network/tcp/connection.hpp>
 #include <core/network/udp/connection.hpp>
@@ -22,13 +22,14 @@
 #include <streaming/dataserver/faultIndication.hpp>
 #include <streaming/gameserver/streamIds.hpp>
 #include <streaming/gameserver/registerUserRequest.hpp>
+#include <streaming/gameserver/registerUserResponse.hpp>
 
 #include <gtest/gtest.h>
 
 using eMU::loginserver::Context;
 using eMU::loginserver::Protocol;
 using eMU::loginserver::DataserverProtocol;
-using eMU::loginserver::GameserverProtocol;
+using eMU::loginserver::UdpProtocol;
 using eMU::core::common::XmlReader;
 using eMU::core::network::tcp::NetworkUser;
 using eMU::mt::env::asioStub::io_service;
@@ -46,6 +47,8 @@ using eMU::streaming::dataserver::CheckAccountResponse;
 using eMU::streaming::dataserver::CheckAccountResult;
 using eMU::streaming::dataserver::FaultIndication;
 using eMU::streaming::gameserver::RegisterUserRequest;
+using eMU::streaming::gameserver::RegisterUserResponse;
+using eMU::streaming::gameserver::UserRegistrationResult;
 
 class LoginserverTest: public ::testing::Test
 {
@@ -55,13 +58,14 @@ protected:
         loginserverProtocol_(loginserverContext_),
         connection_(new eMU::core::network::tcp::Connection(ioService_, loginserverProtocol_)),
         dataserverProtocol_(loginserverContext_),
-        gameserverProtocol_(loginserverContext_) {}
+        udpProtocol_(loginserverContext_),
+        gameserverCode_(0) {}
 
     void SetUp()
     {
         initializeGameserversList();
         prepareDataserverConnection();
-        prepareGameserverConnection();
+        prepareUdpConnection();
 
         connection_->accept();
         ASSERT_EQ(1, loginserverContext_.getUsersFactory().getObjects().size());
@@ -85,11 +89,12 @@ protected:
         ASSERT_EQ(dataserverConnection, loginserverContext_.getClientConnection());
     }
 
-    void prepareGameserverConnection()
+    void prepareUdpConnection()
     {
-        eMU::core::network::udp::Connection::Pointer gameserverConnection(new eMU::core::network::udp::Connection(ioService_, 55557, gameserverProtocol_));
-        gameserverConnection->registerConnection();
-        ASSERT_EQ(gameserverConnection, loginserverContext_.getUdpConnection());
+        eMU::core::network::udp::Connection::Pointer udpConnection(new eMU::core::network::udp::Connection(ioService_, 55557, udpProtocol_));
+        udpConnection->registerConnection();
+        udpConnection->queueReceiveFrom();
+        ASSERT_EQ(udpConnection, loginserverContext_.getUdpConnection());
     }
 
     void loginScenario()
@@ -113,6 +118,25 @@ protected:
 
         LoginResponse loginResponse(loginResponseStream);
         ASSERT_EQ(LoginResult::Succeed, loginResponse.getResult());
+    }
+
+    void gameserverDetailsScenario(NetworkUser::Hash userHash, UserRegistrationResult result)
+    {
+        loginScenario();
+
+        IO_CHECK(connection_->getSocket().send(GameserverDetailsRequest(gameserverCode_).getWriteStream().getPayload()));
+
+        ASSERT_TRUE(loginserverContext_.getUdpConnection()->getSocket().isUnread());
+        const ReadStream &registerUserRequestStream = loginserverContext_.getUdpConnection()->getSocket().receive();
+        ASSERT_EQ(eMU::streaming::gameserver::streamIds::kRegisterUserRequest, registerUserRequestStream.getId());
+
+        RegisterUserRequest registerUserRequest(registerUserRequestStream);
+        ASSERT_EQ("accountTest", registerUserRequest.getUserRegistrationInfo().accountId_);
+        ASSERT_EQ(loginserverContext_.getUsersFactory().getObjects()[0]->getHash(), registerUserRequest.getUserRegistrationInfo().userHash_);
+
+        IO_CHECK(loginserverContext_.getUdpConnection()->getSocket().send(RegisterUserResponse(gameserverCode_,
+                                                                                               userHash,
+                                                                                               result).getWriteStream().getPayload()));
     }
 
     void faultIndicationScenario(bool userHashExists)
@@ -149,7 +173,8 @@ protected:
     io_service ioService_;
     eMU::core::network::tcp::Connection::Pointer connection_;
     DataserverProtocol dataserverProtocol_;
-    GameserverProtocol gameserverProtocol_;
+    UdpProtocol udpProtocol_;
+    uint16_t gameserverCode_;
 };
 
 TEST_F(LoginserverTest, Login)
@@ -202,18 +227,9 @@ TEST_F(LoginserverTest, GameserversList)
     ASSERT_EQ("eMU_TEST2", response.getServers()[1].name_);
 }
 
-TEST_F(LoginserverTest, GameserversDetails)
+TEST_F(LoginserverTest, GameserverDetails)
 {
-    loginScenario();
-
-    IO_CHECK(connection_->getSocket().send(GameserverDetailsRequest(0).getWriteStream().getPayload()));
-
-    ASSERT_TRUE(loginserverContext_.getUdpConnection()->getSocket().isUnread());
-    const ReadStream &registerUserRequestStream = loginserverContext_.getUdpConnection()->getSocket().receive();
-    ASSERT_EQ(eMU::streaming::gameserver::streamIds::kRegisterUserRequest, registerUserRequestStream.getId());
-
-    RegisterUserRequest registerUserRequest(registerUserRequestStream);
-    ASSERT_EQ(registerUserRequest.getAccountId(), "accountTest");
+    gameserverDetailsScenario(loginserverContext_.getUsersFactory().getObjects()[0]->getHash(), UserRegistrationResult::Succeed);
 
     ASSERT_TRUE(connection_->getSocket().isUnread());
     const ReadStream &gameserverDetailsResponseStream = connection_->getSocket().receive();
@@ -222,4 +238,20 @@ TEST_F(LoginserverTest, GameserversDetails)
     GameserverDetailsResponse gameserverDetailsResponse(gameserverDetailsResponseStream);
     ASSERT_EQ("192.168.0.1", gameserverDetailsResponse.getIpAddress());
     ASSERT_EQ(55901, gameserverDetailsResponse.getPort());
+}
+
+TEST_F(LoginserverTest, WhenUserRegistrationResultIsFailedThenConnectionShouldBeDisconnected)
+{
+    gameserverDetailsScenario(loginserverContext_.getUsersFactory().getObjects()[0]->getHash(), UserRegistrationResult::Failed);
+
+    ASSERT_FALSE(connection_->isOpen());
+    ASSERT_EQ(0, loginserverContext_.getUsersFactory().getObjects().size());
+}
+
+TEST_F(LoginserverTest, WhenUserRegistrationResultProvidedInvalidUserHashThenNothingHappens)
+{
+    gameserverDetailsScenario(NetworkUser::Hash(0x5317), UserRegistrationResult::Failed);
+
+    ASSERT_TRUE(connection_->isOpen());
+    ASSERT_EQ(1, loginserverContext_.getUsersFactory().getObjects().size());
 }
