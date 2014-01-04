@@ -27,7 +27,7 @@ void Udp::dispatch(core::network::udp::Connection::Pointer connection, const boo
 
     for(const auto &stream : readStreamsExtractor.getStreams())
     {
-        LOG(INFO) << "Udp protocol, received stream, id: " << stream.getId();
+        LOG(INFO) << "Udp protocol, received stream id: " << stream.getId();
         this->handleReadStream(stream, senderEndpoint);
     }
 }

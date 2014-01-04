@@ -58,7 +58,7 @@ std::string Controller::getReadPayloadDump(const std::string &connectionId, cons
     }
     catch(const core::common::Factory<User>::ObjectNotFoundException&)
     {
-        LOG(ERROR) << "Cound not find user! Id: " << connectionId;
+        LOG(ERROR) << "Cound not find user by connectionId: " << connectionId;
     }
 
     return "";
@@ -75,7 +75,7 @@ void Controller::disconnect(const std::string &connectionId)
     }
     catch(const core::common::Factory<User>::ObjectNotFoundException&)
     {
-        LOG(ERROR) << "Cound not find user! Id: " << connectionId;
+        LOG(ERROR) << "Cound not find user by connectionId: " << connectionId;
     }
 }
 
@@ -91,7 +91,7 @@ void Controller::send(const std::string &connectionId, const std::string &dump)
     }
     catch(const core::common::Factory<User>::ObjectNotFoundException&)
     {
-        LOG(ERROR) << "Cound not find connectionId: " << connectionId;
+        LOG(ERROR) << "Cound not find user by connectionId: " << connectionId;
     }
 }
 

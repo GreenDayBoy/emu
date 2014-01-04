@@ -14,7 +14,7 @@ bool ReadStreamsExtractor::extract()
 {
     if(payload_.empty())
     {
-        LOG(ERROR) << "Cannot extract streams from empty payload!";
+        LOG(ERROR) << "Could not extract streams from empty payload!";
         return false;
     }
 

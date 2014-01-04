@@ -29,7 +29,7 @@ public:
 
         UserType &user = context_.getUsersFactory().create(connection);
 
-        LOG(INFO) << "hash: " << user.getHash() <<  ", user registered.";
+        LOG(INFO) << "User connected, hash: " << user.getHash();
 
         return true;
     }
@@ -40,14 +40,14 @@ public:
         {
             UserType &user = context_.getUsersFactory().find(connection);
 
-            LOG(INFO) << "hash: " << user.getHash() <<  ", user closed.";
+            LOG(INFO) << "User closed, hash: " << user.getHash();
 
             context_.getUsersFactory().destroy(user);
             connection->close();
         }
         catch(const typename core::common::Factory<UserType>::ObjectNotFoundException&)
         {
-            LOG(ERROR) << "user not found!";
+            LOG(ERROR) << "Could not find user by connection.";
             connection->close();
         }
     }
@@ -67,7 +67,7 @@ public:
 
             for(const auto &stream : readStreamsExtractor.getStreams())
             {
-                LOG(INFO) << "hash: " << user.getHash() << ", received stream, id: " << stream.getId();
+                LOG(INFO) << "Received, hash: " << user.getHash() << ", stream id: " << stream.getId();
 
                 if(!this->handleReadStream(user, stream))
                 {
@@ -77,7 +77,7 @@ public:
         }
         catch(const typename core::common::Factory<UserType>::ObjectNotFoundException&)
         {
-            LOG(ERROR) << "user not found!";
+            LOG(ERROR) << "Could not find user by connection.";
             return false;
         }
 

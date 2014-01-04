@@ -29,7 +29,7 @@ bool RegisterUserRequest::isValid() const
 
 void RegisterUserRequest::handleValid()
 {
-    LOG(INFO) << "Requested user registration, accountId: " << request_.getUserRegistrationInfo().accountId_
+    LOG(INFO) << "accountId: " << request_.getUserRegistrationInfo().accountId_
               << ", hash: " << request_.getUserRegistrationInfo().userHash_;
 
     streaming::gameserver::UserRegistrationResult result = streaming::gameserver::UserRegistrationResult::Succeed;
@@ -39,13 +39,13 @@ void RegisterUserRequest::handleValid()
                  request_.getUserRegistrationInfo()) == userRegistrationInfos_.end())
     {
         userRegistrationInfos_.push_back(request_.getUserRegistrationInfo());
-        LOG(INFO) << "User registered.";
     }
     else
     {
-        LOG(ERROR) << "User is already registered.";
         result = streaming::gameserver::UserRegistrationResult::Failed;
     }
+
+    LOG(ERROR) << "User registration result: " << static_cast<uint32_t>(result);
 
     streaming::gameserver::RegisterUserResponse response(gameserverCode_, request_.getUserRegistrationInfo().userHash_, result);
     udpConnection_->sendTo(senderEndpoint_, response.getWriteStream().getPayload());

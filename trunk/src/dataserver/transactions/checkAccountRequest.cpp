@@ -27,7 +27,9 @@ bool CheckAccountRequest::isValid() const
 
 void CheckAccountRequest::handleValid()
 {
-    LOG(INFO) << "hash: " << user_.getHash() << ", userHash: " << request_.getUserHash() << ", checking account: " << request_.getAccountId();
+    LOG(INFO) << "hash: " << user_.getHash()
+              << ", userHash: " << request_.getUserHash()
+              << ", accountId: " << request_.getAccountId();
 
     std::stringstream query;
     query << "SELECT"
@@ -61,7 +63,8 @@ void CheckAccountRequest::handleValid()
 
 void CheckAccountRequest::handleInvalid()
 {
-    LOG(ERROR) << "hash: " << user_.getHash() << ", Connection to database is died!";
+    LOG(ERROR) << "hash: " << user_.getHash()
+               << ", Connection to database is died.";
 
     this->sendFaultIndication("Connection to database is died");
 }

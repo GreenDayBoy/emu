@@ -35,22 +35,24 @@ bool CheckAccountResponse::isValid() const
 
 void CheckAccountResponse::handleValid()
 {
-    User &user = usersFactory_.find(response_.getUserHash());
-
     streaming::loginserver::LoginResult result = streaming::loginserver::LoginResult::Succeed;
 
-    if(response_.getResult() == streaming::dataserver::CheckAccountResult::AccountInUse)
+    switch(response_.getResult())
     {
+    case streaming::dataserver::CheckAccountResult::AccountInUse:
         result = streaming::loginserver::LoginResult::AccountInUse;
-    }
-    else if(response_.getResult() == streaming::dataserver::CheckAccountResult::InvalidAccountId)
-    {
-        result = streaming::loginserver::LoginResult::InvalidAccountId;
-    }
-    else if(response_.getResult() == streaming::dataserver::CheckAccountResult::InvalidPassword)
-    {
+        break;
+    case streaming::dataserver::CheckAccountResult::InvalidAccountId:
+        result =  streaming::loginserver::LoginResult::InvalidAccountId;
+        break;
+    case streaming::dataserver::CheckAccountResult::InvalidPassword:
         result = streaming::loginserver::LoginResult::InvalidPassword;
+        break;
+    default:
+        break;
     }
+
+    User &user = usersFactory_.find(response_.getUserHash());
 
     LOG(INFO) << "hash: " << user.getHash() << ", accountId: " << user.getAccountId()
               << ", check account result: " << static_cast<uint32_t>(response_.getResult())
@@ -62,7 +64,7 @@ void CheckAccountResponse::handleValid()
 
 void CheckAccountResponse::handleInvalid()
 {
-    LOG(ERROR) << "hash: " << response_.getUserHash() << " given in dataserver response does not exist!";
+    LOG(ERROR) << "hash: " << response_.getUserHash() << ", given in dataserver response does not exist!";
 }
 
 }
