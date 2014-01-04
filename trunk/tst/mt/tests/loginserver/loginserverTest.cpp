@@ -132,7 +132,7 @@ protected:
 
         RegisterUserRequest registerUserRequest(registerUserRequestStream);
         ASSERT_EQ("accountTest", registerUserRequest.getUserRegistrationInfo().accountId_);
-        ASSERT_EQ(loginserverContext_.getUsersFactory().getObjects()[0]->getHash(), registerUserRequest.getUserRegistrationInfo().userHash_);
+        ASSERT_EQ(loginserverContext_.getUsersFactory().getObjects().back()->getHash(), registerUserRequest.getUserRegistrationInfo().userHash_);
 
         IO_CHECK(loginserverContext_.getUdpConnection()->getSocket().send(RegisterUserResponse(gameserverCode_,
                                                                                                userHash,
@@ -229,7 +229,7 @@ TEST_F(LoginserverTest, GameserversList)
 
 TEST_F(LoginserverTest, GameserverDetails)
 {
-    gameserverDetailsScenario(loginserverContext_.getUsersFactory().getObjects()[0]->getHash(), UserRegistrationResult::Succeed);
+    gameserverDetailsScenario(loginserverContext_.getUsersFactory().getObjects().back()->getHash(), UserRegistrationResult::Succeed);
 
     ASSERT_TRUE(connection_->getSocket().isUnread());
     const ReadStream &gameserverDetailsResponseStream = connection_->getSocket().receive();
@@ -242,7 +242,7 @@ TEST_F(LoginserverTest, GameserverDetails)
 
 TEST_F(LoginserverTest, WhenUserRegistrationResultIsFailedThenConnectionShouldBeDisconnected)
 {
-    gameserverDetailsScenario(loginserverContext_.getUsersFactory().getObjects()[0]->getHash(), UserRegistrationResult::Failed);
+    gameserverDetailsScenario(loginserverContext_.getUsersFactory().getObjects().back()->getHash(), UserRegistrationResult::Failed);
 
     ASSERT_FALSE(connection_->isOpen());
     ASSERT_EQ(0, loginserverContext_.getUsersFactory().getObjects().size());
