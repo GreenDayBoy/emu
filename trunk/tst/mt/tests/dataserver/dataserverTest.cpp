@@ -8,6 +8,8 @@
 #include <streaming/dataserver/checkAccountResult.hpp>
 #include <streaming/dataserver/checkAccountRequest.hpp>
 #include <streaming/dataserver/checkAccountResponse.hpp>
+#include <streaming/dataserver/charactersListRequest.hpp>
+#include <streaming/dataserver/charactersListResponse.hpp>
 #include <streaming/dataserver/faultIndication.hpp>
 
 #include <core/network/tcp/networkUser.hpp>
@@ -28,6 +30,8 @@ using eMU::streaming::ReadStream;
 using eMU::streaming::dataserver::CheckAccountResult;
 using eMU::streaming::dataserver::CheckAccountRequest;
 using eMU::streaming::dataserver::CheckAccountResponse;
+using eMU::streaming::dataserver::CharactersListRequest;
+using eMU::streaming::dataserver::CharactersListResponse;
 using eMU::streaming::dataserver::FaultIndication;
 namespace streamIds = eMU::streaming::dataserver::streamIds;
 
@@ -54,9 +58,21 @@ protected:
         ASSERT_EQ(0, dataserverContext_.getUsersFactory().getObjects().size());
     }
 
-    void faultIndicationScenario()
+    void faultIndicationDueToQueryExecutionFailScenario(const Payload &payload)
     {
-        IO_CHECK(connection_->getSocket().send(CheckAccountRequest(userHash_, "Account", "Password").getWriteStream().getPayload()));
+        sqlInterface_.pushQueryStatus(false);
+        faultIndicationScenario(payload);
+    }
+
+    void faultIndicationDueToSqlConnectionDiedScenario(const Payload &payload)
+    {
+        sqlInterface_.setDied();
+        faultIndicationScenario(payload);
+    }
+
+    void faultIndicationScenario(const Payload &payload)
+    {
+        IO_CHECK(connection_->getSocket().send(payload));
 
         ASSERT_TRUE(connection_->getSocket().isUnread());
         const ReadStream &readStream = connection_->getSocket().receive();
@@ -95,24 +111,46 @@ TEST_F(DataserverTest, CheckAccountShouldBeSuccesful)
     ASSERT_EQ(checkAccountResult, response.getResult());
 }
 
-TEST_F(DataserverTest, WhenQueryExecutionFailedThenFaultIndicationShouldBeReceived)
+TEST_F(DataserverTest, CheckAccountRequest_QueryExecutionFailTriggersFaultIndication)
 {
-    sqlInterface_.pushQueryStatus(false);
-
-    faultIndicationScenario();
+    faultIndicationDueToQueryExecutionFailScenario(CheckAccountRequest(userHash_, "Account", "Password").getWriteStream().getPayload());
 }
 
-TEST_F(DataserverTest, WhenQueryResultIsEmptyThenFaultIndicationShouldBeReceived)
+TEST_F(DataserverTest, CheckAccountRequest_EmptyQueryResultTriggersFaultIndication)
 {
     sqlInterface_.pushQueryStatus(true);
     sqlInterface_.pushQueryResult(QueryResult());
 
-    faultIndicationScenario();
+    faultIndicationScenario(CheckAccountRequest(userHash_, "Account", "Password").getWriteStream().getPayload());
 }
 
-TEST_F(DataserverTest, WhenConnectionToDatabaseIsDiedThenFaultIndicationShouldBeSent)
+TEST_F(DataserverTest, CheckAccountRequest_WhenConnectionToDatabaseIsDiedThenFaultIndicationShouldBeSent)
 {
-    sqlInterface_.setDied();
+    faultIndicationDueToSqlConnectionDiedScenario(CheckAccountRequest(userHash_, "Account", "Password").getWriteStream().getPayload());
+}
 
-    faultIndicationScenario();
+TEST_F(DataserverTest, CharactersListRequest_QueryExecutionFailTriggersFaultIndication)
+{
+    faultIndicationDueToQueryExecutionFailScenario(CharactersListRequest(userHash_, "acc").getWriteStream().getPayload());
+}
+
+TEST_F(DataserverTest, CharactersListRequest_WhenConnectionToDatabaseIsDiedThenFaultIndicationShouldBeSent)
+{
+    faultIndicationDueToQueryExecutionFailScenario(CharactersListRequest(userHash_, "acc").getWriteStream().getPayload());
+}
+
+TEST_F(DataserverTest, CharactersList)
+{
+    sqlInterface_.pushQueryResult(QueryResult());
+    sqlInterface_.pushQueryStatus(true);
+
+    IO_CHECK(connection_->getSocket().send(CharactersListRequest(userHash_, "mu2emu").getWriteStream().getPayload()));
+
+    ASSERT_TRUE(connection_->getSocket().isUnread());
+    const ReadStream &readStream = connection_->getSocket().receive();
+    ASSERT_EQ(streamIds::kCharactersListResponse, readStream.getId());
+
+    CharactersListResponse response(readStream);
+    ASSERT_EQ(userHash_, response.getUserHash());
+    ASSERT_EQ(0, response.getCharacters().size());
 }

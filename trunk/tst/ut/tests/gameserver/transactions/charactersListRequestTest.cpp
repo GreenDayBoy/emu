@@ -21,10 +21,10 @@ using eMU::gameserver::User;
 using eMU::streaming::dataserver::CharactersListRequest;
 namespace streamIds = eMU::streaming::dataserver::streamIds;
 
-class CharactersListRequestTransactionTest: public ::testing::Test
+class GameserverCharactersListRequestTransactionTest: public ::testing::Test
 {
 protected:
-    CharactersListRequestTransactionTest():
+    GameserverCharactersListRequestTransactionTest():
         accountId_("testtesttest"),
         request_(ReadStream(eMU::streaming::gameserver::CharactersListRequest().getWriteStream().getPayload())),
         dataserverConnection_(new ConnectionMock()),
@@ -38,7 +38,7 @@ protected:
     User user_;
 };
 
-TEST_F(CharactersListRequestTransactionTest, handle)
+TEST_F(GameserverCharactersListRequestTransactionTest, handle)
 {
     Payload payload;
     EXPECT_CALL(*dataserverConnection_, send(_)).WillOnce(SaveArg<0>(&payload));
@@ -55,7 +55,7 @@ TEST_F(CharactersListRequestTransactionTest, handle)
     ASSERT_EQ(user_.getAccountId(), charactersListRequest.getAccountId());
 }
 
-TEST_F(CharactersListRequestTransactionTest, WhenConnectionToDataserverIsNotOpenThenClientShouldBeDisconnected)
+TEST_F(GameserverCharactersListRequestTransactionTest, WhenConnectionToDataserverIsNotOpenThenClientShouldBeDisconnected)
 {
     EXPECT_CALL(*dataserverConnection_, isOpen()).WillOnce((Return(false)));
     EXPECT_CALL(*connection_, disconnect());
@@ -63,7 +63,7 @@ TEST_F(CharactersListRequestTransactionTest, WhenConnectionToDataserverIsNotOpen
     eMU::gameserver::transactions::CharactersListRequest(user_, dataserverConnection_, request_).handle();
 }
 
-TEST_F(CharactersListRequestTransactionTest, WhenNullPtrAsDataserverConnectionProvidedThenClientShouldBeDisconnected)
+TEST_F(GameserverCharactersListRequestTransactionTest, WhenNullPtrAsDataserverConnectionProvidedThenClientShouldBeDisconnected)
 {
     EXPECT_CALL(*connection_, disconnect());
 

@@ -1,6 +1,5 @@
 #include <dataserver/transactions/checkAccountRequest.hpp>
 #include <streaming/dataserver/checkAccountResponse.hpp>
-#include <streaming/dataserver/faultIndication.hpp>
 #include <streaming/dataserver/checkAccountResult.hpp>
 
 #include <sstream>
@@ -16,14 +15,8 @@ namespace transactions
 CheckAccountRequest::CheckAccountRequest(User &user,
                                          database::SqlInterface &sqlInterface,
                                          const streaming::dataserver::CheckAccountRequest &request):
-    user_(user),
-    sqlInterface_(sqlInterface),
+    DatabaseTransaction(user, sqlInterface, request.getUserHash()),
     request_(request) {}
-
-bool CheckAccountRequest::isValid() const
-{
-    return sqlInterface_.isAlive();
-}
 
 void CheckAccountRequest::handleValid()
 {
@@ -59,20 +52,6 @@ void CheckAccountRequest::handleValid()
     {
         this->sendFaultIndication(sqlInterface_.getErrorMessage());
     }
-}
-
-void CheckAccountRequest::handleInvalid()
-{
-    LOG(ERROR) << "hash: " << user_.getHash()
-               << ", Connection to database is died.";
-
-    this->sendFaultIndication("Connection to database is died");
-}
-
-void CheckAccountRequest::sendFaultIndication(const std::string &message)
-{
-    streaming::dataserver::FaultIndication indication(request_.getUserHash(), message);
-    user_.getConnection().send(indication.getWriteStream().getPayload());
 }
 
 }
