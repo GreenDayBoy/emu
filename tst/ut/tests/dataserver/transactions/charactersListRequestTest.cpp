@@ -58,13 +58,14 @@ protected:
 
 TEST_F(DataserverCharactersListRequestTransactionTest, handle)
 {
-    Row::Fields fields = {{"hairColor", 0}, {"hairType", 1}, {"level", 2}, {"name", 3}, {"race", 4}};
+    Row::Fields fields = {{"hairColor", 0}, {"hairType", 1}, {"level", 2},
+                          {"name", 3}, {"race", 4}, {"tutorialState", 5}};
 
     Row *row = &queryResult_.createRow(fields);
-    row->insert("12"); row->insert("23"); row->insert("45"); row->insert("andrew"); row->insert("44");
+    row->insert("12"); row->insert("23"); row->insert("45"); row->insert("andrew"); row->insert("44"); row->insert("0");
 
     row = &queryResult_.createRow(fields);
-    row->insert("55"); row->insert("64"); row->insert("178"); row->insert("greg"); row->insert("81");
+    row->insert("55"); row->insert("64"); row->insert("178"); row->insert("greg"); row->insert("81"); row->insert("1");
 
     EXPECT_CALL(sqlInterface_, isAlive()).WillOnce(Return(true));
     EXPECT_CALL(sqlInterface_, fetchQueryResult()).WillOnce(Return((queryResult_)));
@@ -85,12 +86,14 @@ TEST_F(DataserverCharactersListRequestTransactionTest, handle)
     EXPECT_EQ(45, response.getCharacters()[0].level_);
     EXPECT_EQ("andrew", response.getCharacters()[0].name_);
     EXPECT_EQ(44, response.getCharacters()[0].race_);
+    EXPECT_EQ(0, response.getCharacters()[0].tutorialState_);
 
     EXPECT_EQ(55, response.getCharacters()[1].hairColor_);
     EXPECT_EQ(64, response.getCharacters()[1].hairType_);
     EXPECT_EQ(178, response.getCharacters()[1].level_);
     EXPECT_EQ("greg", response.getCharacters()[1].name_);
     EXPECT_EQ(81, response.getCharacters()[1].race_);
+    EXPECT_EQ(1, response.getCharacters()[1].tutorialState_);
 }
 
 TEST_F(DataserverCharactersListRequestTransactionTest, WhenExecutionOfQueryIsFailedThenFaultIndicationShouldBeSent)

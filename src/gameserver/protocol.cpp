@@ -1,7 +1,9 @@
 #include <gameserver/protocol.hpp>
 #include <streaming/gameserver/streamIds.hpp>
+#include <streaming/gameserver/worldLoginRequest.hpp>
 #include <streaming/gameserver/charactersListRequest.hpp>
 #include <gameserver/transactions/charactersListRequest.hpp>
+#include <gameserver/transactions/worldLoginRequest.hpp>
 
 #include <glog/logging.h>
 
@@ -40,6 +42,13 @@ bool Protocol::attach(core::network::tcp::Connection::Pointer connection)
 bool Protocol::handleReadStream(User &user, const streaming::ReadStream &stream)
 {
     uint16_t streamId = stream.getId();
+
+    if(streamId == streaming::gameserver::streamIds::kWorldLoginRequest)
+    {
+        streaming::gameserver::WorldLoginRequest request(stream);
+        transactions::WorldLoginRequest(user, request).handle();
+        return true;
+    }
 
     if(streamId == streaming::gameserver::streamIds::kCharactersListRequest)
     {

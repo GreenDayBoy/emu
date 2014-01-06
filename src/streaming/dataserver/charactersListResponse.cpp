@@ -25,6 +25,7 @@ CharactersListResponse::CharactersListResponse(const ReadStream &readStream):
         characterListInfo.hairType_ = readStream_.readNext<uint8_t>();
         characterListInfo.level_ = readStream_.readNext<uint8_t>();
         characterListInfo.race_ = readStream_.readNext<uint8_t>();
+        characterListInfo.tutorialState_ = readStream_.readNext<uint16_t>();
         characters_.push_back(characterListInfo);
     }
 }
@@ -43,6 +44,7 @@ CharactersListResponse::CharactersListResponse(core::network::tcp::NetworkUser::
         writeStream_.writeNext<uint8_t>(characterListInfo.hairType_);
         writeStream_.writeNext<uint8_t>(characterListInfo.level_);
         writeStream_.writeNext<uint8_t>(characterListInfo.race_);
+        writeStream_.writeNext<uint16_t>(characterListInfo.tutorialState_);
     }
 }
 
