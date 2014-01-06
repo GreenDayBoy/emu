@@ -27,6 +27,11 @@ bool Protocol::handleReadStream(User &user, const streaming::ReadStream &stream)
         return true;
     }
 
+    if(streamId == streaming::dataserver::streamIds::kCharactersListRequest)
+    {
+        return true;
+    }
+
     return false;
 }
 

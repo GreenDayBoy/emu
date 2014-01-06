@@ -24,7 +24,7 @@ bool CharactersListRequest::isValid() const
 
 void CharactersListRequest::handleValid()
 {
-    LOG(INFO) << "Sending characters list rquest, hash: " << user_.getHash()
+    LOG(INFO) << "Sending characters list request, hash: " << user_.getHash()
               << ", accountId: " << user_.getAccountId();
 
     streaming::dataserver::CharactersListRequest request(user_.getHash(), user_.getAccountId());
