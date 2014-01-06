@@ -1,8 +1,6 @@
 #pragma once
 
-#include <dataserver/user.hpp>
-#include <core/common/transaction.hpp>
-#include <dataserver/database/sqlInterface.hpp>
+#include <dataserver/transactions/databaseTransaction.hpp>
 #include <streaming/dataserver/checkAccountRequest.hpp>
 
 namespace eMU
@@ -12,7 +10,7 @@ namespace dataserver
 namespace transactions
 {
 
-class CheckAccountRequest: public core::common::Transaction
+class CheckAccountRequest: public DatabaseTransaction
 {
 public:
     CheckAccountRequest(User &user,
@@ -20,14 +18,8 @@ public:
                         const streaming::dataserver::CheckAccountRequest &request);
 
 private:
-    bool isValid() const;
     void handleValid();
-    void handleInvalid();
 
-    void sendFaultIndication(const std::string &message);
-
-    User &user_;
-    database::SqlInterface &sqlInterface_;
     streaming::dataserver::CheckAccountRequest request_;
 };
 
