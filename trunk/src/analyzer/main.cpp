@@ -12,7 +12,7 @@
 #include <gflags/gflags.h>
 
 DEFINE_int32(max_users, 5, "Max number of users to connect");
-DEFINE_int32(port, 55555, "server listen port");
+DEFINE_int32(port, 55557, "server listen port");
 DEFINE_int32(max_threads, 1, "max number of concurrent threads");
 
 int main(int argsCount, char *args[])

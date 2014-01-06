@@ -24,7 +24,7 @@ void CharactersListRequest::handleValid()
               << ", accountId: " << request_.getAccountId();
 
     std::stringstream query;
-    query << "SELECT hairColor, hairType, level, name, race FROM characters WHERE accountId=" << request_.getAccountId() << ";";
+    query << "SELECT hairColor, hairType, level, name, race, tutorialState FROM characters WHERE accountId='" << request_.getAccountId() << "';";
 
     if(!sqlInterface_.executeQuery(query.str()))
     {
@@ -43,6 +43,7 @@ void CharactersListRequest::handleValid()
         character.level_ = row.getValue<uint32_t>("level");
         character.name_ = row.getValue<std::string>("name");
         character.race_ = row.getValue<uint32_t>("race");
+        character.tutorialState_ = row.getValue<uint16_t>("tutorialState");
 
         characters.push_back(character);
     }

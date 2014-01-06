@@ -7,6 +7,8 @@
 
 #include <streaming/gameserver/registerUserRequest.hpp>
 #include <streaming/gameserver/registerUserResponse.hpp>
+#include <streaming/gameserver/worldLoginRequest.hpp>
+#include <streaming/gameserver/worldLoginResponse.hpp>
 #include <streaming/gameserver/charactersListRequest.hpp>
 #include <streaming/gameserver/streamIds.hpp>
 
@@ -28,6 +30,8 @@ using eMU::streaming::ReadStream;
 using eMU::streaming::gameserver::RegisterUserRequest;
 using eMU::streaming::gameserver::RegisterUserResponse;
 using eMU::streaming::gameserver::UserRegistrationResult;
+using eMU::streaming::gameserver::WorldLoginRequest;
+using eMU::streaming::gameserver::WorldLoginResponse;
 
 class GameserverTest: public ::testing::Test
 {
@@ -116,6 +120,25 @@ TEST_F(GameserverTest, WhenSameRegistrationInfoWasProvidedTwiceThenUserRegistrat
     std::string accountId = "accccc";
     registerUserScenario(userHash, accountId, UserRegistrationResult::Succeed);
     registerUserScenario(userHash, accountId, UserRegistrationResult::Failed);
+}
+
+TEST_F(GameserverTest, WorldLogin)
+{
+    NetworkUser::Hash userHash(0x2371);
+    registerUserScenario(userHash, "acc", UserRegistrationResult::Succeed);
+
+    connection_->accept();
+
+    IO_CHECK(connection_->getSocket().send(WorldLoginRequest().getWriteStream().getPayload()));
+    ASSERT_TRUE(connection_->getSocket().isUnread());
+
+    const ReadStream &worldLoginResponseStream = ReadStream(connection_->getSocket().receive());
+    ASSERT_EQ(eMU::streaming::gameserver::streamIds::kWorldLoginResponse, worldLoginResponseStream.getId());
+
+    WorldLoginResponse worldLoginResponse(worldLoginResponseStream);
+    ASSERT_EQ(0, worldLoginResponse.getResult());
+
+    connection_->disconnect();
 }
 
 TEST_F(GameserverTest, CharactersList)
