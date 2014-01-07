@@ -33,11 +33,11 @@ void CharactersListRequest::handleValid()
     }
 
     const database::QueryResult &queryResult = sqlInterface_.fetchQueryResult();
-    streaming::dataserver::CharacterListInfoContainer characters;
+    streaming::common::CharacterInfoContainer characters;
 
     for(const auto &row : queryResult.getRows())
     {
-        streaming::dataserver::CharacterListInfo character;
+        streaming::common::CharacterInfo character;
         character.hairColor_ = row.getValue<uint32_t>("hairColor");
         character.hairType_ = row.getValue<uint32_t>("hairType");
         character.level_ = row.getValue<uint32_t>("level");

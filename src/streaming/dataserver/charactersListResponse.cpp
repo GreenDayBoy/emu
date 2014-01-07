@@ -19,7 +19,7 @@ CharactersListResponse::CharactersListResponse(const ReadStream &readStream):
     {
         uint32_t characterNameLength = readStream_.readNext<uint32_t>();
 
-        CharacterListInfo characterListInfo;
+        common::CharacterInfo characterListInfo;
         characterListInfo.name_ = readStream_.readNextString(characterNameLength);
         characterListInfo.hairColor_ = readStream_.readNext<uint8_t>();
         characterListInfo.hairType_ = readStream_.readNext<uint8_t>();
@@ -30,7 +30,7 @@ CharactersListResponse::CharactersListResponse(const ReadStream &readStream):
     }
 }
 
-CharactersListResponse::CharactersListResponse(core::network::tcp::NetworkUser::Hash userHash, const CharacterListInfoContainer &characters):
+CharactersListResponse::CharactersListResponse(core::network::tcp::NetworkUser::Hash userHash, const common::CharacterInfoContainer &characters):
     writeStream_(streamIds::kCharactersListResponse)
 {
     writeStream_.writeNext<core::network::tcp::NetworkUser::Hash>(userHash);
@@ -58,7 +58,7 @@ core::network::tcp::NetworkUser::Hash CharactersListResponse::getUserHash() cons
     return userHash_;
 }
 
-const CharacterListInfoContainer& CharactersListResponse::getCharacters() const
+const common::CharacterInfoContainer& CharactersListResponse::getCharacters() const
 {
     return characters_;
 }
