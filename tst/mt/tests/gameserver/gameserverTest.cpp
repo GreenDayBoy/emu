@@ -51,6 +51,10 @@ protected:
     {
         prepareDataserverConnection();
         prepareUdpConnection();
+
+        registerUserScenario(UserRegistrationResult::Succeed);
+        connection_->accept();
+        ASSERT_EQ(1, gameserverContext_.getUsersFactory().getObjects().size());
     }
 
     void prepareDataserverConnection()
@@ -68,7 +72,7 @@ protected:
         ASSERT_EQ(udpConnection, gameserverContext_.getUdpConnection());
     }
 
-    void registerUserScenario(NetworkUser::Hash userHash, const std::string &accountId, UserRegistrationResult result)
+    void registerUserScenario(UserRegistrationResult result, NetworkUser::Hash userHash = NetworkUser::Hash(0x2371), const std::string &accountId = "testLogin")
     {
         IO_CHECK(gameserverContext_.getUdpConnection()->getSocket().send(RegisterUserRequest({userHash, accountId}).getWriteStream().getPayload()));
 
@@ -87,6 +91,8 @@ protected:
         ASSERT_FALSE(gameserverContext_.getClientConnection()->getSocket().isUnread());
         ASSERT_FALSE(connection_->getSocket().isUnread());
         ASSERT_FALSE(gameserverContext_.getUdpConnection()->getSocket().isUnread());
+
+        connection_->disconnect();
         ASSERT_EQ(0, gameserverContext_.getUsersFactory().getObjects().size());
 
         gameserverContext_.getUdpConnection()->unregisterConnection();
@@ -102,65 +108,49 @@ protected:
 
 TEST_F(GameserverTest, RegisterUser)
 {
-    registerUserScenario(NetworkUser::Hash(0x2371), "acc", UserRegistrationResult::Succeed);
-
-    connection_->accept();
-    ASSERT_EQ(1, gameserverContext_.getUsersFactory().getObjects().size());
-
-    connection_->disconnect();
+    registerUserScenario(UserRegistrationResult::Succeed);
 }
 
 TEST_F(GameserverTest, WhenRegistrationInfoWasNotProvidedThenConnectionShouldBeRejected)
 {
-    connection_->accept();
+    eMU::core::network::tcp::Connection::Pointer connection(new eMU::core::network::tcp::Connection(ioService_, gameserverProtocol_));
+    connection->accept();
 
-    ASSERT_FALSE(connection_->getSocket().is_open());
+    ASSERT_FALSE(connection->getSocket().is_open());
 }
 
 TEST_F(GameserverTest, WhenSameRegistrationInfoWasProvidedTwiceThenUserRegistrationShouldFailed)
 {
-    NetworkUser::Hash userHash(0x2371);
-    std::string accountId = "accccc";
-    registerUserScenario(userHash, accountId, UserRegistrationResult::Succeed);
-    registerUserScenario(userHash, accountId, UserRegistrationResult::Failed);
+    NetworkUser::Hash userHash(0x3333);
+    std::string accountId = "login";
+
+    registerUserScenario(UserRegistrationResult::Succeed, userHash, accountId);
+    registerUserScenario(UserRegistrationResult::Failed, userHash, accountId);
 }
 
 TEST_F(GameserverTest, WorldLogin)
 {
-    registerUserScenario(NetworkUser::Hash(0x2371), "acc", UserRegistrationResult::Succeed);
-
-    connection_->accept();
-
     IO_CHECK(connection_->getSocket().send(WorldLoginRequest().getWriteStream().getPayload()));
-    ASSERT_TRUE(connection_->getSocket().isUnread());
 
+    ASSERT_TRUE(connection_->getSocket().isUnread());
     const ReadStream &worldLoginResponseStream = ReadStream(connection_->getSocket().receive());
     ASSERT_EQ(eMU::streaming::gameserver::streamIds::kWorldLoginResponse, worldLoginResponseStream.getId());
 
     WorldLoginResponse worldLoginResponse(worldLoginResponseStream);
     ASSERT_EQ(0, worldLoginResponse.getResult());
-
-    connection_->disconnect();
 }
 
 TEST_F(GameserverTest, CharactersList)
 {
-    NetworkUser::Hash userHash(0x2371);
-    std::string accountId = "accccc";
-    registerUserScenario(userHash, accountId, UserRegistrationResult::Succeed);
-
-    connection_->accept();
-    ASSERT_EQ(1, gameserverContext_.getUsersFactory().getObjects().size());
-
     IO_CHECK(connection_->getSocket().send(eMU::streaming::gameserver::CharactersListRequest().getWriteStream().getPayload()));
-    ASSERT_TRUE(gameserverContext_.getClientConnection()->getSocket().isUnread());
 
+    ASSERT_TRUE(gameserverContext_.getClientConnection()->getSocket().isUnread());
     const ReadStream &charactersListRequestStream = ReadStream(gameserverContext_.getClientConnection()->getSocket().receive());
     ASSERT_EQ(eMU::streaming::dataserver::streamIds::kCharactersListRequest, charactersListRequestStream.getId());
 
     eMU::streaming::dataserver::CharactersListRequest charactersListRequest(charactersListRequestStream);
     ASSERT_EQ(gameserverContext_.getUsersFactory().getObjects().back()->getHash(), charactersListRequest.getUserHash());
-    ASSERT_EQ(accountId, charactersListRequest.getAccountId());
+    ASSERT_EQ(gameserverContext_.getUsersFactory().getObjects().back()->getAccountId(), charactersListRequest.getAccountId());
 
     IO_CHECK(gameserverContext_.getClientConnection()->getSocket().send(CharactersListResponse(charactersListRequest.getUserHash(),
                                                                         CharacterInfoContainer()).getWriteStream().getPayload()));
@@ -171,19 +161,11 @@ TEST_F(GameserverTest, CharactersList)
 
     eMU::streaming::gameserver::CharactersListResponse charactersListResponse(charactersListResponseStream);
     ASSERT_TRUE(charactersListResponse.getCharacters().empty());
-
-    connection_->disconnect();
 }
 
 TEST_F(GameserverTest, WhenCharactersListResponseReceivedWithInvalidUserHashThenNothingHappens)
 {
-    registerUserScenario(NetworkUser::Hash(0x2371), "accccc", UserRegistrationResult::Succeed);
-
-    connection_->accept();
-    ASSERT_EQ(1, gameserverContext_.getUsersFactory().getObjects().size());
-
     IO_CHECK(connection_->getSocket().send(eMU::streaming::gameserver::CharactersListRequest().getWriteStream().getPayload()));
-    ASSERT_TRUE(gameserverContext_.getClientConnection()->getSocket().isUnread());
 
     ASSERT_TRUE(gameserverContext_.getClientConnection()->getSocket().isUnread());
     const ReadStream &charactersListRequestStream = gameserverContext_.getClientConnection()->getSocket().receive();
@@ -192,6 +174,4 @@ TEST_F(GameserverTest, WhenCharactersListResponseReceivedWithInvalidUserHashThen
     IO_CHECK(gameserverContext_.getClientConnection()->getSocket().send(CharactersListResponse(NetworkUser::Hash(0x1234),
                                                                                                CharacterInfoContainer()).getWriteStream().getPayload()));
     ASSERT_TRUE(connection_->getSocket().is_open());
-
-    connection_->disconnect();
 }
