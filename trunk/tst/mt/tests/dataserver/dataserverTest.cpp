@@ -152,5 +152,5 @@ TEST_F(DataserverTest, CharactersList)
 
     CharactersListResponse response(readStream);
     ASSERT_EQ(userHash_, response.getUserHash());
-    ASSERT_EQ(0, response.getCharacters().size());
+    ASSERT_TRUE(response.getCharacters().empty());
 }
