@@ -20,10 +20,12 @@ public:
     CharactersListResponse(const dataserver::CharacterListInfoContainer &characters);
 
     const WriteStream& getWriteStream() const;
+    const dataserver::CharacterListInfoContainer& getCharacters() const;
 
 private:
     ReadStream readStream_;
     WriteStream writeStream_;
+    dataserver::CharacterListInfoContainer characters_;
 };
 
 }
