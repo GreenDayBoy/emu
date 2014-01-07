@@ -141,15 +141,7 @@ protected:
 
     void faultIndicationScenario(bool userHashExists)
     {
-        LoginRequest loginRequest(L"accountTest", L"passwordTest");
-        IO_CHECK(connection_->getSocket().send(loginRequest.getWriteStream().getPayload()));
-
-        ASSERT_TRUE(loginserverContext_.getClientConnection()->getSocket().isUnread());
-        const ReadStream &checkAccountRequestStream = loginserverContext_.getClientConnection()->getSocket().receive();
-        ASSERT_EQ(eMU::streaming::dataserver::streamIds::kCheckAccountRequest, checkAccountRequestStream.getId());
-
-        CheckAccountRequest checkAccountRequest(checkAccountRequestStream);
-        NetworkUser::Hash userHash = userHashExists ? checkAccountRequest.getUserHash() : NetworkUser::Hash(0x1234);
+        NetworkUser::Hash userHash = userHashExists ? loginserverContext_.getUsersFactory().getObjects().back()->getHash() : NetworkUser::Hash(0x1234);
         IO_CHECK(loginserverContext_.getClientConnection()->getSocket().send(FaultIndication(userHash, "test message").getWriteStream().getPayload()));
 
         bool connectionExists = !userHashExists;
