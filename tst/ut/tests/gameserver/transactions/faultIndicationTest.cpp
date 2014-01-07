@@ -1,18 +1,18 @@
-#include <loginserver/transactions/faultIndication.hpp>
-#include <loginserver/user.hpp>
+#include <gameserver/transactions/faultIndication.hpp>
+#include <gameserver/user.hpp>
 #include <streaming/dataserver/faultIndication.hpp>
 #include <ut/env/core/network/tcp/connectionMock.hpp>
 
-using eMU::loginserver::User;
+using eMU::gameserver::User;
 using eMU::core::common::Factory;
 using eMU::streaming::ReadStream;
 using eMU::streaming::dataserver::FaultIndication;
 using eMU::ut::env::core::network::tcp::ConnectionMock;
 
-class LoginserverFaultIndicationTransactionTest: public ::testing::Test
+class GameserverFaultIndicationTransactionTest: public ::testing::Test
 {
 protected:
-    LoginserverFaultIndicationTransactionTest():
+    GameserverFaultIndicationTransactionTest():
         userHashExists_(false) {}
 
     void scenario()
@@ -29,20 +29,20 @@ protected:
         }
 
         FaultIndication indication(hash, "testMessage");
-        eMU::loginserver::transactions::FaultIndication(usersFactory_, ReadStream(indication.getWriteStream().getPayload())).handle();
+        eMU::gameserver::transactions::FaultIndication(usersFactory_, ReadStream(indication.getWriteStream().getPayload())).handle();
     }
 
     Factory<User> usersFactory_;
     bool userHashExists_;
 };
 
-TEST_F(LoginserverFaultIndicationTransactionTest, WhenUserHashIsValidThenConnectionShouldBeDisconnect)
+TEST_F(GameserverFaultIndicationTransactionTest, WhenUserHashIsValidThenConnectionShouldBeDisconnect)
 {
     userHashExists_ = true;
     scenario();
 }
 
-TEST_F(LoginserverFaultIndicationTransactionTest, WhenUserHashIsInvalidThenNothingHappens)
+TEST_F(GameserverFaultIndicationTransactionTest, WhenUserHashIsInvalidThenNothingHappens)
 {
     scenario();
 }
