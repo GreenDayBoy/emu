@@ -10,9 +10,11 @@
 #include <streaming/gameserver/worldLoginRequest.hpp>
 #include <streaming/gameserver/worldLoginResponse.hpp>
 #include <streaming/gameserver/charactersListRequest.hpp>
+#include <streaming/gameserver/charactersListResponse.hpp>
 #include <streaming/gameserver/streamIds.hpp>
 
 #include <streaming/dataserver/charactersListRequest.hpp>
+#include <streaming/dataserver/charactersListResponse.hpp>
 #include <streaming/dataserver/streamIds.hpp>
 
 #include <mt/env/asioStub/ioService.hpp>
@@ -32,6 +34,8 @@ using eMU::streaming::gameserver::RegisterUserResponse;
 using eMU::streaming::gameserver::UserRegistrationResult;
 using eMU::streaming::gameserver::WorldLoginRequest;
 using eMU::streaming::gameserver::WorldLoginResponse;
+using eMU::streaming::dataserver::CharactersListResponse;
+using eMU::streaming::dataserver::CharacterListInfoContainer;
 
 class GameserverTest: public ::testing::Test
 {
@@ -159,6 +163,16 @@ TEST_F(GameserverTest, CharactersList)
     eMU::streaming::dataserver::CharactersListRequest charactersListRequest(charactersListRequestStream);
     ASSERT_EQ(gameserverContext_.getUsersFactory().getObjects().back()->getHash(), charactersListRequest.getUserHash());
     ASSERT_EQ(accountId, charactersListRequest.getAccountId());
+
+    IO_CHECK(gameserverContext_.getClientConnection()->getSocket().send(CharactersListResponse(charactersListRequest.getUserHash(),
+                                                                        CharacterListInfoContainer()).getWriteStream().getPayload()));
+
+    ASSERT_TRUE(connection_->getSocket().isUnread());
+    const ReadStream &charactersListResponseStream = connection_->getSocket().receive();
+    ASSERT_EQ(eMU::streaming::gameserver::streamIds::kCharactersListResponse, charactersListResponseStream.getId());
+
+    eMU::streaming::gameserver::CharactersListResponse charactersListResponse(charactersListResponseStream);
+    ASSERT_TRUE(charactersListResponse.getCharacters().empty());
 
     connection_->disconnect();
 }
