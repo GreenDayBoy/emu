@@ -25,6 +25,7 @@ CharactersListResponse::CharactersListResponse(const dataserver::CharacterListIn
 
     for(const auto &characterInfo : characters)
     {
+        writeStream_.writeNext<uint32_t>(0); // dummy
         std::wstring characterName = boost::locale::conv::utf_to_utf<std::wstring::value_type>(characterInfo.name_);
         writeStream_.writeNext<uint32_t>(characterName.length());
         writeStream_.writeNextWideString(characterName);
