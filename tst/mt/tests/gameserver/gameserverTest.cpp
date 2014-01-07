@@ -12,7 +12,7 @@
 #include <streaming/gameserver/charactersListRequest.hpp>
 #include <streaming/gameserver/charactersListResponse.hpp>
 #include <streaming/gameserver/streamIds.hpp>
-
+#include <streaming/dataserver/faultIndication.hpp>
 #include <streaming/dataserver/charactersListRequest.hpp>
 #include <streaming/dataserver/charactersListResponse.hpp>
 #include <streaming/dataserver/streamIds.hpp>
@@ -34,6 +34,7 @@ using eMU::streaming::gameserver::RegisterUserResponse;
 using eMU::streaming::gameserver::UserRegistrationResult;
 using eMU::streaming::gameserver::WorldLoginRequest;
 using eMU::streaming::gameserver::WorldLoginResponse;
+using eMU::streaming::dataserver::FaultIndication;
 using eMU::streaming::dataserver::CharactersListResponse;
 using eMU::streaming::common::CharacterInfoContainer;
 
@@ -86,6 +87,15 @@ protected:
         ASSERT_EQ(gameserverContext_.getGameserverCode(), registerUserResponse.getGameserverCode());
     }
 
+    void faultIndicationScenario(bool userHashExists)
+    {
+        NetworkUser::Hash userHash = userHashExists ? gameserverContext_.getUsersFactory().getObjects().back()->getHash() : NetworkUser::Hash(0x1234);
+        IO_CHECK(gameserverContext_.getClientConnection()->getSocket().send(FaultIndication(userHash, "test message").getWriteStream().getPayload()));
+
+        bool connectionExists = !userHashExists;
+        ASSERT_EQ(connectionExists, connection_->getSocket().is_open());
+    }
+
     void TearDown()
     {
         ASSERT_FALSE(gameserverContext_.getClientConnection()->getSocket().isUnread());
@@ -126,6 +136,18 @@ TEST_F(GameserverTest, WhenSameRegistrationInfoWasProvidedTwiceThenUserRegistrat
 
     registerUserScenario(UserRegistrationResult::Succeed, userHash, accountId);
     registerUserScenario(UserRegistrationResult::Failed, userHash, accountId);
+}
+
+TEST_F(GameserverTest, WhenFaultIndicationReceivedThenClientShouldBeDisconnected)
+{
+    bool userHashExists = true;
+    faultIndicationScenario(userHashExists);
+}
+
+TEST_F(GameserverTest, WhenFaultIndicationWithInvalidUserHashReceivedThenNothingHappens)
+{
+    bool userHashExists = false;
+    faultIndicationScenario(userHashExists);
 }
 
 TEST_F(GameserverTest, WorldLogin)
