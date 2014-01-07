@@ -182,7 +182,7 @@ TEST_F(LoginserverTest, Login)
     loginScenario();
 }
 
-TEST_F(LoginserverTest, WhenCheckAccountWithInvalidUserHashReceivedThenNothingHappens)
+TEST_F(LoginserverTest, WhenCheckAccountResponseReceivedWithInvalidUserHashThenNothingHappens)
 {
     LoginRequest loginRequest(L"accountTest", L"passwordTest");
     IO_CHECK(connection_->getSocket().send(loginRequest.getWriteStream().getPayload()));

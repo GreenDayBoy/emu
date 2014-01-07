@@ -102,8 +102,7 @@ protected:
 
 TEST_F(GameserverTest, RegisterUser)
 {
-    NetworkUser::Hash userHash(0x2371);
-    registerUserScenario(userHash, "acc", UserRegistrationResult::Succeed);
+    registerUserScenario(NetworkUser::Hash(0x2371), "acc", UserRegistrationResult::Succeed);
 
     connection_->accept();
     ASSERT_EQ(1, gameserverContext_.getUsersFactory().getObjects().size());
@@ -128,8 +127,7 @@ TEST_F(GameserverTest, WhenSameRegistrationInfoWasProvidedTwiceThenUserRegistrat
 
 TEST_F(GameserverTest, WorldLogin)
 {
-    NetworkUser::Hash userHash(0x2371);
-    registerUserScenario(userHash, "acc", UserRegistrationResult::Succeed);
+    registerUserScenario(NetworkUser::Hash(0x2371), "acc", UserRegistrationResult::Succeed);
 
     connection_->accept();
 
@@ -173,6 +171,27 @@ TEST_F(GameserverTest, CharactersList)
 
     eMU::streaming::gameserver::CharactersListResponse charactersListResponse(charactersListResponseStream);
     ASSERT_TRUE(charactersListResponse.getCharacters().empty());
+
+    connection_->disconnect();
+}
+
+TEST_F(GameserverTest, WhenCharactersListResponseReceivedWithInvalidUserHashThenNothingHappens)
+{
+    registerUserScenario(NetworkUser::Hash(0x2371), "accccc", UserRegistrationResult::Succeed);
+
+    connection_->accept();
+    ASSERT_EQ(1, gameserverContext_.getUsersFactory().getObjects().size());
+
+    IO_CHECK(connection_->getSocket().send(eMU::streaming::gameserver::CharactersListRequest().getWriteStream().getPayload()));
+    ASSERT_TRUE(gameserverContext_.getClientConnection()->getSocket().isUnread());
+
+    ASSERT_TRUE(gameserverContext_.getClientConnection()->getSocket().isUnread());
+    const ReadStream &charactersListRequestStream = gameserverContext_.getClientConnection()->getSocket().receive();
+    ASSERT_EQ(eMU::streaming::dataserver::streamIds::kCharactersListRequest, charactersListRequestStream.getId());
+
+    IO_CHECK(gameserverContext_.getClientConnection()->getSocket().send(CharactersListResponse(NetworkUser::Hash(0x1234),
+                                                                                               CharacterListInfoContainer()).getWriteStream().getPayload()));
+    ASSERT_TRUE(connection_->getSocket().is_open());
 
     connection_->disconnect();
 }

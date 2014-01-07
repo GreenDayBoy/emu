@@ -1,7 +1,9 @@
 #include <gameserver/dataserverProtocol.hpp>
 #include <gameserver/transactions/charactersListResponse.hpp>
+#include <gameserver/transactions/faultIndication.hpp>
 #include <streaming/dataserver/streamIds.hpp>
 #include <streaming/dataserver/charactersListResponse.hpp>
+#include <streaming/dataserver/faultIndication.hpp>
 
 #include <glog/logging.h>
 
@@ -22,6 +24,11 @@ bool DataserverProtocol::handleReadStream(const streaming::ReadStream &stream)
     {
         streaming::dataserver::CharactersListResponse response(stream);
         transactions::CharactersListResponse(context_.getUsersFactory(), response).handle();
+    }
+    if(streamId == streaming::dataserver::streamIds::kFaultIndication)
+    {
+        streaming::dataserver::FaultIndication indication(stream);
+        transactions::FaultIndication(context_.getUsersFactory(), indication).handle();
     }
 
     return true;
