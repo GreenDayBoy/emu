@@ -2,7 +2,7 @@
 
 #include <streaming/readStream.hpp>
 #include <streaming/writeStream.hpp>
-#include <streaming/dataserver/characterListInfo.hpp>
+#include <streaming/common/characterInfo.hpp>
 
 #include <string>
 
@@ -17,15 +17,15 @@ class CharactersListResponse
 {
 public:
     CharactersListResponse(const ReadStream &readStream);
-    CharactersListResponse(const dataserver::CharacterListInfoContainer &characters);
+    CharactersListResponse(const common::CharacterInfoContainer &characters);
 
     const WriteStream& getWriteStream() const;
-    const dataserver::CharacterListInfoContainer& getCharacters() const;
+    const common::CharacterInfoContainer& getCharacters() const;
 
 private:
     ReadStream readStream_;
     WriteStream writeStream_;
-    dataserver::CharacterListInfoContainer characters_;
+    common::CharacterInfoContainer characters_;
 };
 
 }

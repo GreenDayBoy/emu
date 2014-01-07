@@ -7,19 +7,19 @@ namespace eMU
 {
 namespace streaming
 {
-namespace dataserver
+namespace common
 {
 
-struct CharacterListInfo
+struct CharacterInfo
 {
-    CharacterListInfo():
+    CharacterInfo():
         level_(0),
         race_(0),
         hairType_(0),
         hairColor_(0),
         tutorialState_(0) {}
 
-    CharacterListInfo(const std::string &name,
+    CharacterInfo(const std::string &name,
                       uint8_t level,
                       uint8_t race,
                       uint8_t hairType,
@@ -40,7 +40,7 @@ struct CharacterListInfo
     uint16_t tutorialState_;
 };
 
-typedef std::vector<CharacterListInfo> CharacterListInfoContainer;
+typedef std::vector<CharacterInfo> CharacterInfoContainer;
 
 }
 }

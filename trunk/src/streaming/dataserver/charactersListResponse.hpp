@@ -2,7 +2,7 @@
 
 #include <streaming/readStream.hpp>
 #include <streaming/writeStream.hpp>
-#include <streaming/dataserver/characterListInfo.hpp>
+#include <streaming/common/characterInfo.hpp>
 #include <core/network/tcp/networkUser.hpp>
 
 #include <string>
@@ -18,18 +18,18 @@ class CharactersListResponse
 {
 public:
     CharactersListResponse(const ReadStream &readStream);
-    CharactersListResponse(core::network::tcp::NetworkUser::Hash userHash, const CharacterListInfoContainer &characters);
+    CharactersListResponse(core::network::tcp::NetworkUser::Hash userHash, const common::CharacterInfoContainer &characters);
 
     const WriteStream& getWriteStream() const;
     core::network::tcp::NetworkUser::Hash getUserHash() const;
-    const CharacterListInfoContainer& getCharacters() const;
+    const common::CharacterInfoContainer& getCharacters() const;
 
 private:
     ReadStream readStream_;
     WriteStream writeStream_;
 
     core::network::tcp::NetworkUser::Hash userHash_;
-    CharacterListInfoContainer characters_;
+    common::CharacterInfoContainer characters_;
 };
 
 }

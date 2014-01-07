@@ -17,7 +17,7 @@ using eMU::ut::env::core::network::tcp::ConnectionMock;
 
 using eMU::streaming::ReadStream;
 using eMU::streaming::dataserver::CharactersListResponse;
-using eMU::streaming::dataserver::CharacterListInfoContainer;
+using eMU::streaming::common::CharacterInfoContainer;
 
 using eMU::ut::env::core::network::tcp::ConnectionMock;
 
@@ -31,7 +31,7 @@ protected:
 
     Factory<User> usersFactory_;
     ConnectionMock::Pointer connection_;
-    CharacterListInfoContainer characters_;
+    CharacterInfoContainer characters_;
     Payload payload_;
 };
 

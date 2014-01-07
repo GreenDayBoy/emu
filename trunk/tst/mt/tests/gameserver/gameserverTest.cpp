@@ -35,7 +35,7 @@ using eMU::streaming::gameserver::UserRegistrationResult;
 using eMU::streaming::gameserver::WorldLoginRequest;
 using eMU::streaming::gameserver::WorldLoginResponse;
 using eMU::streaming::dataserver::CharactersListResponse;
-using eMU::streaming::dataserver::CharacterListInfoContainer;
+using eMU::streaming::common::CharacterInfoContainer;
 
 class GameserverTest: public ::testing::Test
 {
@@ -163,7 +163,7 @@ TEST_F(GameserverTest, CharactersList)
     ASSERT_EQ(accountId, charactersListRequest.getAccountId());
 
     IO_CHECK(gameserverContext_.getClientConnection()->getSocket().send(CharactersListResponse(charactersListRequest.getUserHash(),
-                                                                        CharacterListInfoContainer()).getWriteStream().getPayload()));
+                                                                        CharacterInfoContainer()).getWriteStream().getPayload()));
 
     ASSERT_TRUE(connection_->getSocket().isUnread());
     const ReadStream &charactersListResponseStream = connection_->getSocket().receive();
@@ -190,7 +190,7 @@ TEST_F(GameserverTest, WhenCharactersListResponseReceivedWithInvalidUserHashThen
     ASSERT_EQ(eMU::streaming::dataserver::streamIds::kCharactersListRequest, charactersListRequestStream.getId());
 
     IO_CHECK(gameserverContext_.getClientConnection()->getSocket().send(CharactersListResponse(NetworkUser::Hash(0x1234),
-                                                                                               CharacterListInfoContainer()).getWriteStream().getPayload()));
+                                                                                               CharacterInfoContainer()).getWriteStream().getPayload()));
     ASSERT_TRUE(connection_->getSocket().is_open());
 
     connection_->disconnect();
