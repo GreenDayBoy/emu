@@ -4,18 +4,9 @@ project(eMU CXX)
 # Common variables --------------
 set(eMU_base_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-set(eMU_src_DIR ${eMU_base_DIR}/src)
-set(eMU_core_DIR ${eMU_src_DIR}/core)
-set(eMU_streaming_DIR ${eMU_src_DIR}/streaming)
-set(eMU_protocols_DIR ${eMU_src_DIR}/protocols)
-set(eMU_dataserver_DIR ${eMU_src_DIR}/dataserver)
-set(eMU_loginserver_DIR ${eMU_src_DIR}/loginserver)
-set(eMU_gameserver_DIR ${eMU_src_DIR}/gameserver)
-set(eMU_analyzer_DIR ${eMU_src_DIR}/analyzer)
-
+set(eMU_sources_DIR ${eMU_base_DIR}/src)
+set(eMU_include_DIR ${eMU_base_DIR}/include)
 set(eMU_tst_DIR ${eMU_base_DIR}/tst)
-set(eMU_ut_DIR ${eMU_tst_DIR}/ut)
-set(eMU_mt_DIR ${eMU_tst_DIR}/mt)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${eMU_base_DIR}/lib)
 set(EXECUTABLE_OUTPUT_PATH ${eMU_base_DIR}/bin)
@@ -26,8 +17,7 @@ message(STATUS "Configuring build type ${CMAKE_BUILD_TYPE}")
 # -------------------------------
 
 # Includes ----------------------
-include_directories(${eMU_src_DIR})
-include_directories(${eMU_tst_DIR})
+include_directories(${eMU_include_DIR})
 include_directories(${QT_ROOT}/include)
 #--------------------------------
 
@@ -36,68 +26,103 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${QT_ROOT}/lib)
 # -------------------------------
 
 # core setup -----------------
-file(GLOB_RECURSE core_SOURCES "${eMU_core_DIR}/*[.cpp.hpp]")
-add_library(core SHARED ${core_SOURCES})
+set(eMU_core_sources_DIR ${eMU_sources_DIR}/core)
+set(eMU_core_headers_DIR ${eMU_include_DIR}/core)
+
+file(GLOB_RECURSE eMU_core_FILES ${eMU_core_sources_DIR}/*.cpp ${eMU_core_headers_DIR}/*.hpp)
+
+add_library(core SHARED ${eMU_core_FILES})
 target_link_libraries(core glog boost_system boost_thread)
 # -------------------------------
 
 # streaming setup -----------------
-file(GLOB_RECURSE streaming_SOURCES "${eMU_streaming_DIR}/*[.cpp.hpp]")
-add_library(streaming SHARED ${streaming_SOURCES})
+set(eMU_streaming_sources_DIR ${eMU_sources_DIR}/streaming)
+set(eMU_streaming_headers_DIR ${eMU_include_DIR}/streaming)
+
+file(GLOB_RECURSE eMU_streaming_FILES ${eMU_streaming_sources_DIR}/*.cpp ${eMU_streaming_headers_DIR}/*.hpp)
+
+add_library(streaming SHARED ${eMU_streaming_FILES})
 add_dependencies(streaming core)
 # -------------------------------
 
 # protocols setup -----------------
-file(GLOB_RECURSE protocols_SOURCES "${eMU_protocols_DIR}/*[.cpp.hpp]")
-add_library(protocols SHARED ${protocols_SOURCES})
-add_dependencies(protocols core)
+set(eMU_protocols_sources_DIR ${eMU_sources_DIR}/protocols)
+set(eMU_protocols_headers_DIR ${eMU_include_DIR}/protocols)
+
+file(GLOB_RECURSE eMU_protocols_FILES ${eMU_protocols_sources_DIR}/*.cpp ${eMU_protocols_headers_DIR}/*.hpp)
+
+add_library(protocols SHARED ${eMU_protocols_FILES})
+target_link_libraries(protocols core streaming)
+add_dependencies(protocols core streaming)
 # -------------------------------
 
 # dataserver setup ----------------
-file(GLOB_RECURSE dataserver_SOURCES "${eMU_dataserver_DIR}/*[.cpp.hpp]")
-add_executable(dataserver ${dataserver_SOURCES})
-target_link_libraries(dataserver pthread core streaming mysqlclient gflags protocols)
+set(eMU_dataserver_sources_DIR ${eMU_sources_DIR}/dataserver)
+set(eMU_dataserver_headers_DIR ${eMU_include_DIR}/dataserver)
+
+file(GLOB_RECURSE eMU_dataserver_FILES ${eMU_dataserver_sources_DIR}/*.cpp ${eMU_dataserver_headers_DIR}/*.hpp)
+
+add_executable(dataserver ${eMU_dataserver_FILES})
+target_link_libraries(dataserver core streaming protocols pthread mysqlclient gflags)
 add_dependencies(dataserver core streaming protocols)
 # ------------------------------------
 
 # loginserver setup ----------------
-file(GLOB_RECURSE loginserver_SOURCES "${eMU_loginserver_DIR}/*[.cpp.hpp]")
-add_executable(loginserver ${loginserver_SOURCES})
-target_link_libraries(loginserver pthread core streaming gflags protocols)
+set(eMU_loginserver_sources_DIR ${eMU_sources_DIR}/loginserver)
+set(eMU_loginserver_headers_DIR ${eMU_include_DIR}/loginserver)
+
+file(GLOB_RECURSE eMU_loginserver_FILES ${eMU_loginserver_sources_DIR}/*.cpp ${eMU_loginserver_headers_DIR}/*.hpp)
+
+add_executable(loginserver ${eMU_loginserver_FILES})
+target_link_libraries(loginserver core streaming protocols pthread gflags)
 add_dependencies(loginserver core streaming protocols)
 # ------------------------------------
 
 # gameserver setup ----------------
-file(GLOB_RECURSE gameserver_SOURCES "${eMU_gameserver_DIR}/*[.cpp.hpp]")
-add_executable(gameserver ${gameserver_SOURCES})
-target_link_libraries(gameserver pthread core streaming gflags protocols)
+set(eMU_gameserver_sources_DIR ${eMU_sources_DIR}/gameserver)
+set(eMU_gameserver_headers_DIR ${eMU_include_DIR}/gameserver)
+
+file(GLOB_RECURSE eMU_gameserver_FILES ${eMU_gameserver_sources_DIR}/*.cpp ${eMU_gameserver_headers_DIR}/*.hpp)
+
+add_executable(gameserver ${eMU_gameserver_FILES})
+target_link_libraries(gameserver core streaming protocols pthread gflags)
 add_dependencies(gameserver core streaming protocols)
 # ------------------------------------
 
-# mt/ut tests setup ----------------
-# ut -------
-file(GLOB_RECURSE ut_SOURCES "${eMU_ut_DIR}/*[.cpp.hpp]")
-list(APPEND ut_SOURCES ${core_SOURCES} ${streaming_SOURCES} ${dataserver_SOURCES} ${loginserver_SOURCES} ${gameserver_SOURCES} ${protocols_SOURCES})
-list(REMOVE_ITEM ut_SOURCES ${eMU_dataserver_DIR}/main.cpp ${eMU_loginserver_DIR}/main.cpp ${eMU_gameserver_DIR}/main.cpp)
+# analyzer setup -------------
+set(eMU_analyzer_sources_DIR ${eMU_sources_DIR}/analyzer)
+set(eMU_analyzer_headers_DIR ${eMU_include_DIR}/analyzer)
 
-add_executable(ut EXCLUDE_FROM_ALL ${ut_SOURCES})
+file(GLOB_RECURSE eMU_analyzer_FILES ${eMU_analyzer_sources_DIR}/*.cpp ${eMU_analyzer_headers_DIR}/*.hpp)
+
+add_executable(analyzer EXCLUDE_FROM_ALL ${eMU_analyzer_FILES})
+target_link_libraries(analyzer core protocols gflags pthread Qt5Widgets Qt5Core Qt5Gui)
+add_dependencies(analyzer core)
+# ----------------------------
+
+# ut -------------------------
+set(eMU_ut_sources_DIR ${eMU_tst_DIR}/ut)
+set(eMU_ut_headers_DIR ${eMU_include_DIR}/ut)
+
+file(GLOB_RECURSE eMU_ut_FILES ${eMU_ut_sources_DIR}/*.cpp ${eMU_ut_headers_DIR}/*.hpp)
+list(APPEND eMU_ut_FILES ${eMU_core_FILES} ${eMU_streaming_FILES} ${eMU_protocols_FILES} ${eMU_dataserver_FILES} ${eMU_loginserver_FILES} ${eMU_gameserver_FILES})
+list(REMOVE_ITEM eMU_ut_FILES ${eMU_dataserver_sources_DIR}/main.cpp ${eMU_loginserver_sources_DIR}/main.cpp ${eMU_gameserver_sources_DIR}/main.cpp)
+
+add_executable(ut EXCLUDE_FROM_ALL ${eMU_ut_FILES})
 target_link_libraries(ut gmock gtest pthread glog boost_system boost_thread mysqlclient)
+# ----------------------------
 
-# mt -------
-file(GLOB_RECURSE mt_SOURCES "${eMU_mt_DIR}/*[.cpp.hpp]")
-list(APPEND mt_SOURCES ${core_SOURCES} ${streaming_SOURCES} ${dataserver_SOURCES} ${loginserver_SOURCES} ${gameserver_SOURCES} ${protocols_SOURCES})
-list(REMOVE_ITEM mt_SOURCES ${eMU_dataserver_DIR}/main.cpp ${eMU_loginserver_DIR}/main.cpp ${eMU_gameserver_DIR}/main.cpp)
+# mt ----------------------------
+set(eMU_mt_sources_DIR ${eMU_tst_DIR}/mt)
+set(eMU_mt_headers_DIR ${eMU_include_DIR}/mt)
 
-add_executable(mt EXCLUDE_FROM_ALL ${mt_SOURCES})
+file(GLOB_RECURSE eMU_mt_FILES ${eMU_mt_sources_DIR}/*.cpp ${eMU_mt_headers_DIR}/*.hpp)
+list(APPEND eMU_mt_FILES ${eMU_core_FILES} ${eMU_streaming_FILES} ${eMU_protocols_FILES} ${eMU_dataserver_FILES} ${eMU_loginserver_FILES} ${eMU_gameserver_FILES})
+list(REMOVE_ITEM eMU_mt_FILES ${eMU_dataserver_sources_DIR}/main.cpp ${eMU_loginserver_sources_DIR}/main.cpp ${eMU_gameserver_sources_DIR}/main.cpp)
+
+add_executable(mt EXCLUDE_FROM_ALL ${eMU_mt_FILES})
 target_link_libraries(mt gtest pthread glog boost_system boost_thread mysqlclient)
 # -------------------------------
-
-# analyzer setup -------------
-file(GLOB_RECURSE analyzer_SOURCES "${eMU_analyzer_DIR}/*[.cpp.hpp]")
-add_executable(analyzer EXCLUDE_FROM_ALL ${analyzer_SOURCES})
-target_link_libraries(analyzer gflags core streaming pthread Qt5Widgets Qt5Core Qt5Gui)
-add_dependencies(analyzer core streaming)
-# ----------------------------
 
 # Compiler flags ----------------
 set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -pedantic -fPIE")
