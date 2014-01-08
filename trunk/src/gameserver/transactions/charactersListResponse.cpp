@@ -1,7 +1,7 @@
 #include <gameserver/transactions/charactersListResponse.hpp>
 #include <streaming/gameserver/charactersListResponse.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -24,8 +24,8 @@ void CharactersListResponse::handleValid()
 {
     User &user = usersFactory_.find(response_.getUserHash());
 
-    LOG(INFO) << "hash: " << user.getHash() << ", accountId: " << user.getAccountId()
-              << ", characters list response, #characters: " << response_.getCharacters().size();
+    eMU_LOG(info) << "hash: " << user.getHash() << ", accountId: " << user.getAccountId()
+        << ", characters list response, #characters: " << response_.getCharacters().size();
 
     streaming::gameserver::CharactersListResponse response(response_.getCharacters());
     user.getConnection().send(response.getWriteStream().getPayload());
@@ -33,7 +33,7 @@ void CharactersListResponse::handleValid()
 
 void CharactersListResponse::handleInvalid()
 {
-    LOG(ERROR) << "hash: " << response_.getUserHash() << ", given in dataserver response does not exist!";
+    eMU_LOG(error) << "hash: " << response_.getUserHash() << ", given in dataserver response does not exist!";
 }
 
 }

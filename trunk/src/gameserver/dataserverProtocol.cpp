@@ -5,7 +5,7 @@
 #include <streaming/dataserver/charactersListResponse.hpp>
 #include <streaming/dataserver/faultIndication.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {

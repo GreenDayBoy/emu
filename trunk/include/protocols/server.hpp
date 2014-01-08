@@ -5,7 +5,7 @@
 #include <streaming/readStreamsExtractor.hpp>
 #include <protocols/contexts/server.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -23,13 +23,13 @@ public:
     {
         if(context_.getUsersFactory().getObjects().size() > context_.getMaxNumberOfUsers())
         {
-            LOG(WARNING) << "Max number of users reached.";
+            eMU_LOG(warning) << "Max number of users reached.";
             return false;
         }
 
         UserType &user = context_.getUsersFactory().create(connection);
 
-        LOG(INFO) << "User connected, hash: " << user.getHash();
+        eMU_LOG(info) << "User connected, hash: " << user.getHash();
 
         return true;
     }
@@ -40,14 +40,14 @@ public:
         {
             UserType &user = context_.getUsersFactory().find(connection);
 
-            LOG(INFO) << "User closed, hash: " << user.getHash();
+            eMU_LOG(info) << "User closed, hash: " << user.getHash();
 
             context_.getUsersFactory().destroy(user);
             connection->close();
         }
         catch(const typename core::common::Factory<UserType>::ObjectNotFoundException&)
         {
-            LOG(ERROR) << "Could not find user by connection.";
+            eMU_LOG(error) << "Could not find user by connection.";
             connection->close();
         }
     }
@@ -57,7 +57,7 @@ public:
         streaming::ReadStreamsExtractor readStreamsExtractor(connection->getReadPayload());
         if(!readStreamsExtractor.extract())
         {
-            LOG(ERROR) << "Streams extraction failed.";
+            eMU_LOG(error) << "Streams extraction failed.";
             return false;
         }
 
@@ -67,7 +67,7 @@ public:
 
             for(const auto &stream : readStreamsExtractor.getStreams())
             {
-                LOG(INFO) << "Received, hash: " << user.getHash() << ", stream id: " << stream.getId();
+                eMU_LOG(info) << "Received, hash: " << user.getHash() << ", stream id: " << stream.getId();
 
                 if(!this->handleReadStream(user, stream))
                 {
@@ -77,7 +77,7 @@ public:
         }
         catch(const typename core::common::Factory<UserType>::ObjectNotFoundException&)
         {
-            LOG(ERROR) << "Could not find user by connection.";
+            eMU_LOG(error) << "Could not find user by connection.";
             return false;
         }
 

@@ -1,5 +1,6 @@
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 #include <core/network/writeBuffer.hpp>
+#include <string.h>
 
 namespace eMU
 {
@@ -35,8 +36,8 @@ bool WriteBuffer::insert(const Payload& payload)
 
     if((destinationPayload.getSize() + payload.getSize()) > Payload::getMaxSize())
     {
-        LOG(ERROR) << "buffer overflow! pending: " << pending_
-                   << ", current size: " << payload.getSize();
+        eMU_LOG(error) << "buffer overflow! pending: " << pending_
+            << ", current size: " << payload.getSize();
 
         return false;
     }

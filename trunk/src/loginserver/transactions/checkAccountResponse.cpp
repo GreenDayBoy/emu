@@ -3,7 +3,7 @@
 #include <streaming/loginserver/loginResponse.hpp>
 #include <streaming/loginserver/loginResult.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -43,9 +43,9 @@ void CheckAccountResponse::handleValid()
 
     User &user = usersFactory_.find(response_.getUserHash());
 
-    LOG(INFO) << "hash: " << user.getHash() << ", accountId: " << user.getAccountId()
-              << ", check account result: " << static_cast<uint32_t>(response_.getResult())
-              << ", login result: " << static_cast<uint32_t>(result);
+    eMU_LOG(info) << "hash: " << user.getHash() << ", accountId: " << user.getAccountId()
+        << ", check account result: " << static_cast<uint32_t>(response_.getResult())
+        << ", login result: " << static_cast<uint32_t>(result);
 
     streaming::loginserver::LoginResponse response(result);
     user.getConnection().send(response.getWriteStream().getPayload());
@@ -53,7 +53,7 @@ void CheckAccountResponse::handleValid()
 
 void CheckAccountResponse::handleInvalid()
 {
-    LOG(ERROR) << "hash: " << response_.getUserHash() << ", given in dataserver response does not exist!";
+    eMU_LOG(error) << "hash: " << response_.getUserHash() << ", given in dataserver response does not exist!";
 }
 
 }

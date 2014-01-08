@@ -1,7 +1,7 @@
 #include <gameserver/transactions/worldLoginRequest.hpp>
 #include <streaming/gameserver/worldLoginResponse.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -21,7 +21,7 @@ bool WorldLoginRequest::isValid() const
 
 void WorldLoginRequest::handleValid()
 {
-    LOG(INFO) << "hash: " << user_.getHash() << ", accountId: " << user_.getAccountId();
+    eMU_LOG(info) << "hash: " << user_.getHash() << ", accountId: " << user_.getAccountId();
 
     user_.getConnection().send(streaming::gameserver::WorldLoginResponse(0).getWriteStream().getPayload());
 }

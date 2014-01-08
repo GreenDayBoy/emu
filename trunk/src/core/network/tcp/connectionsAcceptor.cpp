@@ -1,5 +1,5 @@
 #include <core/network/tcp/connectionsAcceptor.hpp>
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -36,7 +36,7 @@ void ConnectionsAcceptor::acceptHandler(Connection::Pointer connection, const bo
     }
     else if(errorCode != boost::asio::error::operation_aborted)
     {
-        LOG(ERROR) << "Error during establishing connection, error: " << errorCode.message();
+        eMU_LOG(error) << "Error during establishing connection, error: " << errorCode.message();
     }
     else
     {

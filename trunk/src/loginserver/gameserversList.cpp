@@ -1,7 +1,7 @@
 #include <loginserver/gameserversList.hpp>
 #include <core/common/exception.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -14,7 +14,7 @@ bool GameserversList::initialize(eMU::core::common::XmlReader &xmlReader)
 {
     if(!xmlReader.parse("servers"))
     {
-        LOG(ERROR) << "Cannot parse servers list xml.";
+        eMU_LOG(error) << "Cannot parse servers list xml.";
 
         return false;
     }

@@ -1,4 +1,4 @@
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 #include <core/network/tcp/connection.hpp>
 #include <core/network/tcp/protocol.hpp>
 
@@ -44,8 +44,8 @@ void Connection::close()
     }
     catch(const boost::system::system_error &error)
     {
-        LOG(WARNING) << "Error during closing socket, error: " << error.what()
-                     << ", code: " << error.code();
+        eMU_LOG(warning) << "Error during closing socket, error: " << error.what()
+            << ", code: " << error.code();
     }
 }
 
@@ -89,7 +89,7 @@ bool Connection::connect(const boost::asio::ip::tcp::endpoint &endpoint)
         }
         else
         {
-            LOG(ERROR) << "Connect, attach to protocol failed! Closing connection.";
+            eMU_LOG(error) << "Connect, attach to protocol failed! Closing connection.";
 
             this->close();
             return false;
@@ -97,8 +97,8 @@ bool Connection::connect(const boost::asio::ip::tcp::endpoint &endpoint)
     }
     else
     {
-        LOG(ERROR) << "Error during connect, address: " << endpoint.address().to_string() << ", port: " <<  endpoint.port()
-                   << ", error: " << errorCode.message() << ", code: " << errorCode.value();
+        eMU_LOG(error) << "Error during connect, address: " << endpoint.address().to_string() << ", port: " <<  endpoint.port()
+            << ", error: " << errorCode.message() << ", code: " << errorCode.value();
 
         if(this->isOpen())
         {
@@ -135,7 +135,7 @@ void Connection::receiveHandler(const boost::system::error_code &errorCode, size
 
     if(!protocol_.dispatch(shared_from_this()))
     {
-        LOG(ERROR) << "Dispatch data failed. Disconnecting.";
+        eMU_LOG(error) << "Dispatch data failed. Disconnecting.";
         this->disconnect();
     }
 
@@ -164,9 +164,9 @@ void Connection::sendHandler(const boost::system::error_code& errorCode, size_t 
 
 void Connection::errorHandler(const boost::system::error_code &errorCode, const std::string &operationName)
 {
-    LOG(ERROR) << "Error during handling async operation: " << operationName
-               << ", error: " << errorCode.message()
-               << ", code: " << errorCode.value();
+    eMU_LOG(error) << "Error during handling async operation: " << operationName
+        << ", error: " << errorCode.message()
+        << ", code: " << errorCode.value();
 
     if(boost::asio::error::operation_aborted != errorCode)
     {
@@ -192,7 +192,7 @@ void Connection::accept()
     }
     else
     {
-        LOG(ERROR) << "Accept, attach to protocol failed! Closing connection.";
+        eMU_LOG(error) << "Accept, attach to protocol failed! Closing connection.";
         this->close();
     }
 }

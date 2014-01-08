@@ -1,7 +1,7 @@
 #include <gameserver/transactions/charactersListRequest.hpp>
 #include <streaming/dataserver/charactersListRequest.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -24,8 +24,8 @@ bool CharactersListRequest::isValid() const
 
 void CharactersListRequest::handleValid()
 {
-    LOG(INFO) << "Sending characters list request, hash: " << user_.getHash()
-              << ", accountId: " << user_.getAccountId();
+    eMU_LOG(info) << "Sending characters list request, hash: " << user_.getHash()
+        << ", accountId: " << user_.getAccountId();
 
     streaming::dataserver::CharactersListRequest request(user_.getHash(), user_.getAccountId());
     dataserverConnection_->send(request.getWriteStream().getPayload());
@@ -33,8 +33,8 @@ void CharactersListRequest::handleValid()
 
 void CharactersListRequest::handleInvalid()
 {
-    LOG(ERROR) << "hash: " << user_.getHash() << ", accountId: " << user_.getAccountId()
-               << ", connection to dataserver not established! Disconnected.";
+    eMU_LOG(error) << "hash: " << user_.getHash() << ", accountId: " << user_.getAccountId()
+        << ", connection to dataserver not established! Disconnected.";
 
     user_.getConnection().disconnect();
 }

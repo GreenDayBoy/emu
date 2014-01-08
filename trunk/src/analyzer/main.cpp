@@ -8,7 +8,7 @@
 #include <QtGui/QStandardItem>
 
 #include <boost/thread.hpp>
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 #include <gflags/gflags.h>
 
 DEFINE_int32(max_users, 5, "Max number of users to connect");
@@ -17,10 +17,7 @@ DEFINE_int32(max_threads, 1, "max number of concurrent threads");
 
 int main(int argsCount, char *args[])
 {
-    FLAGS_colorlogtostderr = true;
-    FLAGS_logtostderr = true;
     google::ParseCommandLineFlags(&argsCount, &args, true);
-    google::InitGoogleLogging(args[0]);
 
     QApplication analyzer(argsCount, args);
 

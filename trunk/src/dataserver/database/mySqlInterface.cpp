@@ -1,6 +1,6 @@
 #include <dataserver/database/mySqlInterface.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
 namespace eMU
@@ -54,12 +54,12 @@ bool MySqlInterface::executeQuery(std::string query)
 
     if(mysql_real_query(&handle_, query.c_str(), query.size()) == 0)
     {
-        LOG(INFO) << "Executed query: " << query;
+        eMU_LOG(info) << "Executed query: " << query;
         return true;
     }
     else
     {
-        LOG(ERROR) << "Query execution failed, reason: " << this->getErrorMessage() << ", query: " << query;
+        eMU_LOG(error) << "Query execution failed, reason: " << this->getErrorMessage() << ", query: " << query;
         return false;
     }
 }
@@ -127,7 +127,7 @@ bool MySqlInterface::isAlive()
     }
     else
     {
-        LOG(ERROR) << "Ping failed, reason: " << this->getErrorMessage();
+        eMU_LOG(error) << "Ping failed, reason: " << this->getErrorMessage();
         return false;
     }
 }

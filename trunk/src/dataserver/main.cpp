@@ -6,7 +6,7 @@
 #include <core/common/concurrency.hpp>
 
 #include <boost/thread.hpp>
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 #include <gflags/gflags.h>
 
 DEFINE_string(db_host, "127.0.0.1", "Database engine address");
@@ -20,21 +20,18 @@ DEFINE_int32(max_threads, 2, "max number of concurrent threads");
 
 int main(int argsCount, char *args[])
 {
-    FLAGS_colorlogtostderr = true;
-    FLAGS_logtostderr = true;
     google::ParseCommandLineFlags(&argsCount, &args, true);
-    google::InitGoogleLogging(args[0]);
 
     eMU::dataserver::database::MySqlInterface mysqlInterface;
     if(!mysqlInterface.initialize())
     {
-        LOG(ERROR) << "Initialization of database engine failed.";
+        eMU_LOG(error) << "Initialization of database engine failed.";
         return 1;
     }
 
     if(!mysqlInterface.connect(FLAGS_db_host, FLAGS_db_port, FLAGS_db_user, FLAGS_db_password, FLAGS_db_name))
     {
-        LOG(ERROR) << "Connect to database engine failed.";
+        eMU_LOG(error) << "Connect to database engine failed.";
         return 1;
     }
 

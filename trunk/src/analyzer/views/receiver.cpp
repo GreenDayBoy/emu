@@ -1,7 +1,7 @@
 #include <analyzer/views/receiver.hpp>
 #include <analyzer/controller.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {

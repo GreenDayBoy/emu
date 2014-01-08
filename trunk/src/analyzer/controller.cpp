@@ -1,6 +1,6 @@
 #include <analyzer/controller.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/locale.hpp>
 #include <sstream>
@@ -58,7 +58,7 @@ std::string Controller::getReadPayloadDump(const std::string &connectionId, cons
     }
     catch(const core::common::Factory<User>::ObjectNotFoundException&)
     {
-        LOG(ERROR) << "Cound not find user by connectionId: " << connectionId;
+        eMU_LOG(error) << "Cound not find user by connectionId: " << connectionId;
     }
 
     return "";
@@ -75,7 +75,7 @@ void Controller::disconnect(const std::string &connectionId)
     }
     catch(const core::common::Factory<User>::ObjectNotFoundException&)
     {
-        LOG(ERROR) << "Cound not find user by connectionId: " << connectionId;
+        eMU_LOG(error) << "Cound not find user by connectionId: " << connectionId;
     }
 }
 
@@ -91,7 +91,7 @@ void Controller::send(const std::string &connectionId, const std::string &dump)
     }
     catch(const core::common::Factory<User>::ObjectNotFoundException&)
     {
-        LOG(ERROR) << "Cound not find user by connectionId: " << connectionId;
+        eMU_LOG(error) << "Cound not find user by connectionId: " << connectionId;
     }
 }
 

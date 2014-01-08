@@ -5,7 +5,7 @@
 
 #include <streaming/loginserver/streamIds.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {

@@ -2,7 +2,7 @@
 #include <streaming/loginserver/gameserverDetailsResponse.hpp>
 #include <streaming/gameserver/registerUserRequest.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -27,7 +27,7 @@ bool GameserverDetailsRequest::isValid() const
 
 void GameserverDetailsRequest::handleValid()
 {
-    LOG(INFO) << "hash: " << user_.getHash() << ", gameserverCode: " << request_.getGameserverCode();
+    eMU_LOG(info) << "hash: " << user_.getHash() << ", gameserverCode: " << request_.getGameserverCode();
 
     const streaming::loginserver::GameserverInfo &gameserverInfo = gameserversList_.getGameserverInfo(request_.getGameserverCode());
 
@@ -39,7 +39,7 @@ void GameserverDetailsRequest::handleValid()
 
 void GameserverDetailsRequest::handleInvalid()
 {
-    LOG(ERROR) << "hash: " << user_.getHash() << ", requested gameserver does not exists! gameserverCode: " << request_.getGameserverCode();
+    eMU_LOG(error) << "hash: " << user_.getHash() << ", requested gameserver does not exists! gameserverCode: " << request_.getGameserverCode();
 
     user_.getConnection().disconnect();
 }

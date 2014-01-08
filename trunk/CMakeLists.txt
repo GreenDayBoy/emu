@@ -32,7 +32,7 @@ set(eMU_core_headers_DIR ${eMU_include_DIR}/core)
 file(GLOB_RECURSE eMU_core_FILES ${eMU_core_sources_DIR}/*.cpp ${eMU_core_headers_DIR}/*.hpp)
 
 add_library(core SHARED ${eMU_core_FILES})
-target_link_libraries(core glog boost_system boost_thread)
+target_link_libraries(core boost_system boost_thread boost_log)
 # -------------------------------
 
 # streaming setup -----------------
@@ -109,7 +109,7 @@ list(APPEND eMU_ut_FILES ${eMU_core_FILES} ${eMU_streaming_FILES} ${eMU_protocol
 list(REMOVE_ITEM eMU_ut_FILES ${eMU_dataserver_sources_DIR}/main.cpp ${eMU_loginserver_sources_DIR}/main.cpp ${eMU_gameserver_sources_DIR}/main.cpp)
 
 add_executable(ut EXCLUDE_FROM_ALL ${eMU_ut_FILES})
-target_link_libraries(ut gmock gtest pthread glog boost_system boost_thread mysqlclient)
+target_link_libraries(ut gmock gtest pthread boost_system boost_thread boost_log mysqlclient)
 # ----------------------------
 
 # mt ----------------------------
@@ -121,11 +121,17 @@ list(APPEND eMU_mt_FILES ${eMU_core_FILES} ${eMU_streaming_FILES} ${eMU_protocol
 list(REMOVE_ITEM eMU_mt_FILES ${eMU_dataserver_sources_DIR}/main.cpp ${eMU_loginserver_sources_DIR}/main.cpp ${eMU_gameserver_sources_DIR}/main.cpp)
 
 add_executable(mt EXCLUDE_FROM_ALL ${eMU_mt_FILES})
-target_link_libraries(mt gtest pthread glog boost_system boost_thread mysqlclient)
+target_link_libraries(mt gtest pthread boost_system boost_thread boost_log mysqlclient)
 # -------------------------------
 
 # Compiler flags ----------------
-set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -pedantic -fPIE")
+add_definitions(-DBOOST_LOG_DYN_LINK)
+
+set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -pedantic")
+
+if(NOT WIN32)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIE")
+endif()
 
 if(NOT COVERAGE)
     set(COVERAGE_FLAGS "")

@@ -1,6 +1,6 @@
 #include <mt/asioStub/tcp/socket.hpp>
 #include <mt/asioStub/ioService.hpp>
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {

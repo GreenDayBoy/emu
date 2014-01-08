@@ -1,6 +1,7 @@
 #include <streaming/readStreamsExtractor.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
+#include <string.h>
 
 namespace eMU
 {
@@ -14,7 +15,7 @@ bool ReadStreamsExtractor::extract()
 {
     if(payload_.empty())
     {
-        LOG(ERROR) << "Could not extract streams from empty payload!";
+        eMU_LOG(error) << "Could not extract streams from empty payload!";
         return false;
     }
 
@@ -32,13 +33,13 @@ bool ReadStreamsExtractor::extract()
             }
             else
             {
-                LOG(ERROR) << "Extracted stream has 0 size!";
+                eMU_LOG(error) << "Extracted stream has 0 size!";
                 return false;
             }
         }
         else
         {
-            LOG(ERROR) << "Invalid stream format!";
+            eMU_LOG(error) << "Invalid stream format!";
             return false;
         }
     }
@@ -97,7 +98,7 @@ size_t ReadStreamsExtractor::extractStream(size_t streamOffset)
     }
     catch(const core::network::Payload::SizeOutOfBoundException&)
     {
-        LOG(ERROR) << "Size of payload with stream is out of bound!";
+        eMU_LOG(error) << "Size of payload with stream is out of bound!";
         return 0;
     }
 }

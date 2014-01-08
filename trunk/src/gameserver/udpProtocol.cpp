@@ -4,7 +4,7 @@
 #include <streaming/gameserver/streamIds.hpp>
 #include <streaming/gameserver/registerUserRequest.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {

@@ -3,7 +3,7 @@
 #include <streaming/dataserver/checkAccountResult.hpp>
 
 #include <sstream>
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -20,16 +20,16 @@ CheckAccountRequest::CheckAccountRequest(User &user,
 
 void CheckAccountRequest::handleValid()
 {
-    LOG(INFO) << "hash: " << user_.getHash()
-              << ", userHash: " << request_.getUserHash()
-              << ", accountId: " << request_.getAccountId();
+    eMU_LOG(info) << "hash: " << user_.getHash()
+        << ", userHash: " << request_.getUserHash()
+        << ", accountId: " << request_.getAccountId();
 
     std::stringstream query;
     query << "SELECT"
-          << " `eMU_AccountCheck`("
-          << "'" << request_.getAccountId() << "'"
-          << ", '" << request_.getPassword() << "'"
-          << ", '" << "127.0.0.1" << "');";
+        << " `eMU_AccountCheck`("
+        << "'" << request_.getAccountId() << "'"
+        << ", '" << request_.getPassword() << "'"
+        << ", '" << "127.0.0.1" << "');";
 
     if(sqlInterface_.executeQuery(query.str()))
     {
@@ -44,7 +44,7 @@ void CheckAccountRequest::handleValid()
         }
         else
         {
-            LOG(ERROR) << "Empty query results for accountId: " << request_.getAccountId();
+            eMU_LOG(error) << "Empty query results for accountId: " << request_.getAccountId();
             this->sendFaultIndication("Check account query result is empty");
         }
     }

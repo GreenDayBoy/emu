@@ -1,7 +1,7 @@
 #include <protocols/udp.hpp>
 #include <streaming/readStreamsExtractor.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -21,13 +21,13 @@ void Udp::dispatch(core::network::udp::Connection::Pointer connection, const boo
     streaming::ReadStreamsExtractor readStreamsExtractor(connection->getReadPayload());
     if(!readStreamsExtractor.extract())
     {
-        LOG(ERROR) << "Streams extraction failed.";
+        eMU_LOG(error) << "Streams extraction failed.";
         return;
     }
 
     for(const auto &stream : readStreamsExtractor.getStreams())
     {
-        LOG(INFO) << "Udp protocol, received stream id: " << stream.getId();
+        eMU_LOG(info) << "Udp protocol, received stream id: " << stream.getId();
         this->handleReadStream(stream, senderEndpoint);
     }
 }
