@@ -1,7 +1,7 @@
 #include <core/network/udp/connection.hpp>
 #include <core/network/udp/protocol.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -111,9 +111,9 @@ void Connection::sendToHandler(const boost::asio::ip::udp::endpoint &endpoint, c
 
 void Connection::errorHandler(const boost::system::error_code &errorCode, const std::string &operationName)
 {
-    LOG(ERROR) << "Error during handling async operation: " << operationName
-               << ", error: " << errorCode.message()
-               << ", code: " << errorCode.value() << std::endl;
+    eMU_LOG(error) << "Error during handling async operation: " << operationName
+        << ", error: " << errorCode.message()
+        << ", code: " << errorCode.value() << std::endl;
 }
 
 asio::ip::udp::socket& Connection::getSocket()

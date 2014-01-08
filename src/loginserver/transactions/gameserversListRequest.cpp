@@ -1,7 +1,7 @@
 #include <loginserver/transactions/gameserversListRequest.hpp>
 #include <streaming/loginserver/gameserversListResponse.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -24,7 +24,7 @@ bool GameserversListRequest::isValid() const
 
 void GameserversListRequest::handleValid()
 {
-    LOG(INFO) << "hash: " << user_.getHash();
+    eMU_LOG(info) << "hash: " << user_.getHash();
     streaming::loginserver::GameserversListResponse response(gameserversList_.getServers());
 
     user_.getConnection().send(response.getWriteStream().getPayload());

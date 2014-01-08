@@ -6,7 +6,7 @@
 #include <streaming/dataserver/checkAccountRequest.hpp>
 #include <streaming/dataserver/charactersListRequest.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {

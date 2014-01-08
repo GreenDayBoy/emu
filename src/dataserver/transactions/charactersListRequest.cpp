@@ -2,7 +2,7 @@
 #include <streaming/dataserver/charactersListResponse.hpp>
 
 #include <sstream>
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -19,9 +19,9 @@ CharactersListRequest::CharactersListRequest(User &user,
 
 void CharactersListRequest::handleValid()
 {
-    LOG(INFO) << "hash: " << user_.getHash()
-              << ", userHash: " << request_.getUserHash()
-              << ", accountId: " << request_.getAccountId();
+    eMU_LOG(info) << "hash: " << user_.getHash()
+        << ", userHash: " << request_.getUserHash()
+        << ", accountId: " << request_.getAccountId();
 
     std::stringstream query;
     query << "SELECT hairColor, hairType, level, name, race, tutorialState FROM characters WHERE accountId='" << request_.getAccountId() << "';";

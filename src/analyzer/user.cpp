@@ -1,6 +1,6 @@
 #include <analyzer/user.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {

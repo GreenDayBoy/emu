@@ -1,7 +1,7 @@
 #include <loginserver/transactions/loginRequest.hpp>
 #include <streaming/dataserver/checkAccountRequest.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -24,18 +24,18 @@ bool LoginRequest::isValid() const
 
 void LoginRequest::handleValid()
 {
-    LOG(INFO) << "hash: " << user_.getHash() << ", accountId: " << request_.getAccountId();
+    eMU_LOG(info) << "hash: " << user_.getHash() << ", accountId: " << request_.getAccountId();
     user_.setAccountId(request_.getAccountId());
 
-    LOG(INFO) << "hash: " << user_.getHash() << ", sending request for account check.";
+    eMU_LOG(info) << "hash: " << user_.getHash() << ", sending request for account check.";
     streaming::dataserver::CheckAccountRequest checkAccountRequest(user_.getHash(), request_.getAccountId(), request_.getPassword());
     dataserverConnection_->send(checkAccountRequest.getWriteStream().getPayload());
 }
 
 void LoginRequest::handleInvalid()
 {
-    LOG(ERROR) << "hash: " << user_.getHash() << ", accountId: " << request_.getAccountId()
-               << ", connection to dataserver not established! Disconnected.";
+    eMU_LOG(error) << "hash: " << user_.getHash() << ", accountId: " << request_.getAccountId()
+        << ", connection to dataserver not established! Disconnected.";
 
     user_.getConnection().disconnect();
 }

@@ -1,7 +1,7 @@
 #include <analyzer/views/connectionsList.hpp>
 #include <analyzer/controller.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -41,7 +41,7 @@ std::string ConnectionsList::getConnectionId(const QModelIndex &index) const
     }
     else
     {
-        LOG(ERROR) << "Selected object has not valid parent!";
+        eMU_LOG(error) << "Selected object has not valid parent!";
     }
 
     return "";
@@ -56,7 +56,7 @@ std::string ConnectionsList::getSelectedConnectionId() const
     }
     catch(const StandardItemWrapper::ItemNotFoundException&)
     {
-        LOG(ERROR) << "Selected object is not a connection!";
+        eMU_LOG(error) << "Selected object is not a connection!";
     }
 
     return "";
@@ -75,7 +75,7 @@ std::string ConnectionsList::getSelectedReadPayloadId() const
     }
     else
     {
-        LOG(ERROR) << "Selected object is not a payload!";
+        eMU_LOG(error) << "Selected object is not a payload!";
     }
 
     return "";
@@ -105,7 +105,7 @@ void ConnectionsList::insertReadPayloadId(const std::string &connectionId, const
     }
     catch(const StandardItemWrapper::ItemNotFoundException&)
     {
-        LOG(ERROR) << "Could not find connectionId: " << connectionId;
+        eMU_LOG(error) << "Could not find connectionId: " << connectionId;
     }
 }
 

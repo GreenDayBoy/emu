@@ -2,7 +2,7 @@
 #include <streaming/gameserver/registerUserResponse.hpp>
 #include <streaming/gameserver/userRegistrationResult.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -29,8 +29,8 @@ bool RegisterUserRequest::isValid() const
 
 void RegisterUserRequest::handleValid()
 {
-    LOG(INFO) << "accountId: " << request_.getUserRegistrationInfo().accountId_
-              << ", hash: " << request_.getUserRegistrationInfo().userHash_;
+    eMU_LOG(info) << "accountId: " << request_.getUserRegistrationInfo().accountId_
+        << ", hash: " << request_.getUserRegistrationInfo().userHash_;
 
     streaming::gameserver::UserRegistrationResult result = streaming::gameserver::UserRegistrationResult::Succeed;
 
@@ -45,7 +45,7 @@ void RegisterUserRequest::handleValid()
         result = streaming::gameserver::UserRegistrationResult::Failed;
     }
 
-    LOG(INFO) << "User registration result: " << static_cast<uint32_t>(result);
+    eMU_LOG(info) << "User registration result: " << static_cast<uint32_t>(result);
 
     streaming::gameserver::RegisterUserResponse response(gameserverCode_, request_.getUserRegistrationInfo().userHash_, result);
     udpConnection_->sendTo(senderEndpoint_, response.getWriteStream().getPayload());
@@ -53,7 +53,7 @@ void RegisterUserRequest::handleValid()
 
 void RegisterUserRequest::handleInvalid()
 {
-    LOG(ERROR) << "udpConnection is nullptr!";
+    eMU_LOG(error) << "udpConnection is nullptr!";
 }
 
 }

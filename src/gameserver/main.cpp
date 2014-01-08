@@ -8,7 +8,7 @@
 #include <core/network/tcp/connection.hpp>
 
 #include <boost/thread.hpp>
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 #include <gflags/gflags.h>
 
 DEFINE_string(dataserver_host, "127.0.0.1", "Dataserver address");
@@ -21,10 +21,7 @@ DEFINE_int32(code, 0, "gameserver code");
 
 int main(int argsCount, char *args[])
 {
-    FLAGS_colorlogtostderr = true;
-    FLAGS_logtostderr = true;
     google::ParseCommandLineFlags(&argsCount, &args, true);
-    google::InitGoogleLogging(args[0]);
 
     eMU::gameserver::Context gameserverContext(FLAGS_max_users, FLAGS_code);
 
@@ -35,7 +32,7 @@ int main(int argsCount, char *args[])
     if(!dataserverConnection->connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(FLAGS_dataserver_host),
                                                                     FLAGS_dataserver_port)))
     {
-        LOG(ERROR) << "Connection to datserver failed. host: " << FLAGS_dataserver_host << ", port: " << FLAGS_dataserver_port;
+        eMU_LOG(error) << "Connection to datserver failed. host: " << FLAGS_dataserver_host << ", port: " << FLAGS_dataserver_port;
         return 1;
     }
 

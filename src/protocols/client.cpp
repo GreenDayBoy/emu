@@ -1,7 +1,7 @@
 #include <protocols/client.hpp>
 #include <streaming/readStreamsExtractor.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -20,7 +20,7 @@ bool Client::attach(core::network::tcp::Connection::Pointer connection)
 
 void Client::detach(core::network::tcp::Connection::Pointer)
 {
-    LOG(INFO) << "Client connection closed.";
+    eMU_LOG(info) << "Client connection closed.";
 
     context_.setClientConnection(nullptr);
 }
@@ -30,13 +30,13 @@ bool Client::dispatch(core::network::tcp::Connection::Pointer connection)
     streaming::ReadStreamsExtractor readStreamsExtractor(connection->getReadPayload());
     if(!readStreamsExtractor.extract())
     {
-        LOG(ERROR) << "Streams extraction failed.";
+        eMU_LOG(error) << "Streams extraction failed.";
         return false;
     }
 
     for(const auto &stream : readStreamsExtractor.getStreams())
     {
-        LOG(INFO) << "Client protocol, received stream, id: " << stream.getId();
+        eMU_LOG(info) << "Client protocol, received stream, id: " << stream.getId();
 
         if(!this->handleReadStream(stream))
         {

@@ -1,6 +1,6 @@
 #include <analyzer/protocol.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -14,13 +14,13 @@ bool Protocol::attach(core::network::tcp::Connection::Pointer connection)
 {
     if(controller_.getUsersFactory().getObjects().size() > controller_.getMaxNumberOfUsers())
     {
-        LOG(WARNING) << "Max number of users reached.";
+        eMU_LOG(warning) << "Max number of users reached.";
         return false;
     }
 
     User &user = controller_.getUsersFactory().create(connection);
 
-    LOG(INFO) << "User connected, hash: " << user.getHash();
+    eMU_LOG(info) << "User connected, hash: " << user.getHash();
 
     controller_.onAccept(user);
 
@@ -33,7 +33,7 @@ void Protocol::detach(core::network::tcp::Connection::Pointer connection)
     {
         User &user = controller_.getUsersFactory().find(connection);
 
-        LOG(INFO) << "User closed, hash: " << user.getHash();
+        eMU_LOG(info) << "User closed, hash: " << user.getHash();
 
         controller_.onClose(user);
         controller_.getUsersFactory().destroy(user);
@@ -42,7 +42,7 @@ void Protocol::detach(core::network::tcp::Connection::Pointer connection)
     }
     catch(const typename core::common::Factory<User>::ObjectNotFoundException&)
     {
-        LOG(ERROR) << "could not find user by connection.";
+        eMU_LOG(error) << "could not find user by connection.";
         connection->close();
     }
 }
@@ -53,14 +53,14 @@ bool Protocol::dispatch(core::network::tcp::Connection::Pointer connection)
     {
         User &user = controller_.getUsersFactory().find(connection);
 
-        LOG(INFO) << "Received, hash: " << user.getHash() << ", #bytes: " << user.getConnection().getReadPayload().getSize();
+        eMU_LOG(info) << "Received, hash: " << user.getHash() << ", #bytes: " << user.getConnection().getReadPayload().getSize();
 
         user.storeReadPayload();
         controller_.onReceive(user);
     }
     catch(const typename core::common::Factory<User>::ObjectNotFoundException&)
     {
-        LOG(ERROR) << "could not find user by connection.";
+        eMU_LOG(error) << "could not find user by connection.";
         return false;
     }
 

@@ -1,7 +1,7 @@
 #include <analyzer/views/sender.hpp>
 #include <analyzer/controller.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 #include <boost/lexical_cast.hpp>
 
 namespace eMU

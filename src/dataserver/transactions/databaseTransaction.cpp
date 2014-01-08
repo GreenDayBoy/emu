@@ -2,7 +2,7 @@
 #include <streaming/dataserver/faultIndication.hpp>
 
 #include <sstream>
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
@@ -25,8 +25,8 @@ bool DatabaseTransaction::isValid() const
 
 void DatabaseTransaction::handleInvalid()
 {
-    LOG(ERROR) << "hash: " << user_.getHash()
-               << ", Connection to database is died.";
+    eMU_LOG(error) << "hash: " << user_.getHash()
+        << ", Connection to database is died.";
 
     this->sendFaultIndication("Connection to database is died");
 }

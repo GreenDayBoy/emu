@@ -3,7 +3,7 @@
 #include <loginserver/transactions/faultIndication.hpp>
 #include <streaming/dataserver/streamIds.hpp>
 
-#include <glog/logging.h>
+#include <core/common/logging.hpp>
 
 namespace eMU
 {
