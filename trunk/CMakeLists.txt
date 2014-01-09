@@ -129,12 +129,12 @@ target_link_libraries(mt gtest mysqlclient ${eMU_shared_libraries})
 add_definitions(-DBOOST_ALL_DYN_LINK)
 
 if(NOT WIN32)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIE")
+    set(CMAKE_CXX_FLAGS "-fPIE")
 else()
     add_definitions(-D_WIN32_WINNT=0x0501 -DWINVER=0x0501)
 endif()
 
-set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -pedantic")
+set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -pedantic ${CMAKE_CXX_FLAGS}")
 
 if(NOT COVERAGE)
     set(COVERAGE_FLAGS "")
