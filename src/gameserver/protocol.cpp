@@ -2,8 +2,10 @@
 #include <streaming/gameserver/streamIds.hpp>
 #include <streaming/gameserver/worldLoginRequest.hpp>
 #include <streaming/gameserver/charactersListRequest.hpp>
+#include <streaming/gameserver/characterCreateRequest.hpp>
 #include <gameserver/transactions/charactersListRequest.hpp>
 #include <gameserver/transactions/worldLoginRequest.hpp>
+#include <gameserver/transactions/characterCreateRequest.hpp>
 
 #include <core/common/logging.hpp>
 
@@ -54,6 +56,13 @@ bool Protocol::handleReadStream(User &user, const streaming::ReadStream &stream)
     {
         streaming::gameserver::CharactersListRequest request(stream);
         transactions::CharactersListRequest(user, context_.getClientConnection(), request).handle();
+        return true;
+    }
+
+    if(streamId == streaming::gameserver::streamIds::kCharacterCreateRequest)
+    {
+        streaming::gameserver::CharacterCreateRequest request(stream);
+        transactions::CharacterCreateRequest(user, context_.getClientConnection(), request).handle();
         return true;
     }
 

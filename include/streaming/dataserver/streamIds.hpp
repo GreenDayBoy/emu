@@ -17,6 +17,8 @@ const uint16_t kCheckAccountRequest = kStreamIdBase + 0x0002;
 const uint16_t kCheckAccountResponse = kStreamIdBase + 0x0003;
 const uint16_t kCharactersListRequest = kStreamIdBase + 0x0004;
 const uint16_t kCharactersListResponse = kStreamIdBase + 0x0005;
+const uint16_t kCharacterCreateRequest = kStreamIdBase + 0x0006;
+const uint16_t kCharacterCreateResponse = kStreamIdBase + 0x0007;
 
 }
 }
