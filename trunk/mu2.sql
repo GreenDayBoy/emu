@@ -33,8 +33,8 @@ DROP TABLE IF EXISTS `accounts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `accounts` (
-  `id` varchar(11) NOT NULL DEFAULT '',
-  `password` varchar(11) NOT NULL DEFAULT '',
+  `id` varchar(128) NOT NULL DEFAULT '',
+  `password` varchar(128) NOT NULL DEFAULT '',
   `status` tinyint(1) unsigned zerofill DEFAULT NULL,
   `ban` tinyint(1) unsigned zerofill DEFAULT NULL,
   `pin` varchar(8) NOT NULL,
@@ -51,7 +51,7 @@ CREATE TABLE `accounts` (
 
 LOCK TABLES `accounts` WRITE;
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
-INSERT INTO `accounts` VALUES ('acc','pwd',0,0,'1234','127.0.0.1','2014-01-07 17:15:02',NULL),('loginek','haselko',0,0,'1234','127.0.0.1','2014-01-07 17:54:51',NULL);
+INSERT INTO `accounts` VALUES ('acc','pwd',0,0,'1234','127.0.0.1','2014-01-20 20:02:45',NULL),('loginek','haselko',0,0,'1234','127.0.0.1','2014-01-07 20:44:17',NULL);
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -64,29 +64,26 @@ DROP TABLE IF EXISTS `characters`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `characters` (
   `created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `accountId` varchar(11) DEFAULT '',
-  `name` varchar(11) NOT NULL DEFAULT '',
-  `race` tinyint(1) unsigned DEFAULT '0',
+  `accountId` varchar(128) DEFAULT '',
+  `name` varchar(128) NOT NULL DEFAULT '',
   `level` smallint(2) unsigned NOT NULL DEFAULT '1',
-  `levelUpPoints` smallint(2) unsigned DEFAULT '0',
   `experience` int(4) unsigned DEFAULT '0',
-  `strength` smallint(2) unsigned DEFAULT NULL,
-  `agility` smallint(2) unsigned DEFAULT NULL,
-  `vitality` smallint(2) unsigned DEFAULT NULL,
-  `energy` smallint(2) unsigned DEFAULT NULL,
-  `command` smallint(2) unsigned DEFAULT NULL,
   `money` int(2) unsigned DEFAULT '0',
-  `health` int(4) DEFAULT NULL,
+  `health` int(11) DEFAULT NULL,
   `maxHealth` int(4) DEFAULT NULL,
   `mana` int(4) DEFAULT NULL,
   `maxMana` int(4) DEFAULT NULL,
   `mapId` tinyint(1) unsigned DEFAULT NULL,
   `posX` tinyint(1) unsigned DEFAULT NULL,
   `posY` tinyint(1) unsigned DEFAULT NULL,
-  `direction` tinyint(1) DEFAULT NULL,
-  `controlCode` tinyint(1) unsigned DEFAULT '0',
-  `hairColor` smallint(6) DEFAULT NULL,
+  `skin` tinyint(4) DEFAULT NULL,
+  `race` tinyint(1) unsigned DEFAULT '0',
+  `face` tinyint(4) DEFAULT NULL,
+  `faceScars` tinyint(4) DEFAULT NULL,
   `hairType` smallint(6) DEFAULT NULL,
+  `hairColor` smallint(6) DEFAULT NULL,
+  `tatoo` tinyint(4) DEFAULT NULL,
+  `skinColor` tinyint(4) DEFAULT NULL,
   `tutorialState` smallint(6) DEFAULT NULL,
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -98,7 +95,7 @@ CREATE TABLE `characters` (
 
 LOCK TABLES `characters` WRITE;
 /*!40000 ALTER TABLE `characters` DISABLE KEYS */;
-INSERT INTO `characters` VALUES ('2014-01-06 11:00:00','loginek','andrzej',1,43,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1),('2014-01-06 11:00:00','acc','grzesiu',1,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1),('2014-01-06 11:00:00','loginek','krzysiu',2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1),('2014-01-06 11:00:00','loginek','roman',4,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1),('2014-01-06 11:00:00','loginek','waldek',8,120,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1);
+INSERT INTO `characters` VALUES ('2014-01-06 11:00:00','loginek','andrzej',43,0,0,0,0,0,0,0,0,0,NULL,1,NULL,NULL,0,0,0,0,1),('2014-01-20 18:56:30','acc','romek',1,0,0,100,100,80,80,0,182,128,8,4,0,0,0,0,0,0,1);
 /*!40000 ALTER TABLE `characters` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -256,116 +253,57 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `eMU_CharacterCreate`(
- _accountId VARCHAR(11),
- _name VARCHAR(11),
- _race TINYINT
- ) RETURNS tinyint(4)
-BEGIN
- DECLARE count_ TINYINT;
- DECLARE exists_ TINYINT;
- DECLARE strength_ SMALLINT;
- DECLARE agility_ SMALLINT;
- DECLARE vitality_ SMALLINT;
- DECLARE energy_ SMALLINT;
- DECLARE command_ SMALLINT;
- DECLARE health_ FLOAT;
- DECLARE mana_ FLOAT;
- DECLARE mapId_ SMALLINT;
- DECLARE posX_ SMALLINT;
- DECLARE posY_ SMALLINT;
- 
- SELECT
- COUNT(*)
- INTO
- `count_`
- FROM
- `characters`
- WHERE
- `accountId` = `_accountId`;
- 
- SELECT
- COUNT(*)
- INTO
- `exists_`
- FROM
- `characters`
- WHERE 
- `name` = `_name`;
- 
- IF(`exists_` = 0)
- THEN 
- SET `mapId_` = 0;
- SET `posX_` = 182;
- SET `posY_` = 128;
- SET `command_` = 0;
- 
- CASE `_race`
- WHEN 0 THEN
- SET `strength_` = 18;
- SET `agility_` = 18;
- SET `vitality_` = 15;
- SET `energy_` = 30;
- SET `health_` = 60.0;
- SET `mana_` = 60.0;
- 
- WHEN 16 THEN
- SET `strength_` = 28;
- SET `agility_` = 20;
- SET `vitality_` = 25;
- SET `energy_` = 10;
- SET `health_` = 110.0;
- SET `mana_` = 20.0;
- 
- WHEN 32 THEN
- SET `strength_` = 22;
- SET `agility_` = 25;
- SET `vitality_` = 20;
- SET `energy_` = 15;
- SET `health_` = 80.0;
- SET `mana_` = 30.0;
- SET `mapId_` = 3;
- SET `posX_` = 175;
- SET `posY_` = 110;
- 
- WHEN 48 THEN
- SET `strength_` = 26;
- SET `agility_` = 26;
- SET `vitality_` = 26;
- SET `energy_` = 26;
- SET `health_` = 110.0;
- SET `mana_` = 60.0;
- 
- WHEN 64 THEN
- SET `strength_` = 26;
- SET `agility_` = 20;
- SET `vitality_` = 20;
- SET `energy_` = 15;
- SET `command_` = 25;
- SET `health_` = 90.0;
- SET `mana_` = 40.0;
- ELSE
- BEGIN
- END;
- END CASE;
- 
- INSERT INTO
- `characters` (`accountId`, `name`, `race`,
- `strength`, `agility`, `vitality`,
- `energy`, `command`, `health`,
- `maxHealth`, `mana`, `maxMana`, 
- `mapId`, `posX`, `posY`) 
- VALUES
- (`_accountId`, `_name`, `_race`,
- `strength_`, `agility_`, `vitality_`,
- `energy_`, `command_`, `health_`,
- `health_`, `mana_`, `mana_`,
- `mapId_`, `posX_`, `posY_`); 
- RETURN 1;
- END IF;
- 
- RETURN 0;
-END ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `eMU_CharacterCreate`(
+        `_accountId` VARCHAR(128),
+        `_name` VARCHAR(128),
+        `_skin` TINYINT,
+        `_race` TINYINT,
+        `_face` TINYINT,
+        `_faceScars` TINYINT,
+        `_hairType` TINYINT,
+        `_hairColor` TINYINT,
+        `_tatoo` TINYINT,
+        `_skinColor` TINYINT
+    ) RETURNS tinyint(4)
+BEGIN
+ DECLARE count_ TINYINT;
+ DECLARE exists_ TINYINT;
+ DECLARE health_ FLOAT;
+ DECLARE mana_ FLOAT;
+ DECLARE mapId_ SMALLINT;
+ DECLARE posX_ SMALLINT;
+ DECLARE posY_ SMALLINT;
+ 
+ SELECT COUNT(*) INTO `count_`
+ FROM `characters`
+ WHERE `accountId` = `_accountId`;
+ 
+ IF(`count_` >= 5) THEN
+ 	RETURN 1;
+ END IF;
+ 
+ SELECT COUNT(*) INTO `exists_`
+ FROM `characters`
+ WHERE `name` = `_name`;
+ 
+ IF(`exists_` > 0) THEN
+ 	RETURN 2;
+ END IF;
+ 
+ SET `mapId_` = 0;
+ SET `posX_` = 182;
+ SET `posY_` = 128;
+ SET `health_` = 100;
+ SET `mana_` = 80;
+ 
+ INSERT INTO
+ `characters` (`accountId`, `name`, `health`, `maxHealth`, `mana`, `maxMana`, `mapId`, `posX`, `posY`,
+               `skin`, `race`, `face`, `faceScars`, `hairType`, `hairColor`, `tatoo`, `skinColor`, `tutorialState`) 
+ VALUES (`_accountId`, `_name`, `health_`, `health_`, `mana_`, `mana_`, `mapId_`, `posX_`, `posY_`,
+         `_skin`, `_race`, `_face`, `_faceScars`, `_hairType`, `_hairColor`, `_tatoo`, `_skinColor`, 1); 
+  
+ RETURN 0;
+ END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
@@ -443,4 +381,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-01-07 18:11:34
+-- Dump completed on 2014-01-20 21:15:06
