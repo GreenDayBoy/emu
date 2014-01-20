@@ -10,6 +10,8 @@
 #include <streaming/dataserver/checkAccountResponse.hpp>
 #include <streaming/dataserver/charactersListRequest.hpp>
 #include <streaming/dataserver/charactersListResponse.hpp>
+#include <streaming/dataserver/characterCreateRequest.hpp>
+#include <streaming/dataserver/characterCreateResponse.hpp>
 #include <streaming/dataserver/faultIndication.hpp>
 
 #include <core/network/tcp/networkUser.hpp>
@@ -32,8 +34,12 @@ using eMU::streaming::dataserver::CheckAccountRequest;
 using eMU::streaming::dataserver::CheckAccountResponse;
 using eMU::streaming::dataserver::CharactersListRequest;
 using eMU::streaming::dataserver::CharactersListResponse;
+using eMU::streaming::dataserver::CharacterCreateRequest;
+using eMU::streaming::dataserver::CharacterCreateResponse;
+using eMU::streaming::dataserver::CharacterCreateResult;
 using eMU::streaming::dataserver::FaultIndication;
 namespace streamIds = eMU::streaming::dataserver::streamIds;
+using eMU::streaming::common::CharacterCreateInfo;
 
 class DataserverTest: public ::testing::Test
 {
@@ -67,6 +73,14 @@ protected:
     void faultIndicationDueToSqlConnectionDiedScenario(const Payload &payload)
     {
         sqlInterface_.setDied();
+        faultIndicationScenario(payload);
+    }
+
+    void faultIndicationDueToEmptyQueryResultScenario(const Payload &payload)
+    {
+        sqlInterface_.pushQueryStatus(true);
+        sqlInterface_.pushQueryResult(QueryResult());
+
         faultIndicationScenario(payload);
     }
 
@@ -118,10 +132,7 @@ TEST_F(DataserverTest, CheckAccountRequest_QueryExecutionFailTriggersFaultIndica
 
 TEST_F(DataserverTest, CheckAccountRequest_EmptyQueryResultTriggersFaultIndication)
 {
-    sqlInterface_.pushQueryStatus(true);
-    sqlInterface_.pushQueryResult(QueryResult());
-
-    faultIndicationScenario(CheckAccountRequest(userHash_, "Account", "Password").getWriteStream().getPayload());
+    faultIndicationDueToEmptyQueryResultScenario(CheckAccountRequest(userHash_, "Account", "Password").getWriteStream().getPayload());
 }
 
 TEST_F(DataserverTest, CheckAccountRequest_WhenConnectionToDatabaseIsDiedThenFaultIndicationShouldBeSent)
@@ -136,7 +147,7 @@ TEST_F(DataserverTest, CharactersListRequest_QueryExecutionFailTriggersFaultIndi
 
 TEST_F(DataserverTest, CharactersListRequest_WhenConnectionToDatabaseIsDiedThenFaultIndicationShouldBeSent)
 {
-    faultIndicationDueToQueryExecutionFailScenario(CharactersListRequest(userHash_, "acc").getWriteStream().getPayload());
+    faultIndicationDueToSqlConnectionDiedScenario(CharactersListRequest(userHash_, "acc").getWriteStream().getPayload());
 }
 
 TEST_F(DataserverTest, CharactersList)
@@ -153,4 +164,48 @@ TEST_F(DataserverTest, CharactersList)
     CharactersListResponse response(readStream);
     ASSERT_EQ(userHash_, response.getUserHash());
     ASSERT_TRUE(response.getCharacters().empty());
+}
+
+TEST_F(DataserverTest, CharacterCreateRequest_QueryExecutionFailTriggersFaultIndication)
+{
+    faultIndicationDueToQueryExecutionFailScenario(CharacterCreateRequest(userHash_, "acc",
+                                                                          CharacterCreateInfo("greg", 2, 4, 6,
+                                                                                              8, 9, 11, 13, 15)).getWriteStream().getPayload());
+}
+
+TEST_F(DataserverTest, CharacterCreateRequest_EmptyQueryResultTriggersFaultIndication)
+{
+    faultIndicationDueToEmptyQueryResultScenario(CharacterCreateRequest(userHash_, "acc",
+                                                                        CharacterCreateInfo("greg", 2, 4, 6,
+                                                                                            8, 9, 11, 13, 15)).getWriteStream().getPayload());
+}
+
+TEST_F(DataserverTest, CharacterCreateRequest_WhenConnectionToDatabaseIsDiedThenFaultIndicationShouldBeSent)
+{
+    faultIndicationDueToSqlConnectionDiedScenario(CharacterCreateRequest(userHash_, "acc",
+                                                                         CharacterCreateInfo("greg", 2, 4, 6,
+                                                                                             8, 9, 11, 13, 15)).getWriteStream().getPayload());
+}
+
+TEST_F(DataserverTest, CharacterCreate)
+{
+    QueryResult queryResult;
+    Row &row = queryResult.createRow(Row::Fields());
+    CharacterCreateResult result = CharacterCreateResult::Succeed;
+    row.insert(boost::lexical_cast<Row::Value>(static_cast<uint32_t>(result)));
+
+    sqlInterface_.pushQueryResult(queryResult);
+    sqlInterface_.pushQueryStatus(true);
+
+    IO_CHECK(connection_->getSocket().send(CharacterCreateRequest(userHash_, "mu2account",
+                                                                  CharacterCreateInfo("mu2c", 2, 4, 6,
+                                                                                      8, 9, 11, 13, 15)).getWriteStream().getPayload()));
+
+    ASSERT_TRUE(connection_->getSocket().isUnread());
+    const ReadStream &readStream = connection_->getSocket().receive();
+    ASSERT_EQ(streamIds::kCharacterCreateResponse, readStream.getId());
+
+    CharacterCreateResponse response(readStream);
+    ASSERT_EQ(userHash_, response.getUserHash());
+    ASSERT_EQ(result, response.getResult());
 }

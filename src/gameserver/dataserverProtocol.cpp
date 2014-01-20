@@ -1,8 +1,10 @@
 #include <gameserver/dataserverProtocol.hpp>
 #include <gameserver/transactions/charactersListResponse.hpp>
+#include <gameserver/transactions/characterCreateResponse.hpp>
 #include <gameserver/transactions/faultIndication.hpp>
 #include <streaming/dataserver/streamIds.hpp>
 #include <streaming/dataserver/charactersListResponse.hpp>
+#include <streaming/dataserver/characterCreateResponse.hpp>
 #include <streaming/dataserver/faultIndication.hpp>
 
 #include <core/common/logging.hpp>
@@ -24,6 +26,11 @@ bool DataserverProtocol::handleReadStream(const streaming::ReadStream &stream)
     {
         streaming::dataserver::CharactersListResponse response(stream);
         transactions::CharactersListResponse(context_.getUsersFactory(), response).handle();
+    }
+    if(streamId == streaming::dataserver::streamIds::kCharacterCreateResponse)
+    {
+        streaming::dataserver::CharacterCreateResponse response(stream);
+        transactions::CharacterCreateResponse(context_.getUsersFactory(), response).handle();
     }
     if(streamId == streaming::dataserver::streamIds::kFaultIndication)
     {
