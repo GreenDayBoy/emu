@@ -31,27 +31,26 @@ void CheckAccountRequest::handleValid()
         << ", '" << request_.getPassword() << "'"
         << ", '" << "127.0.0.1" << "');";
 
-    if(sqlInterface_.executeQuery(query.str()))
-    {
-        const database::QueryResult &queryResult = sqlInterface_.fetchQueryResult();
-
-        if(queryResult.getRows().size() > 0)
-        {
-            streaming::dataserver::CheckAccountResult result = static_cast<streaming::dataserver::CheckAccountResult>(queryResult.getRows()[0].getValue<uint32_t>(0));
-            streaming::dataserver::CheckAccountResponse response(request_.getUserHash(), result);
-
-            user_.getConnection().send(response.getWriteStream().getPayload());
-        }
-        else
-        {
-            eMU_LOG(error) << "Empty query results for accountId: " << request_.getAccountId();
-            this->sendFaultIndication("Check account query result is empty");
-        }
-    }
-    else
+    if(!sqlInterface_.executeQuery(query.str()))
     {
         this->sendFaultIndication(sqlInterface_.getErrorMessage());
+        return;
     }
+
+    const database::QueryResult &queryResult = sqlInterface_.fetchQueryResult();
+
+    if(queryResult.getRows().empty())
+    {
+        eMU_LOG(error) << "Empty query results for accountId: " << request_.getAccountId();
+        this->sendFaultIndication("Check account query result is empty");
+
+        return;
+    }
+
+    streaming::dataserver::CheckAccountResult result = static_cast<streaming::dataserver::CheckAccountResult>(queryResult.getRows()[0].getValue<uint32_t>(0));
+    streaming::dataserver::CheckAccountResponse response(request_.getUserHash(), result);
+
+    user_.getConnection().send(response.getWriteStream().getPayload());
 }
 
 }
