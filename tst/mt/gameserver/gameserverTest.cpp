@@ -11,10 +11,14 @@
 #include <streaming/gameserver/worldLoginResponse.hpp>
 #include <streaming/gameserver/charactersListRequest.hpp>
 #include <streaming/gameserver/charactersListResponse.hpp>
+#include <streaming/gameserver/characterCreateRequest.hpp>
+#include <streaming/gameserver/characterCreateResponse.hpp>
 #include <streaming/gameserver/streamIds.hpp>
 #include <streaming/dataserver/faultIndication.hpp>
 #include <streaming/dataserver/charactersListRequest.hpp>
 #include <streaming/dataserver/charactersListResponse.hpp>
+#include <streaming/dataserver/characterCreateRequest.hpp>
+#include <streaming/dataserver/characterCreateResponse.hpp>
 #include <streaming/dataserver/streamIds.hpp>
 
 #include <mt/asioStub/ioService.hpp>
@@ -34,9 +38,14 @@ using eMU::streaming::gameserver::RegisterUserResponse;
 using eMU::streaming::gameserver::UserRegistrationResult;
 using eMU::streaming::gameserver::WorldLoginRequest;
 using eMU::streaming::gameserver::WorldLoginResponse;
+using eMU::streaming::gameserver::CharactersListRequest;
+using eMU::streaming::gameserver::CharactersListResponse;
+using eMU::streaming::gameserver::CharacterCreateRequest;
+using eMU::streaming::gameserver::CharacterCreateResponse;
+using eMU::streaming::gameserver::CharacterCreateResult;
 using eMU::streaming::dataserver::FaultIndication;
-using eMU::streaming::dataserver::CharactersListResponse;
 using eMU::streaming::common::CharacterInfoContainer;
+using eMU::streaming::common::CharacterCreateInfo;
 
 class GameserverTest: public ::testing::Test
 {
@@ -164,7 +173,7 @@ TEST_F(GameserverTest, WorldLogin)
 
 TEST_F(GameserverTest, CharactersList)
 {
-    IO_CHECK(connection_->getSocket().send(eMU::streaming::gameserver::CharactersListRequest().getWriteStream().getPayload()));
+    IO_CHECK(connection_->getSocket().send(CharactersListRequest().getWriteStream().getPayload()));
 
     ASSERT_TRUE(gameserverContext_.getClientConnection()->getSocket().isUnread());
     const ReadStream &charactersListRequestStream = ReadStream(gameserverContext_.getClientConnection()->getSocket().receive());
@@ -174,26 +183,72 @@ TEST_F(GameserverTest, CharactersList)
     ASSERT_EQ(gameserverContext_.getUsersFactory().getObjects().back()->getHash(), charactersListRequest.getUserHash());
     ASSERT_EQ(gameserverContext_.getUsersFactory().getObjects().back()->getAccountId(), charactersListRequest.getAccountId());
 
-    IO_CHECK(gameserverContext_.getClientConnection()->getSocket().send(CharactersListResponse(charactersListRequest.getUserHash(),
-                                                                        CharacterInfoContainer()).getWriteStream().getPayload()));
+    IO_CHECK(gameserverContext_.getClientConnection()->getSocket().send(eMU::streaming::dataserver::CharactersListResponse(charactersListRequest.getUserHash(),
+                                                                                                                           CharacterInfoContainer()).getWriteStream().getPayload()));
 
     ASSERT_TRUE(connection_->getSocket().isUnread());
     const ReadStream &charactersListResponseStream = connection_->getSocket().receive();
     ASSERT_EQ(eMU::streaming::gameserver::streamIds::kCharactersListResponse, charactersListResponseStream.getId());
 
-    eMU::streaming::gameserver::CharactersListResponse charactersListResponse(charactersListResponseStream);
+    CharactersListResponse charactersListResponse(charactersListResponseStream);
     ASSERT_TRUE(charactersListResponse.getCharacters().empty());
 }
 
 TEST_F(GameserverTest, WhenCharactersListResponseReceivedWithInvalidUserHashThenNothingHappens)
 {
-    IO_CHECK(connection_->getSocket().send(eMU::streaming::gameserver::CharactersListRequest().getWriteStream().getPayload()));
+    IO_CHECK(connection_->getSocket().send(CharactersListRequest().getWriteStream().getPayload()));
 
     ASSERT_TRUE(gameserverContext_.getClientConnection()->getSocket().isUnread());
     const ReadStream &charactersListRequestStream = gameserverContext_.getClientConnection()->getSocket().receive();
     ASSERT_EQ(eMU::streaming::dataserver::streamIds::kCharactersListRequest, charactersListRequestStream.getId());
 
-    IO_CHECK(gameserverContext_.getClientConnection()->getSocket().send(CharactersListResponse(NetworkUser::Hash(0x1234),
-                                                                                               CharacterInfoContainer()).getWriteStream().getPayload()));
+    IO_CHECK(gameserverContext_.getClientConnection()->getSocket().send(eMU::streaming::dataserver::CharactersListResponse(NetworkUser::Hash(0x1234),
+                                                                                                                           CharacterInfoContainer()).getWriteStream().getPayload()));
+    ASSERT_TRUE(connection_->getSocket().is_open());
+}
+
+TEST_F(GameserverTest, CharacterCreate)
+{
+    CharacterCreateInfo characterCreateInfo("george", 5, 11, 122, 3, 7, 9, 53, 8);
+    IO_CHECK(connection_->getSocket().send(CharacterCreateRequest(characterCreateInfo).getWriteStream().getPayload()));
+
+    ASSERT_TRUE(gameserverContext_.getClientConnection()->getSocket().isUnread());
+    const ReadStream &characterCreateRequestStream = ReadStream(gameserverContext_.getClientConnection()->getSocket().receive());
+    ASSERT_EQ(eMU::streaming::dataserver::streamIds::kCharacterCreateRequest, characterCreateRequestStream.getId());
+
+    eMU::streaming::dataserver::CharacterCreateRequest characterCreateRequest(characterCreateRequestStream);
+    ASSERT_EQ(gameserverContext_.getUsersFactory().getObjects().back()->getHash(), characterCreateRequest.getUserHash());
+    ASSERT_EQ(gameserverContext_.getUsersFactory().getObjects().back()->getAccountId(), characterCreateRequest.getAccountId());
+    ASSERT_EQ(characterCreateInfo.faceScars_, characterCreateRequest.getCharacterCreateInfo().faceScars_);
+    ASSERT_EQ(characterCreateInfo.face_, characterCreateRequest.getCharacterCreateInfo().face_);
+    ASSERT_EQ(characterCreateInfo.hairColor_, characterCreateRequest.getCharacterCreateInfo().hairColor_);
+    ASSERT_EQ(characterCreateInfo.hairType_, characterCreateRequest.getCharacterCreateInfo().hairType_);
+    ASSERT_EQ(characterCreateInfo.name_, characterCreateRequest.getCharacterCreateInfo().name_);
+    ASSERT_EQ(characterCreateInfo.race_, characterCreateRequest.getCharacterCreateInfo().race_);
+    ASSERT_EQ(characterCreateInfo.skinColor_, characterCreateRequest.getCharacterCreateInfo().skinColor_);
+    ASSERT_EQ(characterCreateInfo.skin_, characterCreateRequest.getCharacterCreateInfo().skin_);
+    ASSERT_EQ(characterCreateInfo.tatoo_, characterCreateRequest.getCharacterCreateInfo().tatoo_);
+
+    IO_CHECK(gameserverContext_.getClientConnection()->getSocket().send(eMU::streaming::dataserver::CharacterCreateResponse(characterCreateRequest.getUserHash(),
+                                                                                                                            eMU::streaming::dataserver::CharacterCreateResult::AlreadyExists).getWriteStream().getPayload()));
+
+    ASSERT_TRUE(connection_->getSocket().isUnread());
+    const ReadStream &characterCreateResponseStream = connection_->getSocket().receive();
+    ASSERT_EQ(eMU::streaming::gameserver::streamIds::kCharacterCreateResponse, characterCreateResponseStream.getId());
+
+    CharacterCreateResponse characterCreateResponse(characterCreateResponseStream);
+    ASSERT_EQ(CharacterCreateResult::AlreadyExists, characterCreateResponse.getResult());
+}
+
+TEST_F(GameserverTest, WhenCharacterCreateResponseReceivedWithInvalidUserHashThenNothingHappens)
+{
+    IO_CHECK(connection_->getSocket().send(CharacterCreateRequest(CharacterCreateInfo("andrew", 1, 2, 3, 4, 5, 6, 7, 8)).getWriteStream().getPayload()));
+
+    ASSERT_TRUE(gameserverContext_.getClientConnection()->getSocket().isUnread());
+    const ReadStream &characterCreateRequestStream = gameserverContext_.getClientConnection()->getSocket().receive();
+    ASSERT_EQ(eMU::streaming::dataserver::streamIds::kCharacterCreateRequest, characterCreateRequestStream.getId());
+
+    eMU::streaming::dataserver::CharacterCreateResponse response(NetworkUser::Hash(0x1234), eMU::streaming::dataserver::CharacterCreateResult::Succeed);
+    IO_CHECK(gameserverContext_.getClientConnection()->getSocket().send(response.getWriteStream().getPayload()));
     ASSERT_TRUE(connection_->getSocket().is_open());
 }
