@@ -2,7 +2,7 @@
 
 #include <streaming/readStream.hpp>
 #include <streaming/writeStream.hpp>
-#include <streaming/common/characterCreateInfo.hpp>
+#include <streaming/common/characterViewInfo.hpp>
 
 #include <string>
 
@@ -17,15 +17,15 @@ class CharacterCreateRequest
 {
 public:
     CharacterCreateRequest(const ReadStream &readStream);
-    CharacterCreateRequest(const common::CharacterCreateInfo &characterCreateInfo);
+    CharacterCreateRequest(const common::CharacterViewInfo &characterCreateInfo);
 
     const WriteStream& getWriteStream() const;
-    const common::CharacterCreateInfo& getCharacterCreateInfo() const;
+    const common::CharacterViewInfo& getCharacterCreateInfo() const;
 
 private:
     ReadStream readStream_;
     WriteStream writeStream_;
-    common::CharacterCreateInfo characterCreateInfo_;
+    common::CharacterViewInfo characterCreateInfo_;
 };
 
 }

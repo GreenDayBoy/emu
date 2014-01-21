@@ -24,7 +24,7 @@ CharactersListResponse::CharactersListResponse(const ReadStream &readStream):
         readStream_.readNext<uint32_t>();
         uint32_t characterNameLength = readStream_.readNext<uint32_t>();
 
-        common::CharacterInfo characterListInfo;
+        common::CharacterListInfo characterListInfo;
         characterListInfo.name_ = boost::locale::conv::utf_to_utf<std::string::value_type>(readStream_.readNextWideString(characterNameLength));
         characterListInfo.level_ = readStream_.readNext<uint8_t>();
         readStream_.readNext<uint8_t>();

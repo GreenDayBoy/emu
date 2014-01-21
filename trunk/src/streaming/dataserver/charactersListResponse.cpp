@@ -19,7 +19,7 @@ CharactersListResponse::CharactersListResponse(const ReadStream &readStream):
     {
         uint32_t characterNameLength = readStream_.readNext<uint32_t>();
 
-        common::CharacterInfo characterListInfo;
+        common::CharacterListInfo characterListInfo;
         characterListInfo.name_ = readStream_.readNextString(characterNameLength);
         characterListInfo.hairColor_ = readStream_.readNext<uint8_t>();
         characterListInfo.hairType_ = readStream_.readNext<uint8_t>();

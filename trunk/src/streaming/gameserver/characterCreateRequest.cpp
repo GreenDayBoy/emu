@@ -28,7 +28,7 @@ CharacterCreateRequest::CharacterCreateRequest(const ReadStream &readStream):
     characterCreateInfo_.skinColor_ = readStream_.readNext<uint8_t>();
 }
 
-CharacterCreateRequest::CharacterCreateRequest(const common::CharacterCreateInfo &characterCreateInfo):
+CharacterCreateRequest::CharacterCreateRequest(const common::CharacterViewInfo &characterCreateInfo):
     writeStream_(streamIds::kCharacterCreateRequest)
 {
     writeStream_.writeNext<uint32_t>(0);
@@ -54,7 +54,7 @@ const WriteStream& CharacterCreateRequest::getWriteStream() const
     return writeStream_;
 }
 
-const common::CharacterCreateInfo& CharacterCreateRequest::getCharacterCreateInfo() const
+const common::CharacterViewInfo& CharacterCreateRequest::getCharacterCreateInfo() const
 {
     return characterCreateInfo_;
 }

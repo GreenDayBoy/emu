@@ -29,7 +29,7 @@ namespace transactions = eMU::dataserver::transactions;
 using eMU::streaming::ReadStream;
 namespace streamIds = eMU::streaming::dataserver::streamIds;
 
-using eMU::streaming::common::CharacterCreateInfo;
+using eMU::streaming::common::CharacterViewInfo;
 using eMU::streaming::dataserver::CharacterCreateResult;
 using eMU::streaming::dataserver::CharacterCreateRequest;
 using eMU::streaming::dataserver::CharacterCreateResponse;
@@ -46,7 +46,7 @@ protected:
         connection_(new ConnectionMock()),
         user_(connection_),
         request_(ReadStream(CharacterCreateRequest(userHash_, "simpleAccount",
-                                                   CharacterCreateInfo("andrew", 8, 7, 6, 5, 4, 3, 2, 1)).getWriteStream().getPayload())),
+                                                   CharacterViewInfo("andrew", 8, 7, 6, 5, 4, 3, 2, 1)).getWriteStream().getPayload())),
         transaction_(user_, sqlInterface_, request_) {}
 
     SqlInterfaceMock sqlInterface_;
