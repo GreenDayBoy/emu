@@ -39,7 +39,7 @@ using eMU::streaming::dataserver::CharacterCreateResponse;
 using eMU::streaming::dataserver::CharacterCreateResult;
 using eMU::streaming::dataserver::FaultIndication;
 namespace streamIds = eMU::streaming::dataserver::streamIds;
-using eMU::streaming::common::CharacterCreateInfo;
+using eMU::streaming::common::CharacterViewInfo;
 
 class DataserverTest: public ::testing::Test
 {
@@ -169,21 +169,21 @@ TEST_F(DataserverTest, CharactersList)
 TEST_F(DataserverTest, CharacterCreateRequest_QueryExecutionFailTriggersFaultIndication)
 {
     faultIndicationDueToQueryExecutionFailScenario(CharacterCreateRequest(userHash_, "acc",
-                                                                          CharacterCreateInfo("greg", 2, 4, 6,
+                                                                          CharacterViewInfo("greg", 2, 4, 6,
                                                                                               8, 9, 11, 13, 15)).getWriteStream().getPayload());
 }
 
 TEST_F(DataserverTest, CharacterCreateRequest_EmptyQueryResultTriggersFaultIndication)
 {
     faultIndicationDueToEmptyQueryResultScenario(CharacterCreateRequest(userHash_, "acc",
-                                                                        CharacterCreateInfo("greg", 2, 4, 6,
+                                                                        CharacterViewInfo("greg", 2, 4, 6,
                                                                                             8, 9, 11, 13, 15)).getWriteStream().getPayload());
 }
 
 TEST_F(DataserverTest, CharacterCreateRequest_WhenConnectionToDatabaseIsDiedThenFaultIndicationShouldBeSent)
 {
     faultIndicationDueToSqlConnectionDiedScenario(CharacterCreateRequest(userHash_, "acc",
-                                                                         CharacterCreateInfo("greg", 2, 4, 6,
+                                                                         CharacterViewInfo("greg", 2, 4, 6,
                                                                                              8, 9, 11, 13, 15)).getWriteStream().getPayload());
 }
 
@@ -198,7 +198,7 @@ TEST_F(DataserverTest, CharacterCreate)
     sqlInterface_.pushQueryStatus(true);
 
     IO_CHECK(connection_->getSocket().send(CharacterCreateRequest(userHash_, "mu2account",
-                                                                  CharacterCreateInfo("mu2c", 2, 4, 6,
+                                                                  CharacterViewInfo("mu2c", 2, 4, 6,
                                                                                       8, 9, 11, 13, 15)).getWriteStream().getPayload()));
 
     ASSERT_TRUE(connection_->getSocket().isUnread());

@@ -30,7 +30,7 @@ CharacterCreateRequest::CharacterCreateRequest(const ReadStream &readStream):
 
 CharacterCreateRequest::CharacterCreateRequest(core::network::tcp::NetworkUser::Hash userHash,
                                                const std::string &accountId,
-                                               const common::CharacterCreateInfo &characterCreateInfo):
+                                               const common::CharacterViewInfo &characterCreateInfo):
     writeStream_(streamIds::kCharacterCreateRequest)
 {
     writeStream_.writeNext<core::network::tcp::NetworkUser::Hash>(userHash);
@@ -65,7 +65,7 @@ const std::string& CharacterCreateRequest::getAccountId() const
     return accountId_;
 }
 
-const common::CharacterCreateInfo& CharacterCreateRequest::getCharacterCreateInfo() const
+const common::CharacterViewInfo& CharacterCreateRequest::getCharacterCreateInfo() const
 {
     return characterCreateInfo_;
 }

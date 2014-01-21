@@ -9,20 +9,20 @@ namespace streaming
 namespace common
 {
 
-struct CharacterCreateInfo
+struct CharacterViewInfo
 {
-    CharacterCreateInfo():
+    CharacterViewInfo():
         skin_(0), race_(0), face_(0),
         faceScars_(0), hairType_(0),
         hairColor_(0),  tatoo_(0),
         skinColor_(0) {}
 
-    CharacterCreateInfo(const std::string &name,
-                        uint8_t skin, uint8_t race,
-                        uint8_t face, uint8_t faceScars,
-                        uint8_t hairType, uint8_t hairColor,
-                        uint8_t tatoo, uint8_t skinColor):
-        name_(name), race_(race), face_(face),
+    CharacterViewInfo(const std::string &name,
+                      uint8_t skin, uint8_t race,
+                      uint8_t face, uint8_t faceScars,
+                      uint8_t hairType, uint8_t hairColor,
+                      uint8_t tatoo, uint8_t skinColor):
+        name_(name), skin_(skin), race_(race), face_(face),
         faceScars_(faceScars), hairType_(hairType),
         hairColor_(hairColor), tatoo_(tatoo),
         skinColor_(skinColor) {}

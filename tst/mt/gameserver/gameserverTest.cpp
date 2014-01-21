@@ -45,7 +45,7 @@ using eMU::streaming::gameserver::CharacterCreateResponse;
 using eMU::streaming::gameserver::CharacterCreateResult;
 using eMU::streaming::dataserver::FaultIndication;
 using eMU::streaming::common::CharacterInfoContainer;
-using eMU::streaming::common::CharacterCreateInfo;
+using eMU::streaming::common::CharacterViewInfo;
 
 class GameserverTest: public ::testing::Test
 {
@@ -209,7 +209,7 @@ TEST_F(GameserverTest, WhenCharactersListResponseReceivedWithInvalidUserHashThen
 
 TEST_F(GameserverTest, CharacterCreate)
 {
-    CharacterCreateInfo characterCreateInfo("george", 5, 11, 122, 3, 7, 9, 53, 8);
+    CharacterViewInfo characterCreateInfo("george", 5, 11, 122, 3, 7, 9, 53, 8);
     IO_CHECK(connection_->getSocket().send(CharacterCreateRequest(characterCreateInfo).getWriteStream().getPayload()));
 
     ASSERT_TRUE(gameserverContext_.getClientConnection()->getSocket().isUnread());
@@ -242,7 +242,7 @@ TEST_F(GameserverTest, CharacterCreate)
 
 TEST_F(GameserverTest, WhenCharacterCreateResponseReceivedWithInvalidUserHashThenNothingHappens)
 {
-    IO_CHECK(connection_->getSocket().send(CharacterCreateRequest(CharacterCreateInfo("andrew", 1, 2, 3, 4, 5, 6, 7, 8)).getWriteStream().getPayload()));
+    IO_CHECK(connection_->getSocket().send(CharacterCreateRequest(CharacterViewInfo("andrew", 1, 2, 3, 4, 5, 6, 7, 8)).getWriteStream().getPayload()));
 
     ASSERT_TRUE(gameserverContext_.getClientConnection()->getSocket().isUnread());
     const ReadStream &characterCreateRequestStream = gameserverContext_.getClientConnection()->getSocket().receive();

@@ -10,16 +10,16 @@ namespace streaming
 namespace common
 {
 
-struct CharacterInfo
+struct CharacterListInfo
 {
-    CharacterInfo():
+    CharacterListInfo():
         level_(0),
         race_(0),
         hairType_(0),
         hairColor_(0),
         tutorialState_(0) {}
 
-    CharacterInfo(const std::string &name,
+    CharacterListInfo(const std::string &name,
                       uint8_t level,
                       uint8_t race,
                       uint8_t hairType,
@@ -40,7 +40,7 @@ struct CharacterInfo
     uint16_t tutorialState_;
 };
 
-typedef std::vector<CharacterInfo> CharacterInfoContainer;
+typedef std::vector<CharacterListInfo> CharacterInfoContainer;
 
 }
 }

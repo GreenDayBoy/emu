@@ -3,7 +3,7 @@
 #include <streaming/readStream.hpp>
 #include <streaming/writeStream.hpp>
 #include <core/network/tcp/networkUser.hpp>
-#include <streaming/common/characterCreateInfo.hpp>
+#include <streaming/common/characterViewInfo.hpp>
 
 #include <string>
 
@@ -20,12 +20,12 @@ public:
     CharacterCreateRequest(const ReadStream &readStream);
     CharacterCreateRequest(core::network::tcp::NetworkUser::Hash userHash,
                            const std::string &accountId,
-                           const common::CharacterCreateInfo &characterCreateInfo);
+                           const common::CharacterViewInfo &characterCreateInfo);
 
     const WriteStream& getWriteStream() const;
     core::network::tcp::NetworkUser::Hash getUserHash() const;
     const std::string& getAccountId() const;
-    const common::CharacterCreateInfo& getCharacterCreateInfo() const;
+    const common::CharacterViewInfo& getCharacterCreateInfo() const;
 
 private:
     ReadStream readStream_;
@@ -33,7 +33,7 @@ private:
 
     core::network::tcp::NetworkUser::Hash userHash_;
     std::string accountId_;
-    common::CharacterCreateInfo characterCreateInfo_;
+    common::CharacterViewInfo characterCreateInfo_;
 };
 
 }

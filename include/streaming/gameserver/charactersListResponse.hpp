@@ -2,7 +2,7 @@
 
 #include <streaming/readStream.hpp>
 #include <streaming/writeStream.hpp>
-#include <streaming/common/characterInfo.hpp>
+#include <streaming/common/characterListInfo.hpp>
 
 #include <string>
 

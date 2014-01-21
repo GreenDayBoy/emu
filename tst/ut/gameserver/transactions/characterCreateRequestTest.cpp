@@ -19,7 +19,7 @@ using eMU::core::network::Payload;
 using eMU::streaming::ReadStream;
 using eMU::gameserver::User;
 using eMU::streaming::dataserver::CharacterCreateRequest;
-using eMU::streaming::common::CharacterCreateInfo;
+using eMU::streaming::common::CharacterViewInfo;
 namespace streamIds = eMU::streaming::dataserver::streamIds;
 
 class GameserverCharacterCreateRequestTransactionTest: public ::testing::Test
@@ -27,7 +27,7 @@ class GameserverCharacterCreateRequestTransactionTest: public ::testing::Test
 protected:
     GameserverCharacterCreateRequestTransactionTest():
         accountId_("testtesttest"),
-        request_(ReadStream(eMU::streaming::gameserver::CharacterCreateRequest(CharacterCreateInfo("andrew", 1, 2, 3, 4, 5, 6, 7, 8)).getWriteStream().getPayload())),
+        request_(ReadStream(eMU::streaming::gameserver::CharacterCreateRequest(CharacterViewInfo("andrew", 1, 2, 3, 4, 5, 6, 7, 8)).getWriteStream().getPayload())),
         dataserverConnection_(new ConnectionMock()),
         connection_(new ConnectionMock()),
         user_(connection_) {}

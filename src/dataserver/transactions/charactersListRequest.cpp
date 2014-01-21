@@ -37,7 +37,7 @@ void CharactersListRequest::handleValid()
 
     for(const auto &row : queryResult.getRows())
     {
-        streaming::common::CharacterInfo character;
+        streaming::common::CharacterListInfo character;
         character.hairColor_ = row.getValue<uint32_t>("hairColor");
         character.hairType_ = row.getValue<uint32_t>("hairType");
         character.level_ = row.getValue<uint32_t>("level");
